@@ -1,0 +1,233 @@
+.network-stats {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 15px;
+
+  .network-header {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    align-items: center;
+
+    svg {
+      &.eth-logo {
+        color: gray;
+      }
+    }
+  }
+
+  .network-cards-container {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+
+    .card {
+      flex: 1;
+      max-width: 33%;
+      margin-top: 0px;
+    }
+    .network-stats-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+
+      .network-stat-col {
+        display: flex;
+        flex-direction: column;
+        font-size: 12px;
+        color: var(--light-text-color);
+
+        > span {
+          font-size: 20px;
+          color: black;
+          margin-top: -5px;
+        }
+        .client-status {
+          text-transform: capitalize;
+          font-size: 14px;
+          display: flex;
+          justify-content: center;
+
+          padding: 2px;
+          border-radius: 5px;
+          &.synced {
+            background-color: rgb(203, 241, 203);
+            color: green;
+          }
+          &.syncing {
+            background-color: rgb(255, 229, 204);
+            color: orange;
+          }
+        }
+      }
+
+      .network-card-header {
+        display: flex;
+        flex-direction: row;
+        gap: 5px;
+
+        .network-card-title {
+          color: var(--light-text-color);
+          margin-top: 1px;
+        }
+
+        .network-card-icon {
+          svg {
+            padding: 3px;
+            border-radius: 5px;
+
+            &.health-icon {
+              color: #0084ff;
+              background-color: #b6e5fa;
+            }
+            &.bolt-icon {
+              color: #6c3299;
+              background-color: #e5c4ff;
+            }
+            &.rewards-icon {
+              color: #017701;
+              background-color: #bce9bc;
+            }
+          }
+        }
+      }
+
+      .status-card-container,
+      .validators-card-container {
+        display: flex;
+        flex-direction: column;
+        padding: 0.5rem 0;
+
+        .status-client-row,
+        .validators-row {
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+        }
+        .status-client-row {
+          > div {
+            flex: 1;
+          }
+        }
+
+        .status-client-details {
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+        }
+
+        hr {
+          margin: 0.5rem 0;
+        }
+
+        .progress {
+          margin-top: 5px;
+          height: 10px;
+          .progress-bar {
+            background-color: orange;
+          }
+        }
+
+        .tooltip-beacon-api-error {
+          margin-bottom: 3px;
+          color: darkorange;
+        }
+      }
+
+      .signer-error-card {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 25px;
+
+        .error-message {
+          display: flex;
+          gap: 5px;
+          padding: 10px;
+          background-color: var(--color-light-background-main);
+          border-radius: 10px;
+          font-style: italic;
+          align-items: center;
+
+          .warning-icon {
+            color: darkorange;
+          }
+        }
+
+        .action-text {
+          margin-top: 5px;
+          color: var(--light-text-color);
+        }
+      }
+    }
+
+    @media (max-width: 65rem) {
+      flex-direction: column;
+      .card {
+        max-width: 100%;
+      }
+    }
+  }
+
+  .no-nodes-card {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+
+    > div {
+      font-size: 16px;
+    }
+  }
+}
+
+#dark {
+  #main {
+    .network-stats {
+      .network-cards-container {
+        .client-status {
+          &.synced {
+            background-color: green;
+            color: rgb(203, 241, 203);
+          }
+          &.syncing {
+            background-color: orange;
+            color: rgb(255, 229, 204);
+          }
+        }
+
+        .network-card-icon {
+          svg {
+            &.health-icon {
+              color: #9fddfa;
+              background-color: #0084ff;
+            }
+            &.bolt-icon {
+              color: #d4a1fd;
+              background-color: #6c3299;
+            }
+            &.rewards-icon {
+              color: #81b181;
+              background-color: #017701;
+            }
+          }
+        }
+
+        .progress {
+          background-color: #696969;
+        }
+
+        .signer-error-card {
+          .error-message {
+            background-color: var(--color-dark-background-main);
+          }
+        }
+      }
+    }
+  }
+}

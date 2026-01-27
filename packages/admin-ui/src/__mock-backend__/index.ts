@@ -56,6 +56,44 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
       progress: 0.83027522935
     }
   ],
+  nodeStatusGetByNetwork: async () => ({
+    mainnet: {
+      ec: {
+        name: "Nethermind",
+        dnp: "nethermind.dnp.dappnode.eth",
+        isSynced: true,
+        currentBlock: 23648945,
+        progress: 100,
+        peers: 50
+      },
+      cc: {
+        name: "Nimbus",
+        dnp: "nimbus.dnp.dappnode.eth",
+        isSynced: true,
+        currentBlock: 12875373,
+        progress: 100,
+        peers: 40
+      }
+    },
+    hoodi: {
+      ec: {
+        name: "besu",
+        dnp: "besu-hoodi.dnp.dappnode.eth",
+        isSynced: true,
+        currentBlock: 1480848,
+        progress: 100,
+        peers: 30
+      },
+      cc: {
+        name: "Prysm",
+        dnp: "prysm-hoodi.dnp.dappnode.eth",
+        isSynced: false,
+        currentBlock: 1592925,
+        progress: 100,
+        peers: 20
+      }
+    }
+  }),
   changeIpfsTimeout: async () => {},
   cleanCache: async () => {},
   cleanDb: async () => {},
@@ -411,6 +449,12 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
       gnosis: "prysm-gnosis.dnp.dappnode.eth"
     };
   },
+  executionClientsGetByNetworks: async () => {
+    return {
+      mainnet: "geth.dnp.dappnode.eth",
+      gnosis: "nethermind-xdai.dnp.dappnode.eth"
+    };
+  },
   premiumBeaconBackupActivate: async () => {},
   premiumBeaconBackupDeactivate: async () => {},
   premiumBeaconBackupStatus: async (): Promise<Record<string, BeaconBackupNetworkStatus>> => {
@@ -433,7 +477,45 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     mainnet: { validators: ["0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"] },
     hoodi: { validators: [] },
     gnosis: null
-  })
+  }),
+
+  validatorsFilterAttestingByNetwork: async () => ({
+    mainnet: { validators: ["0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"] },
+    hoodi: { validators: [] },
+    gnosis: null
+  }),
+
+  validatorsBalancesByNetwork: async () => ({
+    mainnet: {
+      balances: {
+        "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef": "32000000000"
+      }
+    },
+    hoodi: { balances: {} },
+    gnosis: null
+  }),
+
+  signerByNetworkGet: async () => ({
+    mainnet: {
+      isInstalled: true,
+      brainRunning: true
+    },
+    hoodi: {
+      isInstalled: true,
+      brainRunning: false
+    },
+    gnosis: {
+      isInstalled: false,
+      brainRunning: false
+    }
+  }),
+
+  beaconchaSharingConsentGet: async () => ({
+    mainnet: true,
+    hoodi: false
+  }),
+
+  beaconchaSharingConsentSet: async () => {}
 };
 
 export const calls: Routes = {

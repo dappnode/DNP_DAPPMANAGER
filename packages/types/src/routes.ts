@@ -56,6 +56,12 @@ import { TrustedReleaseKey } from "./pkg.js";
 import { OptimismConfigSet, OptimismConfigGet } from "./rollups.js";
 import { Network, StakerConfigGet, StakerConfigSet } from "./stakers.js";
 import { BeaconBackupActivationParams, BeaconBackupNetworkStatus } from "./beaconBackup.js";
+import {
+  BeaconchaSharingConsent,
+  DashboardSupportedNetwork,
+  NodeStatusByNetwork,
+  SignerStatus
+} from "./stakingDashboard.js";
 
 export interface Routes {
   /**
@@ -81,6 +87,18 @@ export interface Routes {
    * @returns fileId = "64020f6e8d2d02aa2324dab9cd68a8ccb186e192232814f79f35d4c2fbf2d1cc"
    */
   backupRestore: (kwargs: { dnpName: string; backup: PackageBackup[]; fileId: string }) => Promise<void>;
+
+  /**
+   * Returns the consent to share validators data for all supported networks
+   */
+  beaconchaSharingConsentGet(): Promise<BeaconchaSharingConsent>;
+
+  /**
+   * Sets the consent to share validators data for a given network
+   * @param network The network for which to set the consent
+   * @param consent The consent value
+   */
+  beaconchaSharingConsentSet(kwargs: { network: DashboardSupportedNetwork; consent: boolean }): Promise<void>;
 
   /**
    * Returns chain data for all installed packages declared as chains
@@ -138,6 +156,14 @@ export interface Routes {
    * @param network Network to get the consensus client for
    */
   consensusClientsGetByNetworks: (kwargs: {
+    networks: Network[];
+  }) => Promise<Partial<Record<Network, string | null | undefined>>>;
+
+  /**
+   * Returns the execution client for a given network
+   * @param network Network to get the execution client for
+   */
+  executionClientsGetByNetworks: (kwargs: {
     networks: Network[];
   }) => Promise<Partial<Record<Network, string | null | undefined>>>;
 
@@ -262,6 +288,7 @@ export interface Routes {
     subscriptionEndpoint?: string;
   }): Promise<void>;
 
+  nodeStatusGetByNetwork(kwargs: { networks: Network[] }): Promise<NodeStatusByNetwork>;
   /**
    * Get all the notifications
    */
@@ -759,6 +786,11 @@ export interface Routes {
   updateUpgrade: () => Promise<string>;
 
   /**
+   * Returns the signer status of the provided networks
+   */
+  signerByNetworkGet: (kwargs: { networks: Network[] }) => Promise<Partial<Record<Network, SignerStatus>>>;
+
+  /**
    * Return the current SSH port from sshd
    */
   sshPortGet: () => Promise<number>;
@@ -795,6 +827,23 @@ export interface Routes {
   validatorsFilterActiveByNetwork(kwargs: {
     networks: Network[];
   }): Promise<Partial<Record<Network, { validators: string[]; beaconError?: Error } | null>>>;
+
+  /**
+   * Returns the attesting validators for each network (using beacon liveness endpoint)
+   * @param networks List of networks
+   * @param epoch (optional) Beacon epoch to check liveness for (default: head)
+   */
+  validatorsFilterAttestingByNetwork: (kwargs: {
+    networks: Network[];
+  }) => Promise<Partial<Record<Network, { validators: string[]; beaconError?: Error } | null>>>;
+
+  /**
+   * Returns the balances for all validators for each network (as a map pubkey -> balance)
+   * @param networks List of networks
+   */
+  validatorsBalancesByNetwork: (kwargs: {
+    networks: Network[];
+  }) => Promise<Partial<Record<Network, { balances: Record<string, string>; beaconError?: Error } | null>>>;
 
   /**
    * Removes a docker volume by name
@@ -844,6 +893,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   autoUpdateSettingsEdit: {},
   backupGet: {},
   backupRestore: {},
+  beaconchaSharingConsentGet: {},
+  beaconchaSharingConsentSet: { log: true },
   chainDataGet: {},
   changeIpfsTimeout: {},
   cleanCache: {},
@@ -852,6 +903,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   stakerConfigGet: {},
   stakerConfigSet: { log: true },
   consensusClientsGetByNetworks: {},
+  executionClientsGetByNetworks: {},
   dappnodeWebNameSet: { log: true },
   deviceAdd: { log: true },
   deviceAdminToggle: { log: true },
@@ -872,6 +924,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   fetchDirectory: {},
   fetchRegistry: {},
   fetchDnpRequest: {},
+  nodeStatusGetByNetwork: {},
   notificationsSendCustom: {},
   notificationsGetAll: {},
   notificationsGetBanner: {},
@@ -948,6 +1001,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   releaseTrustedKeyRemove: { log: true },
   setShouldShownSmooth: {},
   getShouldShowSmooth: {},
+  signerByNetworkGet: {},
   setStaticIp: { log: true },
   statsCpuGet: {},
   statsDiskGet: {},
@@ -964,7 +1018,9 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   updateUpgrade: { log: true },
   natRenewalEnable: {},
   natRenewalIsEnabled: {},
-  validatorsFilterActiveByNetwork: { log: true },
+  validatorsFilterActiveByNetwork: {},
+  validatorsFilterAttestingByNetwork: {},
+  validatorsBalancesByNetwork: {},
   volumeRemove: { log: true },
   volumesGet: {},
   ipPublicGet: {},
