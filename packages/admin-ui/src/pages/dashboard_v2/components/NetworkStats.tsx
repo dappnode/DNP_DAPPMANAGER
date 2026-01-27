@@ -34,7 +34,12 @@ export default function NetworkStats() {
                 </div>
 
                 <div className="network-cards-container">
-                  <StatusCard network={network} data={data.nodeStatus} clientsLoading={clientsLoading} />
+                  <StatusCard
+                    network={network}
+                    data={data.nodeStatus}
+                    clientsLoading={clientsLoading}
+                    clientsDnps={data.clientsDnps}
+                  />
 
                   {data.hasValidators && (
                     <ValidatorsCard

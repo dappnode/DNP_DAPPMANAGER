@@ -19,6 +19,10 @@ export type NodeStatus = { ec: ClientData; cc: ClientData };
 
 export type NetworkStatus = {
   nodeStatus: NodeStatus | undefined;
+  clientsDnps?: {
+    ecDnp: string | null;
+    ccDnp: string | null;
+  };
   validators?: {
     total: number;
     balance: number;

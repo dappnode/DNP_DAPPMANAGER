@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router";
-import { NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { basePath as stakersBasePath, relativePath as stakersPath } from "pages/stakers";
+import { relativePath as packagesRelativePath } from "pages/packages";
 import { DashboardSupportedNetwork, Network, NetworkStatus, NodeStatus } from "@dappnode/types";
 import newTabProps from "utils/newTabProps";
 import { gweiToToken } from "utils/gweiToToken";
@@ -37,11 +38,16 @@ const NetworkCard = ({
 export const StatusCard = ({
   network,
   data,
-  clientsLoading
+  clientsLoading,
+  clientsDnps
 }: {
   network: string;
   data: NodeStatus | undefined;
   clientsLoading: boolean;
+  clientsDnps?: {
+    ecDnp: string | null;
+    ccDnp: string | null;
+  };
 }) => {
   const navigate = useNavigate();
   const execution = data && data.ec;
@@ -57,7 +63,15 @@ export const StatusCard = ({
               <div className="status-client-row">
                 <div className="network-stat-col">
                   <div>EXECUTION</div>
-                  <span>{capitalize(execution.name ?? "-")}</span>
+                  <span>
+                    {clientsDnps?.ecDnp ? (
+                      <Link to={`/${packagesRelativePath}/${clientsDnps.ecDnp}/info`}>
+                        {capitalize(execution.name ?? "-")}
+                      </Link>
+                    ) : (
+                      capitalize(execution.name ?? "-")
+                    )}
+                  </span>
                 </div>
                 <div className="status-client-details">
                   <div className="network-stat-col">
@@ -82,7 +96,15 @@ export const StatusCard = ({
                 <>
                   <div className="network-stat-col">
                     <div>CONSENSUS</div>
-                    <span>{capitalize(consensus.name ?? "-")}</span>
+                    <span>
+                      {clientsDnps?.ccDnp ? (
+                        <Link to={`/${packagesRelativePath}/${clientsDnps.ccDnp}/info`}>
+                          {capitalize(consensus.name ?? "-")}
+                        </Link>
+                      ) : (
+                        capitalize(consensus.name ?? "-")
+                      )}
+                    </span>
                   </div>
                   <div className="status-client-details">
                     <div className="network-stat-col">
@@ -282,7 +304,7 @@ export const NoNodesCard = () => {
         <h5>No nodes configured yet!</h5>
         <div>You haven't set up a node on any network.</div>
         <div>
-          Set up your nodes from the <NavLink to={`/${stakersPath}`}>Stakers tab</NavLink>.
+          Set up your nodes from the <Link to={`/${stakersPath}`}>Stakers tab</Link>.
         </div>
       </div>
     </Card>
