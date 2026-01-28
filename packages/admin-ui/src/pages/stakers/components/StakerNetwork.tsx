@@ -22,6 +22,7 @@ import { docsSmooth } from "params";
 import { BsInfoCircleFill } from "react-icons/bs";
 import { CustomAccordion, CustomAccordionItem } from "components/CustomAccordion";
 import { Link } from "react-router-dom";
+import BackupNodeModal, { useBackupNodeModal } from "components/modals/BackupNodeModal";
 
 import "./stakers.scss";
 
@@ -48,27 +49,30 @@ export default function StakerNetwork({ network, description }: { network: Netwo
     changes
   } = useStakerConfig(network, currentStakerConfigReq);
 
+  const isExecutionChanged =
+    newExecClient?.dnpName !==
+    currentStakerConfigReq.data?.executionClients.find((ec) => ec.status === "ok" && ec.isSelected)?.dnpName;
+
+  const isSignerSelected = Boolean(newWeb3signer?.isSelected);
+
+  // Backup node modal hook
+  const { show, onClose, showBackupNodeModal } = useBackupNodeModal(network, isExecutionChanged, isSignerSelected);
+
   /**
    * Set new staker config
    */
   async function setNewConfig(isLaunchpad: boolean) {
+    let showToast = false;
     try {
       // Make sure there are changes
       if (changes) {
         // TODO: Ask for removing the previous Execution Client and/or Consensus Client if its different
+        const backupModalContinue = await showBackupNodeModal();
+        if (!backupModalContinue) {
+          return;
+        }
+
         if (!isLaunchpad) {
-          await new Promise((resolve: (confirmOnSetConfig: boolean) => void) => {
-            confirm({
-              title: `Staker configuration`,
-              text: "Are you sure you want to implement this staker configuration?",
-              buttons: [
-                {
-                  label: "Continue",
-                  onClick: () => resolve(true)
-                }
-              ]
-            });
-          });
           await new Promise((resolve: (confirmOnSetConfig: boolean) => void) => {
             confirm({
               title: `Disclaimer`,
@@ -76,6 +80,7 @@ export default function StakerNetwork({ network, description }: { network: Netwo
               buttons: [
                 {
                   label: "Continue",
+                  variant: "dappnode",
                   onClick: () => resolve(true)
                 }
               ]
@@ -104,22 +109,28 @@ export default function StakerNetwork({ network, description }: { network: Netwo
           }
         );
         setReqStatus({ result: true });
+        showToast = true;
       }
     } catch (e) {
       setReqStatus({ error: e });
+      showToast = true;
     } finally {
-      setReqStatus({ loading: true });
-      await withToast(() => currentStakerConfigReq.revalidate(), {
-        message: `Getting new ${network} staker configuration`,
-        onSuccess: `Successfully loaded ${network} staker configuration`,
-        onError: `Error new loading ${network} staker configuration`
-      });
-      setReqStatus({ loading: false });
+      if (showToast) {
+        setReqStatus({ loading: true });
+        await withToast(() => currentStakerConfigReq.revalidate(), {
+          message: `Getting new ${network} staker configuration`,
+          onSuccess: `Successfully loaded ${network} staker configuration`,
+          onError: `Error new loading ${network} staker configuration`
+        });
+        setReqStatus({ loading: false });
+      }
     }
   }
 
   return (
     <div className="staker-network-container">
+      <BackupNodeModal show={show} onClose={onClose} />
+
       {network === Network.Prater && (
         <AlertDismissible variant="warning">
           <p>
@@ -204,7 +215,7 @@ export default function StakerNetwork({ network, description }: { network: Netwo
                   />
                 ))}
               </Col>
-              
+
               {/* Only shows consensus clients if data is available */}
               {currentStakerConfigReq.data.consensusClients.length > 0 && (
                 <Col>
