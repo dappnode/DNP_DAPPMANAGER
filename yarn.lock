@@ -1051,7 +1051,6 @@ __metadata:
     "@dappnode/chains": "workspace:^0.1.0"
     "@dappnode/common": "workspace:^0.1.0"
     "@dappnode/daemons": "workspace:^0.1.0"
-    "@dappnode/dashboard-server": "workspace:^0.1.0"
     "@dappnode/db": "workspace:^0.1.0"
     "@dappnode/dockerapi": "workspace:^0.1.0"
     "@dappnode/dockercompose": "workspace:^0.1.0"
