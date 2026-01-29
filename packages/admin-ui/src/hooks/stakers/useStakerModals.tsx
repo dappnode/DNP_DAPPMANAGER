@@ -1,7 +1,5 @@
 import { useRef, useState } from "react";
 import { Network } from "@dappnode/types";
-import { confirm } from "components/ConfirmDialog";
-import { disclaimer } from "pages/stakers/data";
 import { usePremium } from "hooks/premium/usePremium";
 import { useBackupNodeData } from "hooks/premium/useBackupNodeData";
 
@@ -20,8 +18,10 @@ export function useStakerModals({ network, isExecutionChanged, isSignerSelected 
   const { backupData } = useBackupNodeData({ hashedLicense, isPremiumActivated: isPremium });
   const [showNonPremiumModal, setShowNonPremiumModal] = useState(false);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [showDisclaimerModal, setShowDisclaimerModal] = useState(false);
   const modalResolveRef = useRef<((value: boolean) => void) | null>(null);
   const nonPremiumModalResolveRef = useRef<((value: boolean) => void) | null>(null);
+  const disclaimerModalResolveRef = useRef<((value: boolean) => void) | null>(null);
 
   /**
    * Handles the premium modal close action
@@ -42,6 +42,17 @@ export function useStakerModals({ network, isExecutionChanged, isSignerSelected 
     if (nonPremiumModalResolveRef.current) {
       nonPremiumModalResolveRef.current(shouldContinue);
       nonPremiumModalResolveRef.current = null;
+    }
+  };
+
+  /**
+   * Handles the disclaimer modal close action
+   */
+  const handleDisclaimerModalClose = (accepted: boolean) => {
+    setShowDisclaimerModal(false);
+    if (disclaimerModalResolveRef.current) {
+      disclaimerModalResolveRef.current(accepted);
+      disclaimerModalResolveRef.current = null;
     }
   };
 
@@ -79,23 +90,15 @@ export function useStakerModals({ network, isExecutionChanged, isSignerSelected 
   }
 
   /**
-   * Shows the disclaimer confirmation dialog
-   * @returns Promise that resolves when user continues
+   * Shows the disclaimer modal
+   * @returns Promise that resolves to true if user accepts, false if they decline
    */
-  async function showDisclaimerModal(): Promise<void> {
-    await new Promise((resolve: (confirmOnSetConfig: boolean) => void) => {
-      confirm({
-        title: `Disclaimer`,
-        text: disclaimer,
-        buttons: [
-          {
-            label: "Continue",
-            variant: "dappnode",
-            onClick: () => resolve(true)
-          }
-        ]
-      });
+  async function displayDisclaimerModal(): Promise<boolean> {
+    const accepted = await new Promise<boolean>((resolve) => {
+      disclaimerModalResolveRef.current = resolve;
+      setShowDisclaimerModal(true);
     });
+    return accepted;
   }
 
   /**
@@ -112,21 +115,27 @@ export function useStakerModals({ network, isExecutionChanged, isSignerSelected 
       return false;
     }
 
-    // Step 3: Show disclaimer (unless coming from launchpad)
+    // Step 2: Show disclaimer (unless coming from launchpad)
     if (!isLaunchpad) {
-      await showDisclaimerModal();
+      const userAcceptedDisclaimer = await displayDisclaimerModal();
+      if (!userAcceptedDisclaimer) {
+        return false;
+      }
     }
 
     return true;
   }
 
   return {
-    // Premium modal UI state
+    // Non-premium modal UI state
     nonPremiumModalShow: showNonPremiumModal,
     nonPremiumModalOnClose: handleNonPremiumModalClose,
-    // Non-premium modal UI state
+    // Premium modal UI state
     premiumModalShow: showPremiumModal,
     premiumModalOnClose: handlePremiumModalClose,
+    // Disclaimer modal UI state
+    disclaimerModalShow: showDisclaimerModal,
+    disclaimerModalOnClose: handleDisclaimerModalClose,
     // Main flow function
     modalsFlowStart
   };

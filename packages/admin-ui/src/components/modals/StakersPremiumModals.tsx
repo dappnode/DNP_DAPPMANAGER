@@ -5,9 +5,12 @@ import { useNavigate } from "react-router-dom";
 import {
   relativePath as premiumRelativePath,
   basePath as premiumBasePath,
-  subPaths as premiumsubpaths
+  subPaths as premiumsubPaths
 } from "pages/premium/data";
 import { premiumLanding } from "params";
+
+// Export the disclaimer modal
+export { StakerDisclaimerModal } from "./StakerDisclaimerModal";
 
 interface UpgradeToPremiumModal {
   show: boolean;
@@ -64,7 +67,7 @@ export function ActivateBackupModal({ show, onClose }: NonPremiumUserModalProps)
   const navigate = useNavigate();
 
   const navigateToBackupTab = () => {
-    navigate(`/${premiumBasePath}/${premiumsubpaths.backupNode}`);
+    navigate(`/${premiumBasePath}/${premiumsubPaths.backupNode}`);
     onClose(false); // Abort the flow
   };
 
