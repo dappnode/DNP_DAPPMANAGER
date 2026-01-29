@@ -19,18 +19,6 @@ interface UpgradeToPremiumModal {
  *
  * This modal is used to prompt users to upgrade to Premium when changing execution clients.
  *
- *  Primary Button ("Upgrade to Premium")
- *   - Navigates to the premium tab
- *   - Calls onClose(false) to abort the flow
- *
- *  Secondary Button ("Learn More")
- *   - Opens the external documentation link in a new tab
- *   - Does NOT close the modal
- *   - User can read the landing page and come back to the modal
- *
- *  Close Button (X) or Backdrop Click
- *   - Calls onClose(true) to continue with the flow
- *
  */
 
 export function UpgradeToPremiumModal({ show, onClose }: UpgradeToPremiumModal) {
@@ -64,18 +52,7 @@ export function UpgradeToPremiumModal({ show, onClose }: UpgradeToPremiumModal) 
  * PremiumUserModal component
  *
  * This modal is shown to premium users when changing execution clients.
- * It reminds the user that they have backup protection
- *
- *  Primary Button ("Continue")
- *   - Calls onClose(true) to continue with the flow
- *
- *  Secondary Button ("Learn More")
- *   - Opens the external documentation link in a new tab
- *   - Does NOT close the modal
- *
- *  Close Button (X) or Backdrop Click
- *   - Calls onClose(true) to continue with the flow
- *
+ * It reminds the user that they have backup protection available
  */
 
 interface NonPremiumUserModalProps {
@@ -100,11 +77,11 @@ export function ActivateBackupModal({ show, onClose }: NonPremiumUserModalProps)
       imageSrc={dappnodeServerShield}
       imageAlt="Dappnode Server Shield"
       primaryButtonText="Activate Backup"
-      primaryButtonAction={navigateToBackupTab} // Continue with the flow
+      primaryButtonAction={navigateToBackupTab} // Navigate to backup tab
       secondaryButton={{
         type: "action",
         text: "Skip",
-        action: () => onClose(true) // Continue with the flow
+        action: () => onClose(true) // Continue with the stakers flow
       }}
     />
   );
