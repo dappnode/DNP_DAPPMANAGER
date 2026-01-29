@@ -16,13 +16,14 @@ import Loading from "components/Loading";
 import { Alert } from "react-bootstrap";
 import { AppContext } from "App";
 import { Network } from "@dappnode/types";
-import { useStakerConfig } from "./useStakerConfig";
 import { AlertDismissible } from "components/AlertDismissible";
 import { docsSmooth } from "params";
 import { BsInfoCircleFill } from "react-icons/bs";
 import { CustomAccordion, CustomAccordionItem } from "components/CustomAccordion";
 import { Link } from "react-router-dom";
-import BackupNodeModal, { useBackupNodeModal } from "components/modals/BackupNodeModal";
+import { useStakerConfig } from "hooks/stakers/useStakerConfig";
+import { UpgradeToPremiumModal } from "components/modals/BackupNodeModal";
+import { useStakersUpgradePremiumModal } from "hooks/stakers/useStakersModals";
 
 import "./stakers.scss";
 
@@ -56,7 +57,11 @@ export default function StakerNetwork({ network, description }: { network: Netwo
   const isSignerSelected = Boolean(newWeb3signer?.isSelected);
 
   // Backup node modal hook
-  const { show, onClose, showBackupNodeModal } = useBackupNodeModal(network, isExecutionChanged, isSignerSelected);
+  const { show, onClose, showPremiumUpgradeModal } = useStakersUpgradePremiumModal(
+    network,
+    isExecutionChanged,
+    isSignerSelected
+  );
 
   /**
    * Set new staker config
@@ -67,7 +72,7 @@ export default function StakerNetwork({ network, description }: { network: Netwo
       // Make sure there are changes
       if (changes) {
         // TODO: Ask for removing the previous Execution Client and/or Consensus Client if its different
-        const backupModalContinue = await showBackupNodeModal();
+        const backupModalContinue = await showPremiumUpgradeModal();
         if (!backupModalContinue) {
           return;
         }
@@ -129,7 +134,7 @@ export default function StakerNetwork({ network, description }: { network: Netwo
 
   return (
     <div className="staker-network-container">
-      <BackupNodeModal show={show} onClose={onClose} />
+      <UpgradeToPremiumModal show={show} onClose={onClose} />
 
       {network === Network.Prater && (
         <AlertDismissible variant="warning">
