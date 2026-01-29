@@ -1,7 +1,7 @@
 import { params } from "@dappnode/params";
 import { runOnlyOneSequentially, runAtMostEvery } from "@dappnode/utils";
 import { logs } from "@dappnode/logger";
-import { checkDashboardServerStatus } from "./checkDashboardServerStatus.js";
+import { checkAndSyncValidators } from "./checkAndSyncValidators.js";
 
 /**
  * Run the Dashboard Server daemon.
@@ -26,14 +26,14 @@ export function startDashboardServerDaemon(signal: AbortSignal): void {
 
   const runDashboardServerTaskMemo = runOnlyOneSequentially(async () => {
     try {
-      await checkDashboardServerStatus();
+      await checkAndSyncValidators();
     } catch (e) {
       logs.error("Error on dashboard server daemon", e);
     }
   });
 
   // Run periodically at the poll interval (default 2 minutes)
-  // The checkDashboardServerStatus function handles both change detection
+  // The checkAndSyncValidators function handles both change detection
   // and interval-based posting internally
   runAtMostEvery(
     async () => runDashboardServerTaskMemo(),
