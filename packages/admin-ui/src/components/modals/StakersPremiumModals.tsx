@@ -100,7 +100,7 @@ export function ActivateBackupModal({ show, onClose }: NonPremiumUserModalProps)
       imageSrc={dappnodeServerShield}
       imageAlt="Dappnode Server Shield"
       primaryButtonText="Activate Backup"
-      primaryButtonAction={() => navigateToBackupTab} // Continue with the flow
+      primaryButtonAction={navigateToBackupTab} // Continue with the flow
       secondaryButton={{
         type: "action",
         text: "Skip",

@@ -60,8 +60,8 @@ export function useStakerModals({ network, isExecutionChanged, isSignerSelected 
             modalResolveRef.current = resolve;
             setShowNonPremiumModal(true);
           }
-          return shouldContinue;
         });
+        return shouldContinue;
       }
     }
 
