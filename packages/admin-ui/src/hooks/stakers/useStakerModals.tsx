@@ -3,6 +3,7 @@ import { Network } from "@dappnode/types";
 import { confirm } from "components/ConfirmDialog";
 import { disclaimer } from "pages/stakers/data";
 import { usePremium } from "hooks/premium/usePremium";
+import { useBackupNodeData } from "hooks/premium/useBackupNodeData";
 
 interface UseStakerConfigFlowParams {
   network: Network;
@@ -15,7 +16,8 @@ interface UseStakerConfigFlowParams {
  * This is the single source of truth for all modal logic in the staker configuration
  */
 export function useStakerModals({ network, isExecutionChanged, isSignerSelected }: UseStakerConfigFlowParams) {
-  const { isActivated: isPremium } = usePremium();
+  const { isActivated: isPremium, hashedLicense } = usePremium();
+  const { backupData } = useBackupNodeData({ hashedLicense, isPremiumActivated: isPremium });
   const [showNonPremiumModal, setShowNonPremiumModal] = useState(false);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const modalResolveRef = useRef<((value: boolean) => void) | null>(null);
@@ -54,8 +56,15 @@ export function useStakerModals({ network, isExecutionChanged, isSignerSelected 
       if (network === Network.Mainnet || network === Network.Gnosis || network === Network.Hoodi) {
         const shouldContinue = await new Promise<boolean>((resolve) => {
           if (isPremium) {
-            nonPremiumModalResolveRef.current = resolve;
-            setShowPremiumModal(true);
+            // Check if Backup Node isn't already active and is activable for this network
+            const networkBackupData = backupData[network];
+            if (!networkBackupData?.isActive && networkBackupData?.isActivable) {
+              nonPremiumModalResolveRef.current = resolve;
+              setShowPremiumModal(true);
+            } else {
+              // Continue without showing modal
+              resolve(true);
+            }
           } else {
             modalResolveRef.current = resolve;
             setShowNonPremiumModal(true);
