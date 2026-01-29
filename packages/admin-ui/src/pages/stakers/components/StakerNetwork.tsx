@@ -20,7 +20,11 @@ import { BsInfoCircleFill } from "react-icons/bs";
 import { CustomAccordion, CustomAccordionItem } from "components/CustomAccordion";
 import { Link } from "react-router-dom";
 import { useStakerConfig } from "hooks/stakers/useStakerConfig";
-import { UpgradeToPremiumModal, ActivateBackupModal, StakerDisclaimerModal } from "components/modals/StakersPremiumModals";
+import {
+  UpgradeToPremiumModal,
+  ActivateBackupModal,
+  StakerDisclaimerModal
+} from "components/modals/StakersPremiumModals";
 import { useStakerModals } from "hooks/stakers/useStakerModals";
 
 import "./stakers.scss";

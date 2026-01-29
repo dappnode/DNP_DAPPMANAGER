@@ -31,7 +31,7 @@
   border: none;
   cursor: pointer;
   transition: background-color 0.2s ease;
-  
+
   &:hover {
     background-color: var(--background-secondary);
   }
@@ -66,7 +66,7 @@
 .modern-accordion-content {
   overflow: hidden;
   transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
-  
+
   &.collapsed {
     max-height: 0;
     opacity: 0;

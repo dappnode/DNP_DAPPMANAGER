@@ -4,7 +4,7 @@ import "./modernAccordion.scss";
 
 /**
  * ModernAccordion - A reusable accordion component with modern styling
- * 
+ *
  * @example
  * // Simple usage with string content
  * <ModernAccordion
@@ -14,7 +14,7 @@ import "./modernAccordion.scss";
  *   ]}
  *   allowMultipleOpen={true}
  * />
- * 
+ *
  * @example
  * // With default open sections
  * <ModernAccordion

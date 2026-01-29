@@ -22,17 +22,20 @@ const parseTermsSections = (termsList: string[]) => {
     const lines = text.split("\n");
     // Remove ## from title
     const title = lines[0].replace(/^##\s*/, "").trim();
-    const content = lines.slice(1).join("\n").trim();
-    
+    const content = lines
+      .slice(1)
+      .join("\n")
+      .trim();
+
     // Convert content to React elements
     const contentElements = (
       <>
-        {content.split('\n\n').map((paragraph, index) => (
+        {content.split("\n\n").map((paragraph, index) => (
           <p key={index}>{paragraph}</p>
         ))}
       </>
     );
-    
+
     items.push({ title, content: contentElements });
   }
 
@@ -73,9 +76,12 @@ export function StakerDisclaimerModal({ show, onClose }: StakerDisclaimerModalPr
           <p>
             <strong>Last updated: January 28, 2026</strong>
           </p>
-          {intro.split('\n\n').slice(1).map((paragraph, index) => (
-            <p key={index}>{paragraph.replace(/\*\*/g, '')}</p>
-          ))}
+          {intro
+            .split("\n\n")
+            .slice(1)
+            .map((paragraph, index) => (
+              <p key={index}>{paragraph.replace(/\*\*/g, "")}</p>
+            ))}
         </div>
 
         <div className="disclaimer-sections">
