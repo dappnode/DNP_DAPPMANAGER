@@ -16,17 +16,30 @@ interface UseStakerConfigFlowParams {
  */
 export function useStakerModals({ network, isExecutionChanged, isSignerSelected }: UseStakerConfigFlowParams) {
   const { isActivated: isPremium } = usePremium();
+  const [showNonPremiumModal, setShowNonPremiumModal] = useState(false);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const modalResolveRef = useRef<((value: boolean) => void) | null>(null);
+  const nonPremiumModalResolveRef = useRef<((value: boolean) => void) | null>(null);
 
   /**
    * Handles the premium modal close action
    */
-  const handlePremiumModalClose = (shouldContinue: boolean) => {
-    setShowPremiumModal(false);
+  const handleNonPremiumModalClose = (shouldContinue: boolean) => {
+    setShowNonPremiumModal(false);
     if (modalResolveRef.current) {
       modalResolveRef.current(shouldContinue);
       modalResolveRef.current = null;
+    }
+  };
+
+  /**
+   * Handles the non-premium modal close action
+   */
+  const handlePremiumModalClose = (shouldContinue: boolean) => {
+    setShowPremiumModal(false);
+    if (nonPremiumModalResolveRef.current) {
+      nonPremiumModalResolveRef.current(shouldContinue);
+      nonPremiumModalResolveRef.current = null;
     }
   };
 
@@ -37,16 +50,18 @@ export function useStakerModals({ network, isExecutionChanged, isSignerSelected 
   async function displayPremiumModals(): Promise<boolean> {
     // Only check if execution changed AND signer is selected
     if (isExecutionChanged && isSignerSelected) {
-      // Only for non-premium users
-      if (!isPremium) {
-        // Only show modal for certain networks
-        if (network === Network.Mainnet || network === Network.Gnosis || network === Network.Hoodi) {
-          const shouldContinue = await new Promise<boolean>((resolve) => {
-            modalResolveRef.current = resolve;
+      // Only show modal for networks with Backup Node support
+      if (network === Network.Mainnet || network === Network.Gnosis || network === Network.Hoodi) {
+        const shouldContinue = await new Promise<boolean>((resolve) => {
+          if (isPremium) {
+            nonPremiumModalResolveRef.current = resolve;
             setShowPremiumModal(true);
-          });
+          } else {
+            modalResolveRef.current = resolve;
+            setShowNonPremiumModal(true);
+          }
           return shouldContinue;
-        }
+        });
       }
     }
 
@@ -82,13 +97,13 @@ export function useStakerModals({ network, isExecutionChanged, isSignerSelected 
    * @returns true if user approved all steps, false if they aborted
    */
   async function modalsFlowStart(isLaunchpad: boolean): Promise<boolean> {
-    // Step 1: Check if user needs to upgrade to premium
+    // Step 1: Premium modals
     const userApprovedPremium = await displayPremiumModals();
     if (!userApprovedPremium) {
       return false;
     }
 
-    // Step 2: Show disclaimer (unless coming from launchpad)
+    // Step 3: Show disclaimer (unless coming from launchpad)
     if (!isLaunchpad) {
       await showDisclaimerModal();
     }
@@ -98,6 +113,9 @@ export function useStakerModals({ network, isExecutionChanged, isSignerSelected 
 
   return {
     // Premium modal UI state
+    nonPremiumModalShow: showNonPremiumModal,
+    nonPremiumModalOnClose: handleNonPremiumModalClose,
+    // Non-premium modal UI state
     premiumModalShow: showPremiumModal,
     premiumModalOnClose: handlePremiumModalClose,
     // Main flow function

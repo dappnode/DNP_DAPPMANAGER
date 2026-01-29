@@ -20,7 +20,7 @@ import { BsInfoCircleFill } from "react-icons/bs";
 import { CustomAccordion, CustomAccordionItem } from "components/CustomAccordion";
 import { Link } from "react-router-dom";
 import { useStakerConfig } from "hooks/stakers/useStakerConfig";
-import { UpgradeToPremiumModal } from "components/modals/BackupNodeModal";
+import { UpgradeToPremiumModal, ActivateBackupModal } from "components/modals/StakersPremiumModals";
 import { useStakerModals } from "hooks/stakers/useStakerModals";
 
 import "./stakers.scss";
@@ -55,7 +55,13 @@ export default function StakerNetwork({ network, description }: { network: Netwo
   const isSignerSelected = Boolean(newWeb3signer?.isSelected);
 
   // Configuration flow with modals
-  const { premiumModalShow, premiumModalOnClose, modalsFlowStart } = useStakerModals({
+  const {
+    nonPremiumModalShow,
+    nonPremiumModalOnClose,
+    premiumModalShow,
+    premiumModalOnClose,
+    modalsFlowStart
+  } = useStakerModals({
     network,
     isExecutionChanged,
     isSignerSelected
@@ -117,7 +123,8 @@ export default function StakerNetwork({ network, description }: { network: Netwo
 
   return (
     <div className="staker-network-container">
-      <UpgradeToPremiumModal show={premiumModalShow} onClose={premiumModalOnClose} />
+      <UpgradeToPremiumModal show={nonPremiumModalShow} onClose={nonPremiumModalOnClose} />
+      <ActivateBackupModal show={premiumModalShow} onClose={premiumModalOnClose} />
 
       {network === Network.Prater && (
         <AlertDismissible variant="warning">
