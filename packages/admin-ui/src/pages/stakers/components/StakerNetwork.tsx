@@ -5,13 +5,11 @@ import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import { api, useApi } from "api";
 import ErrorView from "components/ErrorView";
-import { confirm } from "components/ConfirmDialog";
 import MevBoost from "./columns/MevBoost";
 import RemoteSigner from "./columns/RemoteSigner";
 import ConsensusClient from "./columns/ConsensusClient";
 import ExecutionClient from "./columns/ExecutionClient";
 import Button from "components/Button";
-import { disclaimer } from "../data";
 import Loading from "components/Loading";
 import { Alert } from "react-bootstrap";
 import { AppContext } from "App";
@@ -23,7 +21,7 @@ import { CustomAccordion, CustomAccordionItem } from "components/CustomAccordion
 import { Link } from "react-router-dom";
 import { useStakerConfig } from "hooks/stakers/useStakerConfig";
 import { UpgradeToPremiumModal } from "components/modals/BackupNodeModal";
-import { useStakersUpgradePremiumModal } from "hooks/stakers/useStakersModals";
+import { useStakerModals } from "hooks/stakers/useStakerModals";
 
 import "./stakers.scss";
 
@@ -56,12 +54,12 @@ export default function StakerNetwork({ network, description }: { network: Netwo
 
   const isSignerSelected = Boolean(newWeb3signer?.isSelected);
 
-  // Backup node modal hook
-  const { show, onClose, showPremiumUpgradeModal } = useStakersUpgradePremiumModal(
+  // Configuration flow with modals
+  const { premiumModalShow, premiumModalOnClose, modalsFlowStart } = useStakerModals({
     network,
     isExecutionChanged,
     isSignerSelected
-  );
+  });
 
   /**
    * Set new staker config
@@ -71,28 +69,13 @@ export default function StakerNetwork({ network, description }: { network: Netwo
     try {
       // Make sure there are changes
       if (changes) {
-        // TODO: Ask for removing the previous Execution Client and/or Consensus Client if its different
-        const backupModalContinue = await showPremiumUpgradeModal();
-        if (!backupModalContinue) {
-          return;
+        // Request user input through all required modals
+        const userApproved = await modalsFlowStart(isLaunchpad);
+        if (!userApproved) {
+          return; // User aborted the flow
         }
 
-        if (!isLaunchpad) {
-          await new Promise((resolve: (confirmOnSetConfig: boolean) => void) => {
-            confirm({
-              title: `Disclaimer`,
-              text: disclaimer,
-              buttons: [
-                {
-                  label: "Continue",
-                  variant: "dappnode",
-                  onClick: () => resolve(true)
-                }
-              ]
-            });
-          });
-        }
-
+        // Apply the configuration changes
         setReqStatus({ loading: true });
         await withToast(
           () =>
@@ -134,7 +117,7 @@ export default function StakerNetwork({ network, description }: { network: Netwo
 
   return (
     <div className="staker-network-container">
-      <UpgradeToPremiumModal show={show} onClose={onClose} />
+      <UpgradeToPremiumModal show={premiumModalShow} onClose={premiumModalOnClose} />
 
       {network === Network.Prater && (
         <AlertDismissible variant="warning">
