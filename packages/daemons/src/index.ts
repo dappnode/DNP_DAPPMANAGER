@@ -1,5 +1,6 @@
 import { DappnodeInstaller } from "@dappnode/installer";
 import { startAutoUpdatesDaemon } from "./autoUpdates/index.js";
+import { startDashboardServerDaemon } from "./dashboardServer/index.js";
 import { startDiskUsageDaemon } from "./diskUsage/index.js";
 import { startDynDnsDaemon } from "./dyndns/index.js";
 import { startEthicalMetricsDaemon } from "./ethicalMetrics/index.js";
@@ -25,7 +26,7 @@ export function startDaemons(
   signal: AbortSignal
 ): void {
   // Increase the max listeners for AbortSignal. default is 10
-  setMaxListeners(12, signal);
+  setMaxListeners(13, signal);
 
   startAutoUpdatesDaemon(dappnodeInstaller, signal);
   startDiskUsageDaemon(signal);
@@ -39,6 +40,7 @@ export function startDaemons(
   startHostRebootDaemon(signal);
   startRepositoryHealthDaemon(signal);
   startDockerNetworkConfigsDaemon(signal, execution, consensus, signer, mevBoost);
+    startDashboardServerDaemon(signal);
 }
 
 export { startAvahiDaemon } from "./avahi/index.js";
