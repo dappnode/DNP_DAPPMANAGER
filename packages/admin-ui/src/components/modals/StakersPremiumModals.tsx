@@ -5,9 +5,12 @@ import { useNavigate } from "react-router-dom";
 import {
   relativePath as premiumRelativePath,
   basePath as premiumBasePath,
-  subPaths as premiumsubpaths
+  subPaths as premiumSubPaths
 } from "pages/premium/data";
 import { premiumLanding } from "params";
+
+// Export the disclaimer modal
+export { StakerDisclaimerModal } from "./StakerDisclaimerModal";
 
 interface UpgradeToPremiumModal {
   show: boolean;
@@ -64,7 +67,7 @@ export function ActivateBackupModal({ show, onClose }: NonPremiumUserModalProps)
   const navigate = useNavigate();
 
   const navigateToBackupTab = () => {
-    navigate(`/${premiumBasePath}/${premiumsubpaths.backupNode}`);
+    navigate(`/${premiumBasePath}/${premiumSubPaths.backupNode}`);
     onClose(false); // Abort the flow
   };
 
@@ -72,7 +75,7 @@ export function ActivateBackupModal({ show, onClose }: NonPremiumUserModalProps)
     <BasePromotionModal
       show={show}
       onClose={() => onClose(true)} // Continue with the flow when closing
-      title="Premium ensures you won't lose your rewards"
+      title="Premium protects your rewards while syncing"
       description=" Since you are a Premium user, do not forget to activate your Backup node to avoid downtime while your execution client is syncing."
       imageSrc={dappnodeServerShield}
       imageAlt="Dappnode Server Shield"

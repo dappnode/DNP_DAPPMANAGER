@@ -20,7 +20,11 @@ import { BsInfoCircleFill } from "react-icons/bs";
 import { CustomAccordion, CustomAccordionItem } from "components/CustomAccordion";
 import { Link } from "react-router-dom";
 import { useStakerConfig } from "hooks/stakers/useStakerConfig";
-import { UpgradeToPremiumModal, ActivateBackupModal } from "components/modals/StakersPremiumModals";
+import {
+  UpgradeToPremiumModal,
+  ActivateBackupModal,
+  StakerDisclaimerModal
+} from "components/modals/StakersPremiumModals";
 import { useStakerModals } from "hooks/stakers/useStakerModals";
 
 import "./stakers.scss";
@@ -60,6 +64,8 @@ export default function StakerNetwork({ network, description }: { network: Netwo
     nonPremiumModalOnClose,
     premiumModalShow,
     premiumModalOnClose,
+    disclaimerModalShow,
+    disclaimerModalOnClose,
     modalsFlowStart
   } = useStakerModals({
     network,
@@ -123,8 +129,10 @@ export default function StakerNetwork({ network, description }: { network: Netwo
 
   return (
     <div className="staker-network-container">
+      {/* Modals */}
       <UpgradeToPremiumModal show={nonPremiumModalShow} onClose={nonPremiumModalOnClose} />
       <ActivateBackupModal show={premiumModalShow} onClose={premiumModalOnClose} />
+      <StakerDisclaimerModal show={disclaimerModalShow} onClose={disclaimerModalOnClose} />
 
       {network === Network.Prater && (
         <AlertDismissible variant="warning">
