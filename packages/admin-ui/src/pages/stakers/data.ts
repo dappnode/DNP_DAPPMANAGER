@@ -69,21 +69,21 @@ const privacyPolicy = `## Privacy Policy
 
 Dappnode Association, respects your privacy and is committed to protecting your personal data in accordance with applicable law. By using Dappnode, you consent to the collection and processing of the following information:
 
-**Personal data collected:** IP addresses, device identifiers, usage logs, emails or other contact information provided voluntarily, and data generated from the use of Dappnode.
+Personal data collected: IP addresses, device identifiers, usage logs, emails or other contact information provided voluntarily, and data generated from the use of Dappnode.
 
-**Purpose of processing:** operation of the software, security, support, communications, and legal compliance.
+Purpose of processing: operation of the software, security, support, communications, and legal compliance.
 
-**Legal basis:** performance of a contract, legitimate interest, or compliance with legal obligations.
+Legal basis: performance of a contract, legitimate interest, or compliance with legal obligations.
 
-**Data retention:** personal data is retained only as long as necessary for the purposes described or as required by law.
+Data retention: personal data is retained only as long as necessary for the purposes described or as required by law.
 
-**Recipients:** data may be shared with service providers necessary for operation, including payment processors, hosting, and technical support providers.
+Recipients: data may be shared with service providers necessary for operation, including payment processors, hosting, and technical support providers.
 
-**International transfers:** any transfers outside Switzerland or the EU are subject to appropriate safeguards under applicable law.
+International transfers: any transfers outside Switzerland or the EU are subject to appropriate safeguards under applicable law.
 
-**User rights:** you may request access, correction, deletion, restriction of processing, or objection. You may also lodge a complaint with the relevant data protection authority (Swiss Federal Data Protection and Information Commissioner, FDPIC).
+User rights: you may request access, correction, deletion, restriction of processing, or objection. You may also lodge a complaint with the relevant data protection authority (Swiss Federal Data Protection and Information Commissioner, FDPIC).
 
-**How to exercise rights:** contact Dappnode Association via support channels or email provided in the application or website.
+How to exercise rights: contact Dappnode Association via support channels or email provided in the application or website.
 
 By using Dappnode, you acknowledge that you have read and understood this Privacy Policy and consent to the collection and processing of your personal data as described herein.
 `;
