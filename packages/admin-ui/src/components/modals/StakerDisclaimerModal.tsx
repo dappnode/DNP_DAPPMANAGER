@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Modal } from "react-bootstrap";
 import Button from "components/Button";
-import { ModernAccordion } from "components/ModernAccordion";
+import { CollapsibleList } from "components/CollapsibleList";
 import { termsOfUseList } from "pages/stakers/data";
 
 import "./stakerDisclaimerModal.scss";
@@ -85,7 +85,7 @@ export function StakerDisclaimerModal({ show, onClose }: StakerDisclaimerModalPr
         </div>
 
         <div className="disclaimer-sections">
-          <ModernAccordion items={accordionItems} allowMultipleOpen={true} />
+          <CollapsibleList items={accordionItems} allowMultipleOpen={true} />
         </div>
 
         <div className="disclaimer-acceptance">

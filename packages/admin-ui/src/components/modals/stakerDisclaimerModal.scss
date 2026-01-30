@@ -1,4 +1,6 @@
 .staker-disclaimer-modal {
+  z-index: 3000 !important; /* Ensure modal appears above sidebar (z-index: 2000) */
+
   .modal-dialog {
     max-width: 800px;
   }
@@ -70,8 +72,7 @@
         user-select: none;
 
         input[type="checkbox"] {
-          margin-right: 0.75rem;
-          margin-top: 0.25rem;
+          margin-right: 0.5rem;
           width: 20px;
           height: 20px;
           cursor: pointer;
@@ -127,18 +128,53 @@
   }
 }
 
-// Dark mode adjustments
-[data-theme="dark"] {
+.modal-backdrop {
+  z-index: 2999 !important; /* Just below modal but above sidebar */
+}
+
+// Dark mode adjustments - modal is rendered outside #dark, so target body.dark or html.dark
+body.dark,
+html.dark {
   .staker-disclaimer-modal {
     .modal-header,
     .modal-body,
     .modal-footer {
-      background-color: var(--background-dark);
+      background-color: var(--color-dark-card);
     }
 
-    .disclaimer-intro,
-    .disclaimer-acceptance {
-      background-color: var(--background-secondary-dark);
+    .modal-header {
+      border-bottom-color: var(--color-dark-border);
+
+      .modal-title {
+        color: var(--color-dark-maintext);
+      }
+    }
+
+    .modal-body {
+      .disclaimer-intro {
+        background-color: var(--color-dark-background-main);
+        border-left-color: var(--warning-color);
+
+        p,
+        strong {
+          color: var(--color-dark-secondarytext);
+        }
+      }
+
+      .disclaimer-acceptance {
+        background-color: var(--color-dark-background-main);
+        border-color: var(--color-dark-border);
+
+        .disclaimer-checkbox-label {
+          span {
+            color: var(--color-dark-maintext);
+          }
+        }
+      }
+    }
+
+    .modal-footer {
+      border-top-color: var(--color-dark-border);
     }
   }
 }
