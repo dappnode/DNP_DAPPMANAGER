@@ -1,29 +1,29 @@
 import React, { useState, ReactNode } from "react";
 import { BsChevronDown } from "react-icons/bs";
-import "./accordion.scss";
+import "./collapsibleList.scss";
 
-interface AccordionItemProps {
+interface CollapsibleListItemProps {
   title: string | ReactNode;
   children: ReactNode;
   isOpen: boolean;
   onToggle: () => void;
 }
 
-function AccordionItem({ title, children, isOpen, onToggle }: AccordionItemProps) {
+function CollapsibleListItem({ title, children, isOpen, onToggle }: CollapsibleListItemProps) {
   return (
-    <div className={`accordion-item ${isOpen ? "open" : ""}`}>
-      <button className="accordion-header" onClick={onToggle} type="button">
-        <span className="accordion-title">{title}</span>
-        <BsChevronDown className={`accordion-icon ${isOpen ? "rotated" : ""}`} />
+    <div className={`collapsible-list-item ${isOpen ? "open" : ""}`}>
+      <button className="collapsible-list-header" onClick={onToggle} type="button">
+        <span className="collapsible-list-title">{title}</span>
+        <BsChevronDown className={`collapsible-list-icon ${isOpen ? "rotated" : ""}`} />
       </button>
-      <div className={`accordion-content ${isOpen ? "expanded" : "collapsed"}`}>
-        <div className="accordion-body">{children}</div>
+      <div className={`collapsible-list-content ${isOpen ? "expanded" : "collapsed"}`}>
+        <div className="collapsible-list-body">{children}</div>
       </div>
     </div>
   );
 }
 
-interface AccordionProps {
+interface CollapsibleListProps {
   items: {
     title: string | ReactNode;
     content: ReactNode;
@@ -32,7 +32,7 @@ interface AccordionProps {
   defaultOpenIndexes?: number[];
 }
 
-export function Accordion({ items, allowMultipleOpen = true, defaultOpenIndexes = [] }: AccordionProps) {
+export function CollapsibleList({ items, allowMultipleOpen = true, defaultOpenIndexes = [] }: CollapsibleListProps) {
   const [openIndexes, setOpenIndexes] = useState<Set<number>>(new Set(defaultOpenIndexes));
 
   const toggleSection = (index: number) => {
@@ -54,16 +54,16 @@ export function Accordion({ items, allowMultipleOpen = true, defaultOpenIndexes 
   };
 
   return (
-    <div className="accordion">
+    <div className="collapsible-list">
       {items.map((item, index) => (
-        <AccordionItem
+        <CollapsibleListItem
           key={index}
           title={item.title}
           isOpen={openIndexes.has(index)}
           onToggle={() => toggleSection(index)}
         >
           {item.content}
-        </AccordionItem>
+        </CollapsibleListItem>
       ))}
     </div>
   );
