@@ -1,28 +1,6 @@
 import React, { useState, ReactNode } from "react";
 import { BsChevronDown } from "react-icons/bs";
-import "./modernAccordion.scss";
-
-/**
- * ModernAccordion - A reusable accordion component with modern styling
- *
- * @example
- * // Simple usage with string content
- * <ModernAccordion
- *   items={[
- *     { title: "Section 1", content: <p>Content here</p> },
- *     { title: "Section 2", content: <div>More content</div> }
- *   ]}
- *   allowMultipleOpen={true}
- * />
- *
- * @example
- * // With default open sections
- * <ModernAccordion
- *   items={items}
- *   allowMultipleOpen={false}
- *   defaultOpenIndexes={[0]}
- * />
- */
+import "./accordion.scss";
 
 interface AccordionItemProps {
   title: string | ReactNode;
@@ -33,19 +11,19 @@ interface AccordionItemProps {
 
 function AccordionItem({ title, children, isOpen, onToggle }: AccordionItemProps) {
   return (
-    <div className={`modern-accordion-item ${isOpen ? "open" : ""}`}>
-      <button className="modern-accordion-header" onClick={onToggle} type="button">
-        <span className="modern-accordion-title">{title}</span>
-        <BsChevronDown className={`modern-accordion-icon ${isOpen ? "rotated" : ""}`} />
+    <div className={`accordion-item ${isOpen ? "open" : ""}`}>
+      <button className="accordion-header" onClick={onToggle} type="button">
+        <span className="accordion-title">{title}</span>
+        <BsChevronDown className={`accordion-icon ${isOpen ? "rotated" : ""}`} />
       </button>
-      <div className={`modern-accordion-content ${isOpen ? "expanded" : "collapsed"}`}>
-        <div className="modern-accordion-body">{children}</div>
+      <div className={`accordion-content ${isOpen ? "expanded" : "collapsed"}`}>
+        <div className="accordion-body">{children}</div>
       </div>
     </div>
   );
 }
 
-interface ModernAccordionProps {
+interface AccordionProps {
   items: {
     title: string | ReactNode;
     content: ReactNode;
@@ -54,7 +32,7 @@ interface ModernAccordionProps {
   defaultOpenIndexes?: number[];
 }
 
-export function ModernAccordion({ items, allowMultipleOpen = true, defaultOpenIndexes = [] }: ModernAccordionProps) {
+export function Accordion({ items, allowMultipleOpen = true, defaultOpenIndexes = [] }: AccordionProps) {
   const [openIndexes, setOpenIndexes] = useState<Set<number>>(new Set(defaultOpenIndexes));
 
   const toggleSection = (index: number) => {
@@ -76,7 +54,7 @@ export function ModernAccordion({ items, allowMultipleOpen = true, defaultOpenIn
   };
 
   return (
-    <div className="modern-accordion">
+    <div className="accordion">
       {items.map((item, index) => (
         <AccordionItem
           key={index}
