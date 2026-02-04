@@ -91,7 +91,7 @@ export default function StarknetFullNode({
               <span style={{ color: "red" }}> *</span>
             </Form.Label>
             <Form.Text className="text-muted d-block mb-2">
-              Address used to sign attestations (Hot wallet).{" "}
+              Address used to operate your validator (Hot wallet).{" "}
               <Link to={docsUrl.starknetDocs} {...externalUrlProps}>
                 Read the docs
               </Link>{" "}
@@ -114,8 +114,7 @@ export default function StarknetFullNode({
               <span style={{ color: "red" }}> *</span>
             </Form.Label>{" "}
             <Form.Text className="text-muted d-block mb-2">
-              Your private key for the operator address is required to sign attestations. Keep it safe and never share
-              it with anyone.
+              Your private key for the operator address. Keep it safe and never share it with anyone.{" "}
               <Link to={docsUrl.starknetDocs} {...externalUrlProps}>
                 Read the docs
               </Link>{" "}
