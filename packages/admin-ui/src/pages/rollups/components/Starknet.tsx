@@ -18,6 +18,7 @@ import { Link } from "react-router-dom";
 import { basePath as stakersBasePath } from "pages/stakers/data";
 import { basePath as packagesBasePath, mySubPath } from "pages/packages/data";
 import { prettyDnpName } from "utils/format";
+import { docsUrl, externalUrlProps } from "params";
 import "./columns.scss";
 
 export default function Starknet({
@@ -149,7 +150,7 @@ export default function Starknet({
               (1) <b>Choose</b> a <b>Full Node Client</b> (Juno or Pathfinder) <br />
               (2) [Optional] <b>Select Staking Application</b> to participate in Starknet staking and configure it
               following the{" "}
-              <a href="https://docs.dappnode.io/docs/user/staking/starknet/solo/" target="_blank">
+              <a href={docsUrl.starknetDocs} {...externalUrlProps}>
                 docs
               </a>
             </p>
