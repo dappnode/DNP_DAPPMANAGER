@@ -10,11 +10,15 @@ import SubTitle from "components/SubTitle";
 import StarknetFullNode from "./columns/StarknetFullNode";
 import { Network } from "@dappnode/types";
 import { useStarknetConfig } from "./useStarknetConfig";
-import "./columns.scss";
 import { Alert, Button } from "react-bootstrap";
 import { confirm } from "components/ConfirmDialog";
 import { disclaimer } from "../data";
 import { withToast } from "components/toast/Toast";
+import { Link } from "react-router-dom";
+import { basePath as stakersBasePath } from "pages/stakers/data";
+import { basePath as packagesBasePath, mySubPath } from "pages/packages/data";
+import { prettyDnpName } from "utils/format";
+import "./columns.scss";
 
 export default function Starknet({
   network,
@@ -58,6 +62,10 @@ export default function Starknet({
   } = useStarknetConfig(network, currentStakerConfigReq);
 
   const networkName = network === Network.StarknetMainnet ? "Starknet" : "Starknet Sepolia";
+  const currentStakersConfig = currentStakerConfigReq.data;
+  const currentSelectedFullNode = currentStakersConfig?.executionClients.find(
+    (client) => client.status === "ok" && client.isInstalled && client.isRunning && client.isSelected
+  );
 
   /**
    * Set new Starknet config
@@ -154,14 +162,22 @@ export default function Starknet({
                 </p>
                 <ol className="mb-2">
                   <li>
-                    <b>Run a local node:</b> Go to the <b>Stakers</b> menu and set up an Ethereum{" "}
-                    {network === Network.StarknetMainnet ? "Mainnet" : "Sepolia"} node (both execution and consensus
-                    clients) on your DAppNode.
+                    <b>Run a local node:</b> Go to the{" "}
+                    <Link to={`/${stakersBasePath}/${network === Network.StarknetMainnet ? "ethereum" : "sepolia"}`}>
+                      {network === Network.StarknetMainnet ? "Ethereum" : "Sepolia"}
+                    </Link>{" "}
+                    section and set up a node (both execution and consensus clients) on your Dappnode.
                   </li>
                   <li>
-                    <b>Use an external RPC service:</b> Configure your Starknet node to use an external Ethereum RPC
-                    provider (such as Infura, Alchemy, or other RPC services) if you don't want to run a local Ethereum
-                    node.
+                    <b>Use an external RPC service:</b>{" "}
+                    {currentSelectedFullNode ? (
+                      <Link to={`/${packagesBasePath}/${mySubPath}/${currentSelectedFullNode.dnpName}/config`}>
+                        Configure your {prettyDnpName(currentSelectedFullNode.dnpName)}
+                      </Link>
+                    ) : (
+                      "Configure your Starknet node"
+                    )}{" "}
+                    to use an external Ethereum RPC provider (such as Infura, Alchemy, or other RPC services).
                   </li>
                 </ol>
               </Alert>
