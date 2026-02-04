@@ -15,7 +15,7 @@ import { OverlayTrigger, ProgressBar, Tooltip } from "react-bootstrap";
 import { HealthIcon } from "./icons/HealthIcon";
 import { BoltIcon } from "./icons/BoltIcon";
 import { RewardsIcon } from "./icons/RewardsIcon";
-import { MdWarningAmber } from "react-icons/md";
+import { MdInfoOutline, MdWarningAmber } from "react-icons/md";
 
 const NetworkCard = ({
   title,
@@ -82,22 +82,28 @@ export const StatusCard = ({
                     <span>{execution.peers}</span>
                   </div>
                   <div className="network-stat-col">
-                    <div>#{execution.currentBlock}</div>
                     {consensusSynced ? (
-                      <div className={`client-status ${execution.isSynced ? "synced" : "syncing"}`}>
-                        {execution.isSynced ? "synced" : "syncing"}
-                      </div>
+                      <>
+                        <div>#{execution.currentBlock}</div>
+                        <div className={`client-status ${execution.isSynced ? "synced" : "syncing"}`}>
+                          {execution.isSynced ? "synced" : "syncing"}
+                        </div>
+                      </>
                     ) : (
                       <OverlayTrigger
                         overlay={
                           <Tooltip id="execution-waiting-tooltip">
-                            Execution client status will be available once the consensus client finishes syncing. The
-                            consensus client must sync first to validate execution layer blocks.
+                            Execution client status will be available once the consensus client finishes syncing.
                           </Tooltip>
                         }
                         placement="top"
                       >
-                        <div className="client-status waiting">Waiting for consensus</div>
+                        <div>
+                          <div>
+                            <MdInfoOutline className="tooltip-icon" />
+                          </div>
+                          <div className="client-status waiting">Waiting</div>
+                        </div>
                       </OverlayTrigger>
                     )}
                   </div>
