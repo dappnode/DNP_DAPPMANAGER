@@ -52,6 +52,9 @@ export const StatusCard = ({
   const navigate = useNavigate();
   const execution = data && data.ec;
   const consensus = data && data.cc;
+
+  const consensusSynced = consensus ? consensus.isSynced : false; // Used to determine if we can show execution sync progress to avoid synced false positives
+
   return (
     <NetworkCard title="NODE STATUS" icon={<HealthIcon />}>
       {clientsLoading ? (
@@ -80,13 +83,27 @@ export const StatusCard = ({
                   </div>
                   <div className="network-stat-col">
                     <div>#{execution.currentBlock}</div>
-                    <div className={`client-status ${execution.isSynced ? "synced" : "syncing"}`}>
-                      {execution.isSynced ? "synced" : "syncing"}
-                    </div>
+                    {consensusSynced ? (
+                      <div className={`client-status ${execution.isSynced ? "synced" : "syncing"}`}>
+                        {execution.isSynced ? "synced" : "syncing"}
+                      </div>
+                    ) : (
+                      <OverlayTrigger
+                        overlay={
+                          <Tooltip id="execution-waiting-tooltip">
+                            Execution client status will be available once the consensus client finishes syncing. The
+                            consensus client must sync first to validate execution layer blocks.
+                          </Tooltip>
+                        }
+                        placement="top"
+                      >
+                        <div className="client-status waiting">Waiting for consensus</div>
+                      </OverlayTrigger>
+                    )}
                   </div>
                 </div>
               </div>
-              {!execution.isSynced && <ProgressBar animated now={execution.progress} />}
+              {consensusSynced && !execution.isSynced && <ProgressBar animated now={execution.progress} />}
             </div>
           )}
           <hr />
