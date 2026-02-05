@@ -112,7 +112,8 @@ export const docsUrl = {
   pwaResetPermissions: `${docsBaseUrl}/docs/user/dappnode-app/how-to-install#reset-notifications-permissions`,
   premiumOverview: `${docsBaseUrl}/docs/user/dappnode-premium/overview`,
   premiumBackupNode: `${docsBaseUrl}/docs/user/dappnode-premium/premium-services#backup-node-for-validators`,
-  premiumBackupValidatorsLimit: `${docsBaseUrl}/docs/user/dappnode-premium/premium-services#validators-limit`
+  premiumBackupValidatorsLimit: `${docsBaseUrl}/docs/user/dappnode-premium/premium-services#validators-limit`,
+  starknetDocs: `${docsBaseUrl}/docs/user/staking/starknet/solo`
 };
 
 export const forumUrl = {
