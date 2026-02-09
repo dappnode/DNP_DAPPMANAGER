@@ -24,7 +24,7 @@ services:
       - DISABLE_UPNP=
       - ALWAYS_DAPPGETBASIC=
       - SKIP_COMPOSE_VALIDATION=
-      - DEV=
+      - TEST=
     networks:
       dncore_network:
         aliases:
