@@ -1162,6 +1162,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@dappnode/dockercompose@workspace:packages/dockerCompose"
   dependencies:
+    "@dappnode/schemas": "workspace:^0.1.0"
     "@dappnode/types": "workspace:^0.1.0"
     "@dappnode/utils": "workspace:^0.1.0"
     "@types/lodash-es": "npm:^4.17.9"

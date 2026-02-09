@@ -1,6 +1,7 @@
 import { mapValues, toPairs, sortBy, fromPairs, pick } from "lodash-es";
 import { getPrivateNetworkAliases, getIsCore, parseEnvironment, getIsMonoService } from "@dappnode/utils";
 import { params } from "@dappnode/params";
+import { dockerParams } from "@dappnode/schemas";
 import { cleanCompose } from "./clean.js";
 import { parseServiceNetworks } from "./networks.js";
 import {
@@ -28,6 +29,13 @@ export function setDappnodeComposeDefaults(composeUnsafe: Compose, manifest: Man
     version: ensureMinimumComposeVersion(composeUnsafe.version),
 
     services: mapValues(composeUnsafe.services, (serviceUnsafe, serviceName) => {
+      const pickedServiceKeys = dockerParams.SKIP_COMPOSE_VALIDATION
+        ? serviceUnsafe
+        : pick(
+            serviceUnsafe,
+            dockerComposeSafeKeys.filter((safeKey) => safeKey !== "build")
+          );
+
       return sortServiceKeys({
         // OVERRIDABLE VALUES: values that in case of not been set, it will take the following values
         logging: {
@@ -40,10 +48,7 @@ export function setDappnodeComposeDefaults(composeUnsafe: Compose, manifest: Man
         restart: "unless-stopped",
 
         // SAFE KEYS: values that are whitelisted
-        ...pick(
-          serviceUnsafe,
-          dockerComposeSafeKeys.filter((safeKey) => safeKey !== "build")
-        ),
+        ...pickedServiceKeys,
 
         // MANDATORY VALUES: values that will be overwritten with dappnode defaults
         container_name: getContainerName({ dnpName, serviceName, isCore }),
