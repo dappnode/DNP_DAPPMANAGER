@@ -34,6 +34,20 @@
     }
   }
 
+  // Small variant
+  &.sm {
+    padding-bottom: 0.25rem;
+    .item-container {
+      font-size: 0.9rem;
+    }
+    .item {
+      &.active {
+        border-bottom-width: 3px;
+      }
+    }
+  }
+
+  // Responsive behavior
   @media (max-width: 40rem) {
     overflow-x: scroll;
   }

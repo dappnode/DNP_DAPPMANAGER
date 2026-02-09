@@ -23,6 +23,7 @@ services:
       - IPFS_HOST=
       - DISABLE_UPNP=
       - ALWAYS_DAPPGETBASIC=
+      - SKIP_COMPOSE_VALIDATION=
     networks:
       dncore_network:
         aliases:

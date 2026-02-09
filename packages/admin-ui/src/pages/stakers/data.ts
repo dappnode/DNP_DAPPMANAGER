@@ -1,5 +1,6 @@
-export const relativePath = "stakers/ethereum"; // default redirect to mainnet
-export const rootPath = "stakers/*";
+export const basePath = "stakers";
+export const relativePath = `${basePath}/ethereum`; // default redirect to mainnet
+export const rootPath = `${basePath}/*`;
 export const title = "Stakers";
 export const disclaimer = `## Terms of Use - Dappnode
 
