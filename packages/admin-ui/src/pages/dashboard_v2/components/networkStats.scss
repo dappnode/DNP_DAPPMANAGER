@@ -49,6 +49,7 @@
           font-size: 14px;
           display: flex;
           justify-content: center;
+          min-width: 60px;
 
           padding: 2px;
           border-radius: 5px;
@@ -59,6 +60,13 @@
           &.syncing {
             background-color: rgb(255, 229, 204);
             color: orange;
+          }
+          &.waiting {
+            padding-right: 4px;
+            padding-left: 4px;
+            background-color: rgb(230, 230, 230);
+            color: rgb(100, 100, 100);
+            cursor: help;
           }
         }
       }
@@ -198,6 +206,9 @@
           &.syncing {
             background-color: orange;
             color: rgb(255, 229, 204);
+          }
+          &.waiting {
+            background-color: #696969;
           }
         }
 

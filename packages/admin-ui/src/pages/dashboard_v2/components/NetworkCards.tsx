@@ -15,7 +15,7 @@ import { OverlayTrigger, ProgressBar, Tooltip } from "react-bootstrap";
 import { HealthIcon } from "./icons/HealthIcon";
 import { BoltIcon } from "./icons/BoltIcon";
 import { RewardsIcon } from "./icons/RewardsIcon";
-import { MdWarningAmber } from "react-icons/md";
+import { MdInfoOutline, MdWarningAmber } from "react-icons/md";
 
 const NetworkCard = ({
   title,
@@ -52,6 +52,9 @@ export const StatusCard = ({
   const navigate = useNavigate();
   const execution = data && data.ec;
   const consensus = data && data.cc;
+
+  const consensusSynced = consensus ? consensus.isSynced : false; // Used to determine if we can show execution sync progress to avoid synced false positives
+
   return (
     <NetworkCard title="NODE STATUS" icon={<HealthIcon />}>
       {clientsLoading ? (
@@ -79,14 +82,34 @@ export const StatusCard = ({
                     <span>{execution.peers}</span>
                   </div>
                   <div className="network-stat-col">
-                    <div>#{execution.currentBlock}</div>
-                    <div className={`client-status ${execution.isSynced ? "synced" : "syncing"}`}>
-                      {execution.isSynced ? "synced" : "syncing"}
-                    </div>
+                    {consensusSynced ? (
+                      <>
+                        <div>#{execution.currentBlock}</div>
+                        <div className={`client-status ${execution.isSynced ? "synced" : "syncing"}`}>
+                          {execution.isSynced ? "synced" : "syncing"}
+                        </div>
+                      </>
+                    ) : (
+                      <OverlayTrigger
+                        overlay={
+                          <Tooltip id="execution-waiting-tooltip">
+                            Execution client status will be available once the consensus client finishes syncing.
+                          </Tooltip>
+                        }
+                        placement="top"
+                      >
+                        <div>
+                          <div>
+                            <MdInfoOutline className="tooltip-icon" />
+                          </div>
+                          <div className="client-status waiting">Waiting</div>
+                        </div>
+                      </OverlayTrigger>
+                    )}
                   </div>
                 </div>
               </div>
-              {!execution.isSynced && <ProgressBar animated now={execution.progress} />}
+              {consensusSynced && !execution.isSynced && <ProgressBar animated now={execution.progress} />}
             </div>
           )}
           <hr />
