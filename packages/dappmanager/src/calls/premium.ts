@@ -1,5 +1,6 @@
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
+import { BeaconBackupNetworkStatus, Network, BeaconBackupActivationParams, NetworkDetailsRes } from "@dappnode/types";
 
 const baseUrl = "http://premium.dappnode";
 
@@ -107,37 +108,41 @@ export const premiumIsLicenseActive = async (): Promise<boolean> => {
 
 /**
  * Activates the beacon node backup
- * @param id the hashed license
+ * @param key the hashed license
+ * @param network the network that the backup will be activated on
  */
-export const premiumBeaconBackupActivate = async (id: string): Promise<void> => {
+export const premiumBeaconBackupActivate = async ({ key, network }: BeaconBackupActivationParams): Promise<void> => {
   const response = await fetch(`${baseUrl}:8080/api/keys/activate`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ id })
+    body: JSON.stringify({ key, network })
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to activate beacon backup: ${response.statusText}`);
+    const error = await response.text();
+    throw new Error(`Failed to activate beacon backup: ${error}`);
   }
 };
 
 /**
  * Deactivates the beacon node backup
- * @param id the hashed license
+ * @param key the hashed license
+ * @param network the network that the backup will be deactivated on
  */
-export const premiumBeaconBackupDeactivate = async (id: string): Promise<void> => {
+export const premiumBeaconBackupDeactivate = async ({ key, network }: BeaconBackupActivationParams): Promise<void> => {
   const response = await fetch(`${baseUrl}:8080/api/keys/deactivate`, {
-    method: "DELETE",
+    method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ id })
+    body: JSON.stringify({ key, network })
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to deactivate beacon backup: ${response.statusText}`);
+    const error = await response.text();
+    throw new Error(`Failed to deactivate beacon backup: ${error}`);
   }
 };
 
@@ -151,55 +156,30 @@ export const premiumBeaconBackupDeactivate = async (id: string): Promise<void> =
  *
  * @param hashedLicense The hashed license string used to identify the key.
  */
+
 export const premiumBeaconBackupStatus = async (
   hashedLicense: string
-): Promise<{
-  validatorLimit: number;
-  isActivable: boolean;
-  secondsUntilActivable?: number;
-  isActive: boolean;
-  secondsUntilDeactivation?: number;
-}> => {
-  const response = await fetch(`${baseUrl}:8080/api/keys/${hashedLicense}`);
+): Promise<Partial<Record<Network, BeaconBackupNetworkStatus>>> => {
+  const response = await fetch(`${baseUrl}:8080/api/keys/details?id=${hashedLicense}`);
 
   if (!response.ok) {
     throw new Error(`Failed to check backup node status: ${response.statusText}`);
   }
-
   const data = await response.json();
-  const validatorLimit = data.ValidatorLimit;
-  const validUntilString = data.ValidUntil;
-  const validUntil = new Date(validUntilString);
-  const now = new Date();
 
-  const isZeroTime = validUntilString === "0001-01-01T00:00:00Z";
+  const result: Partial<Record<Network, BeaconBackupNetworkStatus>> = {};
 
-  // Activation grace period (30 days after ValidUntil)
-  const gracePeriodEnd = new Date(validUntil.getTime() + 30 * 24 * 60 * 60 * 1000);
-  const hasPassedGracePeriod = now > gracePeriodEnd;
-
-  const isActivable = isZeroTime || hasPassedGracePeriod;
-  const isActive = validUntil > now;
-
-  const result: {
-    validatorLimit: number;
-    isActivable: boolean;
-    secondsUntilActivable?: number;
-    isActive: boolean;
-    secondsUntilDeactivation?: number;
-  } = {
-    validatorLimit,
-    isActivable,
-    isActive
-  };
-
-  if (!isActivable) {
-    result.secondsUntilActivable = Math.floor((gracePeriodEnd.getTime() - now.getTime()) / 1000);
-  }
-
-  if (isActive) {
-    result.secondsUntilDeactivation = Math.floor((validUntil.getTime() - now.getTime()) / 1000);
-  }
+  Object.entries(data.networks).forEach(([network, status]) => {
+    const typedStatus = status as NetworkDetailsRes;
+    result[network as Network] = {
+      validatorLimit: typedStatus.validator_limit,
+      isActivable: typedStatus.active === false && typedStatus.available_activation_seconds > 0,
+      isActive: typedStatus.active,
+      activationHistory: typedStatus.activation_history,
+      timeLeft: typedStatus.available_activation_seconds || 0,
+      timeUntilAvailable: typedStatus.time_to_be_available || 0
+    };
+  });
 
   return result;
 };

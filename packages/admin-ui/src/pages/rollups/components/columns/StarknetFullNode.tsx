@@ -7,9 +7,10 @@ import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
 import Button from "components/Button";
 import { getInstallerPath } from "pages/installer";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Input from "components/Input";
 import { Form } from "react-bootstrap";
+import { docsUrl, externalUrlProps } from "params";
 
 interface StarknetEnvs {
   signerOperationalAddress: string;
@@ -86,18 +87,14 @@ export default function StarknetFullNode({
         <div className="starknet-staking-envs" style={{ marginTop: "1rem" }}>
           <Form.Group className="mb-3">
             <Form.Label>
-              <strong>Operational Address</strong>
+              <strong>Operator Address</strong>
               <span style={{ color: "red" }}> *</span>
             </Form.Label>
             <Form.Text className="text-muted d-block mb-2">
               Address used to sign attestations (Hot wallet).{" "}
-              <a
-                href="https://docs.dappnode.io/docs/user/staking/starknet/solo"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <Link to={docsUrl.starknetDocs} {...externalUrlProps}>
                 Read the docs
-              </a>{" "}
+              </Link>{" "}
               to learn how to get it.
             </Form.Text>
             <Input
@@ -113,10 +110,17 @@ export default function StarknetFullNode({
 
           <Form.Group className="mb-3">
             <Form.Label>
-              <strong>Private Key (Hex)</strong>
+              <strong>Private Key</strong>
               <span style={{ color: "red" }}> *</span>
-            </Form.Label>
-            <Form.Text className="text-muted d-block mb-2">Internal signing private key (keep secure)</Form.Text>
+            </Form.Label>{" "}
+            <Form.Text className="text-muted d-block mb-2">
+              Your private key for the operator address is required to sign attestations. Keep it safe and never share
+              it with anyone.
+              <Link to={docsUrl.starknetDocs} {...externalUrlProps}>
+                Read the docs
+              </Link>{" "}
+              to learn how to get it.
+            </Form.Text>
             <Input
               type="password"
               value={starknetEnvs.signerPrivateKey}
