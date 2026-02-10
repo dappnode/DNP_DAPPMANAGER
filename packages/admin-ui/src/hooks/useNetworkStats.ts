@@ -15,7 +15,6 @@ const supportedNetworks: DashboardSupportedNetwork[] = [
 // Define network's logos and which ones have validators and rewards data
 type NetworkFeatures = {
   hasValidators: boolean;
-  hasRewardsCard: boolean;
   logo: React.FC<React.SVGProps<SVGSVGElement>>;
   beaconExplorer?: { url: string; name: string };
 };
@@ -23,29 +22,25 @@ type NetworkFeatures = {
 const networkFeatures: Record<DashboardSupportedNetwork, NetworkFeatures> = {
   [Network.Mainnet]: {
     hasValidators: true,
-    hasRewardsCard: true,
     logo: EthLogo,
     beaconExplorer: { url: "https://beaconcha.in/", name: "Beaconcha.in" }
   },
   [Network.Gnosis]: {
     hasValidators: true,
-    hasRewardsCard: false,
     logo: GnosisLogo,
     beaconExplorer: { url: "https://beacon.gnosisscan.io/", name: "Beacon Gnosisscan" }
   },
   [Network.Lukso]: {
     hasValidators: true,
-    hasRewardsCard: false,
     logo: LuksoLogo,
     beaconExplorer: { url: "https://explorer.consensus.mainnet.lukso.network/", name: "Beacon Lukso Explorer" }
   },
   [Network.Hoodi]: {
     hasValidators: true,
-    hasRewardsCard: true,
     logo: EthLogo,
     beaconExplorer: { url: "https://hoodi.beaconcha.in/", name: "Hoodi Beaconcha.in" }
   },
-  [Network.Sepolia]: { hasValidators: false, hasRewardsCard: false, logo: EthLogo }
+  [Network.Sepolia]: { hasValidators: false, logo: EthLogo }
 };
 
 export function useNetworkStats() {
