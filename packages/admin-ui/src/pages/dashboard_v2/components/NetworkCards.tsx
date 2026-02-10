@@ -1,16 +1,15 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
 import { basePath as stakersBasePath, relativePath as stakersPath } from "pages/stakers";
 import { relativePath as packagesRelativePath } from "pages/packages";
-import { DashboardSupportedNetwork, Network, NetworkStatus, NodeStatus } from "@dappnode/types";
+import { Network, NetworkStatus, NodeStatus } from "@dappnode/types";
 import newTabProps from "utils/newTabProps";
 import { gweiToToken } from "utils/gweiToToken";
 import { capitalize } from "utils/strings";
 import Card from "components/Card";
 import Loading from "components/Loading";
 import Button from "components/Button";
-import Switch from "components/Switch";
 import { OverlayTrigger, ProgressBar, Tooltip } from "react-bootstrap";
 import { HealthIcon } from "./icons/HealthIcon";
 import { BoltIcon } from "./icons/BoltIcon";
@@ -280,42 +279,16 @@ export const ValidatorsCard = ({
   );
 };
 
-export const RewardsCard = ({
-  network,
-  data,
-  loading,
-  beaconchaConsentSet
-}: {
-  network: string;
-  data: NetworkStatus["rewards"];
-  loading: boolean;
-  beaconchaConsentSet: ({
-    network,
-    consent
-  }: {
-    network: DashboardSupportedNetwork;
-    consent: boolean;
-  }) => Promise<void>;
-}) => {
-  const [beaconchaConsent, setBeaconchaConsent] = useState<boolean>(!!data?.beaconchaConsent);
-
-  const handleSetBeaconchaConsent = async (checked: boolean) => {
-    await beaconchaConsentSet({ network: network as DashboardSupportedNetwork, consent: checked });
-    setBeaconchaConsent(checked);
-  };
+export const RewardsCard = ({ network, data }: { network: string; data: NetworkStatus["rewards"] }) => {
+  console.log(network, "RewardsCard data:", data);
 
   return (
     <NetworkCard title="REWARDS" icon={<RewardsIcon />}>
-      {loading ? (
-        <Loading small />
-      ) : (
-        <div
-          style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", fontSize: "16px" }}
-        >
-          Beaconcha Consent:{" "}
-          <Switch checked={beaconchaConsent} onToggle={(checked) => handleSetBeaconchaConsent(checked)} />
-        </div>
-      )}
+      <div
+        style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", fontSize: "16px" }}
+      >
+        🚧 COMING SOON 🚧
+      </div>
     </NetworkCard>
   );
 };

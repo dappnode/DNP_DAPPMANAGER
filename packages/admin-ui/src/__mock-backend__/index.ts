@@ -508,14 +508,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
       isInstalled: false,
       brainRunning: false
     }
-  }),
-
-  beaconchaSharingConsentGet: async () => ({
-    mainnet: true,
-    hoodi: false
-  }),
-
-  beaconchaSharingConsentSet: async () => {}
+  })
 };
 
 export const calls: Routes = {
