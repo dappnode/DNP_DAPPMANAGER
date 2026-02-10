@@ -35,17 +35,10 @@ export default function NetworkStats() {
                   />
 
                   {data.hasValidators && (
-                    <ValidatorsCard
-                      network={network}
-                      validatorsLoading={validatorsLoading}
-                      data={data.validators}
-                      hasRewardsData={data.hasRewardsData || false}
-                      efectivity={data.rewards?.efectivity}
-                      proposals={data.rewards?.proposals}
-                    />
+                    <ValidatorsCard network={network} validatorsLoading={validatorsLoading} data={data.validators} />
                   )}
 
-                  {data.hasRewardsData && <RewardsCard network={network} data={data.rewards} />}
+                  {data.beaconExplorer && <RewardsCard network={network} beaconExplorer={data.beaconExplorer} />}
                 </div>
               </div>
             );

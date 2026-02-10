@@ -164,17 +164,11 @@ export const StatusCard = ({
 export const ValidatorsCard = ({
   network,
   validatorsLoading,
-  data,
-  hasRewardsData,
-  efectivity,
-  proposals
+  data
 }: {
   network: string;
   validatorsLoading: boolean;
   data: NetworkStatus["validators"];
-  hasRewardsData: boolean;
-  efectivity: number | undefined;
-  proposals: number | undefined;
 }) => {
   const signerInstalled = data?.signerStatus.isInstalled;
   const brainRunning = data?.signerStatus.brainRunning;
@@ -235,12 +229,6 @@ export const ValidatorsCard = ({
                 <div>ATTESTING</div>
                 <span>{data?.attesting ?? "-"}</span>
               </div>
-              {hasRewardsData && (
-                <div className="network-stat-col">
-                  <div>EFFECTIVITY</div>
-                  <span>{efectivity ?? "-"}%</span>
-                </div>
-              )}
             </div>
             <hr />
             <div className="validators-row">
@@ -252,13 +240,6 @@ export const ValidatorsCard = ({
                     : "-"}
                 </span>
               </div>
-
-              {hasRewardsData && (
-                <div className="network-stat-col">
-                  <div>PROPOSALS</div>
-                  <span>{proposals ?? "-"}</span>
-                </div>
-              )}
             </div>
           </div>
           <Button
@@ -271,7 +252,7 @@ export const ValidatorsCard = ({
             {...newTabProps}
             variant="outline-dappnode"
           >
-            <span>{data?.total < 1 ? "Import Validators" : "View Validators"}</span>
+            <span>{data?.total < 1 ? "Import Validators" : "Manage Validators"}</span>
           </Button>
         </>
       )}
@@ -279,16 +260,25 @@ export const ValidatorsCard = ({
   );
 };
 
-export const RewardsCard = ({ network, data }: { network: string; data: NetworkStatus["rewards"] }) => {
-  console.log(network, "RewardsCard data:", data);
+export const RewardsCard = ({
+  network,
+  beaconExplorer
+}: {
+  network: string;
+  beaconExplorer: { [key: string]: string };
+}) => {
+  console.log(network, "RewardsCard data:", beaconExplorer);
 
   return (
     <NetworkCard title="REWARDS" icon={<RewardsIcon />}>
       <div
         style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", fontSize: "16px" }}
       >
-        🚧 COMING SOON 🚧
+        View your detailed validator rewards in the explorer.
       </div>
+      <Button href={beaconExplorer.url} fullwidth {...newTabProps} variant="outline-dappnode">
+        <span>{`Visit ${beaconExplorer.name}`}</span>
+      </Button>
     </NetworkCard>
   );
 };

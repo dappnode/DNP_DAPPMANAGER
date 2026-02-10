@@ -30,17 +30,8 @@ export type NetworkStatus = {
     beaconError?: Error;
     signerStatus: SignerStatus;
   };
-  rewards?: {
-    APR: number;
-    ethPrice: number;
-    "7days": number;
-    "30days": number;
-    "365days": number;
-    efectivity: number; // Even though this is validator data, it is retrieved from Beaconcha.in API along with rewards data
-    proposals: number; // Even though this is validator data, it is retrieved from Beaconcha.in API along with rewards data
-  };
   hasValidators: boolean; // Whether this network has validators
-  hasRewardsData: boolean; // Whether this network can retrieve rewards data from Beaconcha.in API
+  beaconExplorer?: { url: string; name: string }; // Whether this network has a beacon explorer to redirect to for validator rewards
 };
 
 export type SignerStatus = {

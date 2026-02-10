@@ -15,16 +15,32 @@ const supportedNetworks: DashboardSupportedNetwork[] = [
 // Define network's logos and which ones have validators and rewards data
 type NetworkFeatures = {
   hasValidators: boolean;
-  hasRewardsData: boolean;
   logo: React.FC<React.SVGProps<SVGSVGElement>>;
+  beaconExplorer?: { url: string; name: string };
 };
 
 const networkFeatures: Record<DashboardSupportedNetwork, NetworkFeatures> = {
-  [Network.Mainnet]: { hasValidators: true, hasRewardsData: true, logo: EthLogo },
-  [Network.Gnosis]: { hasValidators: true, hasRewardsData: false, logo: GnosisLogo },
-  [Network.Lukso]: { hasValidators: true, hasRewardsData: false, logo: LuksoLogo },
-  [Network.Hoodi]: { hasValidators: true, hasRewardsData: true, logo: EthLogo },
-  [Network.Sepolia]: { hasValidators: false, hasRewardsData: false, logo: EthLogo }
+  [Network.Mainnet]: {
+    hasValidators: true,
+    logo: EthLogo,
+    beaconExplorer: { url: "https://beaconcha.in/", name: "Beaconcha.in" }
+  },
+  [Network.Gnosis]: {
+    hasValidators: true,
+    logo: GnosisLogo,
+    beaconExplorer: { url: "https://beacon.gnosisscan.io/", name: "Beacon Gnosisscan" }
+  },
+  [Network.Lukso]: {
+    hasValidators: true,
+    logo: LuksoLogo,
+    beaconExplorer: { url: "https://explorer.consensus.mainnet.lukso.network/", name: "Beacon Lukso Explorer" }
+  },
+  [Network.Hoodi]: {
+    hasValidators: true,
+    logo: EthLogo,
+    beaconExplorer: { url: "https://hoodi.beaconcha.in/", name: "Hoodi Beaconcha.in" }
+  },
+  [Network.Sepolia]: { hasValidators: false, logo: EthLogo }
 };
 
 export function useNetworkStats() {
@@ -94,20 +110,6 @@ export function useNetworkStats() {
         }
       : undefined;
 
-    const rewardsData = features.hasRewardsData
-      ? {
-          rewards: {
-            APR: 3.321,
-            ethPrice: 3800,
-            "7days": 0.0045,
-            "30days": 0.0123,
-            "365days": 0.3321,
-            efectivity: 99.9,
-            proposals: 3
-          }
-        }
-      : {};
-
     // Remove network where no node data is available
     if (nodeStatusData && (nodeStatusData.ec || nodeStatusData.cc)) {
       networkStats[network] = {
@@ -117,9 +119,8 @@ export function useNetworkStats() {
           ccDnp: consensusClientDnp || null
         },
         ...validatorsData,
-        ...rewardsData,
         hasValidators: features.hasValidators,
-        hasRewardsData: features.hasRewardsData
+        beaconExplorer: features.beaconExplorer || undefined
       };
     } else {
       delete networkStats[network];
