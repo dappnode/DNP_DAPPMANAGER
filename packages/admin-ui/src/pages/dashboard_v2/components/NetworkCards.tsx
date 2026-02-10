@@ -252,7 +252,7 @@ export const ValidatorsCard = ({
             {...newTabProps}
             variant="outline-dappnode"
           >
-            <span>{data?.total < 1 ? "Import Validators" : "View Validators"}</span>
+            <span>{data?.total < 1 ? "Import Validators" : "Manage Validators"}</span>
           </Button>
         </>
       )}
@@ -260,8 +260,14 @@ export const ValidatorsCard = ({
   );
 };
 
-export const RewardsCard = ({ network, url }: { network: string; url: { [key: string]: string } }) => {
-  console.log(network, "RewardsCard data:", url);
+export const RewardsCard = ({
+  network,
+  beaconExplorer
+}: {
+  network: string;
+  beaconExplorer: { [key: string]: string };
+}) => {
+  console.log(network, "RewardsCard data:", beaconExplorer);
 
   return (
     <NetworkCard title="REWARDS" icon={<RewardsIcon />}>
@@ -270,6 +276,9 @@ export const RewardsCard = ({ network, url }: { network: string; url: { [key: st
       >
         View your detailed validator rewards in the explorer.
       </div>
+      <Button href={beaconExplorer.url} fullwidth {...newTabProps} variant="outline-dappnode">
+        <span>{`Visit ${beaconExplorer.name}`}</span>
+      </Button>
     </NetworkCard>
   );
 };

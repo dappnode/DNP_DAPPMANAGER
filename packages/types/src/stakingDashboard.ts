@@ -31,7 +31,7 @@ export type NetworkStatus = {
     signerStatus: SignerStatus;
   };
   hasValidators: boolean; // Whether this network has validators
-  hasRewardsCard: boolean; // Whether this network has to display rewards cards to redirect to beaconcha.in or similar
+  beaconExplorer?: { url: string; name: string }; // Whether this network has a beacon explorer to redirect to for validator rewards
 };
 
 export type SignerStatus = {

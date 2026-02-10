@@ -17,13 +17,34 @@ type NetworkFeatures = {
   hasValidators: boolean;
   hasRewardsCard: boolean;
   logo: React.FC<React.SVGProps<SVGSVGElement>>;
+  beaconExplorer?: { url: string; name: string };
 };
 
 const networkFeatures: Record<DashboardSupportedNetwork, NetworkFeatures> = {
-  [Network.Mainnet]: { hasValidators: true, hasRewardsCard: true, logo: EthLogo },
-  [Network.Gnosis]: { hasValidators: true, hasRewardsCard: false, logo: GnosisLogo },
-  [Network.Lukso]: { hasValidators: true, hasRewardsCard: false, logo: LuksoLogo },
-  [Network.Hoodi]: { hasValidators: true, hasRewardsCard: true, logo: EthLogo },
+  [Network.Mainnet]: {
+    hasValidators: true,
+    hasRewardsCard: true,
+    logo: EthLogo,
+    beaconExplorer: { url: "https://beaconcha.in/", name: "Beaconcha.in" }
+  },
+  [Network.Gnosis]: {
+    hasValidators: true,
+    hasRewardsCard: false,
+    logo: GnosisLogo,
+    beaconExplorer: { url: "https://beacon.gnosisscan.io/", name: "Beacon Gnosisscan" }
+  },
+  [Network.Lukso]: {
+    hasValidators: true,
+    hasRewardsCard: false,
+    logo: LuksoLogo,
+    beaconExplorer: { url: "https://explorer.consensus.mainnet.lukso.network/", name: "Beacon Lukso Explorer" }
+  },
+  [Network.Hoodi]: {
+    hasValidators: true,
+    hasRewardsCard: true,
+    logo: EthLogo,
+    beaconExplorer: { url: "https://hoodi.beaconcha.in/", name: "Hoodi Beaconcha.in" }
+  },
   [Network.Sepolia]: { hasValidators: false, hasRewardsCard: false, logo: EthLogo }
 };
 
@@ -104,7 +125,7 @@ export function useNetworkStats() {
         },
         ...validatorsData,
         hasValidators: features.hasValidators,
-        hasRewardsCard: features.hasRewardsCard
+        beaconExplorer: features.beaconExplorer || undefined
       };
     } else {
       delete networkStats[network];
