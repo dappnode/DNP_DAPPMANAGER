@@ -39,7 +39,8 @@ import {
   WifiReport,
   WireguardDeviceCredentials,
   DockerUpgradeRequirements,
-  InstalledPackageData
+  InstalledPackageData,
+  UiActivityData
 } from "./calls.js";
 import { PackageEnvs } from "./compose.js";
 import { PackageBackup } from "./manifest.js";
@@ -829,6 +830,19 @@ export interface Routes {
 
   /** Get URLs to a single Wireguard credentials */
   wireguardDevicesGet(): Promise<string[]>;
+
+  /**
+   * Updates the UI activity metrics.
+   * Called periodically from the admin-ui to report user activity.
+   * @param isActive Whether the user is currently active
+   * @param sessionStartTimestamp When the current session started (Unix epoch seconds)
+   */
+  uiActivityUpdate: (kwargs: { isActive: boolean; sessionStartTimestamp: number }) => Promise<void>;
+
+  /**
+   * Gets the current UI activity metrics.
+   */
+  uiActivityGet: () => Promise<UiActivityData>;
 }
 
 interface RouteData {
@@ -973,7 +987,9 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   wireguardDeviceAdd: { log: true },
   wireguardDeviceRemove: { log: true },
   wireguardDeviceGet: {},
-  wireguardDevicesGet: {}
+  wireguardDevicesGet: {},
+  uiActivityUpdate: {},
+  uiActivityGet: {}
 };
 
 // DO NOT REMOVE
