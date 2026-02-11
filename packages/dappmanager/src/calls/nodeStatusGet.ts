@@ -1,3 +1,4 @@
+import { logs } from "@dappnode/logger";
 import { DashboardSupportedNetwork, NodeStatusByNetwork } from "@dappnode/types";
 
 const ecBaseUrl = (network: DashboardSupportedNetwork) => `http://execution.${network}.dncore.dappnode:8545`;
@@ -26,7 +27,7 @@ const getEcName = async (network: DashboardSupportedNetwork) => {
 
     return { name: clientName };
   } catch (e) {
-    console.error(`Error getting EC version: ${e}`);
+    logs.error(`Error getting EC version: ${e}`);
     return null;
   }
 };
@@ -91,7 +92,7 @@ const getEcSyncStatus = async (network: DashboardSupportedNetwork) => {
 
     return { isSynced, currentBlock, progress };
   } catch (e) {
-    console.error(`Error getting EC data: ${e}`);
+    logs.error(`Error getting EC data: ${e}`);
     return null;
   }
 };
@@ -116,7 +117,7 @@ const getEcPeers = async (network: DashboardSupportedNetwork) => {
     const peersData = await peersResponse.json();
     return peersData.result ? parseInt(peersData.result, 16) : 0;
   } catch (error) {
-    console.error(`Error getting EC peers: ${error}`);
+    logs.error(`Error getting EC peers: ${error}`);
     return null;
   }
 };
@@ -137,7 +138,7 @@ const getCcName = async (network: DashboardSupportedNetwork) => {
 
     return { name: clientName };
   } catch (e) {
-    console.error(`Error getting CC data: ${e}`);
+    logs.error(`Error getting CC data: ${e}`);
     return null;
   }
 };
@@ -153,7 +154,7 @@ const getCcPeers = async (network: DashboardSupportedNetwork) => {
     const peersData = await peersResponse.json();
     return peersData.data.connected;
   } catch (error) {
-    console.error(`Error getting CC peers: ${error}`);
+    logs.error(`Error getting CC peers: ${error}`);
     return null;
   }
 };
@@ -182,7 +183,7 @@ const getCcSyncStatus = async (network: DashboardSupportedNetwork) => {
 
     return { isSynced, currentBlock, progress };
   } catch (e) {
-    console.error(`Error getting CC data: ${e}`);
+    logs.error(`Error getting CC data: ${e}`);
     return null;
   }
 };
