@@ -262,12 +262,25 @@ export const ValidatorsCard = ({
 
 export const RewardsCard = ({
   network,
-  beaconExplorer
+  beaconExplorer,
+  pubKeys
 }: {
   network: string;
   beaconExplorer: { [key: string]: string };
+  pubKeys?: string[];
 }) => {
-  console.log(network, "RewardsCard data:", beaconExplorer);
+  // Construct dynamic Beaconcha.in dashboard URL for networks that support it (Mainnet and Hoodi)
+  const getDashboardUrl = () => {
+    const baseUrl = beaconExplorer.url;
+
+    if (pubKeys && pubKeys.length > 0 && (network === Network.Mainnet || network === Network.Hoodi)) {
+      return `${baseUrl}dashboard?validators=${pubKeys.join(",")}`;
+    }
+
+    return baseUrl;
+  };
+
+  const dashboardUrl = getDashboardUrl();
 
   return (
     <NetworkCard title="REWARDS" icon={<RewardsIcon />}>
@@ -276,7 +289,7 @@ export const RewardsCard = ({
       >
         View your detailed validator rewards in the explorer.
       </div>
-      <Button href={beaconExplorer.url} fullwidth {...newTabProps} variant="outline-dappnode">
+      <Button href={dashboardUrl} fullwidth {...newTabProps} variant="outline-dappnode">
         <span>{`Visit ${beaconExplorer.name}`}</span>
       </Button>
     </NetworkCard>

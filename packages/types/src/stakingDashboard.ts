@@ -29,6 +29,7 @@ export type NetworkStatus = {
     attesting: number;
     beaconError?: Error;
     signerStatus: SignerStatus;
+    pubKeys?: string[]; // Validator public keys used for beaconcha.in dynamic dashboard URLs
   };
   hasValidators: boolean; // Whether this network has validators
   beaconExplorer?: { url: string; name: string }; // Whether this network has a beacon explorer to redirect to for validator rewards

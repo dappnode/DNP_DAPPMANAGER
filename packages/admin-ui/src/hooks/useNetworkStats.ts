@@ -33,7 +33,7 @@ const networkFeatures: Record<DashboardSupportedNetwork, NetworkFeatures> = {
   [Network.Lukso]: {
     hasValidators: true,
     logo: LuksoLogo,
-    beaconExplorer: { url: "https://explorer.consensus.mainnet.lukso.network/", name: "Beacon Lukso Explorer" }
+    beaconExplorer: { url: "https://dora.explorer.mainnet.lukso.network/", name: "Beacon Lukso Explorer" }
   },
   [Network.Hoodi]: {
     hasValidators: true,
@@ -105,7 +105,8 @@ export function useNetworkStats() {
             balance,
             attesting,
             beaconError,
-            signerStatus
+            signerStatus,
+            pubKeys: validatorsActive?.validators || []
           }
         }
       : undefined;
