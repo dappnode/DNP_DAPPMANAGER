@@ -78,7 +78,6 @@ async function fetchAttestingPubkeysForBatch(network: Network, pubkeys: string[]
 
   // Get current epoch from head. Use last completed epoch = currentEpoch - 1
   const headHeaderUrl = new URL(`/eth/v1/beacon/headers/head`, base);
-  console.log(`[fetchAttestingPubkeysForBatch] headHeaderUrl:`, headHeaderUrl.toString());
 
   const headRes = await fetch(headHeaderUrl.toString(), { headers: { Accept: "application/json" } });
   if (!headRes.ok) {
@@ -89,7 +88,6 @@ async function fetchAttestingPubkeysForBatch(network: Network, pubkeys: string[]
 
   const slotStr = headJson?.data?.header?.message?.slot;
   if (!slotStr) throw new Error(`Beacon API ${network} headers/head missing data.header.message.slot`);
-  fetchAttestingPubkeysForBatch;
   const currentEpoch = Math.floor(Number(slotStr) / 32);
   const livenessEpoch = currentEpoch - 1; // "last epoch" and widely supported
 
