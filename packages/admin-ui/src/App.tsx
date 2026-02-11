@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import { Route, useLocation, useNavigate } from "react-router-dom";
 import { startApi, apiAuth, LoginStatus } from "api";
 // Components
 import { ToastContainer } from "react-toastify";
@@ -19,6 +19,8 @@ import { AppContextIface, Theme } from "types";
 import Smooth from "components/Smooth";
 import { PwaPermissionsAlert, PwaPermissionsModal } from "components/PwaPermissions";
 import { LocalProxyBanner } from "pages/wifi/components/localProxying/LocalProxyBanner";
+// Grafana Faro for frontend monitoring and tracing
+import { FaroRoutes } from "@grafana/faro-react";
 
 export const AppContext = React.createContext<AppContextIface>({
   theme: "light",
@@ -94,7 +96,7 @@ function MainApp({ username }: { username: string }) {
             <NotificationsMain />
           </ErrorBoundary>
           <PwaPermissionsAlert />
-          <Routes>
+          <FaroRoutes>
             {/** Provide the app context only to the dashboard (where the modules switch is handled) */}
             {Object.values(pages).map(({ RootComponent, rootPath }) => (
               <Route
@@ -110,7 +112,7 @@ function MainApp({ username }: { username: string }) {
             {/* Redirection for routes with hashes */}
             {/* 404 routes redirect to dashboard or default page */}
             <Route path="*" element={<DefaultRedirect />} />
-          </Routes>
+          </FaroRoutes>
         </div>
 
         {/* Place here non-page components */}
