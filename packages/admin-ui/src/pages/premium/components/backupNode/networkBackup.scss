@@ -49,6 +49,7 @@
     .consensus-card {
       .cc-item {
         padding: 10px;
+        font-size: 18px;
 
         background-color: var(--color-light-background-main);
         border-radius: 10px;
@@ -77,6 +78,7 @@
           flex-direction: row;
           justify-content: space-between;
           align-items: center;
+          font-size: 18px;
 
           .tooltip-beacon-api-error {
             margin-bottom: 3px;
@@ -128,10 +130,6 @@
       justify-content: center;
     }
 
-    .section-subtitle {
-      font-weight: bold;
-    }
-
     .action-backup-col {
       display: flex;
       flex-direction: column;
@@ -180,6 +178,7 @@
       padding: 6px 8px;
       border-radius: 5px;
       border-bottom: 1px solid #ddd;
+      font-size: 18px;
       cursor: pointer;
     }
 
