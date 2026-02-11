@@ -38,11 +38,11 @@ export default function NetworkStats() {
                     <ValidatorsCard network={network} validatorsLoading={validatorsLoading} data={data.validators} />
                   )}
 
-                  {data.beaconExplorer && (
+                  {data.beaconExplorer && data.validators && data.validators.total > 0 && (
                     <RewardsCard
                       network={network}
                       beaconExplorer={data.beaconExplorer}
-                      pubKeys={data.validators?.pubKeys}
+                      pubKeys={data.validators.pubKeys}
                     />
                   )}
                 </div>
