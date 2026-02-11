@@ -54,10 +54,10 @@ export default function SystemHealth() {
                   warning={85}
                 />
               </StatBlock>
-              <StatBlock title="Memory" icon={<MemoryIcon />} data={`${memoryUsed} /${memoryTotal}`}>
+              <StatBlock title="Memory" icon={<MemoryIcon />} data={`${memoryUsed} / ${memoryTotal}`}>
                 <CustomProgressBar value={memoryPercentage} />
               </StatBlock>
-              <StatBlock title="Disk" icon={<DiskIcon />} data={`${diskUsed} /${diskTotal}`}>
+              <StatBlock title="Disk" icon={<DiskIcon />} data={`${diskUsed} / ${diskTotal}`}>
                 <CustomProgressBar value={diskPercentage} />
               </StatBlock>
             </div>
