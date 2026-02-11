@@ -126,8 +126,6 @@ export function useNetworkStats() {
     } else {
       delete networkStats[network];
     }
-
-    console.log(`Network stats for ${network}:`, networkStats[network]);
   }
 
   // Provide a function to get the logo for a network
