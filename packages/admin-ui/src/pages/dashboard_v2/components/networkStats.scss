@@ -44,7 +44,7 @@
           color: black;
           margin-top: -5px;
         }
-        .client-status {
+        .badge-status {
           text-transform: capitalize;
           font-size: 14px;
           display: flex;
@@ -60,6 +60,10 @@
           &.syncing {
             background-color: rgb(255, 229, 204);
             color: orange;
+          }
+          &.offline {
+            background-color: rgb(255, 204, 204);
+            color: rgb(180, 0, 0);
           }
           &.waiting {
             padding-right: 4px;
@@ -198,7 +202,7 @@
   #main {
     .network-stats {
       .network-cards-container {
-        .client-status {
+        .badge-status {
           &.synced {
             background-color: green;
             color: rgb(203, 241, 203);
@@ -206,6 +210,10 @@
           &.syncing {
             background-color: orange;
             color: rgb(255, 229, 204);
+          }
+          &.offline {
+            background-color: rgb(180, 0, 0);
+            color: rgb(255, 204, 204);
           }
           &.waiting {
             background-color: #696969;

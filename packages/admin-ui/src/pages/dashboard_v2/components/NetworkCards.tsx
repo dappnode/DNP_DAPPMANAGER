@@ -84,7 +84,7 @@ export const StatusCard = ({
                     {consensusSynced ? (
                       <>
                         <div>#{execution.currentBlock}</div>
-                        <div className={`client-status ${execution.isSynced ? "synced" : "syncing"}`}>
+                        <div className={`badge-status ${execution.isSynced ? "synced" : "syncing"}`}>
                           {execution.isSynced ? "synced" : "syncing"}
                         </div>
                       </>
@@ -101,7 +101,7 @@ export const StatusCard = ({
                           <div>
                             <MdInfoOutline className="tooltip-icon" />
                           </div>
-                          <div className="client-status waiting">Waiting</div>
+                          <div className="badge-status waiting">Waiting</div>
                         </div>
                       </OverlayTrigger>
                     )}
@@ -135,7 +135,7 @@ export const StatusCard = ({
                     </div>
                     <div className="network-stat-col">
                       <div>#{consensus.currentBlock}</div>
-                      <div className={`client-status ${consensus.isSynced ? "synced" : "syncing"}`}>
+                      <div className={`badge-status ${consensus.isSynced ? "synced" : "syncing"}`}>
                         {consensus.isSynced ? "synced" : "syncing"}
                       </div>
                     </div>
@@ -226,8 +226,8 @@ export const ValidatorsCard = ({
                 <span>{data?.total ?? "0"}</span>
               </div>
               <div className="network-stat-col">
-                <div>ATTESTING</div>
-                <span>{data?.attesting ?? "-"}</span>
+                <div>STATUS</div>
+                {renderAttestingStatus(data?.attesting ?? 0, data?.total ?? 0)}
               </div>
             </div>
             <hr />
@@ -294,5 +294,24 @@ export const NoNodesCard = () => {
         </div>
       </div>
     </Card>
+  );
+};
+
+// Helper function to render attesting status
+const renderAttestingStatus = (attesting: number, total: number) => {
+  if (total === 0) {
+    return <span>-</span>;
+  }
+  if (attesting === total) {
+    return <div className="badge-status offline">Offline</div>;
+  }
+  if (attesting === 0) {
+    return <div className="badge-status synced">Online</div>;
+  }
+  // Partial: some attesting, some not
+  return (
+    <span className="badge-status syncing">
+      {attesting}/{total}
+    </span>
   );
 };
