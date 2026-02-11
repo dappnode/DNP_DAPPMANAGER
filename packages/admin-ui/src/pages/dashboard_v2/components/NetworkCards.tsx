@@ -316,10 +316,10 @@ const renderAttestingStatus = (attesting: number, total: number) => {
     return <span>-</span>;
   }
   if (attesting === total) {
-    return <div className="badge-status offline">Offline</div>;
+    return <div className="badge-status synced">Online</div>;
   }
   if (attesting === 0) {
-    return <div className="badge-status synced">Online</div>;
+    return <div className="badge-status offline">Offline</div>;
   }
   // Partial: some attesting, some not
   return (
