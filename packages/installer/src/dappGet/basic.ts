@@ -22,7 +22,7 @@ export default async function dappGetBasic(
   const dependencies = await dappGetFetcher.dependencies(dappnodeInstaller, req.name, req.ver);
 
   // Append dependencies in the list of DNPs to install
-  // Add current request to pacakages to install
+  // Add current request to packages to install
   const state = {
     ...dependencies,
     [req.name]: req.ver
@@ -30,7 +30,7 @@ export default async function dappGetBasic(
   const alreadyUpdated: DappGetState = {};
   const currentVersions: DappGetState = {};
 
-  // The function below does not directly affect funcionality.
+  // The function below does not directly affect functionality.
   // However it would prevent already installed DNPs from installing
   try {
     const installedDnps = await listPackages();
@@ -39,7 +39,7 @@ export default async function dappGetBasic(
       const nextVersion = state[dnp.dnpName];
       if (nextVersion && !shouldUpdate(prevVersion, nextVersion)) {
         // DNP is already updated.
-        // Remove from the success object and add it to the alreadyUpdatedd
+        // Remove from the success object and add it to the alreadyUpdated
         alreadyUpdated[dnp.dnpName] = state[dnp.dnpName];
         delete state[dnp.dnpName];
       }

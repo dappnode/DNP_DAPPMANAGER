@@ -38,7 +38,7 @@ export default function NotificationsView() {
   useEffect(() => {
     const interval = setInterval(() => {
       notificationsCall.revalidate();
-    }, 60 * 1000); // Re-fecthes banner notifications every minute
+    }, 60 * 1000); // Re-fetches banner notifications every minute
 
     return () => clearInterval(interval);
   }, []);

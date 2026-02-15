@@ -74,7 +74,7 @@ export class AuthPasswordSession {
         throw new NotLoggedInError();
       }
     } else {
-      // Sanity check for cookie existance
+      // Sanity check for cookie existence
       if (req.cookies) throw new NotLoggedInError();
       else throw new NotLoggedInNoCookieError();
     }
