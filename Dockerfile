@@ -40,8 +40,8 @@ ENV COMPOSE_HTTP_TIMEOUT=300 \
   UI_FILES_PATH=/usr/src/app/packages/admin-ui/build \
   GIT_DATA_PATH=.git-data.json 
 
-# Install necessary packages
-RUN apk add --no-cache docker curl docker-cli-compose xz zip unzip libltdl bind bind-dev bind-tools avahi-tools dbus miniupnpc
+# Install necessary packages (including Tor for anonymous metrics forwarding via SOCKS5 on port 9050)
+RUN apk add --no-cache docker curl docker-cli-compose xz zip unzip libltdl bind bind-dev bind-tools avahi-tools dbus miniupnpc tor
 
 # Copy git data
 COPY --from=git-data /usr/src/app/.git-data.json $GIT_DATA_PATH
