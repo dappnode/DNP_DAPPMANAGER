@@ -16,20 +16,55 @@ import "./dappnode_styles.scss";
 import "./dappnode_colors.scss";
 import "./light_dark.scss";
 import "./layout.scss";
+// PWA
 import { PwaInstallProvider } from "pages/system/components/App/PwaInstallContext";
-import { initializeFaro, InternalLoggerLevel } from "@grafana/faro-web-sdk";
-import { diag, DiagConsoleLogger, DiagLogLevel } from "@opentelemetry/api";
-
-diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
+// Grafana Faro for frontend monitoring and tracing
+import { createRoutesFromChildren, matchRoutes, Routes, useLocation, useNavigationType } from "react-router-dom";
+import {
+  createReactRouterV6Options,
+  getWebInstrumentations,
+  initializeFaro,
+  ReactIntegration
+} from "@grafana/faro-react";
+import { getDefaultOTELInstrumentations, TracingInstrumentation } from "@grafana/faro-web-tracing";
 
 initializeFaro({
-  url: "http://alloy.dms.dappnode:12345/collect",
+  url: "http://my.dappnode:8080",
   app: {
-    name: "frontend",
-    version: "1.0.0"
+    name: "dappnode",
+    version: "1.0.0",
+    environment: "production"
   },
-  internalLoggerLevel: InternalLoggerLevel.VERBOSE // Possible values are: OFF, ERROR, WARN, INFO, VERBOSE
+  sessionTracking: {
+    samplingRate: 1,
+    persistent: true
+  },
+  instrumentations: [
+    // Mandatory, omits default instrumentations otherwise.
+    ...getWebInstrumentations({
+      
+    }),
+
+    // Tracing package to get end-to-end visibility for HTTP requests.
+    new TracingInstrumentation({
+      instrumentations: [...getDefaultOTELInstrumentations({ ignoreUrls: [/my.dappnode:8080/],})], // ignore ui-metrics endpoint to avoid having spam of requests in grafana-cloud
+    }),
+
+    // React integration for React applications.
+    new ReactIntegration({
+      router: createReactRouterV6Options({
+        createRoutesFromChildren,
+        matchRoutes,
+        Routes,
+        useLocation,
+        useNavigationType
+      })
+    })
+  ]
 });
+
+// push version using grafana faro
+
 
 // This process.env. vars will be substituted at build time
 // The VITE_APP_ prefix is mandatory for the substitution to work
@@ -38,8 +73,6 @@ window.versionData = cleanObj({
   branch: import.meta.env.VITE_APP_BRANCH,
   commit: import.meta.env.VITE_APP_COMMIT
 });
-
-console.error("ffff");
 
 const root = createRoot(document.getElementById("root") as HTMLElement);
 
