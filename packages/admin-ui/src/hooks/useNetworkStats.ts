@@ -6,7 +6,8 @@ import {
   Network,
   NetworkStats,
   NodeStatus,
-  NodeStatusByNetwork
+  NodeStatusByNetwork,
+  SignerStatus
 } from "@dappnode/types";
 import { api, useApi } from "api";
 import EthLogo from "img/logos/eth-logo.svg?react";
@@ -95,29 +96,52 @@ function getNetworksWithInstalledClients(
   return networks;
 }
 
+type ValidatorsByNetwork = Partial<Record<Network, { validators: string[]; beaconError?: Error } | null>>;
+type ValidatorsBalancesByNetwork = Partial<
+  Record<Network, { balances: Record<string, string>; beaconError?: Error } | null>
+>;
+type SignersStatusByNetwork = Partial<Record<Network, SignerStatus>>;
+
 export function useNetworkStats() {
-  // Fetch consensus and execution clients for all supported networks
+  // Step 1: Fetch consensus and execution clients for all supported networks
   const consensusClientsReq = useApi.consensusClientsGetByNetworks({ networks: supportedNetworks });
   const executionClientsReq = useApi.executionClientsGetByNetworks({ networks: supportedNetworks });
 
   const consensusClientsByNetwork = consensusClientsReq.data;
   const executionClientsByNetwork = executionClientsReq.data;
 
+  // States fetched only for networks with installed clients
   const [nodesStatusByNetwork, setNodesStatusByNetwork] = useState<NodeStatusByNetwork | undefined>(undefined);
   const [nodesStatusLoading, setNodesStatusLoading] = useState(false);
+  const [validatorsActiveByNetwork, setValidatorsActiveByNetwork] = useState<ValidatorsByNetwork | undefined>(
+    undefined
+  );
+  const [validatorsAttestingByNetwork, setValidatorsAttestingByNetwork] = useState<ValidatorsByNetwork | undefined>(
+    undefined
+  );
+  const [validatorsBalancesByNetwork, setValidatorsBalancesByNetwork] = useState<
+    ValidatorsBalancesByNetwork | undefined
+  >(undefined);
+  const [signersStatusByNetwork, setSignersStatusByNetwork] = useState<SignersStatusByNetwork | undefined>(undefined);
+  const [validatorsLoading, setValidatorsLoading] = useState(false);
+
   const lastFetchedNetworksKey = useRef<string>("");
 
-  const fetchNodesStatus = useCallback(async () => {
+  const fetchNetworkData = useCallback(async () => {
     if (!consensusClientsByNetwork || !executionClientsByNetwork) return;
 
-    // Collect all dnpNames from both client responses
+    // Step 2: Collect all dnpNames from both client responses
     const dnpNames = collectDnpNames(consensusClientsByNetwork, executionClientsByNetwork);
     if (dnpNames.size === 0) {
       setNodesStatusByNetwork({});
+      setValidatorsActiveByNetwork({});
+      setValidatorsAttestingByNetwork({});
+      setValidatorsBalancesByNetwork({});
+      setSignersStatusByNetwork({});
       return;
     }
 
-    // Verify packages are installed
+    // Step 3: Verify which packages are installed
     let installedDnpNames: Set<string>;
     try {
       const installedPackages = await api.packagesGet();
@@ -130,6 +154,10 @@ export function useNetworkStats() {
 
     if (installedDnpNames.size === 0) {
       setNodesStatusByNetwork({});
+      setValidatorsActiveByNetwork({});
+      setValidatorsAttestingByNetwork({});
+      setValidatorsBalancesByNetwork({});
+      setSignersStatusByNetwork({});
       return;
     }
 
@@ -141,6 +169,10 @@ export function useNetworkStats() {
 
     if (networksWithClients.length === 0) {
       setNodesStatusByNetwork({});
+      setValidatorsActiveByNetwork({});
+      setValidatorsAttestingByNetwork({});
+      setValidatorsBalancesByNetwork({});
+      setSignersStatusByNetwork({});
       return;
     }
 
@@ -149,39 +181,37 @@ export function useNetworkStats() {
     if (networksKey === lastFetchedNetworksKey.current) return;
     lastFetchedNetworksKey.current = networksKey;
 
+    // Step 4: Fetch node status, validators, and signer data only for networks with installed clients
     try {
       setNodesStatusLoading(true);
-      const nodeStatus = await api.nodeStatusGetByNetwork({ networks: networksWithClients });
+      setValidatorsLoading(true);
+
+      const [nodeStatus, validatorsActive, validatorsAttesting, validatorsBalances, signersStatus] = await Promise.all([
+        api.nodeStatusGetByNetwork({ networks: networksWithClients }),
+        api.validatorsFilterActiveByNetwork({ networks: networksWithClients }),
+        api.validatorsFilterAttestingByNetwork({ networks: networksWithClients }),
+        api.validatorsBalancesByNetwork({ networks: networksWithClients }),
+        api.signerByNetworkGet({ networks: networksWithClients })
+      ]);
+
       setNodesStatusByNetwork(nodeStatus);
+      setValidatorsActiveByNetwork(validatorsActive);
+      setValidatorsAttestingByNetwork(validatorsAttesting);
+      setValidatorsBalancesByNetwork(validatorsBalances);
+      setSignersStatusByNetwork(signersStatus);
     } catch (e) {
-      console.error("Error fetching node status by network", e);
+      console.error("Error fetching network data", e);
     } finally {
       setNodesStatusLoading(false);
+      setValidatorsLoading(false);
     }
   }, [consensusClientsByNetwork, executionClientsByNetwork]);
 
   useEffect(() => {
-    fetchNodesStatus();
-  }, [fetchNodesStatus]);
-
-  // Validators requests (unchanged, still fetched for all supported networks)
-  const validatorsFilterActiveReq = useApi.validatorsFilterActiveByNetwork({ networks: supportedNetworks });
-  const validatorsFilterAttestingReq = useApi.validatorsFilterAttestingByNetwork({ networks: supportedNetworks });
-  const validatorsBalancesReq = useApi.validatorsBalancesByNetwork({ networks: supportedNetworks });
-  const signersStatusReq = useApi.signerByNetworkGet({ networks: supportedNetworks });
-
-  const validatorsActiveByNetwork = validatorsFilterActiveReq.data;
-  const validatorsAttestingByNetwork = validatorsFilterAttestingReq.data;
-  const validatorsBalancesByNetwork = validatorsBalancesReq.data;
-  const signersStatusByNetwork = signersStatusReq.data;
+    fetchNetworkData();
+  }, [fetchNetworkData]);
 
   const clientsLoading = nodesStatusLoading || consensusClientsReq.isValidating || executionClientsReq.isValidating;
-
-  const validatorsLoading =
-    validatorsFilterActiveReq.isValidating ||
-    validatorsFilterAttestingReq.isValidating ||
-    validatorsBalancesReq.isValidating ||
-    signersStatusReq.isValidating;
 
   const networkStats: NetworkStats = {};
 
