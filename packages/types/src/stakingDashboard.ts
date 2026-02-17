@@ -15,7 +15,13 @@ export type ClientData = {
   peers: number;
 } | null;
 
-export type NodeStatus = { ec: ClientData; cc: ClientData };
+export type ClientError = {
+  error: string;
+};
+
+export type ClientResult = ClientData | ClientError;
+
+export type NodeStatus = { ec: ClientResult; cc: ClientResult };
 
 export type NetworkStatus = {
   nodeStatus: NodeStatus | undefined;

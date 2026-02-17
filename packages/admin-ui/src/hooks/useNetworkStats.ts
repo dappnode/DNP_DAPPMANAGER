@@ -1,5 +1,13 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { DashboardSupportedNetwork, Network, NetworkStats, NodeStatus, NodeStatusByNetwork } from "@dappnode/types";
+import {
+  ClientError,
+  ClientResult,
+  DashboardSupportedNetwork,
+  Network,
+  NetworkStats,
+  NodeStatus,
+  NodeStatusByNetwork
+} from "@dappnode/types";
 import { api, useApi } from "api";
 import EthLogo from "img/logos/eth-logo.svg?react";
 import GnosisLogo from "img/logos/gnosis-logo.svg?react";
@@ -217,8 +225,10 @@ export function useNetworkStats() {
         }
       : undefined;
 
-    // Remove network where no node data is available
-    if (nodeStatusData && (nodeStatusData.ec || nodeStatusData.cc)) {
+    // Show network when any client has data or an error (but not when both are null)
+    const hasEc = nodeStatusData?.ec !== null && nodeStatusData?.ec !== undefined;
+    const hasCc = nodeStatusData?.cc !== null && nodeStatusData?.cc !== undefined;
+    if (nodeStatusData && (hasEc || hasCc)) {
       networkStats[network] = {
         nodeStatus: nodeStatusData,
         clientsDnps: {
@@ -240,4 +250,8 @@ export function useNetworkStats() {
   }
 
   return { networkStats, clientsLoading, getNetworkLogo, validatorsLoading };
+}
+
+export function isClientError(result: ClientResult): result is ClientError {
+  return result !== null && typeof result === "object" && "error" in result;
 }

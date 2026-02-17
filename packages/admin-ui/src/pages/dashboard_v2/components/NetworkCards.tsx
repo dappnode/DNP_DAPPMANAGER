@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { basePath as stakersBasePath, relativePath as stakersPath } from "pages/stakers";
 import { relativePath as packagesRelativePath } from "pages/packages";
 import { Network, NetworkStatus, NodeStatus } from "@dappnode/types";
+import { isClientError } from "hooks/useNetworkStats";
 import newTabProps from "utils/newTabProps";
 import { gweiToToken } from "utils/gweiToToken";
 import { capitalize } from "utils/strings";
@@ -49,8 +50,16 @@ export const StatusCard = ({
   };
 }) => {
   const navigate = useNavigate();
-  const execution = data && data.ec;
-  const consensus = data && data.cc;
+
+  const ecResult = data?.ec;
+  const ccResult = data?.cc;
+
+  const ecError = ecResult && isClientError(ecResult) ? ecResult : null;
+  const ccError = ccResult && isClientError(ccResult) ? ccResult : null;
+  const parseClientName = (dnpName: string) => capitalize(dnpName.split(".")[0].split("-")[0] ?? "-");
+
+  const execution = ecResult && !isClientError(ecResult) ? ecResult : null;
+  const consensus = ccResult && !isClientError(ccResult) ? ccResult : null;
 
   const consensusSynced = consensus ? consensus.isSynced : false; // Used to determine if we can show execution sync progress to avoid synced false positives
 
@@ -60,7 +69,40 @@ export const StatusCard = ({
         <Loading small />
       ) : data ? (
         <div className="status-card-container">
-          {execution && (
+          {ecError ? (
+            <div>
+              <div className="status-client-row">
+                <div className="network-stat-col">
+                  <div>EXECUTION</div>
+                  <span>
+                    {clientsDnps?.ecDnp ? (
+                      <Link to={`/${packagesRelativePath}/${clientsDnps.ecDnp}/info`}>
+                        {parseClientName(clientsDnps.ecDnp)}
+                      </Link>
+                    ) : (
+                      "-"
+                    )}
+                  </span>
+                </div>
+                <div className="status-client-details">
+                  <div />
+                  <div className="network-stat-col">
+                    <OverlayTrigger
+                      overlay={<Tooltip id={`ec-error-tooltip-${network}`}>{ecError.error}</Tooltip>}
+                      placement="top"
+                    >
+                      <div>
+                        <div>
+                          <MdInfoOutline className="tooltip-icon" />
+                        </div>
+                        <div className="badge-status offline">Error</div>
+                      </div>
+                    </OverlayTrigger>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : execution ? (
             <div>
               <div className="status-client-row">
                 <div className="network-stat-col">
@@ -110,9 +152,42 @@ export const StatusCard = ({
               </div>
               {consensusSynced && !execution.isSynced && <ProgressBar animated now={execution.progress} />}
             </div>
-          )}
+          ) : null}
           <hr />
-          {consensus && (
+          {ccError ? (
+            <div>
+              <div className="status-client-row">
+                <div className="network-stat-col">
+                  <div>CONSENSUS</div>
+                  <span>
+                    {clientsDnps?.ccDnp ? (
+                      <Link to={`/${packagesRelativePath}/${clientsDnps.ccDnp}/info`}>
+                        {parseClientName(clientsDnps.ccDnp)}
+                      </Link>
+                    ) : (
+                      "-"
+                    )}
+                  </span>
+                </div>
+                <div className="status-client-details">
+                  <div />
+                  <div className="network-stat-col">
+                    <OverlayTrigger
+                      overlay={<Tooltip id={`cc-error-tooltip-${network}`}>{ccError.error}</Tooltip>}
+                      placement="top"
+                    >
+                      <div>
+                        <div>
+                          <MdInfoOutline className="tooltip-icon" />
+                        </div>
+                        <div className="badge-status offline">Error</div>
+                      </div>
+                    </OverlayTrigger>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : consensus ? (
             <div>
               <div className="status-client-row">
                 <>
@@ -144,7 +219,7 @@ export const StatusCard = ({
               </div>
               {!consensus.isSynced && <ProgressBar animated now={consensus.progress} />}
             </div>
-          )}
+          ) : null}
         </div>
       ) : (
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>Data could not be fetched</div>
@@ -299,7 +374,7 @@ export const RewardsCard = ({
 export const NoNodesCard = () => {
   return (
     <Card>
-      <div className="no-nodes-card" style={{ textAlign: "center" }}>
+      <div className="no-nodes-card">
         <h5>No nodes configured yet!</h5>
         <div>You haven't set up a node on any network.</div>
         <div>
