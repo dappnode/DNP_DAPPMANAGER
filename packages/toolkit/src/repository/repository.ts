@@ -1,7 +1,12 @@
 import * as isIPFS from "is-ipfs";
 import { CID, IPFSEntry } from "kubo-rpc-client";
+import { CarReader } from "@ipld/car";
+import { recursive as exporter } from "ipfs-unixfs-exporter";
+import { Version } from "multiformats";
 import path from "path";
 import fs from "fs";
+import stream from "stream";
+import util from "util";
 import {
   ReleaseSignature,
   TrustedReleaseKey,
@@ -24,11 +29,9 @@ import { getReleaseSignatureStatus, serializeIpfsDirectory } from "./releaseSign
 import { isEnsDomain } from "../isEnsDomain.js";
 import { dappnodeRegistry } from "./params.js";
 import { JsonRpcApiProvider } from "ethers";
-import { CidContentProviderResolver } from "./contentProvider/contentProviderResolver.js";
-import { GatewayIpfsProvider } from "./contentProvider/ipfsProvider.js";
 import { HttpMirrorMapCache } from "./contentProvider/mirrorMapCache.js";
 import { HttpMirrorProvider } from "./contentProvider/mirrorProvider.js";
-import { OnContentProviderEvent } from "./contentProvider/types.js";
+import { FetchByCidOptions, OnContentProviderEvent } from "./contentProvider/types.js";
 
 const source = "ipfs" as const;
 
@@ -55,8 +58,7 @@ export type DappnodeRepositoryOptions = {
 export class DappnodeRepository extends ApmRepository {
   protected gatewayUrl: string;
   protected localIpfsUrl = "http://ipfs.dappnode:5001";
-  private readonly contentResolver: CidContentProviderResolver;
-  private readonly ipfsProvider: GatewayIpfsProvider;
+  private readonly mirrorProvider?: HttpMirrorProvider;
 
   /**
    * Constructs an instance of DappnodeRepository
@@ -68,28 +70,19 @@ export class DappnodeRepository extends ApmRepository {
     this.gatewayUrl = ipfsUrl.replace(/\/?$/, ""); // e.g. "https://gateway.pinata.cloud"
 
     const mirrorConfig = options?.mirrorContentMap;
-    const ipfsProvider = new GatewayIpfsProvider({
-      gatewayUrl: this.gatewayUrl,
-      defaultTimeoutMs: 30 * 1000
-    });
-
-    this.ipfsProvider = ipfsProvider;
-    this.contentResolver = new CidContentProviderResolver({
-      ipfsProvider,
-      mirrorProvider: mirrorConfig?.mapUrl
-        ? new HttpMirrorProvider({
-            mapCache: new HttpMirrorMapCache({
-              mapUrl: mirrorConfig.mapUrl,
-              ttlMs: mirrorConfig.ttlMs ?? 10 * 60 * 1000,
-              timeoutMs: mirrorConfig.mapFetchTimeoutMs ?? 8 * 1000
-            }),
-            timeoutMs: mirrorConfig.timeoutMs ?? 20 * 1000,
-            retries: mirrorConfig.retries ?? 1,
-            maxDownloadBytes: mirrorConfig.maxDownloadBytes ?? 10 * 1024 * 1024 * 1024,
-            allowHttpUrls: mirrorConfig.allowHttpUrls ?? false
-          })
-        : undefined
-    });
+    if (mirrorConfig?.mapUrl) {
+      this.mirrorProvider = new HttpMirrorProvider({
+        mapCache: new HttpMirrorMapCache({
+          mapUrl: mirrorConfig.mapUrl,
+          ttlMs: mirrorConfig.ttlMs ?? 10 * 60 * 1000,
+          timeoutMs: mirrorConfig.mapFetchTimeoutMs ?? 8 * 1000
+        }),
+        timeoutMs: mirrorConfig.timeoutMs ?? 20 * 1000,
+        retries: mirrorConfig.retries ?? 1,
+        maxDownloadBytes: mirrorConfig.maxDownloadBytes ?? 10 * 1024 * 1024 * 1024,
+        allowHttpUrls: mirrorConfig.allowHttpUrls ?? false
+      });
+    }
   }
 
   /**
@@ -98,7 +91,6 @@ export class DappnodeRepository extends ApmRepository {
    */
   public changeIpfsGatewayUrl(ipfsUrl: string): void {
     this.gatewayUrl = ipfsUrl.replace(/\/?$/, "");
-    this.ipfsProvider.setGatewayUrl(this.gatewayUrl);
   }
 
   /**
@@ -303,14 +295,40 @@ export class DappnodeRepository extends ApmRepository {
     maxLength?: number,
     onContentProviderEvent?: OnContentProviderEvent
   ): Promise<string> {
-    const result = await this.contentResolver.fetchByCid(hash, {
+    const mirrorAttempt = await this.downloadFromMirrorIfAvailable(hash, {
       onContentProviderEvent
     });
 
-    if (maxLength && result.bytes.length >= maxLength) throw Error(`Maximum size ${maxLength} bytes exceeded`);
+    if (mirrorAttempt.bytes) {
+      if (maxLength && mirrorAttempt.bytes.length >= maxLength) throw Error(`Maximum size ${maxLength} bytes exceeded`);
+      const decoder = new TextDecoder("utf-8");
+      return decoder.decode(mirrorAttempt.bytes);
+    }
 
+    const chunks: Uint8Array[] = [];
+    const { carReader, root } = await this.getAndVerifyContentFromGateway(hash);
+    const content = await this.unpackCarReader(carReader, root);
+    for await (const chunk of content) chunks.push(chunk);
+
+    let totalLength = 0;
+    chunks.forEach((chunk) => (totalLength += chunk.length));
+    const buffer = new Uint8Array(totalLength);
+    let offset = 0;
+    chunks.forEach((chunk) => {
+      buffer.set(chunk, offset);
+      offset += chunk.length;
+    });
+
+    if (maxLength && buffer.length >= maxLength) throw Error(`Maximum size ${maxLength} bytes exceeded`);
+
+    onContentProviderEvent?.({
+      provider: "ipfs",
+      status: "success",
+      cid: hash,
+      reason: mirrorAttempt.ipfsReason
+    });
     const decoder = new TextDecoder("utf-8");
-    return decoder.decode(result.bytes);
+    return decoder.decode(buffer);
   }
 
   /**
@@ -345,23 +363,140 @@ export class DappnodeRepository extends ApmRepository {
   }): Promise<void> {
     if (!_path || _path.startsWith("/ipfs/") || !path.isAbsolute(_path)) throw Error(`Invalid path: "${_path}"`);
 
-    const content = await this.contentResolver.fetchByCid(hash, {
+    const mirrorAttempt = await this.downloadFromMirrorIfAvailable(hash, {
       timeoutMs: timeout || 30 * 1000,
       expectedSize: fileSize,
       progress,
       onContentProviderEvent
     });
 
-    const tempPath = `${_path}.tmp-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-    try {
-      await fs.promises.writeFile(tempPath, content.bytes);
-      await fs.promises.rename(tempPath, _path);
-    } catch (e) {
-      await fs.promises.unlink(tempPath).catch(() => {
-        // Best effort cleanup.
-      });
-      throw e;
+    if (mirrorAttempt.bytes) {
+      const tempPath = `${_path}.tmp-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      try {
+        await fs.promises.writeFile(tempPath, mirrorAttempt.bytes);
+        await fs.promises.rename(tempPath, _path);
+      } catch (e) {
+        await fs.promises.unlink(tempPath).catch(() => {
+          // Best effort cleanup.
+        });
+        throw e;
+      }
+      return;
     }
+
+    const { carReader, root } = await this.getAndVerifyContentFromGateway(hash);
+    const readable = await this.unpackCarReader(carReader, root);
+
+    return new Promise((resolve, reject) => {
+      async function handleDownload(): Promise<void> {
+        if (!_path || _path.startsWith("/ipfs/") || !path.isAbsolute("/")) reject(Error(`Invalid path: "${path}"`));
+
+        const asyncIterableArray: Uint8Array[] = [];
+
+        const timeoutToCancel = setTimeout(
+          () => {
+            reject(Error(`Timeout downloading ${hash}`));
+          },
+          timeout || 30 * 1000
+        );
+
+        let totalData = 0;
+        let previousProgress = -1;
+        const resolution = 1;
+        const round = (n: number): number => resolution * Math.round((100 * n) / resolution);
+
+        const onData = (chunk: Uint8Array): void => {
+          clearTimeout(timeoutToCancel);
+          totalData += chunk.length;
+          asyncIterableArray.push(chunk);
+          if (progress && fileSize) {
+            const currentProgress = round(totalData / fileSize);
+            if (currentProgress !== previousProgress) {
+              progress(currentProgress);
+              previousProgress = currentProgress;
+            }
+          }
+        };
+
+        const onFinish = (): void => {
+          clearTimeout(timeoutToCancel);
+          onContentProviderEvent?.({
+            provider: "ipfs",
+            status: "success",
+            cid: hash,
+            reason: mirrorAttempt.ipfsReason
+          });
+          resolve();
+        };
+
+        const onError =
+          (streamId: string) =>
+          (err: Error): void => {
+            clearTimeout(timeoutToCancel);
+            reject(Error(streamId + ": " + err));
+          };
+
+        try {
+          for await (const chunk of readable) onData(chunk);
+
+          const writable = fs.createWriteStream(_path);
+          await util.promisify(stream.pipeline)(stream.Readable.from(asyncIterableArray), writable);
+          onFinish();
+        } catch (e) {
+          onError("Error writing to fs")(e as Error);
+        }
+      }
+
+      handleDownload().catch((error) => reject(error));
+    });
+  }
+
+  private async downloadFromMirrorIfAvailable(
+    hash: string,
+    options: FetchByCidOptions & { onContentProviderEvent?: OnContentProviderEvent }
+  ): Promise<{
+    bytes: Uint8Array | null;
+    ipfsReason: "mirror-miss" | "mirror-failed" | "ipfs-only";
+  }> {
+    if (!this.mirrorProvider) {
+      return {
+        bytes: null,
+        ipfsReason: "ipfs-only"
+      };
+    }
+
+    const mirrorResult = await this.mirrorProvider.fetchByCid(hash, options);
+    if (mirrorResult.status === "success") {
+      options.onContentProviderEvent?.({
+        provider: "mirror",
+        status: "success",
+        cid: hash,
+        urlHost: mirrorResult.urlHost
+      });
+      return {
+        bytes: mirrorResult.bytes,
+        ipfsReason: "mirror-miss"
+      };
+    }
+
+    if (mirrorResult.status === "failed") {
+      options.onContentProviderEvent?.({
+        provider: "mirror",
+        status: "failed",
+        cid: hash,
+        reason: mirrorResult.reason,
+        urlHost: mirrorResult.urlHost
+      });
+      return {
+        bytes: null,
+        ipfsReason: "mirror-failed"
+      };
+    }
+
+    return {
+      bytes: null,
+      ipfsReason: "mirror-miss"
+    };
   }
 
   /**
@@ -403,6 +538,58 @@ export class DappnodeRepository extends ApmRepository {
       path: `${link.Hash["/"]}/${link.Name}`,
       size: link.Tsize
     }));
+  }
+
+  /**
+   * Gets the content from an IPFS gateway using the given hash and verifies its integrity.
+   * The content is returned as a CAR reader and the root CID.
+   */
+  private async getAndVerifyContentFromGateway(hash: string): Promise<{
+    carReader: CarReader;
+    root: CID;
+  }> {
+    const url = `${this.gatewayUrl}/ipfs/${hash}?format=car`;
+    const res = await fetch(url, {
+      headers: { Accept: "application/vnd.ipld.car" }
+    });
+    if (!res.ok) throw new Error(`Gateway error: ${res.status} ${res.statusText}`);
+
+    const bytes = new Uint8Array(await res.arrayBuffer());
+    const carReader = await CarReader.fromBytes(bytes);
+
+    const roots = await carReader.getRoots();
+    const root = roots[0];
+    if (roots.length !== 1 || root.toString() !== CID.parse(hash).toString()) {
+      throw new Error(`UNTRUSTED CONTENT: expected root ${hash}, got ${roots}`);
+    }
+
+    return { carReader, root };
+  }
+
+  /**
+   * Unpacks a CAR reader and returns an async iterable of uint8arrays.
+   */
+  private async unpackCarReader(
+    carReader: CarReader,
+    root: CID<unknown, number, number, Version>
+  ): Promise<AsyncIterable<Uint8Array>> {
+    const iterable: AsyncIterable<Uint8Array>[] = [];
+
+    const entries = exporter(root, {
+      async get(cid) {
+        const block = await carReader.get(cid as CID);
+        if (!block) throw Error(`Could not get block ${cid}`);
+        return block.bytes;
+      }
+    });
+
+    for await (const entry of entries) {
+      if (entry.type === "file") iterable.push(entry.content());
+      else throw Error(`Expected type: file, got: ${entry.type}`);
+    }
+    if (iterable.length > 1) throw Error(`Unexpected number of files. There must be only one`);
+
+    return iterable[0];
   }
 
   /**

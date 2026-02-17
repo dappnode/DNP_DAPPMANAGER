@@ -1,7 +1,3 @@
-export type ContentProviderName = "ipfs" | "mirror";
-
-export type ContentProviderReason = "mirror-miss" | "mirror-failed" | "ipfs-only";
-
 export type ContentProviderEvent =
   | {
       provider: "mirror";
@@ -20,7 +16,7 @@ export type ContentProviderEvent =
       provider: "ipfs";
       status: "success";
       cid: string;
-      reason: ContentProviderReason;
+      reason: "mirror-miss" | "mirror-failed" | "ipfs-only";
     };
 
 export type OnContentProviderEvent = (event: ContentProviderEvent) => void;
@@ -29,15 +25,6 @@ export interface FetchByCidOptions {
   timeoutMs?: number;
   expectedSize?: number;
   progress?: (n: number) => void;
-}
-
-export interface FetchByCidResult {
-  bytes: Uint8Array;
-  provider: ContentProviderName;
-}
-
-export interface IpfsProvider {
-  fetchByCid(cid: string, options?: FetchByCidOptions): Promise<FetchByCidResult>;
 }
 
 export type MirrorMapEntry = {
