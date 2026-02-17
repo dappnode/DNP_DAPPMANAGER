@@ -234,7 +234,7 @@ export function useNetworkStats() {
       total = validatorsActive.validators.length;
       beaconError = validatorsActive.beaconError;
     }
-    if (features.hasValidators && validatorsAttesting) {
+    if (features.hasValidators && validatorsAttesting && !validatorsAttesting.beaconError) {
       attesting = validatorsAttesting.validators.length;
     }
     if (features.hasValidators && balancesObj && validatorsActive) {
