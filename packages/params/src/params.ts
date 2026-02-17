@@ -6,6 +6,14 @@ const MINUTE = 60 * 1000; // miliseconds
 const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
 
+function parseEnvPositiveInt(key: string, defaultValue: number): number {
+  const rawValue = process.env[key];
+  if (!rawValue) return defaultValue;
+
+  const parsed = parseInt(rawValue, 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : defaultValue;
+}
+
 /**
  * DAPPMANAGER Parameters. This parameters are modified on execution for testing
  */
@@ -155,6 +163,16 @@ export const params = {
 
   // Install method parameters
   ALWAYS_DAPPGETBASIC: process.env.ALWAYS_DAPPGETBASIC === 'true',
+  CONTENT_MIRROR_MAP_URL: process.env.CONTENT_MIRROR_MAP_URL || "https://installer.dappnode.io/content-map.json",
+  CONTENT_MIRROR_MAP_TTL_MS: parseEnvPositiveInt("CONTENT_MIRROR_MAP_TTL_MS", 10 * MINUTE),
+  CONTENT_MIRROR_MAP_FETCH_TIMEOUT_MS: parseEnvPositiveInt("CONTENT_MIRROR_MAP_FETCH_TIMEOUT_MS", 8 * 1000),
+  CONTENT_MIRROR_TIMEOUT_MS: parseEnvPositiveInt("CONTENT_MIRROR_TIMEOUT_MS", 20 * 1000),
+  CONTENT_MIRROR_RETRIES: parseEnvPositiveInt("CONTENT_MIRROR_RETRIES", 1),
+  CONTENT_MIRROR_MAX_DOWNLOAD_BYTES: parseEnvPositiveInt(
+    "CONTENT_MIRROR_MAX_DOWNLOAD_BYTES",
+    10 * 1024 * 1024 * 1024
+  ),
+  CONTENT_MIRROR_ALLOW_HTTP_URLS: /true/i.test(process.env.CONTENT_MIRROR_ALLOW_HTTP_URLS || ""),
   // Watchers
   TEMPERATURE_DAEMON_INTERVAL: 5 * MINUTE,
   AUTO_UPDATE_DAEMON_INTERVAL: 30 * MINUTE,

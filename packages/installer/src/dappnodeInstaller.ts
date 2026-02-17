@@ -1,5 +1,5 @@
 import { params } from "@dappnode/params";
-import { DappnodeRepository } from "@dappnode/toolkit";
+import { DappnodeRepository, DappnodeRepositoryOptions } from "@dappnode/toolkit";
 import * as db from "@dappnode/db";
 import {
   DistributedFile,
@@ -45,8 +45,8 @@ export function getIpfsUrl(): string {
 }
 
 export class DappnodeInstaller extends DappnodeRepository {
-  constructor(ipfsUrl: string, provider: JsonRpcApiProvider) {
-    super(ipfsUrl, provider);
+  constructor(ipfsUrl: string, provider: JsonRpcApiProvider, options?: DappnodeRepositoryOptions) {
+    super(ipfsUrl, provider, options);
   }
 
   private async updateProviders(): Promise<void> {

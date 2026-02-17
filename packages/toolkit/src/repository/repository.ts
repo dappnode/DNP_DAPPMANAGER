@@ -1,12 +1,7 @@
 import * as isIPFS from "is-ipfs";
 import { CID, IPFSEntry } from "kubo-rpc-client";
-import { CarReader } from "@ipld/car";
-import { recursive as exporter } from "ipfs-unixfs-exporter";
-import { Version } from "multiformats";
 import path from "path";
 import fs from "fs";
-import stream from "stream";
-import util from "util";
 import {
   ReleaseSignature,
   TrustedReleaseKey,
@@ -29,8 +24,27 @@ import { getReleaseSignatureStatus, serializeIpfsDirectory } from "./releaseSign
 import { isEnsDomain } from "../isEnsDomain.js";
 import { dappnodeRegistry } from "./params.js";
 import { JsonRpcApiProvider } from "ethers";
+import { CidContentProviderResolver } from "./contentProvider/contentProviderResolver.js";
+import { GatewayIpfsProvider } from "./contentProvider/ipfsProvider.js";
+import { HttpMirrorMapCache } from "./contentProvider/mirrorMapCache.js";
+import { HttpMirrorProvider } from "./contentProvider/mirrorProvider.js";
+import { OnContentProviderEvent } from "./contentProvider/types.js";
 
 const source = "ipfs" as const;
+
+type MirrorContentMapConfig = {
+  mapUrl?: string;
+  ttlMs?: number;
+  timeoutMs?: number;
+  retries?: number;
+  maxDownloadBytes?: number;
+  allowHttpUrls?: boolean;
+  mapFetchTimeoutMs?: number;
+};
+
+export type DappnodeRepositoryOptions = {
+  mirrorContentMap?: MirrorContentMapConfig;
+};
 
 /**
  * The DappnodeRepository class extends ApmRepository class to provide methods to interact with the IPFS network.
@@ -41,15 +55,41 @@ const source = "ipfs" as const;
 export class DappnodeRepository extends ApmRepository {
   protected gatewayUrl: string;
   protected localIpfsUrl = "http://ipfs.dappnode:5001";
+  private readonly contentResolver: CidContentProviderResolver;
+  private readonly ipfsProvider: GatewayIpfsProvider;
 
   /**
    * Constructs an instance of DappnodeRepository
    * @param ipfsUrl - The URL of the IPFS network node.
    * @param ethUrl - The URL of the Ethereum node to connect to.
    */
-  constructor(ipfsUrl: string, provider: JsonRpcApiProvider) {
+  constructor(ipfsUrl: string, provider: JsonRpcApiProvider, options?: DappnodeRepositoryOptions) {
     super(provider);
     this.gatewayUrl = ipfsUrl.replace(/\/?$/, ""); // e.g. "https://gateway.pinata.cloud"
+
+    const mirrorConfig = options?.mirrorContentMap;
+    const ipfsProvider = new GatewayIpfsProvider({
+      gatewayUrl: this.gatewayUrl,
+      defaultTimeoutMs: 30 * 1000
+    });
+
+    this.ipfsProvider = ipfsProvider;
+    this.contentResolver = new CidContentProviderResolver({
+      ipfsProvider,
+      mirrorProvider: mirrorConfig?.mapUrl
+        ? new HttpMirrorProvider({
+            mapCache: new HttpMirrorMapCache({
+              mapUrl: mirrorConfig.mapUrl,
+              ttlMs: mirrorConfig.ttlMs ?? 10 * 60 * 1000,
+              timeoutMs: mirrorConfig.mapFetchTimeoutMs ?? 8 * 1000
+            }),
+            timeoutMs: mirrorConfig.timeoutMs ?? 20 * 1000,
+            retries: mirrorConfig.retries ?? 1,
+            maxDownloadBytes: mirrorConfig.maxDownloadBytes ?? 10 * 1024 * 1024 * 1024,
+            allowHttpUrls: mirrorConfig.allowHttpUrls ?? false
+          })
+        : undefined
+    });
   }
 
   /**
@@ -58,6 +98,7 @@ export class DappnodeRepository extends ApmRepository {
    */
   public changeIpfsGatewayUrl(ipfsUrl: string): void {
     this.gatewayUrl = ipfsUrl.replace(/\/?$/, "");
+    this.ipfsProvider.setGatewayUrl(this.gatewayUrl);
   }
 
   /**
@@ -257,28 +298,19 @@ export class DappnodeRepository extends ApmRepository {
    * @see catString
    * @see catCarReaderToMemory
    */
-  public async writeFileToMemory(hash: string, maxLength?: number): Promise<string> {
-    const chunks: Uint8Array[] = [];
-    const { carReader, root } = await this.getAndVerifyContentFromGateway(hash);
-    const content = await this.unpackCarReader(carReader, root);
-    for await (const chunk of content) chunks.push(chunk);
-
-    // Concatenate the chunks into a single Uint8Array
-    let totalLength = 0;
-    chunks.forEach((chunk) => (totalLength += chunk.length));
-    const buffer = new Uint8Array(totalLength);
-    let offset = 0;
-    chunks.forEach((chunk) => {
-      buffer.set(chunk, offset);
-      offset += chunk.length;
+  public async writeFileToMemory(
+    hash: string,
+    maxLength?: number,
+    onContentProviderEvent?: OnContentProviderEvent
+  ): Promise<string> {
+    const result = await this.contentResolver.fetchByCid(hash, {
+      onContentProviderEvent
     });
 
-    if (maxLength && buffer.length >= maxLength) throw Error(`Maximum size ${maxLength} bytes exceeded`);
+    if (maxLength && result.bytes.length >= maxLength) throw Error(`Maximum size ${maxLength} bytes exceeded`);
 
-    // Convert the Uint8Array to a string
-    // TODO: This assumes the data is UTF-8 encoded. If it's not, you will need a more complex conversion. Research which encoding is used by IPFS.
     const decoder = new TextDecoder("utf-8");
-    return decoder.decode(buffer);
+    return decoder.decode(result.bytes);
   }
 
   /**
@@ -301,74 +333,35 @@ export class DappnodeRepository extends ApmRepository {
     path: _path,
     timeout,
     fileSize,
-    progress
+    progress,
+    onContentProviderEvent
   }: {
     hash: string;
     path: string;
     timeout?: number;
     fileSize?: number;
     progress?: (n: number) => void;
+    onContentProviderEvent?: OnContentProviderEvent;
   }): Promise<void> {
-    const { carReader, root } = await this.getAndVerifyContentFromGateway(hash);
-    const readable = await this.unpackCarReader(carReader, root);
+    if (!_path || _path.startsWith("/ipfs/") || !path.isAbsolute(_path)) throw Error(`Invalid path: "${_path}"`);
 
-    return new Promise((resolve, reject) => {
-      async function handleDownload(): Promise<void> {
-        if (!_path || _path.startsWith("/ipfs/") || !path.isAbsolute("/")) reject(Error(`Invalid path: "${path}"`));
-
-        const asyncIterableArray: Uint8Array[] = [];
-
-        // Timeout cancel mechanism
-        const timeoutToCancel = setTimeout(
-          () => {
-            reject(Error(`Timeout downloading ${hash}`));
-          },
-          timeout || 30 * 1000
-        );
-
-        let totalData = 0;
-        let previousProgress = -1;
-        const resolution = 1;
-        const round = (n: number): number => resolution * Math.round((100 * n) / resolution);
-
-        const onData = (chunk: Uint8Array): void => {
-          clearTimeout(timeoutToCancel);
-          totalData += chunk.length;
-          asyncIterableArray.push(chunk);
-          if (progress && fileSize) {
-            const currentProgress = round(totalData / fileSize);
-            if (currentProgress !== previousProgress) {
-              progress(currentProgress);
-              previousProgress = currentProgress;
-            }
-          }
-        };
-
-        const onFinish = (): void => {
-          clearTimeout(timeoutToCancel);
-          resolve();
-        };
-
-        const onError =
-          (streamId: string) =>
-          (err: Error): void => {
-            clearTimeout(timeoutToCancel);
-            reject(Error(streamId + ": " + err));
-          };
-
-        try {
-          for await (const chunk of readable) onData(chunk);
-
-          const writable = fs.createWriteStream(_path);
-          await util.promisify(stream.pipeline)(stream.Readable.from(asyncIterableArray), writable);
-          onFinish();
-        } catch (e) {
-          onError("Error writing to fs")(e as Error);
-        }
-      }
-
-      handleDownload().catch((error) => reject(error));
+    const content = await this.contentResolver.fetchByCid(hash, {
+      timeoutMs: timeout || 30 * 1000,
+      expectedSize: fileSize,
+      progress,
+      onContentProviderEvent
     });
+
+    const tempPath = `${_path}.tmp-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    try {
+      await fs.promises.writeFile(tempPath, content.bytes);
+      await fs.promises.rename(tempPath, _path);
+    } catch (e) {
+      await fs.promises.unlink(tempPath).catch(() => {
+        // Best effort cleanup.
+      });
+      throw e;
+    }
   }
 
   /**
@@ -410,70 +403,6 @@ export class DappnodeRepository extends ApmRepository {
       path: `${link.Hash["/"]}/${link.Name}`,
       size: link.Tsize
     }));
-  }
-
-  /**
-   * Gets the content from an IPFS gateway using the given hash and verifies its integrity.
-   * The content is returned as a CAR reader and the root CID.
-   *
-   * @param hash - The content identifier (CID) of the content to get and verify.
-   * @returns The content as a CAR reader and the root CID.
-   * @throws Error when the root CID does not match the provided hash (content is untrusted).
-   */
-  private async getAndVerifyContentFromGateway(hash: string): Promise<{
-    carReader: CarReader;
-    root: CID;
-  }> {
-    // 1. Download the CAR
-    const url = `${this.gatewayUrl}/ipfs/${hash}?format=car`;
-    const res = await fetch(url, {
-      headers: { Accept: "application/vnd.ipld.car" }
-    });
-    if (!res.ok) throw new Error(`Gateway error: ${res.status} ${res.statusText}`);
-
-    // 2. Parse into a CarReader
-    const bytes = new Uint8Array(await res.arrayBuffer());
-    const carReader = await CarReader.fromBytes(bytes);
-
-    // 3. Verify the root CID
-    const roots = await carReader.getRoots();
-    const root = roots[0];
-    if (roots.length !== 1 || root.toString() !== CID.parse(hash).toString()) {
-      throw new Error(`UNTRUSTED CONTENT: expected root ${hash}, got ${roots}`);
-    }
-
-    return { carReader, root };
-  }
-
-  /**
-   * Unpacks a CAR reader and returns an async iterable of uint8arrays.
-   *
-   * @param carReader - The CAR reader to unpack.
-   * @param root - The root CID.
-   * @returns An async iterable of uint8arrays.
-   */
-  private async unpackCarReader(
-    carReader: CarReader,
-    root: CID<unknown, number, number, Version>
-  ): Promise<AsyncIterable<Uint8Array>> {
-    const iterable: AsyncIterable<Uint8Array>[] = [];
-
-    const entries = exporter(root, {
-      async get(cid) {
-        // TODO: remove below type casting
-        const block = await carReader.get(cid as CID);
-        if (!block) throw Error(`Could not get block ${cid}`);
-        return block.bytes;
-      }
-    });
-
-    for await (const entry of entries) {
-      if (entry.type === "file") iterable.push(entry.content());
-      else throw Error(`Expected type: file, got: ${entry.type}`);
-    }
-    if (iterable.length > 1) throw Error(`Unexpected number of files. There must be only one`);
-
-    return iterable[0];
   }
 
   /**
