@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { createHash } from "crypto";
-import { HttpMirrorMapCache } from "../../src/repository/contentProvider/mirrorMapCache.js";
+import { HttpMirrorMapSource } from "../../src/repository/contentProvider/mirrorMapCache.js";
 import { HttpMirrorProvider } from "../../src/repository/contentProvider/mirrorProvider.js";
 
 describe("Mirror content provider", () => {
@@ -72,7 +72,7 @@ describe("Mirror content provider", () => {
 
   it("map is fetched on every lookup (no cache)", async () => {
     let fetchCount = 0;
-    const cache = new HttpMirrorMapCache({
+    const source = new HttpMirrorMapSource({
       mapUrl,
       timeoutMs: 1000,
       fetchFn: async (): Promise<Response> => {
@@ -82,8 +82,8 @@ describe("Mirror content provider", () => {
       }
     });
 
-    const first = await cache.getEntry(cid);
-    const second = await cache.getEntry(cid);
+    const first = await source.getEntry(cid);
+    const second = await source.getEntry(cid);
 
     expect(fetchCount).to.equal(2);
     expect(first?.url).to.equal("https://mirror.dappnode.test/first.txz");
@@ -92,14 +92,14 @@ describe("Mirror content provider", () => {
 });
 
 function createMirrorProvider({ mapUrl, fetchStub }: { mapUrl: string; fetchStub: typeof fetch }): HttpMirrorProvider {
-  const mapCache = new HttpMirrorMapCache({
+  const mapSource = new HttpMirrorMapSource({
     mapUrl,
     timeoutMs: 2000,
     fetchFn: fetchStub
   });
 
   return new HttpMirrorProvider({
-    mapCache,
+    mapSource,
     timeoutMs: 3000,
     maxDownloadBytes: 10 * 1024 * 1024,
     fetchFn: fetchStub

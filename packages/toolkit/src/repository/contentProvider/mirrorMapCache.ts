@@ -1,9 +1,9 @@
-import { MirrorMapCache, MirrorMapEntry, MirrorMapSchema } from "./types.js";
+import { MirrorMapEntry, MirrorMapSchema, MirrorMapSource } from "./types.js";
 import { normalizeCid } from "./utils.js";
 
 type FetchLike = typeof fetch;
 
-export class HttpMirrorMapCache implements MirrorMapCache {
+export class HttpMirrorMapSource implements MirrorMapSource {
   private readonly mapUrl?: string;
   private readonly timeoutMs: number;
   private readonly fetchFn: FetchLike;

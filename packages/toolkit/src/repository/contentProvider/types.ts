@@ -12,7 +12,7 @@ export type MirrorMapEntry = {
 
 export type MirrorMapSchema = Record<string, string | MirrorMapEntry>;
 
-export interface MirrorMapCache {
+export interface MirrorMapSource {
   getEntry(cid: string): Promise<MirrorMapEntry | null>;
 }
 

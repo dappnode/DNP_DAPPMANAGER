@@ -29,7 +29,7 @@ import { getReleaseSignatureStatus, serializeIpfsDirectory } from "./releaseSign
 import { isEnsDomain } from "../isEnsDomain.js";
 import { dappnodeRegistry } from "./params.js";
 import { JsonRpcApiProvider } from "ethers";
-import { HttpMirrorMapCache } from "./contentProvider/mirrorMapCache.js";
+import { HttpMirrorMapSource } from "./contentProvider/mirrorMapCache.js";
 import { HttpMirrorProvider } from "./contentProvider/mirrorProvider.js";
 import { FetchByCidOptions } from "./contentProvider/types.js";
 
@@ -69,7 +69,7 @@ export class DappnodeRepository extends ApmRepository {
     const mirrorConfig = options?.mirrorContentMap;
     if (mirrorConfig?.mapUrl) {
       this.mirrorProvider = new HttpMirrorProvider({
-        mapCache: new HttpMirrorMapCache({
+        mapSource: new HttpMirrorMapSource({
           mapUrl: mirrorConfig.mapUrl,
           timeoutMs: mirrorConfig.mapFetchTimeoutMs ?? 8 * 1000
         }),

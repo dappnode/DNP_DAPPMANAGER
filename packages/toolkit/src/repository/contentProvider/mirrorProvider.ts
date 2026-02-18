@@ -1,27 +1,27 @@
 import { createHash } from "crypto";
-import { FetchByCidOptions, MirrorMapCache, MirrorProvider, MirrorAttemptResult } from "./types.js";
+import { FetchByCidOptions, MirrorMapSource, MirrorProvider, MirrorAttemptResult } from "./types.js";
 import { normalizeCid, roundProgress } from "./utils.js";
 
 type FetchLike = typeof fetch;
 
 export class HttpMirrorProvider implements MirrorProvider {
-  private readonly mapCache: MirrorMapCache;
+  private readonly mapSource: MirrorMapSource;
   private readonly timeoutMs: number;
   private readonly maxDownloadBytes: number;
   private readonly fetchFn: FetchLike;
 
   constructor({
-    mapCache,
+    mapSource,
     timeoutMs,
     maxDownloadBytes,
     fetchFn = fetch
   }: {
-    mapCache: MirrorMapCache;
+    mapSource: MirrorMapSource;
     timeoutMs: number;
     maxDownloadBytes: number;
     fetchFn?: FetchLike;
   }) {
-    this.mapCache = mapCache;
+    this.mapSource = mapSource;
     this.timeoutMs = timeoutMs;
     this.maxDownloadBytes = maxDownloadBytes;
     this.fetchFn = fetchFn;
@@ -29,7 +29,7 @@ export class HttpMirrorProvider implements MirrorProvider {
 
   public async fetchByCid(cid: string, options?: FetchByCidOptions): Promise<MirrorAttemptResult> {
     const normalizedCid = normalizeCid(cid);
-    const mapEntry = await this.mapCache.getEntry(normalizedCid);
+    const mapEntry = await this.mapSource.getEntry(normalizedCid);
     if (!mapEntry) return { status: "miss" };
 
     let url: URL;
