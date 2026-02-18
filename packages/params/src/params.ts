@@ -28,8 +28,8 @@ const GLOBAL_ENVS_FILE_NAME = "dnp.dappnode.global.env";
 const HOST_HOME = "/usr/src/dappnode";
 
 if (process.env.TEST) {
-  DNCORE_DIR = "./DNCORE";
-  REPO_DIR = "./dnp_repo";
+  DNCORE_DIR = path.resolve("./DNCORE");
+  REPO_DIR = path.resolve("./dnp_repo");
 }
 
 /** Absolute global ENVs .env file from DAPPMANAGER containers */

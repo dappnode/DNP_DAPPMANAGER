@@ -352,7 +352,10 @@ export class DappnodeRepository extends ApmRepository {
   }): Promise<void> {
     if (!_path || _path.startsWith("/ipfs/") || !path.isAbsolute(_path)) throw Error(`Invalid path: "${_path}"`);
 
-    const mirrorBytes = await this.downloadFromMirrorIfAvailable(hash, {
+    // Extract filename from path for mirror downloads (e.g., Docker images)
+    const filename = path.basename(_path);
+
+    const mirrorBytes = await this.downloadFromMirrorIfAvailable(hash, filename, {
       timeoutMs: timeout || 30 * 1000,
       expectedSize: fileSize,
       progress
@@ -645,7 +648,8 @@ export class DappnodeRepository extends ApmRepository {
       return {
         hash: imageAsset.cid.toString(),
         size: imageAsset.size,
-        source // TODO: consdier adding different sources
+        source, // TODO: consdier adding different sources
+        path: imageAsset.name // Include actual filename for mirror downloads
       };
     }
   }

@@ -926,6 +926,8 @@ export interface DistributedFile {
   hash: string;
   source: DistributedFileSource;
   size: number;
+  /** Optional path/filename for the file (e.g., for Docker images with architecture) */
+  path?: string;
 }
 
 export interface IpfsRepository {
