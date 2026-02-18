@@ -68,14 +68,13 @@ export async function downloadImage(
   hash: string,
   path: string,
   fileSize: number,
-  progress: (n: number) => void,
-  onContentProviderEvent?: Parameters<DappnodeInstaller["writeFileToFs"]>[0]["onContentProviderEvent"]
+  progress: (n: number) => void
 ): Promise<void> {
   // TODO: Ensure file is available
 
   // Cat stream to file system
   // Make sure the path is correct and the parent folder exist or is created
-  await dappnodeInstaller.writeFileToFs({ hash, path, fileSize, progress, onContentProviderEvent });
+  await dappnodeInstaller.writeFileToFs({ hash, path, fileSize, progress });
 }
 
 export async function getImage(
@@ -98,29 +97,9 @@ export async function getImage(
   }
 
   const { hash, size } = imageFile;
-  const onContentProviderEvent: Parameters<DappnodeInstaller["writeFileToFs"]>[0]["onContentProviderEvent"] = (
-    event
-  ) => {
-    switch (event.provider) {
-      case "mirror":
-        if (event.status === "success") {
-          logs.info(`Downloading ${event.cid} from mirror host ${event.urlHost}`);
-        } else {
-          const hostLabel = event.urlHost ? ` host ${event.urlHost}` : "";
-          logs.warn(`Mirror${hostLabel} failed for ${event.cid}: ${event.reason}. Falling back to IPFS`);
-        }
-        break;
-      case "ipfs":
-        if (event.reason === "mirror-failed") logs.info(`Downloading ${event.cid} from IPFS fallback`);
-        break;
-      default:
-        break;
-    }
-  };
-
   switch (imageFile.source) {
     case "ipfs":
-      await downloadImage(dappnodeInstaller, hash, path, size, progress, onContentProviderEvent);
+      await downloadImage(dappnodeInstaller, hash, path, size, progress);
       break;
     default:
       throw Error(`Unsupported source ${imageFile.source}`);

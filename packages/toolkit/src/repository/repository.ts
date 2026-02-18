@@ -31,7 +31,7 @@ import { dappnodeRegistry } from "./params.js";
 import { JsonRpcApiProvider } from "ethers";
 import { HttpMirrorMapCache } from "./contentProvider/mirrorMapCache.js";
 import { HttpMirrorProvider } from "./contentProvider/mirrorProvider.js";
-import { FetchByCidOptions, OnContentProviderEvent } from "./contentProvider/types.js";
+import { FetchByCidOptions } from "./contentProvider/types.js";
 
 const source = "ipfs" as const;
 
@@ -286,17 +286,14 @@ export class DappnodeRepository extends ApmRepository {
    */
   public async writeFileToMemory(
     hash: string,
-    maxLength?: number,
-    onContentProviderEvent?: OnContentProviderEvent
+    maxLength?: number
   ): Promise<string> {
-    const mirrorAttempt = await this.downloadFromMirrorIfAvailable(hash, {
-      onContentProviderEvent
-    });
+    const mirrorBytes = await this.downloadFromMirrorIfAvailable(hash, {});
 
-    if (mirrorAttempt.bytes) {
-      if (maxLength && mirrorAttempt.bytes.length >= maxLength) throw Error(`Maximum size ${maxLength} bytes exceeded`);
+    if (mirrorBytes) {
+      if (maxLength && mirrorBytes.length >= maxLength) throw Error(`Maximum size ${maxLength} bytes exceeded`);
       const decoder = new TextDecoder("utf-8");
-      return decoder.decode(mirrorAttempt.bytes);
+      return decoder.decode(mirrorBytes);
     }
 
     const chunks: Uint8Array[] = [];
@@ -315,12 +312,6 @@ export class DappnodeRepository extends ApmRepository {
 
     if (maxLength && buffer.length >= maxLength) throw Error(`Maximum size ${maxLength} bytes exceeded`);
 
-    onContentProviderEvent?.({
-      provider: "ipfs",
-      status: "success",
-      cid: hash,
-      reason: mirrorAttempt.ipfsReason
-    });
     const decoder = new TextDecoder("utf-8");
     return decoder.decode(buffer);
   }
@@ -345,29 +336,26 @@ export class DappnodeRepository extends ApmRepository {
     path: _path,
     timeout,
     fileSize,
-    progress,
-    onContentProviderEvent
+    progress
   }: {
     hash: string;
     path: string;
     timeout?: number;
     fileSize?: number;
     progress?: (n: number) => void;
-    onContentProviderEvent?: OnContentProviderEvent;
   }): Promise<void> {
     if (!_path || _path.startsWith("/ipfs/") || !path.isAbsolute(_path)) throw Error(`Invalid path: "${_path}"`);
 
-    const mirrorAttempt = await this.downloadFromMirrorIfAvailable(hash, {
+    const mirrorBytes = await this.downloadFromMirrorIfAvailable(hash, {
       timeoutMs: timeout || 30 * 1000,
       expectedSize: fileSize,
-      progress,
-      onContentProviderEvent
+      progress
     });
 
-    if (mirrorAttempt.bytes) {
+    if (mirrorBytes) {
       const tempPath = `${_path}.tmp-${Date.now()}-${Math.random().toString(16).slice(2)}`;
       try {
-        await fs.promises.writeFile(tempPath, mirrorAttempt.bytes);
+        await fs.promises.writeFile(tempPath, mirrorBytes);
         await fs.promises.rename(tempPath, _path);
       } catch (e) {
         await fs.promises.unlink(tempPath).catch(() => {
@@ -414,12 +402,6 @@ export class DappnodeRepository extends ApmRepository {
 
         const onFinish = (): void => {
           clearTimeout(timeoutToCancel);
-          onContentProviderEvent?.({
-            provider: "ipfs",
-            status: "success",
-            cid: hash,
-            reason: mirrorAttempt.ipfsReason
-          });
           resolve();
         };
 
@@ -447,50 +429,18 @@ export class DappnodeRepository extends ApmRepository {
 
   private async downloadFromMirrorIfAvailable(
     hash: string,
-    options: FetchByCidOptions & { onContentProviderEvent?: OnContentProviderEvent }
-  ): Promise<{
-    bytes: Uint8Array | null;
-    ipfsReason: "mirror-miss" | "mirror-failed" | "ipfs-only";
-  }> {
+    options: FetchByCidOptions
+  ): Promise<Uint8Array | null> {
     if (!this.mirrorProvider) {
-      return {
-        bytes: null,
-        ipfsReason: "ipfs-only"
-      };
+      return null;
     }
 
     const mirrorResult = await this.mirrorProvider.fetchByCid(hash, options);
     if (mirrorResult.status === "success") {
-      options.onContentProviderEvent?.({
-        provider: "mirror",
-        status: "success",
-        cid: hash,
-        urlHost: mirrorResult.urlHost
-      });
-      return {
-        bytes: mirrorResult.bytes,
-        ipfsReason: "mirror-miss"
-      };
+      return mirrorResult.bytes;
     }
 
-    if (mirrorResult.status === "failed") {
-      options.onContentProviderEvent?.({
-        provider: "mirror",
-        status: "failed",
-        cid: hash,
-        reason: mirrorResult.reason,
-        urlHost: mirrorResult.urlHost
-      });
-      return {
-        bytes: null,
-        ipfsReason: "mirror-failed"
-      };
-    }
-
-    return {
-      bytes: null,
-      ipfsReason: "mirror-miss"
-    };
+    return null;
   }
 
   /**

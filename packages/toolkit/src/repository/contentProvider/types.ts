@@ -1,26 +1,3 @@
-export type ContentProviderEvent =
-  | {
-      provider: "mirror";
-      status: "success";
-      cid: string;
-      urlHost: string;
-    }
-  | {
-      provider: "mirror";
-      status: "failed";
-      cid: string;
-      reason: string;
-      urlHost?: string;
-    }
-  | {
-      provider: "ipfs";
-      status: "success";
-      cid: string;
-      reason: "mirror-miss" | "mirror-failed" | "ipfs-only";
-    };
-
-export type OnContentProviderEvent = (event: ContentProviderEvent) => void;
-
 export interface FetchByCidOptions {
   timeoutMs?: number;
   expectedSize?: number;
