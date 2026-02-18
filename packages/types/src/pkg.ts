@@ -179,12 +179,13 @@ export interface TrustedReleaseKey {
   key: string;
 }
 
-type DistributedFileSource = "ipfs" | "swarm";
+export type DistributedFileSource = "ipfs" | "swarm";
 
-interface DistributedFile {
+export interface DistributedFile {
   hash: string;
   source: DistributedFileSource;
   size: number;
+  filename?: string; // Used for mirror downloads to identify specific files within a CID directory
 }
 
 /**

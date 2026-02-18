@@ -29,8 +29,21 @@ import { getReleaseSignatureStatus, serializeIpfsDirectory } from "./releaseSign
 import { isEnsDomain } from "../isEnsDomain.js";
 import { dappnodeRegistry } from "./params.js";
 import { JsonRpcApiProvider } from "ethers";
+import { MirrorProvider, HttpMirrorProvider } from "./contentProvider/index.js";
+import { logs } from "@dappnode/logger";
 
 const source = "ipfs" as const;
+
+/**
+ * Optional configuration for DappnodeRepository
+ */
+export interface DappnodeRepositoryOptions {
+  mirror?: {
+    baseUrl: string;
+    timeoutMs: number;
+    maxBytes: number;
+  };
+}
 
 /**
  * The DappnodeRepository class extends ApmRepository class to provide methods to interact with the IPFS network.
@@ -41,15 +54,26 @@ const source = "ipfs" as const;
 export class DappnodeRepository extends ApmRepository {
   protected gatewayUrl: string;
   protected localIpfsUrl = "http://ipfs.dappnode:5001";
+  private mirrorProvider?: MirrorProvider;
 
   /**
    * Constructs an instance of DappnodeRepository
    * @param ipfsUrl - The URL of the IPFS network node.
-   * @param ethUrl - The URL of the Ethereum node to connect to.
+   * @param provider - The Ethereum JSON-RPC provider.
+   * @param options - Optional configuration (e.g., mirror provider settings).
    */
-  constructor(ipfsUrl: string, provider: JsonRpcApiProvider) {
+  constructor(ipfsUrl: string, provider: JsonRpcApiProvider, options?: DappnodeRepositoryOptions) {
     super(provider);
     this.gatewayUrl = ipfsUrl.replace(/\/?$/, ""); // e.g. "https://gateway.pinata.cloud"
+
+    // Initialize mirror provider if configured
+    if (options?.mirror) {
+      this.mirrorProvider = new HttpMirrorProvider(
+        options.mirror.baseUrl,
+        options.mirror.timeoutMs,
+        options.mirror.maxBytes
+      );
+    }
   }
 
   /**
@@ -238,7 +262,7 @@ export class DappnodeRepository extends ApmRepository {
     // Process matched entries. If multiple files are allowed, and more than one file matches, we parse all of them.
     const { maxSize: maxLength, format } = fileConfig;
     const contents = await Promise.all(
-      matchingEntries.map((entry) => this.writeFileToMemory(entry.cid.toString(), maxLength))
+      matchingEntries.map((entry) => this.writeFileToMemory(entry.cid.toString(), maxLength, entry.name))
     );
 
     // If multiple files are allowed, we return an array of parsed assets.
@@ -249,15 +273,42 @@ export class DappnodeRepository extends ApmRepository {
   /**
    * Downloads the content pointed by the given hash, parses it to UTF8 and returns it as a string.
    * This function is intended for small files.
+   * Tries mirror first (if available and filename provided), then falls back to IPFS.
    *
    * @param hash - The content identifier (CID) of the file to download.
    * @param maxLength - The maximum length of the file in bytes. If the downloaded file exceeds this length, an error is thrown.
+   * @param filename - Optional filename for mirror downloads (directory/filename pattern).
    * @returns The downloaded file content as a UTF8 string.
    * @throws Error when the maximum size is exceeded.
    * @see catString
    * @see catCarReaderToMemory
    */
-  public async writeFileToMemory(hash: string, maxLength?: number): Promise<string> {
+  public async writeFileToMemory(hash: string, maxLength?: number, filename?: string): Promise<string> {
+    const cidStr = this.sanitizeIpfsPath(hash);
+
+    // Try mirror first if available and we have a filename
+    if (this.mirrorProvider && filename) {
+      try {
+        const result = await this.mirrorProvider.fetchFile(cidStr, filename, {});
+
+        if (result.status === "success") {
+          if (maxLength && result.bytes.length >= maxLength) {
+            throw Error(`Maximum size ${maxLength} bytes exceeded`);
+          }
+
+          logs.info(`Downloaded ${filename} from mirror`);
+          const decoder = new TextDecoder("utf-8");
+          return decoder.decode(result.bytes);
+        }
+
+        logs.warn(`Mirror fetch failed for ${filename}: ${result.reason}, falling back to IPFS`);
+      } catch (error) {
+        const errMsg = error instanceof Error ? error.message : "unknown error";
+        logs.warn(`Mirror download error for ${filename}: ${errMsg}, falling back to IPFS`);
+      }
+    }
+
+    // Fallback to IPFS CAR download (existing implementation)
     const chunks: Uint8Array[] = [];
     const { carReader, root } = await this.getAndVerifyContentFromGateway(hash);
     const content = await this.unpackCarReader(carReader, root);
@@ -284,6 +335,7 @@ export class DappnodeRepository extends ApmRepository {
   /**
    * Downloads the content pointed by the given hash and writes it directly to the filesystem.
    * This function is intended for large files, such as Docker images.
+   * Tries mirror first (if available and filename provided), then falls back to IPFS.
    *
    * IMPORTANT: This function is not supported in the browser.
    *
@@ -293,6 +345,7 @@ export class DappnodeRepository extends ApmRepository {
    * @param args.timeout - The maximum time to wait for the download in milliseconds.
    * @param args.fileSize - The expected size of the file in bytes.
    * @param args.progress - An optional function to call with the download progress.
+   * @param args.filename - Optional filename for mirror downloads (directory/filename pattern).
    * @returns A promise that resolves when the file has been written.
    * @throws Error when a download timeout occurs or if the provided path is invalid.
    */
@@ -301,14 +354,39 @@ export class DappnodeRepository extends ApmRepository {
     path: _path,
     timeout,
     fileSize,
-    progress
+    progress,
+    filename
   }: {
     hash: string;
     path: string;
     timeout?: number;
     fileSize?: number;
     progress?: (n: number) => void;
+    filename?: string;
   }): Promise<void> {
+    const cidStr = this.sanitizeIpfsPath(hash);
+
+    // Try mirror first if available and we have a filename
+    if (this.mirrorProvider && filename) {
+      try {
+        const result = await this.mirrorProvider.fetchFile(cidStr, filename, {
+          onProgress: progress
+        });
+
+        if (result.status === "success") {
+          logs.info(`Downloaded ${filename} from mirror, writing to ${_path}`);
+          await fs.promises.writeFile(_path, result.bytes);
+          return; // Success - no need for IPFS fallback
+        }
+
+        logs.warn(`Mirror download failed: ${result.reason}, falling back to IPFS`);
+      } catch (error) {
+        const errMsg = error instanceof Error ? error.message : "unknown error";
+        logs.warn(`Mirror download error: ${errMsg}, falling back to IPFS`);
+      }
+    }
+
+    // Fallback to IPFS CAR download (existing implementation)
     const { carReader, root } = await this.getAndVerifyContentFromGateway(hash);
     const readable = await this.unpackCarReader(carReader, root);
 
@@ -373,6 +451,7 @@ export class DappnodeRepository extends ApmRepository {
 
   /**
    * Lists the contents of a directory pointed by the given hash.
+   * Tries mirror first (if available), then falls back to IPFS.
    * ipfs.dag.get => reutrns `Tsize`!
    *
    * TODO: research why the size is different, i.e for the hash QmWcJrobqhHF7GWpqEbxdv2cWCCXbACmq85Hh7aJ1eu8rn Tsize is 64461521 and size is 64446140
@@ -383,6 +462,11 @@ export class DappnodeRepository extends ApmRepository {
    */
   public async list(hash: string): Promise<IPFSEntry[]> {
     const cidStr = this.sanitizeIpfsPath(hash.toString());
+
+    // IMPORTANT: Always use IPFS for directory listings to get individual file CIDs
+    // Individual file CIDs are required for signature verification (serializeIpfsDirectory)
+    // Mirror is used for file downloads (writeFileToMemory/writeFileToFs) for speed
+    // This hybrid approach provides both security (signature verification) and speed (mirror downloads)
     const url = `${this.gatewayUrl}/ipfs/${cidStr}?format=dag-json`;
     const res = await fetch(url, {
       headers: { Accept: "application/vnd.ipld.dag-json" }
@@ -521,7 +605,8 @@ export class DappnodeRepository extends ApmRepository {
       return {
         hash: imageAsset.cid.toString(),
         size: imageAsset.size,
-        source // TODO: consdier adding different sources
+        source, // TODO: consdier adding different sources
+        filename: imageAsset.name // Add filename for mirror downloads
       };
     }
   }
