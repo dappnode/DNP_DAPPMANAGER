@@ -46,7 +46,15 @@ export function getIpfsUrl(): string {
 
 export class DappnodeInstaller extends DappnodeRepository {
   constructor(ipfsUrl: string, provider: JsonRpcApiProvider) {
-    super(ipfsUrl, provider);
+    super(ipfsUrl, provider, {
+      mirror: params.CONTENT_MIRROR_BASE_URL
+        ? {
+            baseUrl: params.CONTENT_MIRROR_BASE_URL,
+            timeoutMs: params.CONTENT_MIRROR_TIMEOUT_MS,
+            maxBytes: params.CONTENT_MIRROR_MAX_BYTES
+          }
+        : undefined
+    });
   }
 
   private async updateProviders(): Promise<void> {

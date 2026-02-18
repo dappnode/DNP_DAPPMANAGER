@@ -29,8 +29,17 @@ import { getReleaseSignatureStatus, serializeIpfsDirectory } from "./releaseSign
 import { isEnsDomain } from "../isEnsDomain.js";
 import { dappnodeRegistry } from "./params.js";
 import { JsonRpcApiProvider } from "ethers";
+import { MirrorProvider, HttpMirrorProvider } from "./contentProvider/index.js";
 
 const source = "ipfs" as const;
+
+export interface DappnodeRepositoryOptions {
+  mirror?: {
+    baseUrl: string;
+    timeoutMs: number;
+    maxBytes: number;
+  };
+}
 
 /**
  * The DappnodeRepository class extends ApmRepository class to provide methods to interact with the IPFS network.
@@ -41,15 +50,26 @@ const source = "ipfs" as const;
 export class DappnodeRepository extends ApmRepository {
   protected gatewayUrl: string;
   protected localIpfsUrl = "http://ipfs.dappnode:5001";
+  private mirrorProvider?: MirrorProvider;
 
   /**
    * Constructs an instance of DappnodeRepository
    * @param ipfsUrl - The URL of the IPFS network node.
    * @param ethUrl - The URL of the Ethereum node to connect to.
+   * @param options - Optional configuration including mirror provider.
    */
-  constructor(ipfsUrl: string, provider: JsonRpcApiProvider) {
+  constructor(ipfsUrl: string, provider: JsonRpcApiProvider, options?: DappnodeRepositoryOptions) {
     super(provider);
     this.gatewayUrl = ipfsUrl.replace(/\/?$/, ""); // e.g. "https://gateway.pinata.cloud"
+
+    // Initialize mirror provider if configured
+    if (options?.mirror) {
+      this.mirrorProvider = new HttpMirrorProvider(
+        options.mirror.baseUrl,
+        options.mirror.timeoutMs,
+        options.mirror.maxBytes
+      );
+    }
   }
 
   /**
@@ -238,7 +258,7 @@ export class DappnodeRepository extends ApmRepository {
     // Process matched entries. If multiple files are allowed, and more than one file matches, we parse all of them.
     const { maxSize: maxLength, format } = fileConfig;
     const contents = await Promise.all(
-      matchingEntries.map((entry) => this.writeFileToMemory(entry.cid.toString(), maxLength))
+      matchingEntries.map((entry) => this.writeFileToMemory(entry.cid.toString(), maxLength, entry.name))
     );
 
     // If multiple files are allowed, we return an array of parsed assets.
@@ -252,12 +272,36 @@ export class DappnodeRepository extends ApmRepository {
    *
    * @param hash - The content identifier (CID) of the file to download.
    * @param maxLength - The maximum length of the file in bytes. If the downloaded file exceeds this length, an error is thrown.
+   * @param filename - Optional filename for mirror downloads.
    * @returns The downloaded file content as a UTF8 string.
    * @throws Error when the maximum size is exceeded.
    * @see catString
    * @see catCarReaderToMemory
    */
-  public async writeFileToMemory(hash: string, maxLength?: number): Promise<string> {
+  public async writeFileToMemory(hash: string, maxLength?: number, filename?: string): Promise<string> {
+    const cidStr = this.sanitizeIpfsPath(hash.toString());
+
+    // Try mirror first if available and we have a filename
+    if (this.mirrorProvider && filename) {
+      try {
+        const result = await this.mirrorProvider.fetchFile(cidStr, filename, {});
+
+        if (result.status === "success") {
+          if (maxLength && result.bytes.length >= maxLength) {
+            throw Error(`Maximum size ${maxLength} bytes exceeded`);
+          }
+
+          const decoder = new TextDecoder("utf-8");
+          return decoder.decode(result.bytes);
+        }
+
+        // Mirror failed, fallback to IPFS (no logging)
+      } catch (error) {
+        // Mirror error, fallback to IPFS (no logging)
+      }
+    }
+
+    // Fallback to IPFS
     const chunks: Uint8Array[] = [];
     const { carReader, root } = await this.getAndVerifyContentFromGateway(hash);
     const content = await this.unpackCarReader(carReader, root);
@@ -293,6 +337,7 @@ export class DappnodeRepository extends ApmRepository {
    * @param args.timeout - The maximum time to wait for the download in milliseconds.
    * @param args.fileSize - The expected size of the file in bytes.
    * @param args.progress - An optional function to call with the download progress.
+   * @param args.filename - Optional filename for mirror downloads.
    * @returns A promise that resolves when the file has been written.
    * @throws Error when a download timeout occurs or if the provided path is invalid.
    */
@@ -301,14 +346,37 @@ export class DappnodeRepository extends ApmRepository {
     path: _path,
     timeout,
     fileSize,
-    progress
+    progress,
+    filename
   }: {
     hash: string;
     path: string;
     timeout?: number;
     fileSize?: number;
     progress?: (n: number) => void;
+    filename?: string;
   }): Promise<void> {
+    const cidStr = this.sanitizeIpfsPath(hash.toString());
+
+    // Try mirror first if available and we have a filename
+    if (this.mirrorProvider && filename) {
+      try {
+        const result = await this.mirrorProvider.fetchFile(cidStr, filename, {
+          onProgress: progress
+        });
+
+        if (result.status === "success") {
+          await fs.promises.writeFile(_path, result.bytes);
+          return; // Success - no need for IPFS fallback
+        }
+
+        // Mirror failed, fallback to IPFS (no logging)
+      } catch (error) {
+        // Mirror error, fallback to IPFS (no logging)
+      }
+    }
+
+    // Fallback to IPFS
     const { carReader, root } = await this.getAndVerifyContentFromGateway(hash);
     const readable = await this.unpackCarReader(carReader, root);
 
@@ -521,7 +589,8 @@ export class DappnodeRepository extends ApmRepository {
       return {
         hash: imageAsset.cid.toString(),
         size: imageAsset.size,
-        source // TODO: consdier adding different sources
+        source, // TODO: consdier adding different sources
+        filename: imageAsset.name
       };
     }
   }

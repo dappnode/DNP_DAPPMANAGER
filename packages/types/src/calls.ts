@@ -926,6 +926,7 @@ export interface DistributedFile {
   hash: string;
   source: DistributedFileSource;
   size: number;
+  filename?: string;
 }
 
 export interface IpfsRepository {
