@@ -16,37 +16,35 @@ export async function downloadImages(
   packagesData: InstallPackageData[],
   log: Log
 ): Promise<void> {
-  await Promise.all(
-    packagesData.map(async function (pkg) {
-      const { dnpName, semVersion, isCore, imageFile, imagePath } = pkg;
-      log(dnpName, "Starting download...");
+  for (const pkg of packagesData) {
+    const { dnpName, semVersion, isCore, imageFile, imagePath } = pkg;
+    log(dnpName, "Starting download...");
 
-      function onProgress(progress: number): void {
-        let message = `Downloading ${progress}%`;
-        if (progress > 100) message += ` (expected ${imageFile.size} bytes)`;
-        log(dnpName, message);
-      }
+    function onProgress(progress: number): void {
+      let message = `Downloading ${progress}%`;
+      if (progress > 100) message += ` (expected ${imageFile.size} bytes)`;
+      log(dnpName, message);
+    }
 
-      try {
-        await getImage(dappnodeInstaller, imageFile, imagePath, onProgress);
-      } catch (e) {
-        e.message = `Can't download ${dnpName} image: ${e.message}`;
-        throw e; // Use this format to keep the stack trace
-      }
+    try {
+      await getImage(dappnodeInstaller, imageFile, imagePath, onProgress);
+    } catch (e) {
+      e.message = `Can't download ${dnpName} image: ${e.message}`;
+      throw e; // Use this format to keep the stack trace
+    }
 
-      // Do not throw for core packages
-      log(dnpName, "Verifying download...");
-      try {
-        await verifyDockerImage({ imagePath, dnpName, version: semVersion });
-      } catch (e) {
-        const errorMessage = `Error verifying image: ${e.message}`;
-        if (isCore) logs.error(errorMessage);
-        else throw Error(errorMessage);
-      }
+    // Do not throw for core packages
+    log(dnpName, "Verifying download...");
+    try {
+      await verifyDockerImage({ imagePath, dnpName, version: semVersion });
+    } catch (e) {
+      const errorMessage = `Error verifying image: ${e.message}`;
+      if (isCore) logs.error(errorMessage);
+      else throw Error(errorMessage);
+    }
 
-      log(dnpName, "Package downloaded");
-    })
-  );
+    log(dnpName, "Package downloaded");
+  }
 }
 
 /**
@@ -84,7 +82,7 @@ export async function getImage(
   progress: (n: number) => void
 ): Promise<void> {
   // Validate parameters
-  if (!path || path.startsWith("/ipfs/") || !isAbsolute("/")) throw Error(`Invalid path: "${path}"`);
+  if (!path || path.startsWith("/ipfs/") || !isAbsolute(path)) throw Error(`Invalid path: "${path}"`);
   validatePath(path);
 
   // Check if cache exist and validate it

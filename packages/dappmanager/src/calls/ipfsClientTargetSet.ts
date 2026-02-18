@@ -35,7 +35,7 @@ async function changeIpfsClient(nextTarget: IpfsClientTarget, nextGateway?: stri
       dappnodeInstaller.changeIpfsGatewayUrl(params.IPFS_LOCAL);
     } else {
       // Set new values in db
-      db.ipfsGateway.set(nextGateway || params.IPFS_GATEWAY);
+      db.ipfsGateway.set(nextGateway || params.IPFS_REMOTE);
       db.ipfsClientTarget.set(IpfsClientTarget.remote);
 
       // Change IPFS host
