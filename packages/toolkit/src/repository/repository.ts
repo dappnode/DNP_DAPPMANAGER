@@ -29,21 +29,19 @@ import { getReleaseSignatureStatus, serializeIpfsDirectory } from "./releaseSign
 import { isEnsDomain } from "../isEnsDomain.js";
 import { dappnodeRegistry } from "./params.js";
 import { JsonRpcApiProvider } from "ethers";
-import { HttpMirrorMapSource } from "./contentProvider/mirrorMapCache.js";
 import { HttpMirrorProvider } from "./contentProvider/mirrorProvider.js";
 import { FetchByCidOptions } from "./contentProvider/types.js";
 
 const source = "ipfs" as const;
 
-type MirrorContentMapConfig = {
-  mapUrl?: string;
+type MirrorConfig = {
+  baseUrl?: string;
   timeoutMs?: number;
   maxDownloadBytes?: number;
-  mapFetchTimeoutMs?: number;
 };
 
 export type DappnodeRepositoryOptions = {
-  mirrorContentMap?: MirrorContentMapConfig;
+  mirror?: MirrorConfig;
 };
 
 /**
@@ -66,13 +64,10 @@ export class DappnodeRepository extends ApmRepository {
     super(provider);
     this.gatewayUrl = ipfsUrl.replace(/\/?$/, ""); // e.g. "https://gateway.pinata.cloud"
 
-    const mirrorConfig = options?.mirrorContentMap;
-    if (mirrorConfig?.mapUrl) {
+    const mirrorConfig = options?.mirror;
+    if (mirrorConfig?.baseUrl) {
       this.mirrorProvider = new HttpMirrorProvider({
-        mapSource: new HttpMirrorMapSource({
-          mapUrl: mirrorConfig.mapUrl,
-          timeoutMs: mirrorConfig.mapFetchTimeoutMs ?? 8 * 1000
-        }),
+        baseUrl: mirrorConfig.baseUrl,
         timeoutMs: mirrorConfig.timeoutMs ?? 20 * 1000,
         maxDownloadBytes: mirrorConfig.maxDownloadBytes ?? 10 * 1024 * 1024 * 1024
       });

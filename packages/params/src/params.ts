@@ -163,8 +163,7 @@ export const params = {
 
   // Install method parameters
   ALWAYS_DAPPGETBASIC: process.env.ALWAYS_DAPPGETBASIC === 'true',
-  CONTENT_MIRROR_MAP_URL: process.env.CONTENT_MIRROR_MAP_URL || "https://installer.dappnode.io/content-map.json",
-  CONTENT_MIRROR_MAP_FETCH_TIMEOUT_MS: parseEnvPositiveInt("CONTENT_MIRROR_MAP_FETCH_TIMEOUT_MS", 8 * 1000),
+  CONTENT_MIRROR_BASE_URL: process.env.CONTENT_MIRROR_BASE_URL || "https://packages.dappnode.net",
   CONTENT_MIRROR_TIMEOUT_MS: parseEnvPositiveInt("CONTENT_MIRROR_TIMEOUT_MS", 20 * 1000),
   CONTENT_MIRROR_MAX_DOWNLOAD_BYTES: parseEnvPositiveInt(
     "CONTENT_MIRROR_MAX_DOWNLOAD_BYTES",

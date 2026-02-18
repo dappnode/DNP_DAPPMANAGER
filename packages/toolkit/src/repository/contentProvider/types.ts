@@ -4,31 +4,16 @@ export interface FetchByCidOptions {
   progress?: (n: number) => void;
 }
 
-export type MirrorMapEntry = {
-  url: string;
-  sha256?: string;
-  size?: number;
-};
-
-export type MirrorMapSchema = Record<string, string | MirrorMapEntry>;
-
-export interface MirrorMapSource {
-  getEntry(cid: string): Promise<MirrorMapEntry | null>;
-}
-
 export type MirrorAttemptResult =
-  | {
-      status: "miss";
-    }
   | {
       status: "success";
       bytes: Uint8Array;
-      urlHost: string;
+      url: string;
     }
   | {
       status: "failed";
       reason: string;
-      urlHost?: string;
+      url: string;
     };
 
 export interface MirrorProvider {

@@ -1,117 +1,83 @@
 import { expect } from "chai";
-import { createHash } from "crypto";
-import { HttpMirrorMapSource } from "../../src/repository/contentProvider/mirrorMapCache.js";
 import { HttpMirrorProvider } from "../../src/repository/contentProvider/mirrorProvider.js";
 
 describe("Mirror content provider", () => {
-  const mapUrl = "https://mirror.dappnode.test/content-map.json";
+  const baseUrl = "https://packages.dappnode.test";
   const cid = "QmTestCid111111111111111111111111111111111111";
-  const mirrorAssetUrl = "https://mirror.dappnode.test/assets/cid.txz";
 
-  it("mapping hit + mirror download success", async () => {
+  it("mirror download success", async () => {
     const payload = Buffer.from("mirror-ok");
-    const sha256 = createHash("sha256").update(payload).digest("hex");
+    const expectedUrl = `${baseUrl}/${cid}/`;
+
     const fetchStub = async (input: string | URL): Promise<Response> => {
       const url = input.toString();
-      if (url === mapUrl) return jsonResponse({ [cid]: { url: mirrorAssetUrl, sha256 } });
-      if (url === mirrorAssetUrl) return binaryResponse(payload);
+      if (url === expectedUrl) return binaryResponse(payload);
       throw Error(`Unexpected URL ${url}`);
     };
 
-    const provider = createMirrorProvider({ mapUrl, fetchStub });
+    const provider = createMirrorProvider({ baseUrl, fetchStub });
     const result = await provider.fetchByCid(cid);
 
     expect(result.status).to.equal("success");
-    if (result.status === "success") expect(Buffer.from(result.bytes).toString()).to.equal("mirror-ok");
+    if (result.status === "success") {
+      expect(Buffer.from(result.bytes).toString()).to.equal("mirror-ok");
+      expect(result.url).to.equal(expectedUrl);
+    }
   });
 
-  it("mapping hit + mirror download fail (single attempt, no retries)", async () => {
-    let mirrorDownloadCalls = 0;
+  it("mirror download fail (single attempt, no retries)", async () => {
+    let downloadCalls = 0;
+    const expectedUrl = `${baseUrl}/${cid}/`;
+
     const fetchStub = async (input: string | URL): Promise<Response> => {
       const url = input.toString();
-      if (url === mapUrl) return jsonResponse({ [cid]: mirrorAssetUrl });
-      if (url === mirrorAssetUrl) {
-        mirrorDownloadCalls += 1;
+      if (url === expectedUrl) {
+        downloadCalls += 1;
         return new Response("not-found", { status: 404 });
       }
       throw Error(`Unexpected URL ${url}`);
     };
 
-    const provider = createMirrorProvider({ mapUrl, fetchStub });
+    const provider = createMirrorProvider({ baseUrl, fetchStub });
     const result = await provider.fetchByCid(cid);
 
     expect(result.status).to.equal("failed");
-    expect(mirrorDownloadCalls).to.equal(1);
+    expect(result.url).to.equal(expectedUrl);
+    expect(downloadCalls).to.equal(1);
   });
 
-  it("mapping miss", async () => {
+  it("constructs correct URL from CID", async () => {
     const fetchStub = async (input: string | URL): Promise<Response> => {
       const url = input.toString();
-      if (url === mapUrl) return jsonResponse({});
-      throw Error(`Unexpected URL ${url}`);
+      expect(url).to.equal(`${baseUrl}/${cid}/`);
+      return binaryResponse(Buffer.from("test"));
     };
 
-    const provider = createMirrorProvider({ mapUrl, fetchStub });
-    const result = await provider.fetchByCid(cid);
-
-    expect(result.status).to.equal("miss");
+    const provider = createMirrorProvider({ baseUrl, fetchStub });
+    await provider.fetchByCid(cid);
   });
 
-  it("mapping fetch fails", async () => {
+  it("handles baseUrl with trailing slash", async () => {
+    const baseUrlWithSlash = "https://packages.dappnode.test/";
+    const expectedUrl = `https://packages.dappnode.test/${cid}/`;
+
     const fetchStub = async (input: string | URL): Promise<Response> => {
       const url = input.toString();
-      if (url === mapUrl) return new Response("boom", { status: 500 });
-      throw Error(`Unexpected URL ${url}`);
+      expect(url).to.equal(expectedUrl);
+      return binaryResponse(Buffer.from("test"));
     };
 
-    const provider = createMirrorProvider({ mapUrl, fetchStub });
-    const result = await provider.fetchByCid(cid);
-
-    expect(result.status).to.equal("miss");
-  });
-
-  it("map is fetched on every lookup (no cache)", async () => {
-    let fetchCount = 0;
-    const source = new HttpMirrorMapSource({
-      mapUrl,
-      timeoutMs: 1000,
-      fetchFn: async (): Promise<Response> => {
-        fetchCount += 1;
-        if (fetchCount === 1) return jsonResponse({ [cid]: "https://mirror.dappnode.test/first.txz" });
-        return jsonResponse({ [cid]: "https://mirror.dappnode.test/second.txz" });
-      }
-    });
-
-    const first = await source.getEntry(cid);
-    const second = await source.getEntry(cid);
-
-    expect(fetchCount).to.equal(2);
-    expect(first?.url).to.equal("https://mirror.dappnode.test/first.txz");
-    expect(second?.url).to.equal("https://mirror.dappnode.test/second.txz");
+    const provider = createMirrorProvider({ baseUrl: baseUrlWithSlash, fetchStub });
+    await provider.fetchByCid(cid);
   });
 });
 
-function createMirrorProvider({ mapUrl, fetchStub }: { mapUrl: string; fetchStub: typeof fetch }): HttpMirrorProvider {
-  const mapSource = new HttpMirrorMapSource({
-    mapUrl,
-    timeoutMs: 2000,
-    fetchFn: fetchStub
-  });
-
+function createMirrorProvider({ baseUrl, fetchStub }: { baseUrl: string; fetchStub: typeof fetch }): HttpMirrorProvider {
   return new HttpMirrorProvider({
-    mapSource,
+    baseUrl,
     timeoutMs: 3000,
     maxDownloadBytes: 10 * 1024 * 1024,
     fetchFn: fetchStub
-  });
-}
-
-function jsonResponse(value: unknown): Response {
-  return new Response(JSON.stringify(value), {
-    status: 200,
-    headers: {
-      "content-type": "application/json"
-    }
   });
 }
 

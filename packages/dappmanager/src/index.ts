@@ -76,9 +76,8 @@ const providers = new MultiUrlJsonRpcProvider(
 // Required db to be initialized
 export const directory = new DappNodeDirectory(providers);
 export const dappnodeInstaller = new DappnodeInstaller(ipfsUrl, providers, {
-  mirrorContentMap: {
-    mapUrl: params.CONTENT_MIRROR_MAP_URL,
-    mapFetchTimeoutMs: params.CONTENT_MIRROR_MAP_FETCH_TIMEOUT_MS,
+  mirror: {
+    baseUrl: params.CONTENT_MIRROR_BASE_URL,
     timeoutMs: params.CONTENT_MIRROR_TIMEOUT_MS,
     maxDownloadBytes: params.CONTENT_MIRROR_MAX_DOWNLOAD_BYTES
   }

@@ -1,27 +1,26 @@
-import { createHash } from "crypto";
-import { FetchByCidOptions, MirrorMapSource, MirrorProvider, MirrorAttemptResult } from "./types.js";
+import { FetchByCidOptions, MirrorProvider, MirrorAttemptResult } from "./types.js";
 import { normalizeCid, roundProgress } from "./utils.js";
 
 type FetchLike = typeof fetch;
 
 export class HttpMirrorProvider implements MirrorProvider {
-  private readonly mapSource: MirrorMapSource;
+  private readonly baseUrl: string;
   private readonly timeoutMs: number;
   private readonly maxDownloadBytes: number;
   private readonly fetchFn: FetchLike;
 
   constructor({
-    mapSource,
+    baseUrl,
     timeoutMs,
     maxDownloadBytes,
     fetchFn = fetch
   }: {
-    mapSource: MirrorMapSource;
+    baseUrl: string;
     timeoutMs: number;
     maxDownloadBytes: number;
     fetchFn?: FetchLike;
   }) {
-    this.mapSource = mapSource;
+    this.baseUrl = baseUrl.replace(/\/$/, "");
     this.timeoutMs = timeoutMs;
     this.maxDownloadBytes = maxDownloadBytes;
     this.fetchFn = fetchFn;
@@ -29,55 +28,31 @@ export class HttpMirrorProvider implements MirrorProvider {
 
   public async fetchByCid(cid: string, options?: FetchByCidOptions): Promise<MirrorAttemptResult> {
     const normalizedCid = normalizeCid(cid);
-    const mapEntry = await this.mapSource.getEntry(normalizedCid);
-    if (!mapEntry) return { status: "miss" };
-
-    let url: URL;
-    try {
-      url = new URL(mapEntry.url);
-    } catch {
-      return {
-        status: "failed",
-        reason: "invalid mirror URL"
-      };
-    }
-
-    if (url.protocol !== "https:") {
-      return {
-        status: "failed",
-        reason: "mirror URL is not https",
-        urlHost: url.host
-      };
-    }
+    const url = `${this.baseUrl}/${normalizedCid}/`;
 
     try {
       const bytes = await this.download(url, options);
-      if (mapEntry.sha256) this.assertSha256(bytes, mapEntry.sha256);
-      if (mapEntry.size && mapEntry.size !== bytes.length) {
-        throw Error(`invalid mirror payload size: expected ${mapEntry.size}, got ${bytes.length}`);
-      }
-
       return {
         status: "success",
         bytes,
-        urlHost: url.host
+        url
       };
     } catch (e) {
       return {
         status: "failed",
         reason: sanitizeErrorMessage(e),
-        urlHost: url.host
+        url
       };
     }
   }
 
-  private async download(url: URL, options?: FetchByCidOptions): Promise<Uint8Array> {
+  private async download(url: string, options?: FetchByCidOptions): Promise<Uint8Array> {
     const timeoutMs = options?.timeoutMs ?? this.timeoutMs;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
     try {
-      const response = await this.fetchFn(url.toString(), {
+      const response = await this.fetchFn(url, {
         method: "GET",
         signal: controller.signal
       });
@@ -122,13 +97,6 @@ export class HttpMirrorProvider implements MirrorProvider {
       return joinChunks(chunks, downloadedBytes);
     } finally {
       clearTimeout(timeoutId);
-    }
-  }
-
-  private assertSha256(payload: Uint8Array, expectedHex: string): void {
-    const computedHex = createHash("sha256").update(payload).digest("hex");
-    if (computedHex.toLowerCase() !== expectedHex.toLowerCase()) {
-      throw Error("mirror checksum mismatch");
     }
   }
 }
