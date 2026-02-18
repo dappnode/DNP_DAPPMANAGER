@@ -37,11 +37,8 @@ const source = "ipfs" as const;
 
 type MirrorContentMapConfig = {
   mapUrl?: string;
-  ttlMs?: number;
   timeoutMs?: number;
-  retries?: number;
   maxDownloadBytes?: number;
-  allowHttpUrls?: boolean;
   mapFetchTimeoutMs?: number;
 };
 
@@ -74,13 +71,10 @@ export class DappnodeRepository extends ApmRepository {
       this.mirrorProvider = new HttpMirrorProvider({
         mapCache: new HttpMirrorMapCache({
           mapUrl: mirrorConfig.mapUrl,
-          ttlMs: mirrorConfig.ttlMs ?? 10 * 60 * 1000,
           timeoutMs: mirrorConfig.mapFetchTimeoutMs ?? 8 * 1000
         }),
         timeoutMs: mirrorConfig.timeoutMs ?? 20 * 1000,
-        retries: mirrorConfig.retries ?? 1,
-        maxDownloadBytes: mirrorConfig.maxDownloadBytes ?? 10 * 1024 * 1024 * 1024,
-        allowHttpUrls: mirrorConfig.allowHttpUrls ?? false
+        maxDownloadBytes: mirrorConfig.maxDownloadBytes ?? 10 * 1024 * 1024 * 1024
       });
     }
   }

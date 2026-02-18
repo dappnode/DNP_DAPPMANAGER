@@ -78,12 +78,9 @@ export const directory = new DappNodeDirectory(providers);
 export const dappnodeInstaller = new DappnodeInstaller(ipfsUrl, providers, {
   mirrorContentMap: {
     mapUrl: params.CONTENT_MIRROR_MAP_URL,
-    ttlMs: params.CONTENT_MIRROR_MAP_TTL_MS,
     mapFetchTimeoutMs: params.CONTENT_MIRROR_MAP_FETCH_TIMEOUT_MS,
     timeoutMs: params.CONTENT_MIRROR_TIMEOUT_MS,
-    retries: params.CONTENT_MIRROR_RETRIES,
-    maxDownloadBytes: params.CONTENT_MIRROR_MAX_DOWNLOAD_BYTES,
-    allowHttpUrls: params.CONTENT_MIRROR_ALLOW_HTTP_URLS
+    maxDownloadBytes: params.CONTENT_MIRROR_MAX_DOWNLOAD_BYTES
   }
 });
 

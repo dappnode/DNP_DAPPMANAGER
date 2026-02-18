@@ -7,31 +7,23 @@ type FetchLike = typeof fetch;
 export class HttpMirrorProvider implements MirrorProvider {
   private readonly mapCache: MirrorMapCache;
   private readonly timeoutMs: number;
-  private readonly retries: number;
   private readonly maxDownloadBytes: number;
-  private readonly allowHttpUrls: boolean;
   private readonly fetchFn: FetchLike;
 
   constructor({
     mapCache,
     timeoutMs,
-    retries,
     maxDownloadBytes,
-    allowHttpUrls,
     fetchFn = fetch
   }: {
     mapCache: MirrorMapCache;
     timeoutMs: number;
-    retries: number;
     maxDownloadBytes: number;
-    allowHttpUrls: boolean;
     fetchFn?: FetchLike;
   }) {
     this.mapCache = mapCache;
     this.timeoutMs = timeoutMs;
-    this.retries = retries;
     this.maxDownloadBytes = maxDownloadBytes;
-    this.allowHttpUrls = allowHttpUrls;
     this.fetchFn = fetchFn;
   }
 
@@ -50,7 +42,7 @@ export class HttpMirrorProvider implements MirrorProvider {
       };
     }
 
-    if (url.protocol !== "https:" && !this.allowHttpUrls) {
+    if (url.protocol !== "https:") {
       return {
         status: "failed",
         reason: "mirror URL is not https",
@@ -58,31 +50,25 @@ export class HttpMirrorProvider implements MirrorProvider {
       };
     }
 
-    const attempts = Math.max(1, this.retries + 1);
-    let latestErrorMessage = "unknown mirror error";
-    for (let attempt = 1; attempt <= attempts; attempt++) {
-      try {
-        const bytes = await this.download(url, options);
-        if (mapEntry.sha256) this.assertSha256(bytes, mapEntry.sha256);
-        if (mapEntry.size && mapEntry.size !== bytes.length) {
-          throw Error(`invalid mirror payload size: expected ${mapEntry.size}, got ${bytes.length}`);
-        }
-
-        return {
-          status: "success",
-          bytes,
-          urlHost: url.host
-        };
-      } catch (e) {
-        latestErrorMessage = sanitizeErrorMessage(e);
+    try {
+      const bytes = await this.download(url, options);
+      if (mapEntry.sha256) this.assertSha256(bytes, mapEntry.sha256);
+      if (mapEntry.size && mapEntry.size !== bytes.length) {
+        throw Error(`invalid mirror payload size: expected ${mapEntry.size}, got ${bytes.length}`);
       }
-    }
 
-    return {
-      status: "failed",
-      reason: latestErrorMessage,
-      urlHost: url.host
-    };
+      return {
+        status: "success",
+        bytes,
+        urlHost: url.host
+      };
+    } catch (e) {
+      return {
+        status: "failed",
+        reason: sanitizeErrorMessage(e),
+        urlHost: url.host
+      };
+    }
   }
 
   private async download(url: URL, options?: FetchByCidOptions): Promise<Uint8Array> {

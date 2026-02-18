@@ -25,11 +25,15 @@ describe("Mirror content provider", () => {
     if (result.status === "success") expect(Buffer.from(result.bytes).toString()).to.equal("mirror-ok");
   });
 
-  it("mapping hit + mirror download fail", async () => {
+  it("mapping hit + mirror download fail (single attempt, no retries)", async () => {
+    let mirrorDownloadCalls = 0;
     const fetchStub = async (input: string | URL): Promise<Response> => {
       const url = input.toString();
       if (url === mapUrl) return jsonResponse({ [cid]: mirrorAssetUrl });
-      if (url === mirrorAssetUrl) return new Response("not-found", { status: 404 });
+      if (url === mirrorAssetUrl) {
+        mirrorDownloadCalls += 1;
+        return new Response("not-found", { status: 404 });
+      }
       throw Error(`Unexpected URL ${url}`);
     };
 
@@ -37,6 +41,7 @@ describe("Mirror content provider", () => {
     const result = await provider.fetchByCid(cid);
 
     expect(result.status).to.equal("failed");
+    expect(mirrorDownloadCalls).to.equal(1);
   });
 
   it("mapping miss", async () => {
@@ -52,15 +57,24 @@ describe("Mirror content provider", () => {
     expect(result.status).to.equal("miss");
   });
 
-  it("mapping cache stale-while-revalidate", async () => {
-    let now = 0;
-    let fetchCount = 0;
+  it("mapping fetch fails", async () => {
+    const fetchStub = async (input: string | URL): Promise<Response> => {
+      const url = input.toString();
+      if (url === mapUrl) return new Response("boom", { status: 500 });
+      throw Error(`Unexpected URL ${url}`);
+    };
 
+    const provider = createMirrorProvider({ mapUrl, fetchStub });
+    const result = await provider.fetchByCid(cid);
+
+    expect(result.status).to.equal("miss");
+  });
+
+  it("map is fetched on every lookup (no cache)", async () => {
+    let fetchCount = 0;
     const cache = new HttpMirrorMapCache({
       mapUrl,
-      ttlMs: 1000,
       timeoutMs: 1000,
-      now: () => now,
       fetchFn: async (): Promise<Response> => {
         fetchCount += 1;
         if (fetchCount === 1) return jsonResponse({ [cid]: "https://mirror.dappnode.test/first.txz" });
@@ -69,22 +83,17 @@ describe("Mirror content provider", () => {
     });
 
     const first = await cache.getEntry(cid);
+    const second = await cache.getEntry(cid);
+
+    expect(fetchCount).to.equal(2);
     expect(first?.url).to.equal("https://mirror.dappnode.test/first.txz");
-
-    now = 1500;
-    const stale = await cache.getEntry(cid);
-    expect(stale?.url).to.equal("https://mirror.dappnode.test/first.txz");
-
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    const refreshed = await cache.getEntry(cid);
-    expect(refreshed?.url).to.equal("https://mirror.dappnode.test/second.txz");
+    expect(second?.url).to.equal("https://mirror.dappnode.test/second.txz");
   });
 });
 
 function createMirrorProvider({ mapUrl, fetchStub }: { mapUrl: string; fetchStub: typeof fetch }): HttpMirrorProvider {
   const mapCache = new HttpMirrorMapCache({
     mapUrl,
-    ttlMs: 60 * 1000,
     timeoutMs: 2000,
     fetchFn: fetchStub
   });
@@ -92,9 +101,7 @@ function createMirrorProvider({ mapUrl, fetchStub }: { mapUrl: string; fetchStub
   return new HttpMirrorProvider({
     mapCache,
     timeoutMs: 3000,
-    retries: 0,
     maxDownloadBytes: 10 * 1024 * 1024,
-    allowHttpUrls: false,
     fetchFn: fetchStub
   });
 }
