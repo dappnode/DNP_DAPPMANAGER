@@ -2,6 +2,7 @@ import { Compose } from "./compose.js";
 import { Manifest, PrometheusTarget, GrafanaDashboard } from "./manifest.js";
 import { NotificationsConfig } from "./notifications.js";
 import { SetupWizard } from "./setupWizard.js";
+import { DistributedFile } from "./calls.js";
 
 /**
  * =========
@@ -177,15 +178,6 @@ export interface TrustedReleaseKey {
   dnpNameSuffix: string;
   /** `0x14791697260E4c9A71f18484C9f997B308e59325` */
   key: string;
-}
-
-export type DistributedFileSource = "ipfs" | "swarm";
-
-export interface DistributedFile {
-  hash: string;
-  source: DistributedFileSource;
-  size: number;
-  filename?: string; // Used for mirror downloads to identify specific files within a CID directory
 }
 
 /**

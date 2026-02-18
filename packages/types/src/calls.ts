@@ -926,6 +926,7 @@ export interface DistributedFile {
   hash: string;
   source: DistributedFileSource;
   size: number;
+  filename?: string; // Used for mirror downloads to identify specific files within a CID directory
 }
 
 export interface IpfsRepository {
