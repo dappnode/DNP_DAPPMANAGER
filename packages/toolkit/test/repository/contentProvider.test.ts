@@ -61,11 +61,11 @@ describe("HttpMirrorProvider", () => {
   const baseUrl = "https://test-mirror.example.com";
   const timeoutMs = 5000;
   const maxBytes = 1024 * 1024; // 1MB
-  let fetchCalls: { url: string; opts: any }[];
+  let fetchCalls: { url: string; opts: RequestInit }[];
 
-  function mockFetch(response: any, shouldReject = false) {
+  function mockFetch(response: unknown, shouldReject = false) {
     fetchCalls = [];
-    (globalThis as any).fetch = async (url: string, opts: any) => {
+    (globalThis as Record<string, unknown>).fetch = async (url: string, opts: RequestInit) => {
       fetchCalls.push({ url, opts });
       if (shouldReject) throw response;
       return response;
@@ -132,8 +132,8 @@ describe("HttpMirrorProvider", () => {
       try {
         await provider.list("QmTestCid");
         expect.fail("Should have thrown");
-      } catch (e: any) {
-        expect(e.message).to.include("Mirror list failed: 404 Not Found");
+      } catch (e: unknown) {
+        expect((e as Error).message).to.include("Mirror list failed: 404 Not Found");
       }
     });
 
@@ -143,8 +143,8 @@ describe("HttpMirrorProvider", () => {
       try {
         await provider.list("QmTestCid");
         expect.fail("Should have thrown");
-      } catch (e: any) {
-        expect(e.message).to.include("Network error");
+      } catch (e: unknown) {
+        expect((e as Error).message).to.include("Network error");
       }
     });
 
@@ -157,8 +157,8 @@ describe("HttpMirrorProvider", () => {
       try {
         await provider.list("QmTestCid");
         expect.fail("Should have thrown");
-      } catch (e: any) {
-        expect(e.message).to.include("Mirror list response is not an array");
+      } catch (e: unknown) {
+        expect((e as Error).message).to.include("Mirror list response is not an array");
       }
     });
   });
