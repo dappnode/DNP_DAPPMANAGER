@@ -171,7 +171,7 @@ export const params = {
 
   // Mirror provider parameters
   CONTENT_MIRROR_BASE_URL: process.env.CONTENT_MIRROR_BASE_URL || "https://packages.dappnode.net",
-  CONTENT_MIRROR_TIMEOUT_MS: parseInt(process.env.CONTENT_MIRROR_TIMEOUT_MS || "1800000", 10), // 30 minutes
+  CONTENT_MIRROR_TIMEOUT_MS: parseInt(process.env.CONTENT_MIRROR_TIMEOUT_MS || "3600000", 10), // 30 minutes
   CONTENT_MIRROR_MAX_BYTES: parseInt(process.env.CONTENT_MIRROR_MAX_BYTES || "10737418240", 10), // 10GB
 
   // Web3 parameters

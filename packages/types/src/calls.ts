@@ -927,6 +927,7 @@ export interface DistributedFile {
   source: DistributedFileSource;
   size: number;
   filename?: string;
+  packageHash?: string; // Parent directory CID, used for mirror URL construction
 }
 
 export interface IpfsRepository {

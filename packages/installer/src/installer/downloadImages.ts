@@ -69,13 +69,14 @@ export async function downloadImage(
   path: string,
   fileSize: number,
   progress: (n: number) => void,
-  filename?: string
+  filename?: string,
+  packageHash?: string
 ): Promise<void> {
   // TODO: Ensure file is available
 
   // Cat stream to file system
   // Make sure the path is correct and the parent folder exist or is created
-  await dappnodeInstaller.writeFileToFs({ hash, path, fileSize, progress, filename });
+  await dappnodeInstaller.writeFileToFs({ hash, path, fileSize, progress, filename, packageHash });
 }
 
 export async function getImage(
@@ -97,11 +98,11 @@ export async function getImage(
     logs.debug(`Image at ${path} is invalid: ${e}`);
   }
 
-  const { hash, size, filename } = imageFile;
+  const { hash, size, filename, packageHash } = imageFile;
 
   switch (imageFile.source) {
     case "ipfs":
-      await downloadImage(dappnodeInstaller, hash, path, size, progress, filename);
+      await downloadImage(dappnodeInstaller, hash, path, size, progress, filename, packageHash);
       break;
     default:
       throw Error(`Unsupported source ${imageFile.source}`);

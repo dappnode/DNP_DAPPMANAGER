@@ -170,19 +170,20 @@ export class DappnodeRepository extends ApmRepository {
     const ipfsEntries = await this.list(contentUri);
 
     // get manifest
-    const manifest = await this.getPkgAsset<Manifest>(releaseFilesToDownload.manifest, ipfsEntries);
+    const manifest = await this.getPkgAsset<Manifest>(releaseFilesToDownload.manifest, ipfsEntries, contentUri);
     // Ensure its a directory release
     if (!manifest) throw Error(`Invalid pkg release ${contentUri}, manifest not found`);
     const dnpName = manifest.name;
     const isCore = manifest.type === "dncore";
 
     // get compose
-    const compose = await this.getPkgAsset<Compose>(releaseFilesToDownload.compose, ipfsEntries);
+    const compose = await this.getPkgAsset<Compose>(releaseFilesToDownload.compose, ipfsEntries, contentUri);
     if (!compose) throw Error(`Invalid pkg release ${contentUri}, compose not found`);
 
     const signature: ReleaseSignature | undefined = await this.getPkgAsset<ReleaseSignature>(
       releaseFilesToDownload.signature,
-      ipfsEntries
+      ipfsEntries,
+      contentUri
     );
 
     const signatureStatus: ReleaseSignatureStatus = signature
@@ -213,10 +214,10 @@ export class DappnodeRepository extends ApmRepository {
       semVersion: manifest.version,
       isCore,
       origin,
-      imageFile: this.getImageByArch(manifest, ipfsEntries, os),
+      imageFile: this.getImageByArch(manifest, ipfsEntries, os, contentUri),
       avatarFile,
       manifest,
-      setupWizard: await this.getPkgAsset(releaseFilesToDownload.setupWizard, ipfsEntries),
+      setupWizard: await this.getPkgAsset(releaseFilesToDownload.setupWizard, ipfsEntries, contentUri),
       compose,
       signature,
       signatureStatus,
@@ -226,11 +227,11 @@ export class DappnodeRepository extends ApmRepository {
         coreFromForeignRegistry: isCore && !dnpName.endsWith(dappnodeRegistry),
         requestNameMismatch: isEnsDomain(dnpNameOrHash) && dnpNameOrHash !== dnpName
       },
-      disclaimer: await this.getPkgAsset(releaseFilesToDownload.disclaimer, ipfsEntries),
-      gettingStarted: await this.getPkgAsset(releaseFilesToDownload.gettingStarted, ipfsEntries),
-      prometheusTargets: await this.getPkgAsset(releaseFilesToDownload.prometheusTargets, ipfsEntries),
-      grafanaDashboards: await this.getPkgAsset(releaseFilesToDownload.grafanaDashboards, ipfsEntries),
-      notifications: await this.getPkgAsset(releaseFilesToDownload.notifications, ipfsEntries)
+      disclaimer: await this.getPkgAsset(releaseFilesToDownload.disclaimer, ipfsEntries, contentUri),
+      gettingStarted: await this.getPkgAsset(releaseFilesToDownload.gettingStarted, ipfsEntries, contentUri),
+      prometheusTargets: await this.getPkgAsset(releaseFilesToDownload.prometheusTargets, ipfsEntries, contentUri),
+      grafanaDashboards: await this.getPkgAsset(releaseFilesToDownload.grafanaDashboards, ipfsEntries, contentUri),
+      notifications: await this.getPkgAsset(releaseFilesToDownload.notifications, ipfsEntries, contentUri)
     };
   }
 
@@ -243,7 +244,7 @@ export class DappnodeRepository extends ApmRepository {
    * @throws - If the file is required and not found.
    * @returns - The release package for the request or undefined if not found.
    */
-  public async getPkgAsset<T>(fileConfig: FileConfig, ipfsEntries: IPFSEntry[]): Promise<T | undefined> {
+  public async getPkgAsset<T>(fileConfig: FileConfig, ipfsEntries: IPFSEntry[], packageHash?: string): Promise<T | undefined> {
     const { regex, required, multiple } = fileConfig;
     // We filter the entries (files) so that we only consider the ones that match the regex.
     // for example, all grafana dashboards must pass /.*grafana-dashboard.json$/ regex
@@ -258,7 +259,7 @@ export class DappnodeRepository extends ApmRepository {
     // Process matched entries. If multiple files are allowed, and more than one file matches, we parse all of them.
     const { maxSize: maxLength, format } = fileConfig;
     const contents = await Promise.all(
-      matchingEntries.map((entry) => this.writeFileToMemory(entry.cid.toString(), maxLength, entry.name))
+      matchingEntries.map((entry) => this.writeFileToMemory(entry.cid.toString(), maxLength, entry.name, packageHash))
     );
 
     // If multiple files are allowed, we return an array of parsed assets.
@@ -278,13 +279,16 @@ export class DappnodeRepository extends ApmRepository {
    * @see catString
    * @see catCarReaderToMemory
    */
-  public async writeFileToMemory(hash: string, maxLength?: number, filename?: string): Promise<string> {
+  public async writeFileToMemory(hash: string, maxLength?: number, filename?: string, packageHash?: string): Promise<string> {
     const cidStr = this.sanitizeIpfsPath(hash.toString());
 
-    // Try mirror first if available and we have a filename
-    if (this.mirrorProvider && filename) {
+    // Try mirror first if available and we have a filename.
+    // Use packageHash (directory CID) for the mirror URL — the mirror serves files
+    // at /{packageCID}/{filename}, not /{fileCID}/{filename}.
+    if (this.mirrorProvider && filename && packageHash) {
+      const mirrorCid = this.sanitizeIpfsPath(packageHash);
       try {
-        const result = await this.mirrorProvider.fetchFile(cidStr, filename, {});
+        const result = await this.mirrorProvider.fetchFile(mirrorCid, filename, {});
 
         if (result.status === "success") {
           if (maxLength && result.bytes.length >= maxLength) {
@@ -303,7 +307,7 @@ export class DappnodeRepository extends ApmRepository {
 
     // Fallback to IPFS
     const chunks: Uint8Array[] = [];
-    const { carReader, root } = await this.getAndVerifyContentFromGateway(hash);
+    const { carReader, root } = await this.getAndVerifyContentFromGateway(cidStr);
     const content = await this.unpackCarReader(carReader, root);
     for await (const chunk of content) chunks.push(chunk);
 
@@ -347,7 +351,8 @@ export class DappnodeRepository extends ApmRepository {
     timeout,
     fileSize,
     progress,
-    filename
+    filename,
+    packageHash
   }: {
     hash: string;
     path: string;
@@ -355,19 +360,22 @@ export class DappnodeRepository extends ApmRepository {
     fileSize?: number;
     progress?: (n: number) => void;
     filename?: string;
+    packageHash?: string;
   }): Promise<void> {
     const cidStr = this.sanitizeIpfsPath(hash.toString());
 
-    // Try mirror first if available and we have a filename
-    if (this.mirrorProvider && filename) {
+    // Try mirror first if available.
+    // Use packageHash (directory CID) for the URL — mirror serves /{packageCID}/{filename}.
+    // Stream directly to disk to avoid loading the entire image into RAM.
+    if (this.mirrorProvider && filename && packageHash) {
+      const mirrorCid = this.sanitizeIpfsPath(packageHash);
       try {
-        const result = await this.mirrorProvider.fetchFile(cidStr, filename, {
+        const result = await this.mirrorProvider.fetchFileToPath(mirrorCid, filename, _path, {
           onProgress: progress
         });
 
         if (result.status === "success") {
-          await fs.promises.writeFile(_path, result.bytes);
-          return; // Success - no need for IPFS fallback
+          return; // Streamed to disk — no IPFS fallback needed
         }
 
         // Mirror failed, fallback to IPFS (no logging)
@@ -377,7 +385,7 @@ export class DappnodeRepository extends ApmRepository {
     }
 
     // Fallback to IPFS
-    const { carReader, root } = await this.getAndVerifyContentFromGateway(hash);
+    const { carReader, root } = await this.getAndVerifyContentFromGateway(cidStr);
     const readable = await this.unpackCarReader(carReader, root);
 
     return new Promise((resolve, reject) => {
@@ -553,7 +561,7 @@ export class DappnodeRepository extends ApmRepository {
    * @param nodeArch - The architecture of the node.
    * @returns The distributed file object of the image.
    */
-  private getImageByArch(manifest: Manifest, files: IPFSEntry[], nodeArch: NodeJS.Architecture): DistributedFile {
+  private getImageByArch(manifest: Manifest, files: IPFSEntry[], nodeArch: NodeJS.Architecture, packageHash?: string): DistributedFile {
     let arch: Architecture;
     switch (nodeArch) {
       case "arm":
@@ -590,7 +598,8 @@ export class DappnodeRepository extends ApmRepository {
         hash: imageAsset.cid.toString(),
         size: imageAsset.size,
         source, // TODO: consdier adding different sources
-        filename: imageAsset.name
+        filename: imageAsset.name,
+        packageHash
       };
     }
   }

@@ -1,5 +1,10 @@
-import { MirrorProvider, MirrorFetchResult, FetchOptions } from "./types.js";
+import fs from "fs";
+import stream from "stream";
+import util from "util";
+import { MirrorProvider, MirrorFetchResult, MirrorStreamResult, FetchOptions } from "./types.js";
 import { normalizeCid, roundProgress } from "./utils.js";
+
+const pipeline = util.promisify(stream.pipeline);
 
 /**
  * HTTP mirror provider for downloading package files
@@ -15,9 +20,17 @@ export class HttpMirrorProvider implements MirrorProvider {
     this.maxBytes = maxBytes;
   }
 
+  /**
+   * Build the mirror URL for a package file.
+   * @param cid - Package directory CID (not the individual file CID)
+   * @param filename - Filename within the package
+   */
+  private buildUrl(cid: string, filename: string): string {
+    return `${this.baseUrl}/${normalizeCid(cid)}/${filename}`;
+  }
+
   async fetchFile(cid: string, filename: string, options: FetchOptions = {}): Promise<MirrorFetchResult> {
-    const normalizedCid = normalizeCid(cid);
-    const url = `${this.baseUrl}/${normalizedCid}/${filename}`;
+    const url = this.buildUrl(cid, filename);
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.timeoutMs);
@@ -39,6 +52,76 @@ export class HttpMirrorProvider implements MirrorProvider {
       const bytes = await this.readResponseWithProgress(response, totalBytes, options.onProgress);
       return { status: "success", bytes };
     } catch (error) {
+      const message = error instanceof Error ? error.message : "unknown_error";
+      return { status: "failed", reason: message };
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  }
+
+  /**
+   * Stream a file directly to disk without buffering in RAM.
+   * Use this for large files (Docker images) to avoid OOM.
+   */
+  async fetchFileToPath(cid: string, filename: string, destPath: string, options: FetchOptions = {}): Promise<MirrorStreamResult> {
+    const url = this.buildUrl(cid, filename);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), this.timeoutMs);
+
+    try {
+      const response = await fetch(url, { signal: controller.signal });
+
+      if (!response.ok) {
+        return { status: "failed", reason: `http_${response.status}` };
+      }
+
+      if (!response.body) {
+        return { status: "failed", reason: "no_response_body" };
+      }
+
+      const contentLength = response.headers.get("content-length");
+      const totalBytes = contentLength ? parseInt(contentLength, 10) : 0;
+
+      if (totalBytes > this.maxBytes) {
+        return { status: "failed", reason: "file_too_large" };
+      }
+
+      const fileStream = fs.createWriteStream(destPath);
+      // Convert Web ReadableStream to Node.js Readable
+      const nodeReadable = stream.Readable.fromWeb(response.body as Parameters<typeof stream.Readable.fromWeb>[0]);
+
+      if (options.onProgress && totalBytes > 0) {
+        let receivedBytes = 0;
+        let lastProgress = -1;
+        const { onProgress } = options;
+
+        const progressStream = new stream.Transform({
+          transform(chunk: Buffer, _encoding: string, callback: () => void) {
+            receivedBytes += chunk.length;
+            const progress = roundProgress(receivedBytes, totalBytes, 5);
+            if (progress !== lastProgress) {
+              onProgress(progress);
+              lastProgress = progress;
+            }
+            callback();
+            this.push(chunk);
+          }
+        });
+
+        await pipeline(nodeReadable, progressStream, fileStream);
+      } else {
+        await pipeline(nodeReadable, fileStream);
+      }
+
+      if (options.onProgress) options.onProgress(100);
+      return { status: "success" };
+    } catch (error) {
+      // Clean up partial file on error
+      try {
+        await fs.promises.unlink(destPath);
+      } catch {
+        // Ignore cleanup errors
+      }
       const message = error instanceof Error ? error.message : "unknown_error";
       return { status: "failed", reason: message };
     } finally {
