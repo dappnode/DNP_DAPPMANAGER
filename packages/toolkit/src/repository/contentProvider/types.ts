@@ -4,6 +4,13 @@ export interface FetchByCidOptions {
   progress?: (n: number) => void;
 }
 
+export interface MirrorListEntry {
+  name: string;
+  type: "file" | "directory";
+  size: number;
+  mtime: string;
+}
+
 export type MirrorAttemptResult =
   | {
       status: "success";
@@ -17,5 +24,12 @@ export type MirrorAttemptResult =
     };
 
 export interface MirrorProvider {
+  // List files in a directory (CID)
+  list(cid: string): Promise<MirrorListEntry[]>;
+
+  // Download a specific file from a directory
+  fetchFile(cid: string, filename: string, options?: FetchByCidOptions): Promise<MirrorAttemptResult>;
+
+  // Download by CID (for backward compatibility)
   fetchByCid(cid: string, options?: FetchByCidOptions): Promise<MirrorAttemptResult>;
 }

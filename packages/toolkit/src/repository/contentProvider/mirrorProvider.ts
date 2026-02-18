@@ -1,4 +1,4 @@
-import { FetchByCidOptions, MirrorProvider, MirrorAttemptResult } from "./types.js";
+import { FetchByCidOptions, MirrorProvider, MirrorAttemptResult, MirrorListEntry } from "./types.js";
 import { normalizeCid, roundProgress } from "./utils.js";
 
 type FetchLike = typeof fetch;
@@ -24,6 +24,51 @@ export class HttpMirrorProvider implements MirrorProvider {
     this.timeoutMs = timeoutMs;
     this.maxDownloadBytes = maxDownloadBytes;
     this.fetchFn = fetchFn;
+  }
+
+  /**
+   * List files in a directory by fetching JSON from mirror
+   */
+  public async list(cid: string): Promise<MirrorListEntry[]> {
+    const normalizedCid = normalizeCid(cid);
+    const url = `${this.baseUrl}/${normalizedCid}/`;
+
+    try {
+      const response = await this.fetchFn(url, {
+        method: "GET",
+        headers: { Accept: "application/json" }
+      });
+
+      if (!response.ok) throw Error(`HTTP ${response.status}`);
+
+      const entries: MirrorListEntry[] = await response.json();
+      return entries;
+    } catch (e) {
+      throw new Error(`Failed to list mirror directory: ${sanitizeErrorMessage(e)}`);
+    }
+  }
+
+  /**
+   * Download a specific file from a directory
+   */
+  public async fetchFile(cid: string, filename: string, options?: FetchByCidOptions): Promise<MirrorAttemptResult> {
+    const normalizedCid = normalizeCid(cid);
+    const url = `${this.baseUrl}/${normalizedCid}/${filename}`;
+
+    try {
+      const bytes = await this.download(url, options);
+      return {
+        status: "success",
+        bytes,
+        url
+      };
+    } catch (e) {
+      return {
+        status: "failed",
+        reason: sanitizeErrorMessage(e),
+        url
+      };
+    }
   }
 
   public async fetchByCid(cid: string, options?: FetchByCidOptions): Promise<MirrorAttemptResult> {

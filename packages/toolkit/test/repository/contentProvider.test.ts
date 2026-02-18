@@ -70,6 +70,51 @@ describe("Mirror content provider", () => {
     const provider = createMirrorProvider({ baseUrl: baseUrlWithSlash, fetchStub });
     await provider.fetchByCid(cid);
   });
+
+  it("lists directory contents from JSON", async () => {
+    const mockListing = [
+      { name: "avatar.png", type: "file" as const, size: 22145, mtime: "Wed, 18 Feb 2026 12:09:40 GMT" },
+      { name: "dappnode_package.json", type: "file" as const, size: 1495, mtime: "Wed, 18 Feb 2026 12:09:40 GMT" }
+    ];
+
+    const fetchStub = async (input: string | URL): Promise<Response> => {
+      const url = input.toString();
+      expect(url).to.equal(`${baseUrl}/${cid}/`);
+      return new Response(JSON.stringify(mockListing), {
+        status: 200,
+        headers: { "content-type": "application/json" }
+      });
+    };
+
+    const provider = createMirrorProvider({ baseUrl, fetchStub });
+    const entries = await provider.list(cid);
+
+    expect(entries).to.have.length(2);
+    expect(entries[0].name).to.equal("avatar.png");
+    expect(entries[0].size).to.equal(22145);
+    expect(entries[1].name).to.equal("dappnode_package.json");
+  });
+
+  it("downloads specific file from directory", async () => {
+    const filename = "dappnode_package.json";
+    const payload = Buffer.from('{"name":"test"}');
+    const expectedUrl = `${baseUrl}/${cid}/${filename}`;
+
+    const fetchStub: typeof fetch = async (input: string | URL | Request): Promise<Response> => {
+      const url = typeof input === "string" || input instanceof URL ? input.toString() : input.url;
+      if (url === expectedUrl) return binaryResponse(payload);
+      throw Error(`Unexpected URL ${url}`);
+    };
+
+    const provider = createMirrorProvider({ baseUrl, fetchStub });
+    const result = await provider.fetchFile(cid, filename);
+
+    expect(result.status).to.equal("success");
+    if (result.status === "success") {
+      expect(Buffer.from(result.bytes).toString()).to.equal('{"name":"test"}');
+      expect(result.url).to.equal(expectedUrl);
+    }
+  });
 });
 
 function createMirrorProvider({ baseUrl, fetchStub }: { baseUrl: string; fetchStub: typeof fetch }): HttpMirrorProvider {

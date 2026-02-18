@@ -31,8 +31,14 @@ import { dappnodeRegistry } from "./params.js";
 import { JsonRpcApiProvider } from "ethers";
 import { HttpMirrorProvider } from "./contentProvider/mirrorProvider.js";
 import { FetchByCidOptions } from "./contentProvider/types.js";
+import { logs } from "@dappnode/logger";
 
 const source = "ipfs" as const;
+
+function sanitizeError(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  return String(error);
+}
 
 type MirrorConfig = {
   baseUrl?: string;
@@ -137,7 +143,8 @@ export class DappnodeRepository extends ApmRepository {
       version
     });
 
-    const ipfsEntries = await this.list(contentUri);
+    // Use mirror fallback for listing (important for dependency resolution)
+    const ipfsEntries = await this.listWithMirrorFallback(contentUri);
 
     // get manifest
     const manifest = await this.getPkgAsset<Manifest>(releaseFilesToDownload.manifest, ipfsEntries);
@@ -169,7 +176,8 @@ export class DappnodeRepository extends ApmRepository {
     });
     if (!isIPFS.cid(this.sanitizeIpfsPath(contentUri))) throw Error(`Invalid IPFS hash ${contentUri}`);
 
-    const ipfsEntries = await this.list(contentUri);
+    // Try to list from mirror first, fall back to IPFS
+    const ipfsEntries = await this.listWithMirrorFallback(contentUri);
 
     // get manifest
     const manifest = await this.getPkgAsset<Manifest>(releaseFilesToDownload.manifest, ipfsEntries);
@@ -260,7 +268,7 @@ export class DappnodeRepository extends ApmRepository {
     // Process matched entries. If multiple files are allowed, and more than one file matches, we parse all of them.
     const { maxSize: maxLength, format } = fileConfig;
     const contents = await Promise.all(
-      matchingEntries.map((entry) => this.writeFileToMemory(entry.cid.toString(), maxLength))
+      matchingEntries.map((entry) => this.writeFileToMemory(entry.cid.toString(), maxLength, entry.name))
     );
 
     // If multiple files are allowed, we return an array of parsed assets.
@@ -274,6 +282,7 @@ export class DappnodeRepository extends ApmRepository {
    *
    * @param hash - The content identifier (CID) of the file to download.
    * @param maxLength - The maximum length of the file in bytes. If the downloaded file exceeds this length, an error is thrown.
+   * @param filename - Optional filename for mirror downloads
    * @returns The downloaded file content as a UTF8 string.
    * @throws Error when the maximum size is exceeded.
    * @see catString
@@ -281,9 +290,10 @@ export class DappnodeRepository extends ApmRepository {
    */
   public async writeFileToMemory(
     hash: string,
-    maxLength?: number
+    maxLength?: number,
+    filename?: string
   ): Promise<string> {
-    const mirrorBytes = await this.downloadFromMirrorIfAvailable(hash, {});
+    const mirrorBytes = await this.downloadFromMirrorIfAvailable(hash, filename, {});
 
     if (mirrorBytes) {
       if (maxLength && mirrorBytes.length >= maxLength) throw Error(`Maximum size ${maxLength} bytes exceeded`);
@@ -291,6 +301,7 @@ export class DappnodeRepository extends ApmRepository {
       return decoder.decode(mirrorBytes);
     }
 
+    logs.info(`Downloading ${hash} from IPFS gateway`);
     const chunks: Uint8Array[] = [];
     const { carReader, root } = await this.getAndVerifyContentFromGateway(hash);
     const content = await this.unpackCarReader(carReader, root);
@@ -361,6 +372,7 @@ export class DappnodeRepository extends ApmRepository {
       return;
     }
 
+    logs.info(`Downloading ${hash} from IPFS gateway`);
     const { carReader, root } = await this.getAndVerifyContentFromGateway(hash);
     const readable = await this.unpackCarReader(carReader, root);
 
@@ -424,18 +436,75 @@ export class DappnodeRepository extends ApmRepository {
 
   private async downloadFromMirrorIfAvailable(
     hash: string,
+    filename: string | undefined,
     options: FetchByCidOptions
   ): Promise<Uint8Array | null> {
     if (!this.mirrorProvider) {
       return null;
     }
 
-    const mirrorResult = await this.mirrorProvider.fetchByCid(hash, options);
-    if (mirrorResult.status === "success") {
-      return mirrorResult.bytes;
+    const cidStr = this.sanitizeIpfsPath(hash);
+
+    // If we have a filename, try to download the specific file from mirror
+    if (filename) {
+      logs.info(`Attempting to download ${filename} from mirror`);
+      const result = await this.mirrorProvider.fetchFile(cidStr, filename, options);
+
+      if (result.status === "success") {
+        logs.info(`Successfully downloaded ${filename} from mirror (${result.bytes.length} bytes)`);
+        return result.bytes;
+      }
+
+      logs.warn(`Mirror download failed for ${filename}: ${result.reason}, falling back to IPFS`);
+      return null;
     }
 
+    // No filename provided, try to download by CID
+    logs.info(`Attempting to download ${hash} from mirror by CID`);
+    const result = await this.mirrorProvider.fetchByCid(hash, options);
+
+    if (result.status === "success") {
+      logs.info(`Successfully downloaded from mirror (${result.url})`);
+      return result.bytes;
+    }
+
+    logs.warn(`Mirror download failed: ${result.reason}, falling back to IPFS`);
     return null;
+  }
+
+  /**
+   * Tries to list directory contents using mirror first, falls back to IPFS.
+   * Uses the mirror's JSON API to get directory listings.
+   */
+  private async listWithMirrorFallback(hash: string): Promise<IPFSEntry[]> {
+    if (!this.mirrorProvider) {
+      return this.list(hash);
+    }
+
+    try {
+      logs.info(`Attempting to list ${hash} from mirror`);
+      const cidStr = this.sanitizeIpfsPath(hash);
+
+      // Fetch directory listing from mirror as JSON
+      const mirrorEntries = await this.mirrorProvider.list(cidStr);
+
+      // Convert mirror entries to IPFS entry format
+      const entries: IPFSEntry[] = mirrorEntries.map((entry) => ({
+        type: entry.type === "directory" ? "dir" : "file",
+        cid: CID.parse(cidStr), // Use directory CID for all files
+        name: entry.name,
+        path: `${cidStr}/${entry.name}`,
+        size: entry.size
+      }));
+
+      logs.info(`Successfully listed ${entries.length} files from mirror for ${hash}`);
+      return entries;
+    } catch (e) {
+      logs.warn(`Mirror listing failed for ${hash}: ${sanitizeError(e)}, falling back to IPFS`);
+    }
+
+    logs.info(`Listing ${hash} from IPFS`);
+    return this.list(hash);
   }
 
   /**
