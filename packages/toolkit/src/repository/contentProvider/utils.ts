@@ -18,8 +18,15 @@ export function normalizeCid(cid: string): string {
   // Remove /ipfs/ or ipfs/ prefix
   let normalized = cid.split("ipfs/")[1] || cid;
 
-  // Remove trailing and leading slashes
-  normalized = normalized.replace(/\/+$/, "").replace(/^\/+/, "");
+  // Remove trailing slashes (safe, no ReDoS risk)
+  while (normalized.endsWith("/")) {
+    normalized = normalized.slice(0, -1);
+  }
+
+  // Remove leading slashes (safe, no ReDoS risk)
+  while (normalized.startsWith("/")) {
+    normalized = normalized.slice(1);
+  }
 
   // Return only the CID part (ignore any subpath)
   return normalized.split("/")[0];

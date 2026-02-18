@@ -1380,6 +1380,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@dappnode/toolkit@workspace:packages/toolkit"
   dependencies:
+    "@dappnode/logger": "workspace:^0.1.0"
     "@dappnode/types": "workspace:^0.1.0"
     "@ipld/car": "npm:^5.4.0"
     "@types/mocha": "npm:^10"
