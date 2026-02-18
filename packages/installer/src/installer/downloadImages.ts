@@ -84,7 +84,7 @@ export async function getImage(
   progress: (n: number) => void
 ): Promise<void> {
   // Validate parameters
-  if (!path || path.startsWith("/ipfs/") || !isAbsolute("/")) throw Error(`Invalid path: "${path}"`);
+  if (!path || path.startsWith("/ipfs/") || !isAbsolute(path)) throw Error(`Invalid path: "${path}"`);
   validatePath(path);
 
   // Check if cache exist and validate it

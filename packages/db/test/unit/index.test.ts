@@ -6,8 +6,23 @@ import { expect } from "chai";
 const testDir = "./test_files/";
 
 describe("db", () => {
+  const dbPath = path.join(testDir, "test-db.json");
+
+  beforeEach(() => {
+    // Clean up test file before each test
+    if (fs.existsSync(dbPath)) {
+      fs.unlinkSync(dbPath);
+    }
+  });
+
+  afterEach(() => {
+    // Clean up test file after each test
+    if (fs.existsSync(dbPath)) {
+      fs.unlinkSync(dbPath);
+    }
+  });
+
   it("Should read modify and write db", () => {
-    const dbPath = path.join(testDir, "test-db.json");
     const { staticKey, indexedByKey } = dbFactory(dbPath);
 
     const STATIC_VALUE_KEY = "static-value";

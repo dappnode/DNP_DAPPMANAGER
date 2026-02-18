@@ -77,9 +77,12 @@ function getInstallerPackageData(
   const manifestBackupPath = getBackupPath(manifestPath);
   // Use actual filename if available (for new arch-based images),
   // otherwise use legacy format with hash for backward compatibility
-  const imagePath = imageFile.path
-    ? path.join(getRepoDirPath(dnpName, isCore), imageFile.path)
-    : getImagePath(dnpName, `${semVersion}-${imageFile.hash}`, isCore);
+  // Ensure imagePath is absolute for file operations
+  const imagePath = path.resolve(
+    imageFile.path
+      ? path.join(getRepoDirPath(dnpName, isCore), imageFile.path)
+      : getImagePath(dnpName, `${semVersion}-${imageFile.hash}`, isCore)
+  );
 
   // If composePath does not exist, or is invalid: returns {}
   const prevUserSet = ComposeFileEditor.getUserSettingsIfExist(dnpName, isCore);

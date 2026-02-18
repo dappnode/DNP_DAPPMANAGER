@@ -381,7 +381,7 @@ export class DappnodeRepository extends ApmRepository {
 
     return new Promise((resolve, reject) => {
       async function handleDownload(): Promise<void> {
-        if (!_path || _path.startsWith("/ipfs/") || !path.isAbsolute("/")) reject(Error(`Invalid path: "${path}"`));
+        if (!_path || _path.startsWith("/ipfs/") || !path.isAbsolute(_path)) reject(Error(`Invalid path: "${_path}"`));
 
         const asyncIterableArray: Uint8Array[] = [];
 
