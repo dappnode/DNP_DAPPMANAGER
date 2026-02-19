@@ -926,6 +926,10 @@ export interface DistributedFile {
   hash: string;
   source: DistributedFileSource;
   size: number;
+  /** Filename within the package directory (used for mirror URL construction) */
+  filename?: string;
+  /** Package directory CID (used for mirror URL: /{packageHash}/{filename}) */
+  packageHash?: string;
 }
 
 export interface IpfsRepository {

@@ -169,6 +169,11 @@ export const params = {
   IPFS_LOCAL: "http://ipfs.dappnode:8080",
   IPFS_REMOTE: "https://ipfs-gateway.dappnode.net",
 
+  // Mirror content provider (empty = disabled)
+  CONTENT_MIRROR_BASE_URL: process.env.CONTENT_MIRROR_BASE_URL || "",
+  CONTENT_MIRROR_TIMEOUT_MS: parseInt(process.env.CONTENT_MIRROR_TIMEOUT_MS || "1800000", 10), // 30 minutes
+  CONTENT_MIRROR_MAX_BYTES: parseInt(process.env.CONTENT_MIRROR_MAX_BYTES || "10737418240", 10), // 10 GB
+
   // Web3 parameters
   ETH_MAINNET_RPC_URL_REMOTE: process.env.ETH_MAINNET_RPC_URL_REMOTE || "https://web3.dappnode.net",
   ETH_MAINNET_CHECKPOINTSYNC_URL_REMOTE: "https://checkpoint-sync.dappnode.net",

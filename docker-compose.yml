@@ -25,6 +25,9 @@ services:
       - ALWAYS_DAPPGETBASIC=
       - SKIP_COMPOSE_VALIDATION=
       - TEST=
+      - CONTENT_MIRROR_BASE_URL=https://packages.dappnode.net
+      - CONTENT_MIRROR_TIMEOUT_MS=
+      - CONTENT_MIRROR_MAX_BYTES=
     networks:
       dncore_network:
         aliases:

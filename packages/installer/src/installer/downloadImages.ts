@@ -96,11 +96,11 @@ export async function getImage(
     logs.debug(`Image at ${path} is invalid: ${e}`);
   }
 
-  const { hash, size } = imageFile;
+  const { hash, size, filename, packageHash } = imageFile;
 
   switch (imageFile.source) {
     case "ipfs":
-      await downloadImage(dappnodeInstaller, hash, path, size, progress);
+      await dappnodeInstaller.writeFileToFs({ hash, path, fileSize: size, progress, filename, packageHash });
       break;
     default:
       throw Error(`Unsupported source ${imageFile.source}`);
