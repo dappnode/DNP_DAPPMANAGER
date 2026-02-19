@@ -27,6 +27,7 @@
     "tsconfig-paths": "^4.2.0"
   },
   "dependencies": {
+    "@dappnode/logger": "workspace:^0.1.0",
     "@dappnode/types": "workspace:^0.1.0",
     "@ipld/car": "^5.4.0",
     "esm": "^3.2.25",

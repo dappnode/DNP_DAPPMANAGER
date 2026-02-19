@@ -6,7 +6,11 @@
  *   "QmFoo"       → "QmFoo"
  */
 export function normalizeCid(cid: string): string {
-  return cid.replace(/^\/ipfs\//, "").replace(/\/+$/, "");
+  const result = cid.replace(/^\/ipfs\//, "");
+  // Trim trailing slashes without a `+` quantifier (avoids polynomial-backtracking CodeQL warning)
+  let end = result.length;
+  while (end > 0 && result[end - 1] === "/") end--;
+  return result.slice(0, end);
 }
 
 /**
