@@ -65,7 +65,9 @@ export function parseContainerInfo(container: ContainerInfo): PackageContainer {
 
     // Additional package metadata to avoid having to read the manifest
     dependencies: labels.dependencies || {},
-    avatarUrl: labels.avatar ? multiaddressToIpfsGatewayUrl(labels.avatar) : "",
+    avatarUrl: labels.avatar
+      ? labels.avatar.startsWith("http") ? labels.avatar : multiaddressToIpfsGatewayUrl(labels.avatar)
+      : "",
     origin: labels.origin,
     chain: labels.chain,
     canBeFullnode: allowedFullnodeDnpNames.includes(dnpName),

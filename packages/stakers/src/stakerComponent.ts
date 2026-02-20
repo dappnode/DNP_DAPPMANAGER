@@ -37,7 +37,7 @@ protected async getAll({
           return {
             status: "ok",
             dnpName,
-            avatarUrl: fileToGatewayUrl(pkgData.avatarFile),
+            avatarUrl: fileToGatewayUrl(pkgData.avatarFile) || pkgData.manifest.avatarUrl || "",
             isInstalled: getIsInstalled(pkgData, dnpList),
             isUpdated: getIsUpdated(pkgData, dnpList),
             isRunning: getIsRunning(pkgData, dnpList),

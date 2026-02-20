@@ -250,7 +250,7 @@ export class DappnodeInstaller extends DappnodeRepository {
           version: manifest.version,
           serviceName: service.serviceName,
           dependencies: sanitizeDependencies(metadata.dependencies || {}),
-          avatar: this.fileToMultiaddress(avatarFile),
+          avatar: this.fileToMultiaddress(avatarFile) || manifest.avatarUrl,
           chain: metadata.chain,
           origin,
           isCore,

@@ -29,7 +29,7 @@ export async function getOptimismConfig(dappnodeInstaller: DappnodeInstaller): P
             return {
               status: "ok",
               dnpName: execClient,
-              avatarUrl: fileToGatewayUrl(pkgData.avatarFile),
+              avatarUrl: fileToGatewayUrl(pkgData.avatarFile) || pkgData.manifest.avatarUrl || "",
               isInstalled: getIsInstalled(pkgData, dnpList),
               isUpdated: getIsUpdated(pkgData, dnpList),
               isRunning: getIsRunning(pkgData, dnpList),
@@ -59,7 +59,7 @@ export async function getOptimismConfig(dappnodeInstaller: DappnodeInstaller): P
             resolve({
               status: "ok",
               dnpName: optimismNode,
-              avatarUrl: fileToGatewayUrl(pkgData.avatarFile),
+              avatarUrl: fileToGatewayUrl(pkgData.avatarFile) || pkgData.manifest.avatarUrl || "",
               isInstalled: getIsInstalled(pkgData, dnpList),
               isUpdated: getIsUpdated(pkgData, dnpList),
               isRunning,
@@ -89,7 +89,7 @@ export async function getOptimismConfig(dappnodeInstaller: DappnodeInstaller): P
             resolve({
               status: "ok",
               dnpName: optimismL2Geth,
-              avatarUrl: fileToGatewayUrl(pkgData.avatarFile),
+              avatarUrl: fileToGatewayUrl(pkgData.avatarFile) || pkgData.manifest.avatarUrl || "",
               isInstalled: getIsInstalled(pkgData, dnpList),
               isUpdated: getIsUpdated(pkgData, dnpList),
               isRunning,
