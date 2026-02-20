@@ -45,7 +45,7 @@ export async function fetchDirectory(): Promise<DirectoryItem[]> {
           ...directoryItemBasic,
           status: "ok",
           description: getShortDescription(manifest),
-          avatarUrl: fileToGatewayUrl(avatarFile) || manifest.avatarUrl || "",
+          avatarUrl: fileToGatewayUrl(avatarFile), // Must be URL to a resource in a DAPPMANAGER API
           isInstalled: getIsInstalled(release, installedDnpList),
           isUpdated: getIsUpdated(release, installedDnpList),
           featuredStyle: manifest.style,

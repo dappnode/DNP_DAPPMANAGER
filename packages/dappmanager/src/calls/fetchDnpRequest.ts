@@ -95,7 +95,7 @@ export async function fetchDnpRequest({ id, version }: { id: string; version?: s
     semVersion: mainRelease.semVersion,
     reqVersion: mainRelease.reqVersion,
     origin: mainRelease.origin, // "/ipfs/Qm"
-    avatarUrl: fileToGatewayUrl(mainRelease.avatarFile) || mainRelease.manifest.avatarUrl || "",
+    avatarUrl: fileToGatewayUrl(mainRelease.avatarFile),
     // Setup
     setupWizard,
     // Additional data
