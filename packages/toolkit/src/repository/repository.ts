@@ -52,8 +52,8 @@ export interface DappnodeRepositoryOptions {
  * (signedSafe = true, signatureStatus = notSigned).
  *
  * Provider priority (easy to swap — search for "Provider 1" and "Provider 2"):
- *   1. IPFS (dag-json listing + CAR downloads)
- *   2. Mirror HTTP fallback (if configured)
+ *   1. Mirror HTTP (if configured)
+ *   2. IPFS fallback (dag-json listing + CAR downloads)
  *
  * @extends ApmRepository
  */
@@ -144,7 +144,7 @@ export class DappnodeRepository extends ApmRepository {
       version
     });
 
-    const { entries: ipfsEntries, packageCidStr } = await this.listWithMirrorFallback(contentUri);
+    const { entries: ipfsEntries, packageCidStr } = await this.listWithIpfsFallback(contentUri);
 
     // pass packageCidStr so mirror is tried first for the download
     const manifest = await this.getPkgAsset<Manifest>(releaseFilesToDownload.manifest, ipfsEntries, packageCidStr);
@@ -181,7 +181,7 @@ export class DappnodeRepository extends ApmRepository {
     });
     if (!isIPFS.cid(this.sanitizeIpfsPath(contentUri))) throw Error(`Invalid IPFS hash ${contentUri}`);
 
-    const { entries: ipfsEntries, hasRealCids, packageCidStr } = await this.listWithMirrorFallback(contentUri);
+    const { entries: ipfsEntries, hasRealCids, packageCidStr } = await this.listWithIpfsFallback(contentUri);
 
     // get manifest
     const manifest = await this.getPkgAsset<Manifest>(releaseFilesToDownload.manifest, ipfsEntries, packageCidStr);
@@ -494,39 +494,40 @@ export class DappnodeRepository extends ApmRepository {
   }
 
   /**
-   * Provider 1: IPFS dag-json listing (returns real individual file CIDs).
-   * Provider 2: Mirror listing fallback (no individual CIDs — placeholder CID used).
+   * Provider 1: Mirror JSON listing — fast, no individual file CIDs.
+   * Provider 2: IPFS dag-json listing — real individual file CIDs (signature verification possible).
    *
    * When hasRealCids is false, signature verification must be skipped and the caller
    * should treat the package as trusted by the mirror operator (signedSafe = true).
    */
-  private async listWithMirrorFallback(hash: string): Promise<{
+  private async listWithIpfsFallback(hash: string): Promise<{
     entries: IPFSEntry[];
     hasRealCids: boolean;
     packageCidStr: string;
   }> {
     const packageCidStr = this.sanitizeIpfsPath(hash);
 
-    // Provider 1: IPFS dag-json — has real individual file CIDs
-    try {
-      const entries = await this.list(hash);
-      return { entries, hasRealCids: true, packageCidStr };
-    } catch (ipfsErr) {
-      if (!this.mirrorProvider) throw ipfsErr;
-      logs.warn(`IPFS listing failed for ${packageCidStr}, falling back to mirror`);
+    // Provider 1: Mirror JSON listing — no individual CIDs; use package CID as placeholder
+    if (this.mirrorProvider) {
+      try {
+        const mirrorFiles = await this.mirrorProvider.listFiles(packageCidStr);
+        const placeholderCid = CID.parse(packageCidStr);
+        const entries: IPFSEntry[] = mirrorFiles.map((f) => ({
+          type: "file" as const,
+          cid: placeholderCid,
+          name: f.name,
+          path: `${packageCidStr}/${f.name}`,
+          size: f.size
+        }));
+        return { entries, hasRealCids: false, packageCidStr };
+      } catch (mirrorErr) {
+        logs.warn(`Mirror listing failed for ${packageCidStr}, falling back to IPFS: ${mirrorErr}`);
+      }
     }
 
-    // Provider 2: Mirror JSON listing — no individual CIDs; use package CID as placeholder
-    const mirrorFiles = await this.mirrorProvider.listFiles(packageCidStr);
-    const placeholderCid = CID.parse(packageCidStr);
-    const entries: IPFSEntry[] = mirrorFiles.map((f) => ({
-      type: "file" as const,
-      cid: placeholderCid,
-      name: f.name,
-      path: `${packageCidStr}/${f.name}`,
-      size: f.size
-    }));
-    return { entries, hasRealCids: false, packageCidStr };
+    // Provider 2: IPFS dag-json — has real individual file CIDs
+    const entries = await this.list(hash);
+    return { entries, hasRealCids: true, packageCidStr };
   }
 
   /**

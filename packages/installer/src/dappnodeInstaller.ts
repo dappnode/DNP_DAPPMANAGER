@@ -14,7 +14,6 @@ import {
   PrometheusTarget,
   NotificationsConfig
 } from "@dappnode/types";
-import { logs } from "@dappnode/logger";
 import { DappGetState, DappgetOptions, dappGet } from "./dappGet/index.js";
 import {
   validateDappnodeCompose,
@@ -62,29 +61,6 @@ export class DappnodeInstaller extends DappnodeRepository {
     const newIpfsUrl = getIpfsUrl();
     // super.changeEthProvider();
     super.changeIpfsGatewayUrl(newIpfsUrl);
-  }
-
-  /**
-   * Fetches minimal package data for dappstore listing using mirror only.
-   * Much faster than getRelease() — no IPFS listing, no signature verification.
-   * Throws if mirror is not configured or if the mirror fetch fails.
-   */
-  async getPackageDataForListing(name: string): Promise<{ manifest: Manifest; avatarUrl: string; dnpName: string; reqVersion: string }> {
-    if (!this.mirrorProvider) throw new Error("Mirror provider not configured");
-    await this.updateProviders();
-
-    const { contentUri } = await this.getVersionAndIpfsHash({ dnpNameOrHash: name });
-    const packageCid = this.sanitizeIpfsPath(contentUri);
-
-    logs.debug(`getPackageDataForListing: fetching ${name} from mirror`);
-
-    const result = await this.mirrorProvider.fetchFile(packageCid, "dappnode_package.json", {});
-    if (result.status !== "success") throw new Error(`Mirror fetch failed for ${name}: ${result.reason}`);
-
-    const manifest = JSON.parse(new TextDecoder("utf-8").decode(result.bytes)) as Manifest;
-    const avatarUrl = this.mirrorProvider.getFileUrl(packageCid, "avatar.png");
-
-    return { manifest, avatarUrl, dnpName: manifest.name, reqVersion: manifest.version };
   }
 
   /**
