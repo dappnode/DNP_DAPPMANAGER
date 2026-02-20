@@ -29,5 +29,6 @@ COPY --from=git-data /usr/src/app/.git-data.json $GIT_DATA_PATH
 COPY package.json yarn.lock .yarnrc.yml tsconfig.json ./
 COPY packages packages
 
-ENTRYPOINT ["/bin/sh", "-c", "ln -sf /app/packages/admin-ui/build/ /app/packages/dappmanager/dist && \
+ENTRYPOINT ["/bin/sh", "-c", "mkdir -p /app/packages/dappmanager/dnp_repo /app/packages/dappmanager/DNCORE && \
+  ln -sf /app/packages/admin-ui/build/ /app/packages/dappmanager/dist && \
   yarn && yarn build && yarn run dev"]
