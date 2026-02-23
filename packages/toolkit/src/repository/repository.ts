@@ -515,12 +515,7 @@ export class DappnodeRepository extends ApmRepository {
         const files = await this.mirrorProvider.listFiles(packageCidStr);
         return { source: "mirror", files, packageCidStr };
       } catch (mirrorErr) {
-        const is404 = mirrorErr instanceof Error && mirrorErr.message === "http_404";
-        if (is404) {
-          logs.debug(`Package not on mirror, falling back to IPFS: ${packageCidStr}`);
-        } else {
-          logs.warn(`Mirror listing failed for ${packageCidStr}, falling back to IPFS: ${mirrorErr}`);
-        }
+        logs.warn(`Mirror listing failed for ${packageCidStr}, falling back to IPFS: ${mirrorErr}`);
       }
     }
 
