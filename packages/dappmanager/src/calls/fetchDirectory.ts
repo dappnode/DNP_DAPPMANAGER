@@ -45,7 +45,7 @@ export async function fetchDirectory(): Promise<DirectoryItem[]> {
           ...directoryItemBasic,
           status: "ok",
           description: getShortDescription(manifest),
-          avatarUrl: fileToGatewayUrl(avatarFile) || manifest.avatarUrl || "",
+          avatarUrl: fileToGatewayUrl(avatarFile),
           isInstalled: getIsInstalled(release, installedDnpList),
           isUpdated: getIsUpdated(release, installedDnpList),
           featuredStyle: manifest.style,
