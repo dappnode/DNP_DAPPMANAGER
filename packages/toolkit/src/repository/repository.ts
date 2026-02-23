@@ -220,15 +220,15 @@ export class DappnodeRepository extends ApmRepository {
       : true;
 
     // Avatar file hash is an individual file CID — only meaningful when listing came from IPFS.
-    // When using mirror listing, set avatarUrl directly in the manifest so it's available to the UI.
-    const avatarEntry = hasRealCids ? ipfsEntries.find((file: IPFSEntry) => releaseFiles.avatar.regex.test(file.name)) : undefined;
+    // When mirror is used, source is "mirror" so fileToGatewayUrl builds the HTTP mirror URL.
+    const avatarEntry = ipfsEntries.find((file: IPFSEntry) => releaseFiles.avatar.regex.test(file.name));
     const avatarFile: DistributedFile | undefined = avatarEntry
-      ? { hash: avatarEntry.cid.toString(), size: avatarEntry.size, source }
+      ? hasRealCids
+        // source is IPFS by default.
+        ? { hash: avatarEntry.cid.toString(), size: avatarEntry.size, source }   
+        // If fetched from mirror, source is mirror and we include filename and packageHash for mirror URL construction.
+        : { hash: avatarEntry.cid.toString(), size: avatarEntry.size, source: "mirror", filename: avatarEntry.name, packageHash: packageCidStr } 
       : undefined;
-
-    if (!hasRealCids && this.mirrorProvider) {
-      manifest.avatarUrl = this.mirrorProvider.getFileUrl(packageCidStr, "avatar.png");
-    }
 
     return {
       dnpName,

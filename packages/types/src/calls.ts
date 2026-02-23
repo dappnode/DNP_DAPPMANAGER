@@ -921,15 +921,13 @@ export interface LocalIpResponse {
  * ====
  */
 
-export type DistributedFileSource = "ipfs" | "swarm";
+export type DistributedFileSource = "ipfs" | "swarm" | "mirror";
 export interface DistributedFile {
-  hash: string;
+  hash: string; // Individual file CID for "ipfs". Needed for fetching the file from IPFS.
   source: DistributedFileSource;
   size: number;
-  /** Filename within the package directory (used for mirror URL construction) */
-  filename?: string;
-  /** Package directory CID (used for mirror URL: /{packageHash}/{filename}) */
-  packageHash?: string;
+  filename?: string; // Required for "mirror": filename within the package dir (e.g. "avatar.png")
+  packageHash?: string; // Required for "mirror": package directory CID; mirror URL is {baseUrl}/{packageHash}/{filename}
 }
 
 export interface IpfsRepository {
