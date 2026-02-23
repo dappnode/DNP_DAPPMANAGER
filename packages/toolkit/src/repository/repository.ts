@@ -302,11 +302,8 @@ export class DappnodeRepository extends ApmRepository {
     // Provider 1: Mirror — try first if configured and we have routing info
     if (this.mirrorProvider && filename && packageHash) {
       const mirrorCid = this.sanitizeIpfsPath(packageHash);
-      const result = await this.mirrorProvider.fetchFile(mirrorCid, filename, {});
+      const result = await this.mirrorProvider.fetchFile(mirrorCid, filename, { maxBytes: maxLength });
       if (result.status === "success") {
-        if (maxLength && result.bytes.length >= maxLength) {
-          throw Error(`Maximum size ${maxLength} bytes exceeded`);
-        }
         return new TextDecoder("utf-8").decode(result.bytes);
       }
       logs.warn(`Mirror fetch failed for ${filename} (${result.reason}), falling back to IPFS`);

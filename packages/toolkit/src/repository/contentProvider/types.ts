@@ -19,6 +19,7 @@ export type MirrorStreamResult =
 export interface FetchOptions {
   signal?: AbortSignal;
   onProgress?: (progress: number) => void;
+  maxBytes?: number; // per-call size limit; checked against Content-Length (early abort) and actual bytes after download
 }
 
 export interface MirrorOptions {

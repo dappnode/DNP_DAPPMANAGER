@@ -73,12 +73,21 @@ export class HttpMirrorProvider implements MirrorProvider {
       const contentLength = response.headers.get("content-length");
       const totalBytes = contentLength ? parseInt(contentLength, 10) : 0;
 
-      if (totalBytes > this.maxBytes) {
-        logs.warn(`Mirror file too large for ${filename}: ${totalBytes} > ${this.maxBytes}`);
+      // Check against global cap and per-call cap from Content-Length (early abort before download)
+      const effectiveMax = options.maxBytes !== undefined ? Math.min(options.maxBytes, this.maxBytes) : this.maxBytes;
+      if (totalBytes > effectiveMax) {
+        logs.warn(`Mirror file too large for ${filename}: ${totalBytes} > ${effectiveMax}`);
         return { status: "failed", reason: "file_too_large" };
       }
 
       const bytes = await this.readResponseWithProgress(response, totalBytes, options.onProgress);
+
+      // Re-check with actual bytes in case Content-Length was absent or inaccurate
+      if (bytes.length >= effectiveMax) {
+        logs.warn(`Mirror file too large for ${filename}: ${bytes.length} >= ${effectiveMax}`);
+        return { status: "failed", reason: "file_too_large" };
+      }
+
       logs.debug(`Mirror fetched ${filename} (${bytes.length} bytes)`);
       return { status: "success", bytes };
     } catch (error) {
