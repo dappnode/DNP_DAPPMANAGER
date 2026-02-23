@@ -83,8 +83,18 @@ const getEcSyncStatus = async (network: DashboardSupportedNetwork) => {
     startingBlock = parseInt(syncing.startingBlock, 16);
     currentBlock = parseInt(syncing.currentBlock, 16);
     highestBlock = parseInt(syncing.highestBlock, 16);
-    progress = ((currentBlock - startingBlock) / (highestBlock - startingBlock)) * 100;
-    progress = Math.max(0, Math.min(100, Math.round(progress)));
+
+    if (
+      Number.isFinite(currentBlock) &&
+      Number.isFinite(startingBlock) &&
+      Number.isFinite(highestBlock) &&
+      highestBlock !== startingBlock
+    ) {
+      progress = ((currentBlock - startingBlock) / (highestBlock - startingBlock)) * 100;
+      progress = Math.max(0, Math.min(100, Math.round(progress)));
+    } else {
+      progress = 0;
+    }
   }
 
   return { isSynced, currentBlock, progress };
