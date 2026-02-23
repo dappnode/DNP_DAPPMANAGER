@@ -157,18 +157,30 @@ const getCcSyncStatus = async (network: DashboardSupportedNetwork) => {
   const syncing = syncData.data;
 
   const isSynced = syncing.is_syncing === false;
-  const currentBlock = parseInt(syncing.head_slot, 10);
+  const headSlot = parseInt(syncing.head_slot, 10);
+  const syncDistance = parseInt(syncing.sync_distance, 10);
 
   let progress = null;
 
   if (syncing.is_syncing === false) {
     progress = 100;
   } else {
-    // Calculate progress based on slots
-    progress = 100;
+    const highestSlot = headSlot + syncDistance;
+
+    if (
+      Number.isFinite(headSlot) &&
+      Number.isFinite(syncDistance) &&
+      Number.isFinite(highestSlot) &&
+      highestSlot !== 0
+    ) {
+      progress = (headSlot / highestSlot) * 100;
+      progress = Math.max(0, Math.min(100, Math.round(progress)));
+    } else {
+      progress = 0;
+    }
   }
 
-  return { isSynced, currentBlock, progress };
+  return { isSynced, currentBlock: headSlot, progress };
 };
 const getEcData = async (network: DashboardSupportedNetwork): Promise<ClientResult> => {
   const ecName = await getEcName(network);
