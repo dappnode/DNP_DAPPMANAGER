@@ -213,7 +213,11 @@ export function useNetworkStats() {
     fetchNetworkData();
   }, [fetchNetworkData]);
 
-  const clientsLoading = nodesStatusLoading || consensusClientsReq.isValidating || executionClientsReq.isValidating;
+  const clientsLoading =
+    nodesStatusLoading ||
+    consensusClientsReq.isValidating ||
+    executionClientsReq.isValidating ||
+    nodesStatusByNetwork === undefined;
 
   const networkStats: NetworkStats = {};
 
