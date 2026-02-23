@@ -124,6 +124,7 @@ export function useNetworkStats() {
   >(undefined);
   const [signersStatusByNetwork, setSignersStatusByNetwork] = useState<SignersStatusByNetwork | undefined>(undefined);
   const [validatorsLoading, setValidatorsLoading] = useState(false);
+  const [installedDnpNames, setInstalledDnpNames] = useState<Set<string>>(new Set());
 
   const lastFetchedNetworksKey = useRef<string>("");
 
@@ -147,6 +148,7 @@ export function useNetworkStats() {
       const installedPackages = await api.packagesGet();
       const allInstalledNames = new Set(installedPackages.map((pkg) => pkg.dnpName));
       installedDnpNames = new Set([...dnpNames].filter((name) => allInstalledNames.has(name)));
+      setInstalledDnpNames(installedDnpNames);
     } catch (e) {
       console.error("Error fetching installed packages for node status", e);
       return;
@@ -220,6 +222,18 @@ export function useNetworkStats() {
     const nodeStatusData: NodeStatus | undefined = nodesStatusByNetwork?.[network];
     const consensusClientDnp = consensusClientsByNetwork?.[network];
     const executionClientDnp = executionClientsByNetwork?.[network];
+
+    // Only include client results if the corresponding package is actually installed
+    const ecInstalled = executionClientDnp ? installedDnpNames.has(executionClientDnp) : false;
+    const ccInstalled = consensusClientDnp ? installedDnpNames.has(consensusClientDnp) : false;
+
+    const filteredNodeStatus: NodeStatus | undefined = nodeStatusData
+      ? {
+          ec: ecInstalled ? nodeStatusData.ec : null,
+          cc: ccInstalled ? nodeStatusData.cc : null
+        }
+      : undefined;
+
     const validatorsActive = validatorsActiveByNetwork?.[network];
     const validatorsAttesting = validatorsAttestingByNetwork?.[network];
     const balancesObj = validatorsBalancesByNetwork?.[network]?.balances;
@@ -256,14 +270,14 @@ export function useNetworkStats() {
       : undefined;
 
     // Show network when any client has data or an error (but not when both are null)
-    const hasEc = nodeStatusData?.ec !== null && nodeStatusData?.ec !== undefined;
-    const hasCc = nodeStatusData?.cc !== null && nodeStatusData?.cc !== undefined;
-    if (nodeStatusData && (hasEc || hasCc)) {
+    const hasEc = filteredNodeStatus?.ec !== null && filteredNodeStatus?.ec !== undefined;
+    const hasCc = filteredNodeStatus?.cc !== null && filteredNodeStatus?.cc !== undefined;
+    if (filteredNodeStatus && (hasEc || hasCc)) {
       networkStats[network] = {
-        nodeStatus: nodeStatusData,
+        nodeStatus: filteredNodeStatus,
         clientsDnps: {
-          ecDnp: executionClientDnp || null,
-          ccDnp: consensusClientDnp || null
+          ecDnp: ecInstalled ? executionClientDnp || null : null,
+          ccDnp: ccInstalled ? consensusClientDnp || null : null
         },
         ...validatorsData,
         hasValidators: features.hasValidators,
