@@ -2,7 +2,7 @@ import fs from "fs";
 import stream from "stream";
 import util from "util";
 import { logs } from "@dappnode/logger";
-import { MirrorProvider, MirrorFileEntry, MirrorFetchResult, MirrorStreamResult, FetchOptions } from "./types.js";
+import { MirrorProvider, MirrorOptions, MirrorFileEntry, MirrorFetchResult, MirrorStreamResult, FetchOptions } from "./types.js";
 import { normalizeCid, roundProgress } from "./utils.js";
 
 const pipeline = util.promisify(stream.pipeline);
@@ -18,7 +18,7 @@ export class HttpMirrorProvider implements MirrorProvider {
   private timeoutMs: number;
   private maxBytes: number;
 
-  constructor(baseUrl: string, timeoutMs: number, maxBytes: number) {
+  constructor({ baseUrl, timeoutMs, maxBytes }: MirrorOptions) {
     this.baseUrl = baseUrl.replace(/\/?$/, "");
     this.timeoutMs = timeoutMs;
     this.maxBytes = maxBytes;

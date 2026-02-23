@@ -30,16 +30,12 @@ import { isEnsDomain } from "../isEnsDomain.js";
 import { dappnodeRegistry } from "./params.js";
 import { JsonRpcApiProvider } from "ethers";
 import { logs } from "@dappnode/logger";
-import { MirrorProvider, HttpMirrorProvider } from "./contentProvider/index.js";
+import { MirrorProvider, MirrorOptions, HttpMirrorProvider } from "./contentProvider/index.js";
 
 const source = "ipfs" as const;
 
-export interface DappnodeRepositoryOptions {
-  mirror?: {
-    baseUrl: string;
-    timeoutMs: number;
-    maxBytes: number;
-  };
+export interface DappnodeMirrorOptions {
+  mirror?: MirrorOptions;
 }
 
 /**
@@ -68,16 +64,12 @@ export class DappnodeRepository extends ApmRepository {
    * @param provider - Ethereum JSON-RPC provider for ENS/APM resolution.
    * @param options - Optional configuration including mirror provider.
    */
-  constructor(ipfsUrl: string, provider: JsonRpcApiProvider, options?: DappnodeRepositoryOptions) {
+  constructor(ipfsUrl: string, provider: JsonRpcApiProvider, options?: DappnodeMirrorOptions) {
     super(provider);
     this.gatewayUrl = ipfsUrl.replace(/\/?$/, "");
 
     if (options?.mirror) {
-      this.mirrorProvider = new HttpMirrorProvider(
-        options.mirror.baseUrl,
-        options.mirror.timeoutMs,
-        options.mirror.maxBytes
-      );
+      this.mirrorProvider = new HttpMirrorProvider(options.mirror);
     }
   }
 
@@ -181,7 +173,7 @@ export class DappnodeRepository extends ApmRepository {
     });
     if (!isIPFS.cid(this.sanitizeIpfsPath(contentUri))) throw Error(`Invalid IPFS hash ${contentUri}`);
 
-    const { entries: ipfsEntries, hasRealCids, packageCidStr } = await this.listWithIpfsFallback(contentUri);
+    const { entries: ipfsEntries, fromMirror, packageCidStr } = await this.listWithIpfsFallback(contentUri);
 
     // get manifest
     const manifest = await this.getPkgAsset<Manifest>(releaseFilesToDownload.manifest, ipfsEntries, packageCidStr);
@@ -195,14 +187,14 @@ export class DappnodeRepository extends ApmRepository {
     if (!compose) throw Error(`Invalid pkg release ${contentUri}, compose not found`);
 
     // Signature verification requires individual file CIDs from IPFS dag-json listing.
-    // When using mirror fallback listing, CIDs are placeholders so verification is skipped.
+    // When listing came from the mirror, CIDs are placeholders so verification is skipped.
     // Packages sourced from the mirror are trusted by the mirror operator (signedSafe = true).
-    const signature: ReleaseSignature | undefined = hasRealCids
+    const signature: ReleaseSignature | undefined = !fromMirror
       ? await this.getPkgAsset<ReleaseSignature>(releaseFilesToDownload.signature, ipfsEntries, packageCidStr)
       : undefined;
 
     const signatureStatus: ReleaseSignatureStatus =
-      hasRealCids && signature
+      !fromMirror && signature
         ? getReleaseSignatureStatus(
             manifest.name,
             {
@@ -214,20 +206,20 @@ export class DappnodeRepository extends ApmRepository {
         : { status: ReleaseSignatureStatusCode.notSigned };
 
     // When IPFS listing is available, signedSafe requires a known trusted key.
-    // When mirror listing is used (no real CIDs), trust the mirror operator.
-    const signedSafe = hasRealCids
-      ? signatureStatus.status === ReleaseSignatureStatusCode.signedByKnownKey
-      : true;
+    // When listing came from mirror, trust the mirror operator.
+    const signedSafe = fromMirror
+      ? true
+      : signatureStatus.status === ReleaseSignatureStatusCode.signedByKnownKey;
 
-    // Avatar file hash is an individual file CID — only meaningful when listing came from IPFS.
+    // Mirror listings have real filenames but placeholder CIDs — find by name in both cases.
     // When mirror is used, source is "mirror" so fileToGatewayUrl builds the HTTP mirror URL.
     const avatarEntry = ipfsEntries.find((file: IPFSEntry) => releaseFiles.avatar.regex.test(file.name));
     const avatarFile: DistributedFile | undefined = avatarEntry
-      ? hasRealCids
-        // source is IPFS by default.
-        ? { hash: avatarEntry.cid.toString(), size: avatarEntry.size, source }   
+      ? fromMirror
         // If fetched from mirror, source is mirror and we include filename and packageHash for mirror URL construction.
-        : { hash: avatarEntry.cid.toString(), size: avatarEntry.size, source: "mirror", filename: avatarEntry.name, packageHash: packageCidStr } 
+        ? { hash: avatarEntry.cid.toString(), size: avatarEntry.size, source: "mirror", filename: avatarEntry.name, packageHash: packageCidStr }
+        // source is IPFS by default.
+        : { hash: avatarEntry.cid.toString(), size: avatarEntry.size, source }
       : undefined;
 
     return {
@@ -236,7 +228,7 @@ export class DappnodeRepository extends ApmRepository {
       semVersion: manifest.version,
       isCore,
       origin,
-      imageFile: this.getImageByArch(manifest, ipfsEntries, os, packageCidStr),
+      imageFile: this.getImageByArch(manifest, ipfsEntries, os, fromMirror ? packageCidStr : undefined),
       avatarFile,
       manifest,
       setupWizard: await this.getPkgAsset(releaseFilesToDownload.setupWizard, ipfsEntries, packageCidStr),
@@ -497,12 +489,12 @@ export class DappnodeRepository extends ApmRepository {
    * Provider 1: Mirror JSON listing — fast, no individual file CIDs.
    * Provider 2: IPFS dag-json listing — real individual file CIDs (signature verification possible).
    *
-   * When hasRealCids is false, signature verification must be skipped and the caller
+   * When fromMirror is true, signature verification must be skipped and the caller
    * should treat the package as trusted by the mirror operator (signedSafe = true).
    */
   private async listWithIpfsFallback(hash: string): Promise<{
     entries: IPFSEntry[];
-    hasRealCids: boolean;
+    fromMirror: boolean;
     packageCidStr: string;
   }> {
     const packageCidStr = this.sanitizeIpfsPath(hash);
@@ -519,7 +511,7 @@ export class DappnodeRepository extends ApmRepository {
           path: `${packageCidStr}/${f.name}`,
           size: f.size
         }));
-        return { entries, hasRealCids: false, packageCidStr };
+        return { entries, fromMirror: true, packageCidStr };
       } catch (mirrorErr) {
         logs.warn(`Mirror listing failed for ${packageCidStr}, falling back to IPFS: ${mirrorErr}`);
       }
@@ -527,7 +519,7 @@ export class DappnodeRepository extends ApmRepository {
 
     // Provider 2: IPFS dag-json — has real individual file CIDs
     const entries = await this.list(hash);
-    return { entries, hasRealCids: true, packageCidStr };
+    return { entries, fromMirror: false, packageCidStr };
   }
 
   /**
@@ -639,7 +631,7 @@ export class DappnodeRepository extends ApmRepository {
       return {
         hash: imageAsset.cid.toString(),
         size: imageAsset.size,
-        source,
+        source: packageHash ? "mirror" : source,
         filename: imageAsset.name,
         packageHash
       };

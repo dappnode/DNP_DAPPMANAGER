@@ -21,6 +21,12 @@ export interface FetchOptions {
   onProgress?: (progress: number) => void;
 }
 
+export interface MirrorOptions {
+  baseUrl: string;
+  timeoutMs: number;
+  maxBytes: number;
+}
+
 export interface MirrorFileEntry {
   name: string;
   size: number;

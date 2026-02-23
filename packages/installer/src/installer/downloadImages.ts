@@ -50,31 +50,31 @@ export async function downloadImages(
 }
 
 /**
- * Handles the download of a DNP .xz image.
- * This function handles cache and type validation, while the IPFS
- * stream and download is abstracted away.
+ * Streams a DNP image file to disk.
  *
- * 1. Check if cache exist and validate it
- * 2. Cat stream to file system
- * 3. Validate downloaded image. Cache is automatically created at ${path}
- *
- * @param hash "QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ"
- * @param path "/usr/src/path-to-file/file.ext"
- * @param options see "modules/ipfs/methods/catStreamToFs"
+ * @param hash - Individual file CID (source "ipfs"). For source "mirror" this is a placeholder —
+ *               the mirror has no per-file CIDs; actual routing uses packageHash + filename instead.
+ * @param path - Destination path on disk.
+ * @param fileSize - Expected file size in bytes (for progress reporting).
+ * @param progress - Progress callback (0–100).
+ * @param filename - Image filename within the package dir (e.g. "amd64.tar.xz"). Required for source "mirror".
+ * @param packageHash - Package directory CID. Required for source "mirror"; mirror URL is {baseUrl}/{packageHash}/{filename}.
+ *                      NOT the same as hash: hash is the individual file CID, packageHash is the release directory CID.
  */
-
 export async function downloadImage(
   dappnodeInstaller: DappnodeInstaller,
   hash: string,
   path: string,
   fileSize: number,
-  progress: (n: number) => void
+  progress: (n: number) => void,
+  filename?: string,
+  packageHash?: string
 ): Promise<void> {
   // TODO: Ensure file is available
 
   // Cat stream to file system
   // Make sure the path is correct and the parent folder exist or is created
-  await dappnodeInstaller.writeFileToFs({ hash, path, fileSize, progress });
+  await dappnodeInstaller.writeFileToFs({ hash, path, fileSize, progress, filename, packageHash });
 }
 
 export async function getImage(
@@ -100,7 +100,10 @@ export async function getImage(
 
   switch (imageFile.source) {
     case "ipfs":
-      await dappnodeInstaller.writeFileToFs({ hash, path, fileSize: size, progress, filename, packageHash });
+      await downloadImage(dappnodeInstaller, hash, path, size, progress);
+      break;
+    case "mirror":
+      await downloadImage(dappnodeInstaller, hash, path, size, progress, filename, packageHash);
       break;
     default:
       throw Error(`Unsupported source ${imageFile.source}`);
