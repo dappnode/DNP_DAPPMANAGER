@@ -30,9 +30,14 @@ import { isEnsDomain } from "../isEnsDomain.js";
 import { dappnodeRegistry } from "./params.js";
 import { JsonRpcApiProvider } from "ethers";
 import { logs } from "@dappnode/logger";
-import { MirrorProvider, MirrorOptions, HttpMirrorProvider } from "./contentProvider/index.js";
+import { MirrorProvider, MirrorOptions, MirrorFileEntry, HttpMirrorProvider } from "./contentProvider/index.js";
 
 const source = "ipfs" as const;
+
+/** Discriminated union returned by listWithIpfsFallback. Avoids placeholder CIDs in the mirror path. */
+type ListResult =
+  | { source: "mirror"; files: MirrorFileEntry[]; packageCidStr: string }
+  | { source: "ipfs"; entries: IPFSEntry[]; packageCidStr: string };
 
 export interface DappnodeMirrorOptions {
   mirror?: MirrorOptions;
@@ -136,21 +141,14 @@ export class DappnodeRepository extends ApmRepository {
       version
     });
 
-    const { entries: ipfsEntries, packageCidStr } = await this.listWithIpfsFallback(contentUri);
-
-    // pass packageCidStr so mirror is tried first for the download
-    const manifest = await this.getPkgAsset<Manifest>(releaseFilesToDownload.manifest, ipfsEntries, packageCidStr);
+    const listResult = await this.listWithIpfsFallback(contentUri);
+    const manifest = await this.getPkgAsset<Manifest>(releaseFilesToDownload.manifest, listResult);
 
     if (!manifest) throw Error(`Invalid pkg release ${contentUri}, manifest not found`);
 
     return manifest;
   }
 
-  // Q: does getPkgRelease actually download a package?
-  // A: getPkgRelease downloads the manifest, compose and other metadata files, but it does not download the image file.
-  //  The image file is downloaded later when the package is being installed, using the information about the image file obtained
-  //  in getPkgRelease. This allows us to fetch the package information and display it to the user without having to
-  //  download the potentially large image file until it's actually needed for installation.
   /**
    * Get all the assets for a request.
    * @param param0 - Object containing package name, version and architecture
@@ -173,54 +171,54 @@ export class DappnodeRepository extends ApmRepository {
     });
     if (!isIPFS.cid(this.sanitizeIpfsPath(contentUri))) throw Error(`Invalid IPFS hash ${contentUri}`);
 
-    const { entries: ipfsEntries, fromMirror, packageCidStr } = await this.listWithIpfsFallback(contentUri);
+    const listResult = await this.listWithIpfsFallback(contentUri);
 
     // get manifest
-    const manifest = await this.getPkgAsset<Manifest>(releaseFilesToDownload.manifest, ipfsEntries, packageCidStr);
+    const manifest = await this.getPkgAsset<Manifest>(releaseFilesToDownload.manifest, listResult);
     // Ensure its a directory release
     if (!manifest) throw Error(`Invalid pkg release ${contentUri}, manifest not found`);
     const dnpName = manifest.name;
     const isCore = manifest.type === "dncore";
 
     // get compose
-    const compose = await this.getPkgAsset<Compose>(releaseFilesToDownload.compose, ipfsEntries, packageCidStr);
+    const compose = await this.getPkgAsset<Compose>(releaseFilesToDownload.compose, listResult);
     if (!compose) throw Error(`Invalid pkg release ${contentUri}, compose not found`);
 
     // Signature verification requires individual file CIDs from IPFS dag-json listing.
-    // When listing came from the mirror, CIDs are placeholders so verification is skipped.
+    // Mirror listings have no individual CIDs, so verification is skipped.
     // Packages sourced from the mirror are trusted by the mirror operator (signedSafe = true).
-    const signature: ReleaseSignature | undefined = !fromMirror
-      ? await this.getPkgAsset<ReleaseSignature>(releaseFilesToDownload.signature, ipfsEntries, packageCidStr)
-      : undefined;
+    const signature: ReleaseSignature | undefined =
+      listResult.source === "ipfs"
+        ? await this.getPkgAsset<ReleaseSignature>(releaseFilesToDownload.signature, listResult)
+        : undefined;
 
     const signatureStatus: ReleaseSignatureStatus =
-      !fromMirror && signature
+      listResult.source === "ipfs" && signature
         ? getReleaseSignatureStatus(
             manifest.name,
             {
               signature,
-              signedData: serializeIpfsDirectory(ipfsEntries, signature.cid)
+              signedData: serializeIpfsDirectory(listResult.entries, signature.cid)
             },
             trustedKeys
           )
         : { status: ReleaseSignatureStatusCode.notSigned };
 
-    // When IPFS listing is available, signedSafe requires a known trusted key.
-    // When listing came from mirror, trust the mirror operator.
-    const signedSafe = fromMirror
-      ? true
-      : signatureStatus.status === ReleaseSignatureStatusCode.signedByKnownKey;
+    const signedSafe =
+      listResult.source === "mirror"
+        ? true
+        : signatureStatus.status === ReleaseSignatureStatusCode.signedByKnownKey;
 
-    // Mirror listings have real filenames but placeholder CIDs — find by name in both cases.
-    // When mirror is used, source is "mirror" so fileToGatewayUrl builds the HTTP mirror URL.
-    const avatarEntry = ipfsEntries.find((file: IPFSEntry) => releaseFiles.avatar.regex.test(file.name));
-    const avatarFile: DistributedFile | undefined = avatarEntry
-      ? fromMirror
-        // If fetched from mirror, source is mirror and we include filename and packageHash for mirror URL construction.
-        ? { hash: avatarEntry.cid.toString(), size: avatarEntry.size, source: "mirror", filename: avatarEntry.name, packageHash: packageCidStr }
-        // source is IPFS by default.
-        : { hash: avatarEntry.cid.toString(), size: avatarEntry.size, source }
-      : undefined;
+    // Avatar: look up by filename regex; source drives which DistributedFile shape to use
+    let avatarFile: DistributedFile | undefined;
+    if (listResult.source === "mirror") {
+      const entry = listResult.files.find((f) => releaseFiles.avatar.regex.test(f.name));
+      if (entry)
+        avatarFile = { hash: listResult.packageCidStr, size: entry.size, source: "mirror", filename: entry.name, packageHash: listResult.packageCidStr };
+    } else {
+      const entry = listResult.entries.find((e) => releaseFiles.avatar.regex.test(e.name));
+      if (entry) avatarFile = { hash: entry.cid.toString(), size: entry.size, source };
+    }
 
     return {
       dnpName,
@@ -228,10 +226,10 @@ export class DappnodeRepository extends ApmRepository {
       semVersion: manifest.version,
       isCore,
       origin,
-      imageFile: this.getImageByArch(manifest, ipfsEntries, os, fromMirror ? packageCidStr : undefined),
+      imageFile: this.getImageByArch(manifest, listResult, os),
       avatarFile,
       manifest,
-      setupWizard: await this.getPkgAsset(releaseFilesToDownload.setupWizard, ipfsEntries, packageCidStr),
+      setupWizard: await this.getPkgAsset(releaseFilesToDownload.setupWizard, listResult),
       compose,
       signature,
       signatureStatus,
@@ -240,76 +238,94 @@ export class DappnodeRepository extends ApmRepository {
         coreFromForeignRegistry: isCore && !dnpName.endsWith(dappnodeRegistry),
         requestNameMismatch: isEnsDomain(dnpNameOrHash) && dnpNameOrHash !== dnpName
       },
-      disclaimer: await this.getPkgAsset(releaseFilesToDownload.disclaimer, ipfsEntries, packageCidStr),
-      gettingStarted: await this.getPkgAsset(releaseFilesToDownload.gettingStarted, ipfsEntries, packageCidStr),
-      prometheusTargets: await this.getPkgAsset(releaseFilesToDownload.prometheusTargets, ipfsEntries, packageCidStr),
-      grafanaDashboards: await this.getPkgAsset(releaseFilesToDownload.grafanaDashboards, ipfsEntries, packageCidStr),
-      notifications: await this.getPkgAsset(releaseFilesToDownload.notifications, ipfsEntries, packageCidStr)
+      disclaimer: await this.getPkgAsset(releaseFilesToDownload.disclaimer, listResult),
+      gettingStarted: await this.getPkgAsset(releaseFilesToDownload.gettingStarted, listResult),
+      prometheusTargets: await this.getPkgAsset(releaseFilesToDownload.prometheusTargets, listResult),
+      grafanaDashboards: await this.getPkgAsset(releaseFilesToDownload.grafanaDashboards, listResult),
+      notifications: await this.getPkgAsset(releaseFilesToDownload.notifications, listResult)
     };
   }
 
   /**
-   * Get a given release asset for a request. It looks for an IPFS entry for
-   * a given release file given a release file config.
+   * Finds and downloads release assets matching a file config from either mirror or IPFS.
    *
-   * @param fileConfig - A file configuration.
-   * @param ipfsEntries - An array of IPFS entries.
-   * @param packageHash - Optional package directory CID for mirror downloads.
-   * @throws - If the file is required and not found.
-   * @returns - The release package for the request or undefined if not found.
+   * @param fileConfig - Describes which file(s) to look for and how to parse them.
+   * @param listResult - The directory listing (mirror or IPFS) to search in.
+   * @throws If a required file is not found.
    */
-  public async getPkgAsset<T>(fileConfig: FileConfig, ipfsEntries: IPFSEntry[], packageHash?: string): Promise<T | undefined> {
-    const { regex, required, multiple } = fileConfig;
-    // We filter the entries (files) so that we only consider the ones that match the regex.
-    // for example, all grafana dashboards must pass /.*grafana-dashboard.json$/ regex
-    const matchingEntries = ipfsEntries.filter((file) => regex.test(file.name));
+  public async getPkgAsset<T>(fileConfig: FileConfig, listResult: ListResult): Promise<T | undefined> {
+    const { regex, required, multiple, maxSize: maxLength, format } = fileConfig;
 
-    // Handle no matches. If the file is required, throw an error, otherwise return undefined.
-    if (matchingEntries.length === 0) {
+    // Normalize files from either source to { name, fileCid? }
+    // fileCid is only available for IPFS-listed packages (real per-file CIDs).
+    type FileRef = { name: string; fileCid?: string };
+    const allFiles: FileRef[] =
+      listResult.source === "mirror"
+        ? listResult.files.map((f) => ({ name: f.name }))
+        : listResult.entries.map((e) => ({ name: e.name, fileCid: e.cid.toString() }));
+
+    const matchingFiles = allFiles.filter((f) => regex.test(f.name));
+
+    if (matchingFiles.length === 0) {
       if (required) throw new Error(`Missing required file: ${regex}`);
       return undefined;
     }
 
-    // Process matched entries. If multiple files are allowed, and more than one file matches, we parse all of them.
-    const { maxSize: maxLength, format } = fileConfig;
     const contents = await Promise.all(
-      matchingEntries.map((entry) => this.writeFileToMemory(entry.cid.toString(), maxLength, entry.name, packageHash))
+      matchingFiles.map((f) => this.downloadReleaseAsset(f.name, listResult.packageCidStr, f.fileCid, maxLength))
     );
 
-    // If multiple files are allowed, we return an array of parsed assets.
-    // Otherwise, we return a single parsed asset.
     return this.parseAsset<T>(multiple ? contents : contents[0], format);
   }
 
   /**
-   * Downloads the content pointed by the given hash, parses it to UTF8 and returns it as a string.
-   * This function is intended for small files.
-   *
-   * Provider priority:
-   *   1. Mirror — if configured and filename + packageHash are provided
-   *   2. IPFS CAR — via the configured gateway
-   *
-   * @param hash - The individual file CID (used for IPFS fallback).
-   * @param maxLength - The maximum length of the file in bytes.
-   * @param filename - Filename within the package (used for mirror URL construction).
-   * @param packageHash - Package directory CID (used for mirror URL: /{packageHash}/{filename}).
-   * @returns The downloaded file content as a UTF8 string.
-   * @throws Error when the maximum size is exceeded.
+   * Fetches an IPFS file by CID into memory. Used ONLY by ipfsTest method to verify IPFS connectivity.
+   * Does not attempt mirror routing — use downloadReleaseAsset for release files.
    */
-  public async writeFileToMemory(hash: string, maxLength?: number, filename?: string, packageHash?: string): Promise<string> {
-    const cidStr = this.sanitizeIpfsPath(hash.toString());
+  public async writeFileToMemory(hash: string, maxLength?: number): Promise<string> {
+    const cidStr = this.sanitizeIpfsPath(hash);
+    const chunks: Uint8Array[] = [];
+    const { carReader, root } = await this.getAndVerifyContentFromGateway(cidStr);
+    const content = await this.unpackCarReader(carReader, root);
+    for await (const chunk of content) chunks.push(chunk);
 
-    // Provider 1: Mirror — try first if configured and we have routing info
-    if (this.mirrorProvider && filename && packageHash) {
-      const mirrorCid = this.sanitizeIpfsPath(packageHash);
+    let totalLength = 0;
+    chunks.forEach((chunk) => (totalLength += chunk.length));
+    const buffer = new Uint8Array(totalLength);
+    let offset = 0;
+    chunks.forEach((chunk) => {
+      buffer.set(chunk, offset);
+      offset += chunk.length;
+    });
+
+    if (maxLength && buffer.length >= maxLength) throw Error(`Maximum size ${maxLength} bytes exceeded`);
+    return new TextDecoder("utf-8").decode(buffer);
+  }
+
+  /**
+   * Downloads a release file into memory. Tries mirror first (if configured),
+   * falls back to IPFS CAR only if fileCid is provided.
+   *
+   * @param filename - Filename within the package (mirror routing).
+   * @param packageCidStr - Package directory CID (mirror routing: /{packageCidStr}/{filename}).
+   * @param fileCid - Individual file CID. Available for IPFS-listed packages only; absent for mirror-listed packages.
+   * @param maxLength - Maximum file size in bytes.
+   */
+  private async downloadReleaseAsset(filename: string, packageCidStr: string, fileCid?: string, maxLength?: number): Promise<string> {
+    // Provider 1: Mirror — try first if configured
+    if (this.mirrorProvider) {
+      const mirrorCid = this.sanitizeIpfsPath(packageCidStr);
       const result = await this.mirrorProvider.fetchFile(mirrorCid, filename, { maxBytes: maxLength });
       if (result.status === "success") {
         return new TextDecoder("utf-8").decode(result.bytes);
       }
-      logs.warn(`Mirror fetch failed for ${filename} (${result.reason}), falling back to IPFS`);
+      logs.warn(`Mirror fetch failed for ${filename} (${result.reason}), ${fileCid ? "falling back to IPFS" : "no IPFS fallback available"}`);
     }
 
-    // Provider 2: IPFS CAR — fallback (or primary when mirror is not configured)
+    // Provider 2: IPFS CAR — only if we have the individual file CID (not available for mirror-listed packages)
+    if (!fileCid) throw Error(`No IPFS fallback available for ${filename}: no individual file CID`);
+
+    const cidStr = this.sanitizeIpfsPath(fileCid);
     const chunks: Uint8Array[] = [];
     const { carReader, root } = await this.getAndVerifyContentFromGateway(cidStr);
     const content = await this.unpackCarReader(carReader, root);
@@ -483,40 +499,34 @@ export class DappnodeRepository extends ApmRepository {
   }
 
   /**
-   * Provider 1: Mirror JSON listing — fast, no individual file CIDs.
-   * Provider 2: IPFS dag-json listing — real individual file CIDs (signature verification possible).
+   * Provider 1: Mirror JSON listing — fast, real filenames, no individual file CIDs.
+   * Provider 2: IPFS dag-json listing — real individual file CIDs (required for signature verification).
    *
-   * When fromMirror is true, signature verification must be skipped and the caller
-   * should treat the package as trusted by the mirror operator (signedSafe = true).
+   * Returns a discriminated union so callers never deal with placeholder CIDs.
+   * When source is "mirror", signature verification is skipped and signedSafe = true
+   * (trust delegated to the mirror operator).
    */
-  private async listWithIpfsFallback(hash: string): Promise<{
-    entries: IPFSEntry[];
-    fromMirror: boolean;
-    packageCidStr: string;
-  }> {
+  private async listWithIpfsFallback(hash: string): Promise<ListResult> {
     const packageCidStr = this.sanitizeIpfsPath(hash);
 
-    // Provider 1: Mirror JSON listing — no individual CIDs; use package CID as placeholder
+    // Provider 1: Mirror JSON listing — real filenames, no individual file CIDs
     if (this.mirrorProvider) {
       try {
-        const mirrorFiles = await this.mirrorProvider.listFiles(packageCidStr);
-        const placeholderCid = CID.parse(packageCidStr);
-        const entries: IPFSEntry[] = mirrorFiles.map((f) => ({
-          type: "file" as const,
-          cid: placeholderCid,
-          name: f.name,
-          path: `${packageCidStr}/${f.name}`,
-          size: f.size
-        }));
-        return { entries, fromMirror: true, packageCidStr };
+        const files = await this.mirrorProvider.listFiles(packageCidStr);
+        return { source: "mirror", files, packageCidStr };
       } catch (mirrorErr) {
-        logs.warn(`Mirror listing failed for ${packageCidStr}, falling back to IPFS: ${mirrorErr}`);
+        const is404 = mirrorErr instanceof Error && mirrorErr.message === "http_404";
+        if (is404) {
+          logs.debug(`Package not on mirror, falling back to IPFS: ${packageCidStr}`);
+        } else {
+          logs.warn(`Mirror listing failed for ${packageCidStr}, falling back to IPFS: ${mirrorErr}`);
+        }
       }
     }
 
     // Provider 2: IPFS dag-json — has real individual file CIDs
     const entries = await this.list(hash);
-    return { entries, fromMirror: false, packageCidStr };
+    return { source: "ipfs", entries, packageCidStr };
   }
 
   /**
@@ -583,16 +593,15 @@ export class DappnodeRepository extends ApmRepository {
   }
 
   /**
-   * Gets an image by architecture from a set of IPFS entries.
+   * Gets an image by architecture from a ListResult (mirror or IPFS).
    * Throws an error if no image for the given architecture exists.
    *
    * @param manifest - The manifest containing information about the package.
-   * @param files - An array of IPFS entries.
+   * @param listResult - The directory listing (mirror or IPFS).
    * @param nodeArch - The architecture of the node.
-   * @param packageHash - Optional package directory CID for mirror URL construction.
    * @returns The distributed file object of the image.
    */
-  private getImageByArch(manifest: Manifest, files: IPFSEntry[], nodeArch: NodeJS.Architecture, packageHash?: string): DistributedFile {
+  private getImageByArch(manifest: Manifest, listResult: ListResult, nodeArch: NodeJS.Architecture): DistributedFile {
     let arch: Architecture;
     switch (nodeArch) {
       case "arm":
@@ -608,29 +617,42 @@ export class DappnodeRepository extends ApmRepository {
     }
 
     const { name, version } = manifest;
-    const imageAsset =
-      files.find((file) => file.name === this.getImageName(name, version, arch)) ||
-      (arch === defaultArch
-        ? // New DAppNodes should load old single arch packages,
-          // and consider their single image as amd64
-          files.find((file) => file.name === this.getLegacyImageName(name, version))
-        : undefined);
-
-    if (!imageAsset) {
-      throw Error(
+    const missingImageError = (): Error =>
+      Error(
         `No image for architecture '${nodeArch}'. ${
-          manifest.architectures && manifest.architectures.includes(arch)
-            ? `image for ${arch} is missing in release`
-            : undefined
+          manifest.architectures && manifest.architectures.includes(arch) ? `image for ${arch} is missing in release` : undefined
         }`
       );
-    } else {
+
+    if (listResult.source === "mirror") {
+      const imageFile =
+        listResult.files.find((f) => f.name === this.getImageName(name, version, arch)) ||
+        (arch === defaultArch
+          ? // New DAppNodes should load old single arch packages, and consider their single image as amd64
+            listResult.files.find((f) => f.name === this.getLegacyImageName(name, version))
+          : undefined);
+
+      if (!imageFile) throw missingImageError();
       return {
-        hash: imageAsset.cid.toString(),
-        size: imageAsset.size,
-        source: packageHash ? "mirror" : source,
-        filename: imageAsset.name,
-        packageHash
+        hash: listResult.packageCidStr, // placeholder; actual routing uses packageHash + filename
+        size: imageFile.size,
+        source: "mirror",
+        filename: imageFile.name,
+        packageHash: listResult.packageCidStr
+      };
+    } else {
+      const imageEntry =
+        listResult.entries.find((e) => e.name === this.getImageName(name, version, arch)) ||
+        (arch === defaultArch
+          ? // New DAppNodes should load old single arch packages, and consider their single image as amd64
+            listResult.entries.find((e) => e.name === this.getLegacyImageName(name, version))
+          : undefined);
+
+      if (!imageEntry) throw missingImageError();
+      return {
+        hash: imageEntry.cid.toString(),
+        size: imageEntry.size,
+        source
       };
     }
   }
