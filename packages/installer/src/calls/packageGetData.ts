@@ -43,5 +43,5 @@ export function packagePickItemData(pkgRelease: PackageRelease): PackageItemData
 }
 
 function packagePickManifestData(manifest: Manifest): Manifest {
-  return pick(manifest, ["name", "version", "shortDescription", "avatar", "avatarUrl", "links", "chain", "warnings"] as const);
+  return pick(manifest, ["name", "version", "shortDescription", "avatar", "links", "chain", "warnings"] as const);
 }
