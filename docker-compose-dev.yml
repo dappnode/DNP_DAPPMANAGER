@@ -29,7 +29,7 @@ services:
       - ETH_MAINNET_RPC_URL_REMOTE=
       - IPFS_HOST=
       - DISABLE_UPNP=
-      - DISABLE_HOST_SCRIPTS=
+      - DISABLE_HOST_SCRIPTS=${DISABLE_HOST_SCRIPTS:-false}
     networks:
       dncore_network:
         aliases:

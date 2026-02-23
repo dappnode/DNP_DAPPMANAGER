@@ -25,7 +25,7 @@ services:
       - ALWAYS_DAPPGETBASIC=
       - SKIP_COMPOSE_VALIDATION=
       - TEST=
-      - DISABLE_HOST_SCRIPTS=
+      - DISABLE_HOST_SCRIPTS=${DISABLE_HOST_SCRIPTS:-false}
     networks:
       dncore_network:
         aliases:
