@@ -1,7 +1,6 @@
 import fs from "fs";
 import stream from "stream";
 import util from "util";
-import { logs } from "@dappnode/logger";
 import { MirrorProvider, MirrorOptions, MirrorFileEntry, MirrorFetchResult, MirrorStreamResult, FetchOptions } from "./types.js";
 import { normalizeCid, roundProgress } from "./utils.js";
 
@@ -46,7 +45,7 @@ export class HttpMirrorProvider implements MirrorProvider {
       const response = await fetch(url, { signal: controller.signal });
       if (!response.ok) throw new Error(`Mirror listing failed: http_${response.status}`);
       const json = (await response.json()) as Array<{ name: string; size: number }>;
-      logs.debug(`Mirror listed ${json.length} files for ${cid}`);
+      console.debug(`Mirror listed ${json.length} files for ${cid}`);
       return json.map((entry) => ({ name: entry.name, size: entry.size }));
     } finally {
       clearTimeout(timeoutId);
@@ -66,7 +65,7 @@ export class HttpMirrorProvider implements MirrorProvider {
       const response = await fetch(url, { signal: controller.signal });
 
       if (!response.ok) {
-        logs.warn(`Mirror fetch failed for ${filename}: http_${response.status}`);
+        console.warn(`Mirror fetch failed for ${filename}: http_${response.status}`);
         return { status: "failed", reason: `http_${response.status}` };
       }
 
@@ -76,7 +75,7 @@ export class HttpMirrorProvider implements MirrorProvider {
       // Check against global cap and per-call cap from Content-Length (early abort before download)
       const effectiveMax = options.maxBytes !== undefined ? Math.min(options.maxBytes, this.maxBytes) : this.maxBytes;
       if (totalBytes > effectiveMax) {
-        logs.warn(`Mirror file too large for ${filename}: ${totalBytes} > ${effectiveMax}`);
+        console.warn(`Mirror file too large for ${filename}: ${totalBytes} > ${effectiveMax}`);
         return { status: "failed", reason: "file_too_large" };
       }
 
@@ -84,15 +83,15 @@ export class HttpMirrorProvider implements MirrorProvider {
 
       // Re-check with actual bytes in case Content-Length was absent or inaccurate
       if (bytes.length >= effectiveMax) {
-        logs.warn(`Mirror file too large for ${filename}: ${bytes.length} >= ${effectiveMax}`);
+        console.warn(`Mirror file too large for ${filename}: ${bytes.length} >= ${effectiveMax}`);
         return { status: "failed", reason: "file_too_large" };
       }
 
-      logs.debug(`Mirror fetched ${filename} (${bytes.length} bytes)`);
+      console.debug(`Mirror fetched ${filename} (${bytes.length} bytes)`);
       return { status: "success", bytes };
     } catch (error) {
       const message = error instanceof Error ? error.message : "unknown_error";
-      logs.warn(`Mirror fetch error for ${filename}: ${message}`);
+      console.warn(`Mirror fetch error for ${filename}: ${message}`);
       return { status: "failed", reason: message };
     } finally {
       clearTimeout(timeoutId);
@@ -112,7 +111,7 @@ export class HttpMirrorProvider implements MirrorProvider {
       const response = await fetch(url, { signal: controller.signal });
 
       if (!response.ok) {
-        logs.warn(`Mirror stream failed for ${filename}: http_${response.status}`);
+        console.warn(`Mirror stream failed for ${filename}: http_${response.status}`);
         return { status: "failed", reason: `http_${response.status}` };
       }
 
@@ -124,7 +123,7 @@ export class HttpMirrorProvider implements MirrorProvider {
       const totalBytes = contentLength ? parseInt(contentLength, 10) : 0;
 
       if (totalBytes > this.maxBytes) {
-        logs.warn(`Mirror file too large for ${filename}: ${totalBytes} > ${this.maxBytes}`);
+        console.warn(`Mirror file too large for ${filename}: ${totalBytes} > ${this.maxBytes}`);
         return { status: "failed", reason: "file_too_large" };
       }
 
@@ -156,7 +155,7 @@ export class HttpMirrorProvider implements MirrorProvider {
       }
 
       if (options.onProgress) options.onProgress(100);
-      logs.debug(`Mirror streamed ${filename} to ${destPath}`);
+      console.debug(`Mirror streamed ${filename} to ${destPath}`);
       return { status: "success" };
     } catch (error) {
       // Clean up partial file on error
@@ -166,7 +165,7 @@ export class HttpMirrorProvider implements MirrorProvider {
         // Ignore cleanup errors
       }
       const message = error instanceof Error ? error.message : "unknown_error";
-      logs.warn(`Mirror stream error for ${filename}: ${message}`);
+      console.warn(`Mirror stream error for ${filename}: ${message}`);
       return { status: "failed", reason: message };
     } finally {
       clearTimeout(timeoutId);

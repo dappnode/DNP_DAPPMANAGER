@@ -29,7 +29,6 @@ import { getReleaseSignatureStatus, serializeIpfsDirectory } from "./releaseSign
 import { isEnsDomain } from "../isEnsDomain.js";
 import { dappnodeRegistry } from "./params.js";
 import { JsonRpcApiProvider } from "ethers";
-import { logs } from "@dappnode/logger";
 import { MirrorProvider, MirrorOptions, MirrorFileEntry, HttpMirrorProvider } from "./contentProvider/index.js";
 
 const source = "ipfs" as const;
@@ -319,7 +318,7 @@ export class DappnodeRepository extends ApmRepository {
       if (result.status === "success") {
         return new TextDecoder("utf-8").decode(result.bytes);
       }
-      logs.warn(`Mirror fetch failed for ${filename} (${result.reason}), ${fileCid ? "falling back to IPFS" : "no IPFS fallback available"}`);
+      console.warn(`Mirror fetch failed for ${filename} (${result.reason}), ${fileCid ? "falling back to IPFS" : "no IPFS fallback available"}`);
     }
 
     // Provider 2: IPFS CAR — only if we have the individual file CID (not available for mirror-listed packages)
@@ -391,7 +390,7 @@ export class DappnodeRepository extends ApmRepository {
         onProgress: progress
       });
       if (result.status === "success") return;
-      logs.warn(`Mirror stream failed for ${filename} (${result.reason}), falling back to IPFS`);
+      console.warn(`Mirror stream failed for ${filename} (${result.reason}), falling back to IPFS`);
     }
 
     // Provider 2: IPFS CAR — fallback (or primary when mirror is not configured)
@@ -515,7 +514,7 @@ export class DappnodeRepository extends ApmRepository {
         const files = await this.mirrorProvider.listFiles(packageCidStr);
         return { source: "mirror", files, packageCidStr };
       } catch (mirrorErr) {
-        logs.warn(`Mirror listing failed for ${packageCidStr}, falling back to IPFS: ${mirrorErr}`);
+        console.warn(`Mirror listing failed for ${packageCidStr}, falling back to IPFS: ${mirrorErr}`);
       }
     }
 
