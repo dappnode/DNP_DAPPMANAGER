@@ -23,11 +23,7 @@ export { getUserActionLogs } from "./getUserActionLogs.js";
 export { getHostUptime } from "./getHostUptime.js";
 export { pwaUrlGet, pwaRequirementsGet } from "./pwaRequirementsGet.js";
 export { keystoresGetByNetwork } from "./keystoresGet.js";
-export {
-  validatorsFilterActiveByNetwork,
-  validatorsBalancesByNetwork,
-  validatorsFilterAttestingByNetwork
-} from "./validatorsFilterActive.js";
+export { validatorsFilterActiveByNetwork, validatorsDataByNetwork } from "./validatorsFilterActive.js";
 export {
   notificationsSendCustom,
   notificationsGetAllEndpoints,

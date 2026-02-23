@@ -479,20 +479,26 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     gnosis: null
   }),
 
-  validatorsFilterAttestingByNetwork: async () => ({
-    mainnet: { validators: ["0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"] },
-    hoodi: { validators: [] },
-    gnosis: null
-  }),
-
-  validatorsBalancesByNetwork: async () => ({
+  validatorsDataByNetwork: async () => ({
     mainnet: {
+      active: { validators: ["0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"] },
+      attesting: { validators: ["0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"] },
       balances: {
-        "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef": "32000000000"
+        balances: {
+          "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef": "32000000000"
+        }
       }
     },
-    hoodi: { balances: {} },
-    gnosis: null
+    hoodi: {
+      active: { validators: [] },
+      attesting: { validators: [] },
+      balances: { balances: {} }
+    },
+    gnosis: {
+      active: null,
+      attesting: null,
+      balances: null
+    }
   }),
 
   signerByNetworkGet: async () => ({

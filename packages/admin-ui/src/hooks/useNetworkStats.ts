@@ -7,7 +7,8 @@ import {
   NetworkStats,
   NodeStatus,
   NodeStatusByNetwork,
-  SignerStatus
+  SignerStatus,
+  ValidatorsDataByNetwork
 } from "@dappnode/types";
 import { api, useApi } from "api";
 import EthLogo from "img/logos/eth-logo.svg?react";
@@ -96,10 +97,6 @@ function getNetworksWithInstalledClients(
   return networks;
 }
 
-type ValidatorsByNetwork = Partial<Record<Network, { validators: string[]; beaconError?: Error } | null>>;
-type ValidatorsBalancesByNetwork = Partial<
-  Record<Network, { balances: Record<string, string>; beaconError?: Error } | null>
->;
 type SignersStatusByNetwork = Partial<Record<Network, SignerStatus>>;
 
 export function useNetworkStats() {
@@ -113,15 +110,7 @@ export function useNetworkStats() {
   // States fetched only for networks with installed clients
   const [nodesStatusByNetwork, setNodesStatusByNetwork] = useState<NodeStatusByNetwork | undefined>(undefined);
   const [nodesStatusLoading, setNodesStatusLoading] = useState(false);
-  const [validatorsActiveByNetwork, setValidatorsActiveByNetwork] = useState<ValidatorsByNetwork | undefined>(
-    undefined
-  );
-  const [validatorsAttestingByNetwork, setValidatorsAttestingByNetwork] = useState<ValidatorsByNetwork | undefined>(
-    undefined
-  );
-  const [validatorsBalancesByNetwork, setValidatorsBalancesByNetwork] = useState<
-    ValidatorsBalancesByNetwork | undefined
-  >(undefined);
+  const [validatorsData, setValidatorsData] = useState<ValidatorsDataByNetwork | undefined>(undefined);
   const [signersStatusByNetwork, setSignersStatusByNetwork] = useState<SignersStatusByNetwork | undefined>(undefined);
   const [validatorsLoading, setValidatorsLoading] = useState(false);
   const [installedDnpNames, setInstalledDnpNames] = useState<Set<string>>(new Set());
@@ -135,9 +124,7 @@ export function useNetworkStats() {
     const dnpNames = collectDnpNames(consensusClientsByNetwork, executionClientsByNetwork);
     if (dnpNames.size === 0) {
       setNodesStatusByNetwork({});
-      setValidatorsActiveByNetwork({});
-      setValidatorsAttestingByNetwork({});
-      setValidatorsBalancesByNetwork({});
+      setValidatorsData({});
       setSignersStatusByNetwork({});
       return;
     }
@@ -156,9 +143,7 @@ export function useNetworkStats() {
 
     if (installedDnpNames.size === 0) {
       setNodesStatusByNetwork({});
-      setValidatorsActiveByNetwork({});
-      setValidatorsAttestingByNetwork({});
-      setValidatorsBalancesByNetwork({});
+      setValidatorsData({});
       setSignersStatusByNetwork({});
       return;
     }
@@ -171,9 +156,7 @@ export function useNetworkStats() {
 
     if (networksWithClients.length === 0) {
       setNodesStatusByNetwork({});
-      setValidatorsActiveByNetwork({});
-      setValidatorsAttestingByNetwork({});
-      setValidatorsBalancesByNetwork({});
+      setValidatorsData({});
       setSignersStatusByNetwork({});
       return;
     }
@@ -183,23 +166,21 @@ export function useNetworkStats() {
     if (networksKey === lastFetchedNetworksKey.current) return;
     lastFetchedNetworksKey.current = networksKey;
 
-    // Step 4: Fetch node status, validators, and signer data only for networks with installed clients
+    // Step 4: Fetch node status, combined validators data, and signer data
+    // validatorsDataByNetwork combines active, attesting, and balances in a single
+    // backend call, reducing beacon chain API requests
     try {
       setNodesStatusLoading(true);
       setValidatorsLoading(true);
 
-      const [nodeStatus, validatorsActive, validatorsAttesting, validatorsBalances, signersStatus] = await Promise.all([
+      const [nodeStatus, validatorsResult, signersStatus] = await Promise.all([
         api.nodeStatusGetByNetwork({ networks: networksWithClients }),
-        api.validatorsFilterActiveByNetwork({ networks: networksWithClients }),
-        api.validatorsFilterAttestingByNetwork({ networks: networksWithClients }),
-        api.validatorsBalancesByNetwork({ networks: networksWithClients }),
+        api.validatorsDataByNetwork({ networks: networksWithClients }),
         api.signerByNetworkGet({ networks: networksWithClients })
       ]);
 
       setNodesStatusByNetwork(nodeStatus);
-      setValidatorsActiveByNetwork(validatorsActive);
-      setValidatorsAttestingByNetwork(validatorsAttesting);
-      setValidatorsBalancesByNetwork(validatorsBalances);
+      setValidatorsData(validatorsResult);
       setSignersStatusByNetwork(signersStatus);
     } catch (e) {
       console.error("Error fetching network data", e);
@@ -238,9 +219,9 @@ export function useNetworkStats() {
         }
       : undefined;
 
-    const validatorsActive = validatorsActiveByNetwork?.[network];
-    const validatorsAttesting = validatorsAttestingByNetwork?.[network];
-    const balancesObj = validatorsBalancesByNetwork?.[network]?.balances;
+    const validatorsActive = validatorsData?.[network]?.active;
+    const validatorsAttesting = validatorsData?.[network]?.attesting;
+    const balancesObj = validatorsData?.[network]?.balances?.balances;
     const signerStatus = signersStatusByNetwork?.[network] ?? { isInstalled: false, brainRunning: false };
 
     let total = 0;
@@ -260,7 +241,7 @@ export function useNetworkStats() {
       balance = validatorsActive.validators.reduce((acc, pk) => acc + (parseFloat(balancesObj[pk]) || 0), 0);
     }
 
-    const validatorsData = features.hasValidators
+    const validatorsInfo = features.hasValidators
       ? {
           validators: {
             total,
@@ -283,7 +264,7 @@ export function useNetworkStats() {
           ecDnp: ecInstalled ? executionClientDnp || null : null,
           ccDnp: ccInstalled ? consensusClientDnp || null : null
         },
-        ...validatorsData,
+        ...validatorsInfo,
         hasValidators: features.hasValidators,
         beaconExplorer: features.beaconExplorer || undefined
       };
