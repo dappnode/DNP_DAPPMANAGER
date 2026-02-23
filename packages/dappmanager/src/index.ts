@@ -118,21 +118,25 @@ executeMigrations().catch((e) => logs.error("Error on executeMigrations", e));
 // Start daemons
 startDaemons(dappnodeInstaller, execution, consensus, signer, mevBoost, controller.signal);
 
-Promise.all([
-  // Copy host scripts
-  copyHostScripts().catch((e) => logs.error("Error copying host scripts", e)),
-  // Copy host services
-  copyHostServices().catch((e) => logs.error("Error copying host services", e)),
-  // Copy host timers
-  copyHostTimers().catch((e) => logs.error("Error copying host timers", e))
-]).then(() => {
-  // ensure ipv4 forward
-  ensureIpv4Forward().catch((e) => logs.error("Error ensuring ipv4 forward", e));
-  // avahiDaemon uses a host script that must be copied before been initialized
-  startAvahiDaemon().catch((e) => logs.error("Error starting avahi daemon", e));
-  // start recreate-dappnode service with timer
-  recreateDappnode().catch((e) => logs.error("Error starting service recreate dappnode", e));
-});
+if (!params.DISABLE_HOST_SCRIPTS) {
+  Promise.all([
+    // Copy host scripts
+    copyHostScripts().catch((e) => logs.error("Error copying host scripts", e)),
+    // Copy host services
+    copyHostServices().catch((e) => logs.error("Error copying host services", e)),
+    // Copy host timers
+    copyHostTimers().catch((e) => logs.error("Error copying host timers", e))
+  ]).then(() => {
+    // ensure ipv4 forward
+    ensureIpv4Forward().catch((e) => logs.error("Error ensuring ipv4 forward", e));
+    // avahiDaemon uses a host script that must be copied before been initialized
+    startAvahiDaemon().catch((e) => logs.error("Error starting avahi daemon", e));
+    // start recreate-dappnode service with timer
+    recreateDappnode().catch((e) => logs.error("Error starting service recreate dappnode", e));
+  });
+} else {
+  logs.info("Host scripts/services disabled (DISABLE_HOST_SCRIPTS=true)");
+}
 
 // Create the global env file
 createGlobalEnvsEnvFile();
@@ -145,9 +149,11 @@ eventBus.notification.on((notification) => {
 
 // Initial calls to check this DAppNode's status
 // TODO: find a proper place for this. Consider having a initial calls health check
-calls
-  .passwordIsSecure()
-  .then((isSecure) => logs.info("Host password is", isSecure ? "secure" : "INSECURE"))
-  .catch((e) => logs.error("Error checking if host user password is secure", e));
+if (!params.DISABLE_HOST_SCRIPTS) {
+  calls
+    .passwordIsSecure()
+    .then((isSecure) => logs.info("Host password is", isSecure ? "secure" : "INSECURE"))
+    .catch((e) => logs.error("Error checking if host user password is secure", e));
+}
 
 postRestartPatch().catch((e) => logs.error("Error on postRestartPatch", e));

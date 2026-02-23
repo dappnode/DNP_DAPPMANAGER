@@ -294,6 +294,11 @@ export const params = {
 
   // Flags
   DISABLE_UPNP: /true/i.test(process.env.DISABLE_UPNP || ""),
+  /**
+   * Disables host integration features that require Linux host capabilities (systemd, nsenter, dbus, etc).
+   * Useful for running in development environments like macOS + Docker Desktop/Colima.
+   */
+  DISABLE_HOST_SCRIPTS: /true/i.test(process.env.DISABLE_HOST_SCRIPTS || ""),
   AUTH_IP_ALLOW_LOCAL_IP: Boolean(process.env.AUTH_IP_ALLOW_LOCAL_IP),
   TEST: Boolean(process.env.TEST),
 
