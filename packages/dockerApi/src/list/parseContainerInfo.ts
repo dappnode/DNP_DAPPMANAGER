@@ -48,7 +48,7 @@ export function parseContainerInfo(container: ContainerInfo): PackageContainer {
     image: container.Image,
     ip: containerNetworks[params.DOCKER_PRIVATE_NETWORK_NAME]?.IPAddress,
     privateIp: containerNetworks[params.DOCKER_PRIVATE_NETWORK_NEW_NAME]?.IPAddress,
-    ports: ensureUniquePortsFromDockerApi(container.Ports, defaultPorts),
+    ports: container.Ports && ensureUniquePortsFromDockerApi(container.Ports, defaultPorts), // on MacOS docker API might return null for ports
     volumes: container.Mounts.map(
       ({ Name, Source, Destination }): VolumeMapping => ({
         host: Source, // "/var/lib/docker/volumes/nginxproxydnpdappnodeeth_vhost.d/_data",
