@@ -29,9 +29,7 @@ services:
       - ETH_MAINNET_RPC_URL_REMOTE=
       - IPFS_HOST=
       - DISABLE_UPNP=
-      - CONTENT_MIRROR_BASE_URL=https://packages.dappnode.net
-      - CONTENT_MIRROR_TIMEOUT_MS=
-      - CONTENT_MIRROR_MAX_BYTES=
+
     networks:
       dncore_network:
         aliases:
