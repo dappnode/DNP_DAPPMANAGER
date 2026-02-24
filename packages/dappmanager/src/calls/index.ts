@@ -13,6 +13,7 @@ export { diagnose } from "./diagnose.js";
 export { dockerUpgradeCheck, dockerUpgrade } from "./dockerUpgrade.js";
 export { dappnodeWebNameSet } from "./dappnodeWebNameSet.js";
 export { disableEthicalMetrics, enableEthicalMetrics, getEthicalMetricsConfig } from "./ethicalMetrics.js";
+export { executionClientsGetByNetworks } from "./executionClientGet.js";
 export { fetchCoreUpdateData } from "./fetchCoreUpdateData.js";
 export { fetchDirectory } from "./fetchDirectory.js";
 export { fetchDnpRequest } from "./fetchDnpRequest.js";
@@ -22,7 +23,7 @@ export { getUserActionLogs } from "./getUserActionLogs.js";
 export { getHostUptime } from "./getHostUptime.js";
 export { pwaUrlGet, pwaRequirementsGet } from "./pwaRequirementsGet.js";
 export { keystoresGetByNetwork } from "./keystoresGet.js";
-export { validatorsFilterActiveByNetwork } from "./validatorsFilterActive.js";
+export { validatorsFilterActiveByNetwork, validatorsDataByNetwork } from "./validatorsFilterActive.js";
 export {
   notificationsSendCustom,
   notificationsGetAllEndpoints,
@@ -41,6 +42,7 @@ export {
   notificationsDeleteSubscription,
   notificationsSendSubTest
 } from "./notifications.js";
+export { nodeStatusGetByNetwork } from "./nodeStatusGet.js";
 export * from "./httpsPortal.js";
 export { ipfsTest } from "./ipfsTest.js";
 export { ipfsClientTargetSet } from "./ipfsClientTargetSet.js";
@@ -85,6 +87,7 @@ export {
 export { rebootHost } from "./rebootHost.js";
 export * from "./releaseTrustedKey.js";
 export { setStaticIp } from "./setStaticIp.js";
+export { signerByNetworkGet } from "./signerByNetworkGet.js";
 export { getShouldShowSmooth, setShouldShownSmooth } from "./smooth.js";
 export { statsCpuGet } from "./statsCpuGet.js";
 export { sshPortGet, sshPortSet, sshStatusGet, sshStatusSet } from "./sshManager.js";
