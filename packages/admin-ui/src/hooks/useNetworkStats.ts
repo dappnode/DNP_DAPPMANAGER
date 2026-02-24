@@ -192,6 +192,8 @@ export function useNetworkStats() {
 
   useEffect(() => {
     fetchNetworkData();
+    const interval = setInterval(fetchNetworkData, 12 * 1000);
+    return () => clearInterval(interval);
   }, [fetchNetworkData]);
 
   const clientsLoading =
