@@ -31,7 +31,8 @@ describe.skip("Dappnode Repository", function () {
     const contract = new DappnodeRepository(
       ipfsUrl,
       new ethers.InfuraProvider("mainnet", process.env.INFURA_MAINNET_KEY),
-      { mirror: { baseUrl: "https://packages.dappnode.net", timeoutMs: 30_000, maxBytes: 20 * 1024 * 1024 * 1024 } }
+      { baseUrl: "https://packages.dappnode.net", timeoutMs: 30_000, maxBytes: 20 * 1024 * 1024 * 1024 },
+      () => false
     );
 
     it(`[${ipfsUrl}] Should get and validate package version for Prysm:${prysmVersion}`, async () => {
