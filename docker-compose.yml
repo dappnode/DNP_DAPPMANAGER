@@ -25,6 +25,7 @@ services:
       - ALWAYS_DAPPGETBASIC=
       - SKIP_COMPOSE_VALIDATION=
       - TEST=
+
     networks:
       dncore_network:
         aliases:

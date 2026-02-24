@@ -417,6 +417,16 @@ export interface Routes {
   ipfsClientTargetGet(): Promise<IpfsRepository>;
 
   /**
+   * Gets the mirror content provider enabled status
+   */
+  mirrorProviderGet(): Promise<{ enabled: boolean }>;
+
+  /**
+   * Enables or disables the mirror content provider
+   */
+  mirrorProviderSet(kwargs: { enabled: boolean }): Promise<void>;
+
+  /**
    * Returns the keystores imported for the given networks.
    */
   keystoresGetByNetwork(kwargs: {
@@ -934,6 +944,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   ipfsTest: {},
   ipfsClientTargetSet: {},
   ipfsClientTargetGet: {},
+  mirrorProviderGet: {},
+  mirrorProviderSet: {},
   keystoresGetByNetwork: { log: true },
   localProxyingEnableDisable: { log: true },
   localProxyingStatusGet: {},

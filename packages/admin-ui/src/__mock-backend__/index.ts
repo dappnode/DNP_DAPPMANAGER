@@ -264,6 +264,8 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     ipfsClientTarget: IpfsClientTarget.remote,
     ipfsGateway: "https://ipfs-gateway.dappnode.net"
   }),
+  mirrorProviderGet: async () => ({ enabled: false }),
+  mirrorProviderSet: async () => {},
   enableEthicalMetrics: async () => {},
   getEthicalMetricsConfig: async () => ({
     mail: "@example.com",
