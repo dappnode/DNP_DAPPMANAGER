@@ -41,10 +41,10 @@ export function useSystemHealth() {
   return {
     cpuUsage: cpuStats.data ? Math.floor(cpuStats.data.usedPercentage) : 0,
     cpuTemp: cpuStats.data ? Math.floor(cpuStats.data.temperatureAverage) : 0,
-    memoryUsed: memoryStats.data ? humanFileSize(memoryStats.data.used, false, 0) : null,
+    memoryUsed: memoryStats.data ? humanFileSize(memoryStats.data.used, true, 0) : null,
     memoryTotal: memoryStats.data ? humanFileSize(memoryStats.data.total) : null,
     memoryPercentage: memoryStats.data ? Math.floor(memoryStats.data.usedPercentage) : 0,
-    diskUsed: diskStats.data ? humanFileSize(diskStats.data.used, false) : null,
+    diskUsed: diskStats.data ? humanFileSize(diskStats.data.used) : null,
     diskTotal: diskStats.data ? humanFileSize(diskStats.data.total) : null,
     diskPercentage: diskStats.data ? Math.floor(diskStats.data.usedPercentage) : 0,
     uptime: hostUptime.data ? formatUptime(hostUptime.data) : null,

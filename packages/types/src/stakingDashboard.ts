@@ -15,7 +15,13 @@ export type ClientData = {
   peers: number;
 } | null;
 
-export type NodeStatus = { ec: ClientData; cc: ClientData };
+export type ClientError = {
+  error: string;
+};
+
+export type ClientResult = ClientData | ClientError;
+
+export type NodeStatus = { ec: ClientResult; cc: ClientResult };
 
 export type NetworkStatus = {
   nodeStatus: NodeStatus | undefined;
@@ -43,3 +49,11 @@ export type SignerStatus = {
 export type NetworkStats = Partial<Record<DashboardSupportedNetwork, NetworkStatus>>;
 
 export type NodeStatusByNetwork = Partial<Record<DashboardSupportedNetwork, NodeStatus>>;
+
+export type ValidatorsNetworkData = {
+  active: { validators: string[]; beaconError?: Error } | null;
+  attesting: { validators: string[]; beaconError?: Error } | null;
+  balances: { balances: Record<string, string>; beaconError?: Error } | null;
+};
+
+export type ValidatorsDataByNetwork = Partial<Record<DashboardSupportedNetwork, ValidatorsNetworkData>>;

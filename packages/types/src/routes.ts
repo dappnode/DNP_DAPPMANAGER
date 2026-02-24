@@ -56,7 +56,12 @@ import { TrustedReleaseKey } from "./pkg.js";
 import { OptimismConfigSet, OptimismConfigGet } from "./rollups.js";
 import { Network, StakerConfigGet, StakerConfigSet } from "./stakers.js";
 import { BeaconBackupActivationParams, BeaconBackupNetworkStatus } from "./beaconBackup.js";
-import { NodeStatusByNetwork, SignerStatus } from "./stakingDashboard.js";
+import {
+  DashboardSupportedNetwork,
+  NodeStatusByNetwork,
+  SignerStatus,
+  ValidatorsNetworkData
+} from "./stakingDashboard.js";
 
 export interface Routes {
   /**
@@ -271,7 +276,11 @@ export interface Routes {
     subscriptionEndpoint?: string;
   }): Promise<void>;
 
-  nodeStatusGetByNetwork(kwargs: { networks: Network[] }): Promise<NodeStatusByNetwork>;
+  /**
+   * Returns the node status for the given networks
+   */
+  nodeStatusGetByNetwork(kwargs: { networks: DashboardSupportedNetwork[] }): Promise<NodeStatusByNetwork>;
+
   /**
    * Get all the notifications
    */
@@ -812,21 +821,13 @@ export interface Routes {
   }): Promise<Partial<Record<Network, { validators: string[]; beaconError?: Error } | null>>>;
 
   /**
-   * Returns the attesting validators for each network (using beacon liveness endpoint)
-   * @param networks List of networks
-   * @param epoch (optional) Beacon epoch to check liveness for (default: head)
-   */
-  validatorsFilterAttestingByNetwork: (kwargs: {
-    networks: Network[];
-  }) => Promise<Partial<Record<Network, { validators: string[]; beaconError?: Error } | null>>>;
-
-  /**
-   * Returns the balances for all validators for each network (as a map pubkey -> balance)
+   * Combined endpoint: returns active validators, attesting validators, and balances
+   * in a single call per network, minimizing beacon chain API requests.
    * @param networks List of networks
    */
-  validatorsBalancesByNetwork: (kwargs: {
+  validatorsDataByNetwork: (kwargs: {
     networks: Network[];
-  }) => Promise<Partial<Record<Network, { balances: Record<string, string>; beaconError?: Error } | null>>>;
+  }) => Promise<Partial<Record<Network, ValidatorsNetworkData>>>;
 
   /**
    * Removes a docker volume by name
@@ -1000,8 +1001,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   natRenewalEnable: {},
   natRenewalIsEnabled: {},
   validatorsFilterActiveByNetwork: {},
-  validatorsFilterAttestingByNetwork: {},
-  validatorsBalancesByNetwork: {},
+  validatorsDataByNetwork: {},
   volumeRemove: { log: true },
   volumesGet: {},
   ipPublicGet: {},
