@@ -88,6 +88,7 @@ export interface ComposeService {
   user?: string;
   volumes?: string[]; // ["dappmanagerdnpdappnodeeth_data:/usr/src/app/dnp_repo/"];
   working_dir?: string;
+  shm_size?: string; // "2gb"
 }
 
 export interface PackageEnvs {
@@ -188,5 +189,6 @@ export const dockerComposeSafeKeys: (keyof ComposeService)[] = [
   "container_name",
   "dns",
   "ulimits",
-  "deploy"
+  "deploy",
+  "shm_size"
 ];

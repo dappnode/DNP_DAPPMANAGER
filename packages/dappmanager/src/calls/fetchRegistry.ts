@@ -57,7 +57,7 @@ async function fetchRegistryIpfsData(registry: PublicRegistryEntry[]): Promise<D
           ...registryItemBasic,
           status: "ok",
           description: getShortDescription(manifest),
-          avatarUrl: fileToGatewayUrl(avatarFile), // Must be URL to a resource in a DAPPMANAGER API
+          avatarUrl: fileToGatewayUrl(avatarFile),
           isInstalled: getIsInstalled(release, dnpList),
           isUpdated: getIsUpdated(release, dnpList),
           featuredStyle: manifest.style,

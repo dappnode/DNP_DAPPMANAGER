@@ -90,7 +90,7 @@ export function HostStats() {
       cpuStats.revalidate();
       diskStats.revalidate();
       memoryStats.revalidate();
-    }, 5 * 1000);
+    }, 5 * 1000); // every 5 seconds
     return () => {
       clearInterval(interval);
     };
@@ -101,7 +101,7 @@ export function HostStats() {
       () => {
         hostUptime.revalidate();
       },
-      60 * 5 * 1000
+      60 * 5 * 1000 // every 5 minutes
     );
     return () => {
       clearInterval(interval);
