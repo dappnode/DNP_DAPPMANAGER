@@ -2,7 +2,7 @@ import { logs } from "@dappnode/logger";
 import { ClientResult, DashboardSupportedNetwork, NodeStatusByNetwork } from "@dappnode/types";
 
 /** Timeout in milliseconds for each individual client request group (EC or CC) */
-const CLIENT_TIMEOUT_MS = 3_000;
+const CLIENT_TIMEOUT_MS = 5_000;
 
 const ecBaseUrl = (network: DashboardSupportedNetwork) => `http://execution.${network}.dncore.dappnode:8545`;
 const ccBaseUrl = (network: DashboardSupportedNetwork) => `http://beacon-chain.${network}.dncore.dappnode:3500`;

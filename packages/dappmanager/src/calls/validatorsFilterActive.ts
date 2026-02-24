@@ -1,9 +1,13 @@
+import { logs } from "@dappnode/logger";
 import { Network, ValidatorsNetworkData } from "@dappnode/types";
 import { keystoresGetByNetwork } from "./keystoresGet.js";
 
 type KeystoresByProtocol = Record<string, string[]>;
 
 const ACTIVE_STATUSES = new Set(["active_ongoing", "active_exiting", "active_slashed"]);
+
+/** Timeout in milliseconds for each individual network's validators data request */
+const VALIDATORS_TIMEOUT_MS = 5_000;
 
 type ValidatorEntry = {
   index: string;
@@ -148,34 +152,123 @@ export async function validatorsFilterActiveByNetwork({
 
   const BATCH_SIZE = 100;
 
-  for (const network of networks) {
-    const keystores = keystoresByNetwork[network];
-    const pubkeys = extractPubkeys(keystores);
+  await Promise.all(
+    networks.map(async (network) => {
+      const keystores = keystoresByNetwork[network];
+      const pubkeys = extractPubkeys(keystores);
 
-    if (pubkeys.length === 0) {
-      result[network] = null;
-      continue;
-    }
+      if (pubkeys.length === 0) {
+        result[network] = null;
+        return;
+      }
 
-    try {
-      const batches = chunk(pubkeys, BATCH_SIZE);
-      const activeSets = await Promise.all(
-        batches.map(async (b) => {
-          const { activePubkeys } = await fetchValidatorsBatch(network, b);
-          return activePubkeys;
-        })
-      );
+      try {
+        const fetchActive = async (): Promise<{ validators: string[]; beaconError?: Error }> => {
+          const batches = chunk(pubkeys, BATCH_SIZE);
+          const activeSets = await Promise.all(
+            batches.map(async (b) => {
+              const { activePubkeys } = await fetchValidatorsBatch(network, b);
+              return activePubkeys;
+            })
+          );
 
-      const activeSet = new Set(activeSets.flat());
-      const activeInInputOrder = pubkeys.filter((pk) => activeSet.has(pk));
+          const activeSet = new Set(activeSets.flat());
+          return { validators: pubkeys.filter((pk) => activeSet.has(pk)) };
+        };
 
-      result[network] = { validators: activeInInputOrder };
-    } catch (err) {
-      result[network] = { validators: pubkeys, beaconError: err as Error };
-    }
-  }
+        const activeResult = await Promise.race([
+          fetchActive(),
+          new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error(`Timeout after ${VALIDATORS_TIMEOUT_MS}ms`)), VALIDATORS_TIMEOUT_MS)
+          )
+        ]);
+
+        result[network] = activeResult;
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        logs.error(`Error fetching active validators for ${network}: ${message}`);
+        result[network] = { validators: pubkeys, beaconError: err as Error };
+      }
+    })
+  );
 
   return result;
+}
+
+/**
+ * Fetches validators data for a single network with all the beacon chain calls.
+ * Extracted so it can be wrapped with a timeout.
+ */
+async function fetchValidatorsDataForNetwork(network: Network, pubkeys: string[]): Promise<ValidatorsNetworkData> {
+  const BATCH_SIZE = 100;
+  const batches = chunk(pubkeys, BATCH_SIZE);
+
+  // For each batch, call fetchValidatorsBatch ONCE and reuse results for all three concerns
+  const batchResults = await Promise.all(
+    batches.map(async (batch) => {
+      const { activePubkeys, balances, pubkeyToIndex, indexToPubkey } = await fetchValidatorsBatch(network, batch);
+
+      let attestingPubkeys: string[] = [];
+      let attestingError: Error | undefined;
+      try {
+        attestingPubkeys = await fetchAttestingFromLiveness(network, batch, pubkeyToIndex, indexToPubkey);
+      } catch (err) {
+        attestingError = err as Error;
+      }
+
+      return { activePubkeys, balances, attestingPubkeys, attestingError };
+    })
+  );
+
+  // Merge batch results
+  const allActive: string[] = [];
+  const mergedBalances: Record<string, string> = {};
+  const allAttesting: string[] = [];
+  let attestingBeaconError: Error | undefined;
+
+  for (const br of batchResults) {
+    allActive.push(...br.activePubkeys);
+    Object.assign(mergedBalances, br.balances);
+    allAttesting.push(...br.attestingPubkeys);
+    if (br.attestingError) attestingBeaconError = br.attestingError;
+  }
+
+  const activeSet = new Set(allActive);
+  const attestingSet = new Set(allAttesting);
+
+  return {
+    active: { validators: pubkeys.filter((pk) => activeSet.has(pk)) },
+    attesting: attestingBeaconError
+      ? { validators: pubkeys, beaconError: attestingBeaconError }
+      : { validators: pubkeys.filter((pk) => attestingSet.has(pk)) },
+    balances: { balances: mergedBalances }
+  };
+}
+
+/**
+ * Wraps a single network's validators data fetch with a timeout.
+ * On timeout or error, returns data with beaconError set so the UI
+ * can still display the other networks.
+ */
+async function fetchValidatorsDataWithTimeout(network: Network, pubkeys: string[]): Promise<ValidatorsNetworkData> {
+  try {
+    const result = await Promise.race([
+      fetchValidatorsDataForNetwork(network, pubkeys),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error(`Timeout after ${VALIDATORS_TIMEOUT_MS}ms`)), VALIDATORS_TIMEOUT_MS)
+      )
+    ]);
+    return result;
+  } catch (err) {
+    const beaconError = err as Error;
+    const message = beaconError.message || String(err);
+    logs.error(`Error fetching validators data for ${network}: ${message}`);
+    return {
+      active: { validators: pubkeys, beaconError },
+      attesting: { validators: pubkeys, beaconError },
+      balances: { balances: {}, beaconError }
+    };
+  }
 }
 
 /**
@@ -190,74 +283,24 @@ export async function validatorsDataByNetwork({
 }): Promise<Partial<Record<Network, ValidatorsNetworkData>>> {
   const result: Partial<Record<Network, ValidatorsNetworkData>> = {};
   const keystoresByNetwork = await keystoresGetByNetwork({ networks });
-  const BATCH_SIZE = 100;
 
-  for (const network of networks) {
-    const keystores = keystoresByNetwork[network];
-    const pubkeys = extractPubkeys(keystores);
+  await Promise.all(
+    networks.map(async (network) => {
+      const keystores = keystoresByNetwork[network];
+      const pubkeys = extractPubkeys(keystores);
 
-    if (pubkeys.length === 0) {
-      result[network] = {
-        active: null,
-        attesting: null,
-        balances: null
-      };
-      continue;
-    }
-
-    try {
-      const batches = chunk(pubkeys, BATCH_SIZE);
-
-      // For each batch, call fetchValidatorsBatch ONCE and reuse results for all three concerns
-      const batchResults = await Promise.all(
-        batches.map(async (batch) => {
-          const { activePubkeys, balances, pubkeyToIndex, indexToPubkey } = await fetchValidatorsBatch(network, batch);
-
-          let attestingPubkeys: string[] = [];
-          let attestingError: Error | undefined;
-          try {
-            attestingPubkeys = await fetchAttestingFromLiveness(network, batch, pubkeyToIndex, indexToPubkey);
-          } catch (err) {
-            attestingError = err as Error;
-          }
-
-          return { activePubkeys, balances, attestingPubkeys, attestingError };
-        })
-      );
-
-      // Merge batch results
-      const allActive: string[] = [];
-      const mergedBalances: Record<string, string> = {};
-      const allAttesting: string[] = [];
-      let attestingBeaconError: Error | undefined;
-
-      for (const br of batchResults) {
-        allActive.push(...br.activePubkeys);
-        Object.assign(mergedBalances, br.balances);
-        allAttesting.push(...br.attestingPubkeys);
-        if (br.attestingError) attestingBeaconError = br.attestingError;
+      if (pubkeys.length === 0) {
+        result[network] = {
+          active: null,
+          attesting: null,
+          balances: null
+        };
+        return;
       }
 
-      const activeSet = new Set(allActive);
-      const attestingSet = new Set(allAttesting);
-
-      result[network] = {
-        active: { validators: pubkeys.filter((pk) => activeSet.has(pk)) },
-        attesting: attestingBeaconError
-          ? { validators: pubkeys, beaconError: attestingBeaconError }
-          : { validators: pubkeys.filter((pk) => attestingSet.has(pk)) },
-        balances: { balances: mergedBalances }
-      };
-    } catch (err) {
-      // If the shared fetch itself fails, all three concerns get the error
-      const beaconError = err as Error;
-      result[network] = {
-        active: { validators: pubkeys, beaconError },
-        attesting: { validators: pubkeys, beaconError },
-        balances: { balances: {}, beaconError }
-      };
-    }
-  }
+      result[network] = await fetchValidatorsDataWithTimeout(network, pubkeys);
+    })
+  );
 
   return result;
 }

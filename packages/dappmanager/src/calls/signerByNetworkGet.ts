@@ -1,5 +1,9 @@
 import { listPackageNoThrow } from "@dappnode/dockerapi";
+import { logs } from "@dappnode/logger";
 import { Network, SignerStatus } from "@dappnode/types";
+
+/** Timeout in milliseconds for each individual signer status request */
+const SIGNER_TIMEOUT_MS = 5000;
 
 async function signerStatusGet({ network }: { network: Network }): Promise<SignerStatus> {
   const signerDnp = await listPackageNoThrow({
@@ -15,6 +19,26 @@ async function signerStatusGet({ network }: { network: Network }): Promise<Signe
   return { isInstalled, brainRunning };
 }
 
+/**
+ * Wraps a signer status fetch with a timeout. If the request exceeds
+ * SIGNER_TIMEOUT_MS, it returns a default "not installed" status instead of blocking.
+ */
+async function fetchSignerWithTimeout(network: Network): Promise<SignerStatus> {
+  try {
+    const result = await Promise.race([
+      signerStatusGet({ network }),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error(`Timeout after ${SIGNER_TIMEOUT_MS}ms`)), SIGNER_TIMEOUT_MS)
+      )
+    ]);
+    return result;
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+    logs.error(`Error fetching signer status for ${network}: ${message}`);
+    return { isInstalled: false, brainRunning: false };
+  }
+}
+
 export async function signerByNetworkGet({
   networks
 }: {
@@ -22,9 +46,11 @@ export async function signerByNetworkGet({
 }): Promise<Partial<Record<Network, SignerStatus>>> {
   const results: Partial<Record<Network, SignerStatus>> = {};
 
-  for (const network of networks) {
-    results[network] = await signerStatusGet({ network });
-  }
+  await Promise.all(
+    networks.map(async (network) => {
+      results[network] = await fetchSignerWithTimeout(network);
+    })
+  );
 
   return results;
 }
