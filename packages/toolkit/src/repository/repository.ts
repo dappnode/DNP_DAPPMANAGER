@@ -38,21 +38,18 @@ type ListResult =
   | { source: "mirror"; files: MirrorFileEntry[]; packageCidStr: string }
   | { source: "ipfs"; entries: IPFSEntry[]; packageCidStr: string };
 
-export interface DappnodeMirrorOptions {
-  mirror: MirrorOptions;
-}
-
 /**
  * The DappnodeRepository class extends ApmRepository class to provide methods to interact with the IPFS network.
  * To fetch IPFS content it uses dag endpoint for CAR content validation.
  *
- * A mirror provider is always configured and can be enabled or disabled at runtime via setMirrorEnabled().
+ * A mirror provider is always configured. Whether it is used is determined at call time by invoking
+ * isMirrorEnabled() — typically a direct read from the DB, so there is a single source of truth.
  * When disabled, all downloads fall back to IPFS directly. When enabled, the mirror is tried first and
  * IPFS is used as fallback. The mirror does not provide individual file CIDs, so signature verification
  * is skipped for mirror-listed packages (signedSafe = true, signatureStatus = notSigned).
  *
  * Provider priority (easy to swap — search for "Provider 1" and "Provider 2"):
- *   1. Mirror HTTP (if enabled)
+ *   1. Mirror HTTP (if isMirrorEnabled())
  *   2. IPFS fallback (dag-json listing + CAR downloads)
  *
  * @extends ApmRepository
@@ -61,18 +58,20 @@ export class DappnodeRepository extends ApmRepository {
   protected gatewayUrl: string;
   protected localIpfsUrl = "http://ipfs.dappnode:5001";
   private readonly mirrorProvider: HttpMirrorProvider;
-  private mirrorEnabled = false;
+  private readonly isMirrorEnabled: () => boolean;
 
   /**
    * Constructs an instance of DappnodeRepository.
    * @param ipfsUrl - The URL of the IPFS gateway.
    * @param provider - Ethereum JSON-RPC provider for ENS/APM resolution.
-   * @param options - Mirror provider configuration.
+   * @param mirrorOptions - Mirror HTTP provider configuration (baseUrl, timeouts, size limits).
+   * @param isMirrorEnabled - Called before each operation to decide whether to use the mirror.
    */
-  constructor(ipfsUrl: string, provider: JsonRpcApiProvider, options: DappnodeMirrorOptions) {
+  constructor(ipfsUrl: string, provider: JsonRpcApiProvider, mirrorOptions: MirrorOptions, isMirrorEnabled: () => boolean) {
     super(provider);
     this.gatewayUrl = ipfsUrl.replace(/\/?$/, "");
-    this.mirrorProvider = new HttpMirrorProvider(options.mirror);
+    this.mirrorProvider = new HttpMirrorProvider(mirrorOptions);
+    this.isMirrorEnabled = isMirrorEnabled;
   }
 
   /**
@@ -81,14 +80,6 @@ export class DappnodeRepository extends ApmRepository {
    */
   public changeIpfsGatewayUrl(ipfsUrl: string): void {
     this.gatewayUrl = ipfsUrl.replace(/\/?$/, "");
-  }
-
-  /**
-   * Enables or disables the mirror content provider at runtime.
-   * When disabled, all downloads fall back to IPFS directly.
-   */
-  public setMirrorEnabled(enabled: boolean): void {
-    this.mirrorEnabled = enabled;
   }
 
   /**
@@ -318,7 +309,7 @@ export class DappnodeRepository extends ApmRepository {
    */
   private async downloadReleaseAsset(filename: string, packageCidStr: string, fileCid?: string, maxLength?: number): Promise<string> {
     // Provider 1: Mirror — try first if configured
-    if (this.mirrorEnabled) {
+    if (this.isMirrorEnabled()) {
       const mirrorCid = this.sanitizeIpfsPath(packageCidStr);
       const result = await this.mirrorProvider.fetchFile(mirrorCid, filename, { maxBytes: maxLength });
       if (result.status === "success") {
@@ -390,7 +381,7 @@ export class DappnodeRepository extends ApmRepository {
     const cidStr = this.sanitizeIpfsPath(hash.toString());
 
     // Provider 1: Mirror — stream directly to disk to avoid OOM on large Docker images
-    if (this.mirrorEnabled && filename && packageHash) {
+    if (this.isMirrorEnabled() && filename && packageHash) {
       const mirrorCid = this.sanitizeIpfsPath(packageHash);
       const result = await this.mirrorProvider.fetchFileToPath(mirrorCid, filename, _path, {
         onProgress: progress
@@ -515,7 +506,7 @@ export class DappnodeRepository extends ApmRepository {
     const packageCidStr = this.sanitizeIpfsPath(hash);
 
     // Provider 1: Mirror JSON listing — real filenames, no individual file CIDs
-    if (this.mirrorEnabled) {
+    if (this.isMirrorEnabled()) {
       try {
         const files = await this.mirrorProvider.listFiles(packageCidStr);
         return { source: "mirror", files, packageCidStr };

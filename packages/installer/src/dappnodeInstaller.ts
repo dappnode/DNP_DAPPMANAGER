@@ -46,15 +46,12 @@ export function getIpfsUrl(): string {
 
 export class DappnodeInstaller extends DappnodeRepository {
   constructor(ipfsUrl: string, provider: JsonRpcApiProvider) {
-    super(ipfsUrl, provider, {
-      mirror: {
-        baseUrl: params.CONTENT_MIRROR_BASE_URL,
-        timeoutMs: params.CONTENT_MIRROR_TIMEOUT_MS,
-        maxBytes: params.CONTENT_MIRROR_MAX_BYTES
-      }
-    });
-    // Enable/disable mirror based on db value on initialization
-    this.setMirrorEnabled(db.mirrorProviderEnabled.get());
+    super(
+      ipfsUrl,
+      provider,
+      { baseUrl: params.CONTENT_MIRROR_BASE_URL, timeoutMs: params.CONTENT_MIRROR_TIMEOUT_MS, maxBytes: params.CONTENT_MIRROR_MAX_BYTES },
+      () => db.mirrorProviderEnabled.get()
+    );
   }
 
   private async updateProviders(): Promise<void> {
