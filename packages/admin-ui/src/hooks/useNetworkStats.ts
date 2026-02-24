@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   ClientError,
   ClientResult,
@@ -115,8 +115,6 @@ export function useNetworkStats() {
   const [validatorsLoading, setValidatorsLoading] = useState(false);
   const [installedDnpNames, setInstalledDnpNames] = useState<Set<string>>(new Set());
 
-  const lastFetchedNetworksKey = useRef<string>("");
-
   const fetchNetworkData = useCallback(async () => {
     if (!consensusClientsByNetwork || !executionClientsByNetwork) return;
 
@@ -130,18 +128,18 @@ export function useNetworkStats() {
     }
 
     // Step 3: Verify which packages are installed
-    let installedDnpNames: Set<string>;
+    let resolvedInstalledDnpNames: Set<string>;
     try {
       const installedPackages = await api.packagesGet();
       const allInstalledNames = new Set(installedPackages.map((pkg) => pkg.dnpName));
-      installedDnpNames = new Set([...dnpNames].filter((name) => allInstalledNames.has(name)));
-      setInstalledDnpNames(installedDnpNames);
+      resolvedInstalledDnpNames = new Set([...dnpNames].filter((name) => allInstalledNames.has(name)));
+      setInstalledDnpNames(resolvedInstalledDnpNames);
     } catch (e) {
       console.error("Error fetching installed packages for node status", e);
       return;
     }
 
-    if (installedDnpNames.size === 0) {
+    if (resolvedInstalledDnpNames.size === 0) {
       setNodesStatusByNetwork({});
       setValidatorsData({});
       setSignersStatusByNetwork({});
@@ -151,7 +149,7 @@ export function useNetworkStats() {
     const networksWithClients = getNetworksWithInstalledClients(
       consensusClientsByNetwork,
       executionClientsByNetwork,
-      installedDnpNames
+      resolvedInstalledDnpNames
     );
 
     if (networksWithClients.length === 0) {
@@ -160,11 +158,6 @@ export function useNetworkStats() {
       setSignersStatusByNetwork({});
       return;
     }
-
-    // Avoid re-fetching if the networks list hasn't changed
-    const networksKey = JSON.stringify(networksWithClients);
-    if (networksKey === lastFetchedNetworksKey.current) return;
-    lastFetchedNetworksKey.current = networksKey;
 
     // Step 4: Fetch node status, combined validators data, and signer data
     // validatorsDataByNetwork combines active, attesting, and balances in a single
@@ -192,6 +185,8 @@ export function useNetworkStats() {
 
   useEffect(() => {
     fetchNetworkData();
+    const interval = setInterval(fetchNetworkData, 30 * 1000);
+    return () => clearInterval(interval);
   }, [fetchNetworkData]);
 
   const clientsLoading =
