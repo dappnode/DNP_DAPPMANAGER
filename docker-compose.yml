@@ -14,7 +14,7 @@ services:
     volumes:
       - "/run/dbus/system_bus_socket:/run/dbus/system_bus_socket"
       - "dappmanagerdnpdappnodeeth_data:/usr/src/app/dnp_repo/"
-      - "${DNCORE_HOST_PATH:-/usr/src/dappnode/DNCORE}:/usr/src/app/DNCORE/"
+      - "${DAPPNODE_CORE_DIR:-/usr/src/dappnode/DNCORE}:/usr/src/app/DNCORE/"
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "/etc/hostname:/etc/dappnodename:ro"
     environment:
