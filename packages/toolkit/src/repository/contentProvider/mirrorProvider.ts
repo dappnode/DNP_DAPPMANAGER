@@ -65,7 +65,7 @@ export class HttpMirrorProvider implements MirrorProvider {
       const response = await fetch(url, { signal: controller.signal });
 
       if (!response.ok) {
-        console.warn(`Mirror fetch failed for ${filename}: http_${response.status}`);
+        console.debug(`Mirror fetch failed for ${filename}: http_${response.status}`);
         return { status: "failed", reason: `http_${response.status}` };
       }
 
@@ -75,7 +75,7 @@ export class HttpMirrorProvider implements MirrorProvider {
       // Check against global cap and per-call cap from Content-Length (early abort before download)
       const effectiveMax = options.maxBytes !== undefined ? Math.min(options.maxBytes, this.maxBytes) : this.maxBytes;
       if (totalBytes > effectiveMax) {
-        console.warn(`Mirror file too large for ${filename}: ${totalBytes} > ${effectiveMax}`);
+        console.debug(`Mirror file too large for ${filename}: ${totalBytes} > ${effectiveMax}`);
         return { status: "failed", reason: "file_too_large" };
       }
 
@@ -83,7 +83,7 @@ export class HttpMirrorProvider implements MirrorProvider {
 
       // Re-check with actual bytes in case Content-Length was absent or inaccurate
       if (bytes.length >= effectiveMax) {
-        console.warn(`Mirror file too large for ${filename}: ${bytes.length} >= ${effectiveMax}`);
+        console.debug(`Mirror file too large for ${filename}: ${bytes.length} >= ${effectiveMax}`);
         return { status: "failed", reason: "file_too_large" };
       }
 
@@ -91,7 +91,7 @@ export class HttpMirrorProvider implements MirrorProvider {
       return { status: "success", bytes };
     } catch (error) {
       const message = error instanceof Error ? error.message : "unknown_error";
-      console.warn(`Mirror fetch error for ${filename}: ${message}`);
+      console.debug(`Mirror fetch error for ${filename}: ${message}`);
       return { status: "failed", reason: message };
     } finally {
       clearTimeout(timeoutId);
@@ -111,7 +111,7 @@ export class HttpMirrorProvider implements MirrorProvider {
       const response = await fetch(url, { signal: controller.signal });
 
       if (!response.ok) {
-        console.warn(`Mirror stream failed for ${filename}: http_${response.status}`);
+        console.debug(`Mirror stream failed for ${filename}: http_${response.status}`);
         return { status: "failed", reason: `http_${response.status}` };
       }
 
@@ -123,7 +123,7 @@ export class HttpMirrorProvider implements MirrorProvider {
       const totalBytes = contentLength ? parseInt(contentLength, 10) : 0;
 
       if (totalBytes > this.maxBytes) {
-        console.warn(`Mirror file too large for ${filename}: ${totalBytes} > ${this.maxBytes}`);
+        console.debug(`Mirror file too large for ${filename}: ${totalBytes} > ${this.maxBytes}`);
         return { status: "failed", reason: "file_too_large" };
       }
 
@@ -165,7 +165,7 @@ export class HttpMirrorProvider implements MirrorProvider {
         // Ignore cleanup errors
       }
       const message = error instanceof Error ? error.message : "unknown_error";
-      console.warn(`Mirror stream error for ${filename}: ${message}`);
+      console.debug(`Mirror stream error for ${filename}: ${message}`);
       return { status: "failed", reason: message };
     } finally {
       clearTimeout(timeoutId);
