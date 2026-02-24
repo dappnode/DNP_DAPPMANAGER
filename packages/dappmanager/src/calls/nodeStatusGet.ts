@@ -218,18 +218,21 @@ async function fetchClientWithTimeout(
   fetchFn: () => Promise<ClientResult>,
   network: DashboardSupportedNetwork
 ): Promise<ClientResult> {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
   try {
     const result = await Promise.race([
       fetchFn(),
-      new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error(`Timeout after ${CLIENT_TIMEOUT_MS}ms`)), CLIENT_TIMEOUT_MS)
-      )
+      new Promise<never>((_, reject) => {
+        timeoutId = setTimeout(() => reject(new Error(`Timeout after ${CLIENT_TIMEOUT_MS}ms`)), CLIENT_TIMEOUT_MS);
+      })
     ]);
     return result;
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     logs.error(`Error fetching data for ${network}: ${message}`);
     return { error: `Failed to fetch RPC: ${message}` };
+  } finally {
+    if (timeoutId !== undefined) clearTimeout(timeoutId);
   }
 }
 
