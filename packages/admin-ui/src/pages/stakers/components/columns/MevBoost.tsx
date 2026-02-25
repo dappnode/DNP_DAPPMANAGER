@@ -26,6 +26,7 @@ export default function MevBoost({
   newRelays,
   setNewRelays,
   isSelected,
+  isDisabled,
   ...props
 }: {
   network: Network;
@@ -35,14 +36,17 @@ export default function MevBoost({
   newRelays: string[];
   setNewRelays: React.Dispatch<React.SetStateAction<string[]>>;
   isSelected: boolean;
+  isDisabled?: boolean;
 }) {
   const navigate = useNavigate();
 
   return (
-    <Card {...props} className={`mev-boost ${joinCssClass({ isSelected })}`} shadow={isSelected}>
+    <Card {...props} className={`mev-boost ${joinCssClass({ isSelected, isDisabled })}`} shadow={isSelected}>
       <div
         onClick={
-          mevBoost.status === "ok"
+          isDisabled
+            ? undefined
+            : mevBoost.status === "ok"
             ? isSelected
               ? () => setNewMevBoost(null)
               : () => setNewMevBoost(mevBoost)
