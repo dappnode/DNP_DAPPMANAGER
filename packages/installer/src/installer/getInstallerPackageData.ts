@@ -86,7 +86,7 @@ function getInstallerPackageData(
   const nextUserSet = deepmerge(prevUserSet, userSettings || {});
 
   // Append to compose
-  const compose = new ComposeEditor(release.compose);
+  const compose = new ComposeEditor(release.compose, { dnpName });
   compose.applyUserSettings(nextUserSet, { dnpName });
 
   const dockerTimeout = parseTimeoutSeconds(release.manifest.dockerTimeout);
