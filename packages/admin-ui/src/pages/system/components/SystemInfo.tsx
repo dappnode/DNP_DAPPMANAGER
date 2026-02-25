@@ -2,9 +2,9 @@ import React, { useEffect } from "react";
 import { useApi } from "api";
 // Own module
 import VolumesGrid from "./VolumesGrid";
-import { HostStats } from "pages/dashboard/components/HostStats";
 // Components
 import SubTitle from "components/SubTitle";
+import SystemHealth from "pages/dashboard/components/SystemHealth";
 
 export default function SystemInfo() {
   const cpuStats = useApi.statsCpuGet();
@@ -34,8 +34,7 @@ export default function SystemInfo() {
 
   return (
     <>
-      <SubTitle>Machine stats</SubTitle>
-      <HostStats />
+      <SystemHealth />
 
       <SubTitle>Volumes</SubTitle>
       <VolumesGrid />
