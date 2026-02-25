@@ -14,6 +14,7 @@ const DAY = 24 * HOUR;
  * Main persistent folders, linked with docker volumes
  * - No need to prefix or sufix with slashes, path.join() is used in the whole app
  */
+const DAPPNODE_CORE_DIR = process.env.DAPPNODE_CORE_DIR || "/usr/src/dappnode/DNCORE"; // host path
 let DNCORE_DIR = "/usr/src/app/DNCORE"; // Bind volume
 let REPO_DIR = "/usr/src/app/dnp_repo"; // Named volume
 const GLOBAL_ENVS_FILE_NAME = "dnp.dappnode.global.env";
@@ -154,7 +155,7 @@ export const params = {
   AUTO_UPDATE_INCLUDE_IPFS_VERSIONS: false,
 
   // Install method parameters
-  ALWAYS_DAPPGETBASIC: process.env.ALWAYS_DAPPGETBASIC === 'true',
+  ALWAYS_DAPPGETBASIC: process.env.ALWAYS_DAPPGETBASIC === "true",
   // Watchers
   TEMPERATURE_DAEMON_INTERVAL: 5 * MINUTE,
   AUTO_UPDATE_DAEMON_INTERVAL: 30 * MINUTE,
@@ -235,7 +236,7 @@ export const params = {
   vpnDataVolume: "dncore_vpndnpdappnodeeth_data",
   wireguardContainerName: "DAppNodeCore-wireguard.wireguard.dnp.dappnode.eth",
   restartContainerName: "DAppNodeTool-restart.dnp.dappnode.eth",
-  restartDnpVolumes: ["/usr/src/dappnode/DNCORE/:/usr/src/app/DNCORE/", "/var/run/docker.sock:/var/run/docker.sock"],
+  restartDnpVolumes: [`${DAPPNODE_CORE_DIR}:${DNCORE_DIR}`, "/var/run/docker.sock:/var/run/docker.sock"], // Important: restart container needs access to the docker socket and the DNCORE_DIR to restart itself
   corePackagesThatMustBeRunning: ["bind.dnp.dappnode.eth", "dappmanager.dnp.dappnode.eth"],
   corePackagesNotAutoupdatable: [
     "core.dnp.dappnode.eth",
