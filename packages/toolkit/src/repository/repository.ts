@@ -315,7 +315,6 @@ export class DappnodeRepository extends ApmRepository {
       if (result.status === "success") {
         return new TextDecoder("utf-8").decode(result.bytes);
       }
-      console.debug(`Mirror fetch failed for ${filename} (${result.reason}), ${fileCid ? "falling back to IPFS" : "no IPFS fallback available"}`);
     }
 
     // Provider 2: IPFS CAR — only if we have the individual file CID (not available for mirror-listed packages)
@@ -510,8 +509,8 @@ export class DappnodeRepository extends ApmRepository {
       try {
         const files = await this.mirrorProvider.listFiles(packageCidStr);
         return { source: "mirror", files, packageCidStr };
-      } catch (mirrorErr) {
-        console.debug(`Mirror listing failed for ${packageCidStr}, falling back to IPFS: ${mirrorErr}`);
+      } catch {
+        // Mirror listing failed, fall back to IPFS
       }
     }
 
