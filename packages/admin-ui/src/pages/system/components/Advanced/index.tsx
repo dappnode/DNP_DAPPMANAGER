@@ -5,6 +5,7 @@ import { ChangeDappnodeWebName } from "./ChangeDappnodeWebName";
 import { SshManager } from "./SshManager";
 import { ClearCacheDb } from "./ClearCacheDb";
 import { ClearMainDb } from "./ClearMainDb";
+import { ContentProviderSelector } from "./ContentProviderSelector";
 import { ReleaseTrustedKeysEditor } from "./ReleaseTrustedKeysEditor";
 import { UpdateUpgrade } from "./UpdateUpgrade";
 import { DockerUpgrade } from "./DockerUpgrade";
@@ -22,6 +23,9 @@ export function Advanced() {
 
       <SubTitle>SSH</SubTitle>
       <SshManager />
+
+      <SubTitle>Dappnode Content Provider</SubTitle>
+      <ContentProviderSelector />
 
       <SubTitle>Release trusted keys</SubTitle>
       <ReleaseTrustedKeysEditor />

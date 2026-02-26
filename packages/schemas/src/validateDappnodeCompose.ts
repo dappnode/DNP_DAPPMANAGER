@@ -14,6 +14,14 @@ function err(msg: string): void {
  * @param param0
  */
 export function validateDappnodeCompose(compose: Compose, manifest: Manifest): void {
+  // Skip validation if SKIP_COMPOSE_VALIDATION is set to true
+  if (dockerParams.SKIP_COMPOSE_VALIDATION) {
+    console.log(
+      `[WARN] Skipping compose validation for ${manifest.name} because SKIP_COMPOSE_VALIDATION is set to true`
+    );
+    return;
+  }
+
   // clean the errors
   aggregatedError = [];
   const isCore = manifest.type === "dncore";

@@ -15,6 +15,11 @@ export function fileToGatewayUrl(distributedFile?: DistributedFile): string {
   switch (distributedFile.source) {
     case "ipfs":
       return url.resolve(url.resolve(params.IPFS_REMOTE, params.IPFS_GATEWAY), normalizeHash(distributedFile.hash));
+    case "mirror": {
+      if (!distributedFile.filename || !distributedFile.packageHash) return "";
+      const base = params.CONTENT_MIRROR_BASE_URL.replace(/\/?$/, "");
+      return `${base}/${normalizeHash(distributedFile.packageHash)}/${distributedFile.filename}`;
+    }
     default:
       throw Error(`Source not supported: ${distributedFile.source}`);
   }

@@ -48,7 +48,7 @@ export function parseContainerInfo(container: ContainerInfo): PackageContainer {
     image: container.Image,
     ip: containerNetworks[params.DOCKER_PRIVATE_NETWORK_NAME]?.IPAddress,
     privateIp: containerNetworks[params.DOCKER_PRIVATE_NETWORK_NEW_NAME]?.IPAddress,
-    ports: ensureUniquePortsFromDockerApi(container.Ports, defaultPorts),
+    ports: container.Ports && ensureUniquePortsFromDockerApi(container.Ports, defaultPorts), // on MacOS docker API might return null for ports
     volumes: container.Mounts.map(
       ({ Name, Source, Destination }): VolumeMapping => ({
         host: Source, // "/var/lib/docker/volumes/nginxproxydnpdappnodeeth_vhost.d/_data",
@@ -65,7 +65,7 @@ export function parseContainerInfo(container: ContainerInfo): PackageContainer {
 
     // Additional package metadata to avoid having to read the manifest
     dependencies: labels.dependencies || {},
-    avatarUrl: labels.avatar ? multiaddressToIpfsGatewayUrl(labels.avatar) : "",
+    avatarUrl: labels.avatar ? resolveAvatarUrl(labels.avatar) : "",
     origin: labels.origin,
     chain: labels.chain,
     canBeFullnode: allowedFullnodeDnpNames.includes(dnpName),
@@ -100,11 +100,11 @@ export function parseDnpNameFromContainerName(containerName: string): string {
 }
 
 /**
- * Return a queriable gateway url for a multiaddress
- * @param multiaddress "/ipfs/Qm"
- * @returns link to fetch file "http://ipfs-gateway/Qm7763518d4"
+ * Resolves an avatar label value to a usable URL.
+ * Accepts either an IPFS multiaddress ("/ipfs/Qm...") or a plain HTTP URL.
+ * @returns A URL string that can be used to fetch the avatar image.
  */
-export function multiaddressToIpfsGatewayUrl(multiaddress: string): string {
-  const hash = normalizeHash(multiaddress);
-  return fileToGatewayUrl({ source: "ipfs", hash, size: 0 });
+export function resolveAvatarUrl(avatar: string): string {
+  if (avatar.startsWith("http")) return avatar; // Avatar URL is already an HTTP URL. Package was likely installed from mirror
+  return fileToGatewayUrl({ source: "ipfs", hash: normalizeHash(avatar), size: 0 }); // Convert IPFS multiaddress to a gateway URL.
 }

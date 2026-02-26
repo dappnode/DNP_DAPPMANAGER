@@ -29,27 +29,49 @@ import { getReleaseSignatureStatus, serializeIpfsDirectory } from "./releaseSign
 import { isEnsDomain } from "../isEnsDomain.js";
 import { dappnodeRegistry } from "./params.js";
 import { JsonRpcApiProvider } from "ethers";
+import { MirrorOptions, MirrorFileEntry, HttpMirrorProvider } from "./contentProvider/index.js";
 
 const source = "ipfs" as const;
 
+/** Discriminated union returned by listWithIpfsFallback. Avoids placeholder CIDs in the mirror path. */
+type ListResult =
+  | { source: "mirror"; files: MirrorFileEntry[]; packageCidStr: string }
+  | { source: "ipfs"; entries: IPFSEntry[]; packageCidStr: string };
+
 /**
  * The DappnodeRepository class extends ApmRepository class to provide methods to interact with the IPFS network.
- * To fetch IPFS content it uses dag endpoint for CAR content validation
+ * To fetch IPFS content it uses dag endpoint for CAR content validation.
+ *
+ * A mirror provider is always configured. Whether it is used is determined at call time by invoking
+ * isMirrorEnabled() — typically a direct read from the DB, so there is a single source of truth.
+ * When disabled, all downloads fall back to IPFS directly. When enabled, the mirror is tried first and
+ * IPFS is used as fallback. The mirror does not provide individual file CIDs, so signature verification
+ * is skipped for mirror-listed packages (signedSafe = true, signatureStatus = notSigned).
+ *
+ * Provider priority (easy to swap — search for "Provider 1" and "Provider 2"):
+ *   1. Mirror HTTP (if isMirrorEnabled())
+ *   2. IPFS fallback (dag-json listing + CAR downloads)
  *
  * @extends ApmRepository
  */
 export class DappnodeRepository extends ApmRepository {
   protected gatewayUrl: string;
   protected localIpfsUrl = "http://ipfs.dappnode:5001";
+  private readonly mirrorProvider: HttpMirrorProvider;
+  private readonly isMirrorEnabled: () => boolean;
 
   /**
-   * Constructs an instance of DappnodeRepository
-   * @param ipfsUrl - The URL of the IPFS network node.
-   * @param ethUrl - The URL of the Ethereum node to connect to.
+   * Constructs an instance of DappnodeRepository.
+   * @param ipfsUrl - The URL of the IPFS gateway.
+   * @param provider - Ethereum JSON-RPC provider for ENS/APM resolution.
+   * @param mirrorOptions - Mirror HTTP provider configuration (baseUrl, timeouts, size limits).
+   * @param isMirrorEnabled - Called before each operation to decide whether to use the mirror.
    */
-  constructor(ipfsUrl: string, provider: JsonRpcApiProvider) {
+  constructor(ipfsUrl: string, provider: JsonRpcApiProvider, mirrorOptions: MirrorOptions, isMirrorEnabled: () => boolean) {
     super(provider);
-    this.gatewayUrl = ipfsUrl.replace(/\/?$/, ""); // e.g. "https://gateway.pinata.cloud"
+    this.gatewayUrl = ipfsUrl.replace(/\/?$/, "");
+    this.mirrorProvider = new HttpMirrorProvider(mirrorOptions);
+    this.isMirrorEnabled = isMirrorEnabled;
   }
 
   /**
@@ -115,10 +137,8 @@ export class DappnodeRepository extends ApmRepository {
       version
     });
 
-    const ipfsEntries = await this.list(contentUri);
-
-    // get manifest
-    const manifest = await this.getPkgAsset<Manifest>(releaseFilesToDownload.manifest, ipfsEntries);
+    const listResult = await this.listWithIpfsFallback(contentUri);
+    const manifest = await this.getPkgAsset<Manifest>(releaseFilesToDownload.manifest, listResult);
 
     if (!manifest) throw Error(`Invalid pkg release ${contentUri}, manifest not found`);
 
@@ -126,7 +146,7 @@ export class DappnodeRepository extends ApmRepository {
   }
 
   /**
-   * Get all the assets for a request
+   * Get all the assets for a request.
    * @param param0 - Object containing package name, version and architecture
    * @returns - The release package for the request
    */
@@ -147,45 +167,54 @@ export class DappnodeRepository extends ApmRepository {
     });
     if (!isIPFS.cid(this.sanitizeIpfsPath(contentUri))) throw Error(`Invalid IPFS hash ${contentUri}`);
 
-    const ipfsEntries = await this.list(contentUri);
+    const listResult = await this.listWithIpfsFallback(contentUri);
 
     // get manifest
-    const manifest = await this.getPkgAsset<Manifest>(releaseFilesToDownload.manifest, ipfsEntries);
+    const manifest = await this.getPkgAsset<Manifest>(releaseFilesToDownload.manifest, listResult);
     // Ensure its a directory release
     if (!manifest) throw Error(`Invalid pkg release ${contentUri}, manifest not found`);
     const dnpName = manifest.name;
     const isCore = manifest.type === "dncore";
 
     // get compose
-    const compose = await this.getPkgAsset<Compose>(releaseFilesToDownload.compose, ipfsEntries);
+    const compose = await this.getPkgAsset<Compose>(releaseFilesToDownload.compose, listResult);
     if (!compose) throw Error(`Invalid pkg release ${contentUri}, compose not found`);
 
-    const signature: ReleaseSignature | undefined = await this.getPkgAsset<ReleaseSignature>(
-      releaseFilesToDownload.signature,
-      ipfsEntries
-    );
+    // Signature verification requires individual file CIDs from IPFS dag-json listing.
+    // Mirror listings have no individual CIDs, so verification is skipped.
+    // Packages sourced from the mirror are trusted by the mirror operator (signedSafe = true).
+    const signature: ReleaseSignature | undefined =
+      listResult.source === "ipfs"
+        ? await this.getPkgAsset<ReleaseSignature>(releaseFilesToDownload.signature, listResult)
+        : undefined;
 
-    const signatureStatus: ReleaseSignatureStatus = signature
-      ? getReleaseSignatureStatus(
-          manifest.name,
-          {
-            signature,
-            signedData: serializeIpfsDirectory(ipfsEntries, signature.cid)
-          },
-          trustedKeys
-        )
-      : { status: ReleaseSignatureStatusCode.notSigned };
+    const signatureStatus: ReleaseSignatureStatus =
+      listResult.source === "ipfs" && signature
+        ? getReleaseSignatureStatus(
+            manifest.name,
+            {
+              signature,
+              signedData: serializeIpfsDirectory(listResult.entries, signature.cid)
+            },
+            trustedKeys
+          )
+        : { status: ReleaseSignatureStatusCode.notSigned };
 
-    const signedSafe = signatureStatus.status === ReleaseSignatureStatusCode.signedByKnownKey;
+    const signedSafe =
+      listResult.source === "mirror"
+        ? true
+        : signatureStatus.status === ReleaseSignatureStatusCode.signedByKnownKey;
 
-    const avatarEntry = ipfsEntries.find((file) => releaseFiles.avatar.regex.test(file.name));
-    const avatarFile: DistributedFile | undefined = avatarEntry
-      ? {
-          hash: avatarEntry.cid.toString(),
-          size: avatarEntry.size,
-          source
-        }
-      : undefined;
+    // Avatar: look up by filename regex; source drives which DistributedFile shape to use
+    let avatarFile: DistributedFile | undefined;
+    if (listResult.source === "mirror") {
+      const entry = listResult.files.find((f) => releaseFiles.avatar.regex.test(f.name));
+      if (entry)
+        avatarFile = { hash: listResult.packageCidStr, size: entry.size, source: "mirror", filename: entry.name, packageHash: listResult.packageCidStr };
+    } else {
+      const entry = listResult.entries.find((e) => releaseFiles.avatar.regex.test(e.name));
+      if (entry) avatarFile = { hash: entry.cid.toString(), size: entry.size, source };
+    }
 
     return {
       dnpName,
@@ -193,73 +222,108 @@ export class DappnodeRepository extends ApmRepository {
       semVersion: manifest.version,
       isCore,
       origin,
-      imageFile: this.getImageByArch(manifest, ipfsEntries, os),
+      imageFile: this.getImageByArch(manifest, listResult, os),
       avatarFile,
       manifest,
-      setupWizard: await this.getPkgAsset(releaseFilesToDownload.setupWizard, ipfsEntries),
+      setupWizard: await this.getPkgAsset(releaseFilesToDownload.setupWizard, listResult),
       compose,
       signature,
       signatureStatus,
-      // consider adding to signedSafe !origin ||
       signedSafe,
       warnings: {
         coreFromForeignRegistry: isCore && !dnpName.endsWith(dappnodeRegistry),
         requestNameMismatch: isEnsDomain(dnpNameOrHash) && dnpNameOrHash !== dnpName
       },
-      disclaimer: await this.getPkgAsset(releaseFilesToDownload.disclaimer, ipfsEntries),
-      gettingStarted: await this.getPkgAsset(releaseFilesToDownload.gettingStarted, ipfsEntries),
-      prometheusTargets: await this.getPkgAsset(releaseFilesToDownload.prometheusTargets, ipfsEntries),
-      grafanaDashboards: await this.getPkgAsset(releaseFilesToDownload.grafanaDashboards, ipfsEntries),
-      notifications: await this.getPkgAsset(releaseFilesToDownload.notifications, ipfsEntries)
+      disclaimer: await this.getPkgAsset(releaseFilesToDownload.disclaimer, listResult),
+      gettingStarted: await this.getPkgAsset(releaseFilesToDownload.gettingStarted, listResult),
+      prometheusTargets: await this.getPkgAsset(releaseFilesToDownload.prometheusTargets, listResult),
+      grafanaDashboards: await this.getPkgAsset(releaseFilesToDownload.grafanaDashboards, listResult),
+      notifications: await this.getPkgAsset(releaseFilesToDownload.notifications, listResult)
     };
   }
 
   /**
-   * Get a given release asset for a request. It looks for an IPFS entry for
-   * a given release file given a release file config.
+   * Finds and downloads release assets matching a file config from either mirror or IPFS.
    *
-   * @param ipfsEntries - An array of IPFS entries.
-   * @param fileConfig - A file configuration.
-   * @throws - If the file is required and not found.
-   * @returns - The release package for the request or undefined if not found.
+   * @param fileConfig - Describes which file(s) to look for and how to parse them.
+   * @param listResult - The directory listing (mirror or IPFS) to search in.
+   * @throws If a required file is not found.
    */
-  public async getPkgAsset<T>(fileConfig: FileConfig, ipfsEntries: IPFSEntry[]): Promise<T | undefined> {
-    const { regex, required, multiple } = fileConfig;
-    // We filter the entries (files) so that we only consider the ones that match the regex.
-    // for example, all grafana dashboards must pass /.*grafana-dashboard.json$/ regex
-    const matchingEntries = ipfsEntries.filter((file) => regex.test(file.name));
+  public async getPkgAsset<T>(fileConfig: FileConfig, listResult: ListResult): Promise<T | undefined> {
+    const { regex, required, multiple, maxSize: maxLength, format } = fileConfig;
 
-    // Handle no matches. If the file is required, throw an error, otherwise return undefined.
-    if (matchingEntries.length === 0) {
+    // Normalize files from either source to { name, fileCid? }
+    // fileCid is only available for IPFS-listed packages (real per-file CIDs).
+    type FileRef = { name: string; fileCid?: string };
+    const allFiles: FileRef[] =
+      listResult.source === "mirror"
+        ? listResult.files.map((f) => ({ name: f.name }))
+        : listResult.entries.map((e) => ({ name: e.name, fileCid: e.cid.toString() }));
+
+    const matchingFiles = allFiles.filter((f) => regex.test(f.name));
+
+    if (matchingFiles.length === 0) {
       if (required) throw new Error(`Missing required file: ${regex}`);
       return undefined;
     }
 
-    // Process matched entries. If multiple files are allowed, and more than one file matches, we parse all of them.
-    const { maxSize: maxLength, format } = fileConfig;
     const contents = await Promise.all(
-      matchingEntries.map((entry) => this.writeFileToMemory(entry.cid.toString(), maxLength))
+      matchingFiles.map((f) => this.downloadReleaseAsset(f.name, listResult.packageCidStr, f.fileCid, maxLength))
     );
 
-    // If multiple files are allowed, we return an array of parsed assets.
-    // Otherwise, we return a single parsed asset.
     return this.parseAsset<T>(multiple ? contents : contents[0], format);
   }
 
   /**
-   * Downloads the content pointed by the given hash, parses it to UTF8 and returns it as a string.
-   * This function is intended for small files.
-   *
-   * @param hash - The content identifier (CID) of the file to download.
-   * @param maxLength - The maximum length of the file in bytes. If the downloaded file exceeds this length, an error is thrown.
-   * @returns The downloaded file content as a UTF8 string.
-   * @throws Error when the maximum size is exceeded.
-   * @see catString
-   * @see catCarReaderToMemory
+   * Fetches an IPFS file by CID into memory. Used ONLY by ipfsTest method to verify IPFS connectivity.
+   * Does not attempt mirror routing — use downloadReleaseAsset for release files.
    */
   public async writeFileToMemory(hash: string, maxLength?: number): Promise<string> {
+    const cidStr = this.sanitizeIpfsPath(hash);
     const chunks: Uint8Array[] = [];
-    const { carReader, root } = await this.getAndVerifyContentFromGateway(hash);
+    const { carReader, root } = await this.getAndVerifyContentFromGateway(cidStr);
+    const content = await this.unpackCarReader(carReader, root);
+    for await (const chunk of content) chunks.push(chunk);
+
+    let totalLength = 0;
+    chunks.forEach((chunk) => (totalLength += chunk.length));
+    const buffer = new Uint8Array(totalLength);
+    let offset = 0;
+    chunks.forEach((chunk) => {
+      buffer.set(chunk, offset);
+      offset += chunk.length;
+    });
+
+    if (maxLength && buffer.length >= maxLength) throw Error(`Maximum size ${maxLength} bytes exceeded`);
+    return new TextDecoder("utf-8").decode(buffer);
+  }
+
+  /**
+   * Downloads a release file into memory. Tries mirror first (if configured),
+   * falls back to IPFS CAR only if fileCid is provided.
+   *
+   * @param filename - Filename within the package (mirror routing).
+   * @param packageCidStr - Package directory CID (mirror routing: /{packageCidStr}/{filename}).
+   * @param fileCid - Individual file CID. Available for IPFS-listed packages only; absent for mirror-listed packages.
+   * @param maxLength - Maximum file size in bytes.
+   */
+  private async downloadReleaseAsset(filename: string, packageCidStr: string, fileCid?: string, maxLength?: number): Promise<string> {
+    // Provider 1: Mirror — try first if configured
+    if (this.isMirrorEnabled()) {
+      const mirrorCid = this.sanitizeIpfsPath(packageCidStr);
+      const result = await this.mirrorProvider.fetchFile(mirrorCid, filename, { maxBytes: maxLength });
+      if (result.status === "success") {
+        return new TextDecoder("utf-8").decode(result.bytes);
+      }
+      console.debug(`Mirror fetch failed for ${filename} (${result.reason}), ${fileCid ? "falling back to IPFS" : "no IPFS fallback available"}`);
+    }
+
+    // Provider 2: IPFS CAR — only if we have the individual file CID (not available for mirror-listed packages)
+    if (!fileCid) throw Error(`No IPFS fallback available for ${filename}: no individual file CID`);
+
+    const cidStr = this.sanitizeIpfsPath(fileCid);
+    const chunks: Uint8Array[] = [];
+    const { carReader, root } = await this.getAndVerifyContentFromGateway(cidStr);
     const content = await this.unpackCarReader(carReader, root);
     for await (const chunk of content) chunks.push(chunk);
 
@@ -275,41 +339,59 @@ export class DappnodeRepository extends ApmRepository {
 
     if (maxLength && buffer.length >= maxLength) throw Error(`Maximum size ${maxLength} bytes exceeded`);
 
-    // Convert the Uint8Array to a string
     // TODO: This assumes the data is UTF-8 encoded. If it's not, you will need a more complex conversion. Research which encoding is used by IPFS.
-    const decoder = new TextDecoder("utf-8");
-    return decoder.decode(buffer);
+    return new TextDecoder("utf-8").decode(buffer);
   }
 
   /**
    * Downloads the content pointed by the given hash and writes it directly to the filesystem.
    * This function is intended for large files, such as Docker images.
    *
+   * Provider priority:
+   *   1. Mirror — streams directly to disk (no RAM buffering) if configured and filename + packageHash are provided
+   *   2. IPFS CAR — via the configured gateway
+   *
    * IMPORTANT: This function is not supported in the browser.
    *
-   * @param args - The arguments object.
-   * @param args.hash - The content identifier (CID) of the file to download.
+   * @param args.hash - Individual file CID (used for IPFS fallback).
    * @param args.path - The path where the file will be written.
-   * @param args.timeout - The maximum time to wait for the download in milliseconds.
-   * @param args.fileSize - The expected size of the file in bytes.
-   * @param args.progress - An optional function to call with the download progress.
-   * @returns A promise that resolves when the file has been written.
-   * @throws Error when a download timeout occurs or if the provided path is invalid.
+   * @param args.timeout - Maximum time to wait for the IPFS download in milliseconds.
+   * @param args.fileSize - Expected size of the file in bytes (for IPFS progress reporting).
+   * @param args.progress - Optional function to call with the download progress.
+   * @param args.filename - Filename within the package (used for mirror URL construction).
+   * @param args.packageHash - Package directory CID (used for mirror URL: /{packageHash}/{filename}).
    */
   public async writeFileToFs({
     hash,
     path: _path,
     timeout,
     fileSize,
-    progress
+    progress,
+    filename,
+    packageHash
   }: {
     hash: string;
     path: string;
     timeout?: number;
     fileSize?: number;
     progress?: (n: number) => void;
+    filename?: string;
+    packageHash?: string;
   }): Promise<void> {
-    const { carReader, root } = await this.getAndVerifyContentFromGateway(hash);
+    const cidStr = this.sanitizeIpfsPath(hash.toString());
+
+    // Provider 1: Mirror — stream directly to disk to avoid OOM on large Docker images
+    if (this.isMirrorEnabled() && filename && packageHash) {
+      const mirrorCid = this.sanitizeIpfsPath(packageHash);
+      const result = await this.mirrorProvider.fetchFileToPath(mirrorCid, filename, _path, {
+        onProgress: progress
+      });
+      if (result.status === "success") return;
+      console.debug(`Mirror stream failed for ${filename} (${result.reason}), falling back to IPFS`);
+    }
+
+    // Provider 2: IPFS CAR — fallback (or primary when mirror is not configured)
+    const { carReader, root } = await this.getAndVerifyContentFromGateway(cidStr);
     const readable = await this.unpackCarReader(carReader, root);
 
     return new Promise((resolve, reject) => {
@@ -372,8 +454,8 @@ export class DappnodeRepository extends ApmRepository {
   }
 
   /**
-   * Lists the contents of a directory pointed by the given hash.
-   * ipfs.dag.get => reutrns `Tsize`!
+   * Lists the contents of a directory pointed by the given hash using IPFS dag-json.
+   * Returns entries with individual file CIDs (required for signature verification).
    *
    * TODO: research why the size is different, i.e for the hash QmWcJrobqhHF7GWpqEbxdv2cWCCXbACmq85Hh7aJ1eu8rn Tsize is 64461521 and size is 64446140
    *
@@ -413,8 +495,33 @@ export class DappnodeRepository extends ApmRepository {
   }
 
   /**
+   * Provider 1: Mirror JSON listing — fast, real filenames, no individual file CIDs.
+   * Provider 2: IPFS dag-json listing — real individual file CIDs (required for signature verification).
+   *
+   * Returns a discriminated union so callers never deal with placeholder CIDs.
+   * When source is "mirror", signature verification is skipped and signedSafe = true
+   * (trust delegated to the mirror operator).
+   */
+  private async listWithIpfsFallback(hash: string): Promise<ListResult> {
+    const packageCidStr = this.sanitizeIpfsPath(hash);
+
+    // Provider 1: Mirror JSON listing — real filenames, no individual file CIDs
+    if (this.isMirrorEnabled()) {
+      try {
+        const files = await this.mirrorProvider.listFiles(packageCidStr);
+        return { source: "mirror", files, packageCidStr };
+      } catch (mirrorErr) {
+        console.debug(`Mirror listing failed for ${packageCidStr}, falling back to IPFS: ${mirrorErr}`);
+      }
+    }
+
+    // Provider 2: IPFS dag-json — has real individual file CIDs
+    const entries = await this.list(hash);
+    return { source: "ipfs", entries, packageCidStr };
+  }
+
+  /**
    * Gets the content from an IPFS gateway using the given hash and verifies its integrity.
-   * The content is returned as a CAR reader and the root CID.
    *
    * @param hash - The content identifier (CID) of the content to get and verify.
    * @returns The content as a CAR reader and the root CID.
@@ -477,15 +584,15 @@ export class DappnodeRepository extends ApmRepository {
   }
 
   /**
-   * Gets an image by architecture from a set of IPFS entries.
+   * Gets an image by architecture from a ListResult (mirror or IPFS).
    * Throws an error if no image for the given architecture exists.
    *
    * @param manifest - The manifest containing information about the package.
-   * @param files - An array of IPFS entries.
+   * @param listResult - The directory listing (mirror or IPFS).
    * @param nodeArch - The architecture of the node.
    * @returns The distributed file object of the image.
    */
-  private getImageByArch(manifest: Manifest, files: IPFSEntry[], nodeArch: NodeJS.Architecture): DistributedFile {
+  private getImageByArch(manifest: Manifest, listResult: ListResult, nodeArch: NodeJS.Architecture): DistributedFile {
     let arch: Architecture;
     switch (nodeArch) {
       case "arm":
@@ -501,27 +608,42 @@ export class DappnodeRepository extends ApmRepository {
     }
 
     const { name, version } = manifest;
-    const imageAsset =
-      files.find((file) => file.name === this.getImageName(name, version, arch)) ||
-      (arch === defaultArch
-        ? // New DAppNodes should load old single arch packages,
-          // and consider their single image as amd64
-          files.find((file) => file.name === this.getLegacyImageName(name, version))
-        : undefined);
-
-    if (!imageAsset) {
-      throw Error(
+    const missingImageError = (): Error =>
+      Error(
         `No image for architecture '${nodeArch}'. ${
-          manifest.architectures && manifest.architectures.includes(arch)
-            ? `image for ${arch} is missing in release`
-            : undefined
+          manifest.architectures && manifest.architectures.includes(arch) ? `image for ${arch} is missing in release` : undefined
         }`
       );
-    } else {
+
+    if (listResult.source === "mirror") {
+      const imageFile =
+        listResult.files.find((f) => f.name === this.getImageName(name, version, arch)) ||
+        (arch === defaultArch
+          ? // New DAppNodes should load old single arch packages, and consider their single image as amd64
+            listResult.files.find((f) => f.name === this.getLegacyImageName(name, version))
+          : undefined);
+
+      if (!imageFile) throw missingImageError();
       return {
-        hash: imageAsset.cid.toString(),
-        size: imageAsset.size,
-        source // TODO: consdier adding different sources
+        hash: listResult.packageCidStr, // placeholder; actual routing uses packageHash + filename
+        size: imageFile.size,
+        source: "mirror",
+        filename: imageFile.name,
+        packageHash: listResult.packageCidStr
+      };
+    } else {
+      const imageEntry =
+        listResult.entries.find((e) => e.name === this.getImageName(name, version, arch)) ||
+        (arch === defaultArch
+          ? // New DAppNodes should load old single arch packages, and consider their single image as amd64
+            listResult.entries.find((e) => e.name === this.getLegacyImageName(name, version))
+          : undefined);
+
+      if (!imageEntry) throw missingImageError();
+      return {
+        hash: imageEntry.cid.toString(),
+        size: imageEntry.size,
+        source
       };
     }
   }
@@ -578,7 +700,7 @@ export class DappnodeRepository extends ApmRepository {
    * @param ipfsPath - The IPFS path to sanitize.
    * @returns The sanitized IPFS path.
    */
-  private sanitizeIpfsPath(ipfsPath: string): string {
+  protected sanitizeIpfsPath(ipfsPath: string): string {
     if (ipfsPath.includes("ipfs")) return ipfsPath.replace("/ipfs/", "");
     return ipfsPath;
   }

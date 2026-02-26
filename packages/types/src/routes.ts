@@ -56,6 +56,12 @@ import { TrustedReleaseKey } from "./pkg.js";
 import { OptimismConfigSet, OptimismConfigGet } from "./rollups.js";
 import { Network, StakerConfigGet, StakerConfigSet } from "./stakers.js";
 import { BeaconBackupActivationParams, BeaconBackupNetworkStatus } from "./beaconBackup.js";
+import {
+  DashboardSupportedNetwork,
+  NodeStatusByNetwork,
+  SignerStatus,
+  ValidatorsNetworkData
+} from "./stakingDashboard.js";
 
 export interface Routes {
   /**
@@ -138,6 +144,14 @@ export interface Routes {
    * @param network Network to get the consensus client for
    */
   consensusClientsGetByNetworks: (kwargs: {
+    networks: Network[];
+  }) => Promise<Partial<Record<Network, string | null | undefined>>>;
+
+  /**
+   * Returns the execution client for a given network
+   * @param network Network to get the execution client for
+   */
+  executionClientsGetByNetworks: (kwargs: {
     networks: Network[];
   }) => Promise<Partial<Record<Network, string | null | undefined>>>;
 
@@ -261,6 +275,11 @@ export interface Routes {
     notificationPayload: NotificationPayload;
     subscriptionEndpoint?: string;
   }): Promise<void>;
+
+  /**
+   * Returns the node status for the given networks
+   */
+  nodeStatusGetByNetwork(kwargs: { networks: DashboardSupportedNetwork[] }): Promise<NodeStatusByNetwork>;
 
   /**
    * Get all the notifications
@@ -396,6 +415,16 @@ export interface Routes {
    * Gets the Ipfs client target
    */
   ipfsClientTargetGet(): Promise<IpfsRepository>;
+
+  /**
+   * Gets the mirror content provider enabled status
+   */
+  mirrorProviderGet(): Promise<{ enabled: boolean }>;
+
+  /**
+   * Enables or disables the mirror content provider
+   */
+  mirrorProviderSet(kwargs: { enabled: boolean }): Promise<void>;
 
   /**
    * Returns the keystores imported for the given networks.
@@ -759,6 +788,11 @@ export interface Routes {
   updateUpgrade: () => Promise<string>;
 
   /**
+   * Returns the signer status of the provided networks
+   */
+  signerByNetworkGet: (kwargs: { networks: Network[] }) => Promise<Partial<Record<Network, SignerStatus>>>;
+
+  /**
    * Return the current SSH port from sshd
    */
   sshPortGet: () => Promise<number>;
@@ -795,6 +829,15 @@ export interface Routes {
   validatorsFilterActiveByNetwork(kwargs: {
     networks: Network[];
   }): Promise<Partial<Record<Network, { validators: string[]; beaconError?: Error } | null>>>;
+
+  /**
+   * Combined endpoint: returns active validators, attesting validators, and balances
+   * in a single call per network, minimizing beacon chain API requests.
+   * @param networks List of networks
+   */
+  validatorsDataByNetwork: (kwargs: {
+    networks: Network[];
+  }) => Promise<Partial<Record<Network, ValidatorsNetworkData>>>;
 
   /**
    * Removes a docker volume by name
@@ -852,6 +895,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   stakerConfigGet: {},
   stakerConfigSet: { log: true },
   consensusClientsGetByNetworks: {},
+  executionClientsGetByNetworks: {},
   dappnodeWebNameSet: { log: true },
   deviceAdd: { log: true },
   deviceAdminToggle: { log: true },
@@ -872,6 +916,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   fetchDirectory: {},
   fetchRegistry: {},
   fetchDnpRequest: {},
+  nodeStatusGetByNetwork: {},
   notificationsSendCustom: {},
   notificationsGetAll: {},
   notificationsGetBanner: {},
@@ -899,6 +944,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   ipfsTest: {},
   ipfsClientTargetSet: {},
   ipfsClientTargetGet: {},
+  mirrorProviderGet: {},
+  mirrorProviderSet: {},
   keystoresGetByNetwork: { log: true },
   localProxyingEnableDisable: { log: true },
   localProxyingStatusGet: {},
@@ -948,6 +995,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   releaseTrustedKeyRemove: { log: true },
   setShouldShownSmooth: {},
   getShouldShowSmooth: {},
+  signerByNetworkGet: {},
   setStaticIp: { log: true },
   statsCpuGet: {},
   statsDiskGet: {},
@@ -964,7 +1012,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   updateUpgrade: { log: true },
   natRenewalEnable: {},
   natRenewalIsEnabled: {},
-  validatorsFilterActiveByNetwork: { log: true },
+  validatorsFilterActiveByNetwork: {},
+  validatorsDataByNetwork: {},
   volumeRemove: { log: true },
   volumesGet: {},
   ipPublicGet: {},

@@ -1,6 +1,7 @@
 import React from "react";
 import Button from "components/Button";
 import { Card } from "react-bootstrap";
+import SubTitle from "components/SubTitle";
 
 export const ActivateCard = ({
   timeLeft,
@@ -17,11 +18,11 @@ export const ActivateCard = ({
 }) => (
   <Card className="action-backup-card">
     <div className="action-backup-col">
-      <h5>Backup Node Status</h5>
+      <SubTitle>Backup Node Status</SubTitle>
       <h5 className="backup-status blue-text">Available</h5>
     </div>
     <div className="action-backup-col">
-      <h5>Available time remaining</h5>
+      <SubTitle>Available time remaining</SubTitle>
       <div className="countdown-time">{timeLeft}</div>
     </div>
     <div className="action-backup-col">
