@@ -34,8 +34,6 @@ export default function SystemInfo() {
 
   return (
     <>
-      <SystemHealth />
-
       <SubTitle>Volumes</SubTitle>
       <VolumesGrid />
     </>
