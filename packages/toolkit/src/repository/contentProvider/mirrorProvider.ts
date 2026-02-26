@@ -45,7 +45,6 @@ export class HttpMirrorProvider implements MirrorProvider {
       const response = await fetch(url, { signal: controller.signal });
       if (!response.ok) throw new Error(`Mirror listing failed: http_${response.status}`);
       const json = (await response.json()) as Array<{ name: string; size: number }>;
-      console.debug(`Mirror listed ${json.length} files for ${cid}`);
       return json.map((entry) => ({ name: entry.name, size: entry.size }));
     } finally {
       clearTimeout(timeoutId);
@@ -65,7 +64,6 @@ export class HttpMirrorProvider implements MirrorProvider {
       const response = await fetch(url, { signal: controller.signal });
 
       if (!response.ok) {
-        console.debug(`Mirror fetch failed for ${filename}: http_${response.status}`);
         return { status: "failed", reason: `http_${response.status}` };
       }
 
@@ -87,11 +85,9 @@ export class HttpMirrorProvider implements MirrorProvider {
         return { status: "failed", reason: "file_too_large" };
       }
 
-      console.debug(`Mirror fetched ${filename} (${bytes.length} bytes)`);
       return { status: "success", bytes };
     } catch (error) {
       const message = error instanceof Error ? error.message : "unknown_error";
-      console.debug(`Mirror fetch error for ${filename}: ${message}`);
       return { status: "failed", reason: message };
     } finally {
       clearTimeout(timeoutId);
@@ -111,7 +107,6 @@ export class HttpMirrorProvider implements MirrorProvider {
       const response = await fetch(url, { signal: controller.signal });
 
       if (!response.ok) {
-        console.debug(`Mirror stream failed for ${filename}: http_${response.status}`);
         return { status: "failed", reason: `http_${response.status}` };
       }
 
@@ -155,7 +150,6 @@ export class HttpMirrorProvider implements MirrorProvider {
       }
 
       if (options.onProgress) options.onProgress(100);
-      console.debug(`Mirror streamed ${filename} to ${destPath}`);
       return { status: "success" };
     } catch (error) {
       // Clean up partial file on error
