@@ -101,31 +101,6 @@ export function useStakerModals({ network, isExecutionChanged, isSignerSelected 
     return accepted;
   }
 
-  /**
-   * Orchestrates all required modals for the configuration flow
-   * This is the main function to call when you need user approval for config changes
-   *
-   * @param isLaunchpad - Whether this is being called from the launchpad flow
-   * @returns true if user approved all steps, false if they aborted
-   */
-  async function modalsFlowStart(isLaunchpad: boolean): Promise<boolean> {
-    // Step 1: Premium modals
-    const userApprovedPremium = await displayPremiumModals();
-    if (!userApprovedPremium) {
-      return false;
-    }
-
-    // Step 2: Show disclaimer (unless coming from launchpad)
-    if (!isLaunchpad) {
-      const userAcceptedDisclaimer = await displayDisclaimerModal();
-      if (!userAcceptedDisclaimer) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
   return {
     // Non-premium modal UI state
     nonPremiumModalShow: showNonPremiumModal,
@@ -136,7 +111,7 @@ export function useStakerModals({ network, isExecutionChanged, isSignerSelected 
     // Disclaimer modal UI state
     disclaimerModalShow: showDisclaimerModal,
     disclaimerModalOnClose: handleDisclaimerModalClose,
-    // Main flow function
-    modalsFlowStart
+    displayPremiumModals,
+    displayDisclaimerModal
   };
 }

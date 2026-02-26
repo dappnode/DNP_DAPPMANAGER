@@ -8,11 +8,12 @@ import {
   subPaths as premiumSubPaths
 } from "pages/premium/data";
 import { premiumLanding } from "params";
+import { Network } from "@dappnode/types";
 
 // Export the disclaimer modal
 export { StakerDisclaimerModal } from "./StakerDisclaimerModal";
 
-interface UpgradeToPremiumModal {
+interface UpgradeToPremiumModalProps {
   show: boolean;
   onClose: (shouldContinue: boolean) => void;
 }
@@ -24,7 +25,7 @@ interface UpgradeToPremiumModal {
  *
  */
 
-export function UpgradeToPremiumModal({ show, onClose }: UpgradeToPremiumModal) {
+export function UpgradeToPremiumModal({ show, onClose }: UpgradeToPremiumModalProps) {
   const navigate = useNavigate();
 
   const navigateToPremiumTab = () => {
@@ -58,16 +59,17 @@ export function UpgradeToPremiumModal({ show, onClose }: UpgradeToPremiumModal) 
  * It reminds the user that they have backup protection available
  */
 
-interface NonPremiumUserModalProps {
+interface ActivateBackupModalProps {
   show: boolean;
   onClose: (shouldContinue: boolean) => void;
+  network: Network;
 }
 
-export function ActivateBackupModal({ show, onClose }: NonPremiumUserModalProps) {
+export function ActivateBackupModal({ show, onClose, network }: ActivateBackupModalProps) {
   const navigate = useNavigate();
 
   const navigateToBackupTab = () => {
-    navigate(`/${premiumBasePath}/${premiumSubPaths.backupNode}`);
+    navigate(`/${premiumBasePath}/${premiumSubPaths.backupNode}/${network === Network.Mainnet ? "ethereum" : network}`);
     onClose(false); // Abort the flow
   };
 

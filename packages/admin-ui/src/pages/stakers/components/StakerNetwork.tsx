@@ -66,7 +66,8 @@ export default function StakerNetwork({ network, description }: { network: Netwo
     premiumModalOnClose,
     disclaimerModalShow,
     disclaimerModalOnClose,
-    modalsFlowStart
+    displayPremiumModals,
+    displayDisclaimerModal
   } = useStakerModals({
     network,
     isExecutionChanged,
@@ -76,19 +77,20 @@ export default function StakerNetwork({ network, description }: { network: Netwo
   /**
    * Set new staker config
    */
-  async function setNewConfig(isLaunchpad: boolean) {
+  async function setNewConfig() {
     let showToast = false;
     try {
       // Make sure there are changes
       if (changes) {
         // Request user input through all required modals
-        const userApproved = await modalsFlowStart(isLaunchpad);
+        const userApproved = await displayDisclaimerModal();
         if (!userApproved) {
           return; // User aborted the flow
         }
 
         // Apply the configuration changes
         setReqStatus({ loading: true });
+        displayPremiumModals();
         await withToast(
           () =>
             // Omit metadata to be sent back to the backend
@@ -108,6 +110,7 @@ export default function StakerNetwork({ network, description }: { network: Netwo
             onError: `Error setting new staker configuration`
           }
         );
+
         setReqStatus({ result: true });
         showToast = true;
       }
@@ -131,7 +134,7 @@ export default function StakerNetwork({ network, description }: { network: Netwo
     <div className="staker-network-container">
       {/* Modals */}
       <UpgradeToPremiumModal show={nonPremiumModalShow} onClose={nonPremiumModalOnClose} />
-      <ActivateBackupModal show={premiumModalShow} onClose={premiumModalOnClose} />
+      <ActivateBackupModal show={premiumModalShow} onClose={premiumModalOnClose} network={network} />
       <StakerDisclaimerModal show={disclaimerModalShow} onClose={disclaimerModalOnClose} />
 
       {network === Network.Prater && (
@@ -267,7 +270,7 @@ export default function StakerNetwork({ network, description }: { network: Netwo
                 <Button
                   variant="dappnode"
                   disabled={!changes.isAllowed || reqStatus.loading}
-                  onClick={() => setNewConfig(false)}
+                  onClick={() => setNewConfig()}
                 >
                   Apply changes
                 </Button>
