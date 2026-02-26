@@ -206,6 +206,19 @@ register.registerMetric(
   })
 );
 
+// Mirror content provider enabled or disabled
+register.registerMetric(
+  new client.Gauge({
+    name: "dappmanager_mirror_content_provider",
+    help: "Whether the Dappnode mirror content provider is enabled (1) or disabled (0)",
+    labelNames: ["mirrorContentProvider"],
+    collect() {
+      const enabled = db.mirrorProviderEnabled.get();
+      this.set({ mirrorContentProvider: "enabled" }, enabled ? 1 : 0);
+    }
+  })
+);
+
 // Add a default label which is added to all metrics
 register.setDefaultLabels({
   app: "dappmanager-custom-metrics"
