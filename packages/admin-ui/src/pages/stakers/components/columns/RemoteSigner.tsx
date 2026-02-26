@@ -14,19 +14,23 @@ export default function RemoteSigner({
   signer,
   setNewWeb3signer,
   isSelected,
+  isDisabled,
   ...props
 }: {
   signer: StakerItem;
   setNewWeb3signer: React.Dispatch<React.SetStateAction<StakerItemOk | null>>;
   isSelected: boolean;
+  isDisabled?: boolean;
 }) {
   const navigate = useNavigate();
 
   return (
-    <Card {...props} className={`remote-signer ${joinCssClass({ isSelected })}`} shadow={isSelected}>
+    <Card {...props} className={`remote-signer ${joinCssClass({ isSelected, isDisabled })}`} shadow={isSelected}>
       <div
         onClick={
-          signer.status === "ok"
+          isDisabled
+            ? undefined
+            : signer.status === "ok"
             ? isSelected
               ? () => setNewWeb3signer(null)
               : () => setNewWeb3signer(signer)
