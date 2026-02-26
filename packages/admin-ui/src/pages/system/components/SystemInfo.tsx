@@ -4,7 +4,6 @@ import { useApi } from "api";
 import VolumesGrid from "./VolumesGrid";
 // Components
 import SubTitle from "components/SubTitle";
-import SystemHealth from "pages/dashboard/components/SystemHealth";
 
 export default function SystemInfo() {
   const cpuStats = useApi.statsCpuGet();
