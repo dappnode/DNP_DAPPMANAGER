@@ -208,7 +208,7 @@ export class DappnodeInstaller extends DappnodeRepository {
     avatarFile: DistributedFile | undefined,
     origin?: string
   ): Compose {
-    const customCompose = new ComposeEditor(setDappnodeComposeDefaults(compose, manifest));
+    const customCompose = new ComposeEditor(setDappnodeComposeDefaults(compose, manifest), { dnpName: manifest.name });
 
     const services = Object.values(customCompose.services());
     const globalEnvsFromDbPrefixed = computeGlobalEnvsFromDb(true);
