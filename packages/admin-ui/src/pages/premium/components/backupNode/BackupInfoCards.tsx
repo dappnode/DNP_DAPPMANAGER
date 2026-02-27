@@ -60,7 +60,7 @@ export const ConsensusCard = ({
                   <Link to={stakersPath}> Stakers tab</Link>.
                 </div>
               ) : (
-                <div> Compatible client selected </div>
+                <div> Compatible client selected. Prysm and Teku not supported. </div>
               )}
             </div>
           </div>

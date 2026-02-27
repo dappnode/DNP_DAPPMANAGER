@@ -8,7 +8,7 @@ import { Network } from "@dappnode/types";
 import { SectionNavigator } from "components/SectionNavigator";
 import SwitchText from "components/SwitchText";
 import { RouteType } from "types";
-import { useFilterStakersNetworks } from "hooks/useFilterStakersNetworks";
+import { useFilterStakersNetworks } from "hooks/stakers/useFilterStakersNetworks";
 
 const availableRoutes: RouteType[] = [
   {
