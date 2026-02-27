@@ -218,6 +218,7 @@ export default function StakerNetwork({ network, description }: { network: Netwo
                     executionClient={executionClient}
                     setNewExecClient={setNewExecClient}
                     isSelected={executionClient.dnpName === newExecClient?.dnpName}
+                    isDisabled={reqStatus.loading}
                   />
                 ))}
               </Col>
@@ -232,6 +233,7 @@ export default function StakerNetwork({ network, description }: { network: Netwo
                       consensusClient={consensusClient}
                       setNewConsClient={setNewConsClient}
                       isSelected={consensusClient.dnpName === newConsClient?.dnpName}
+                      isDisabled={reqStatus.loading}
                     />
                   ))}
                 </Col>
@@ -245,6 +247,7 @@ export default function StakerNetwork({ network, description }: { network: Netwo
                     signer={currentStakerConfigReq.data.web3Signer}
                     setNewWeb3signer={setNewWeb3signer}
                     isSelected={Boolean(newWeb3signer)}
+                    isDisabled={reqStatus.loading}
                   />
                 </Col>
               )}
@@ -260,6 +263,7 @@ export default function StakerNetwork({ network, description }: { network: Netwo
                       newRelays={newRelays}
                       setNewRelays={setNewRelays}
                       isSelected={currentStakerConfigReq.data.mevBoost.dnpName === newMevBoost?.dnpName}
+                      isDisabled={reqStatus.loading}
                     />
                   </Col>
                 )}
