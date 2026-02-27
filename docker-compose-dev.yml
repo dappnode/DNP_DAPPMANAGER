@@ -45,5 +45,3 @@ services:
       dnpublic_network:
         aliases:
           - dappmanager.external
-    logging:
-      driver: journald

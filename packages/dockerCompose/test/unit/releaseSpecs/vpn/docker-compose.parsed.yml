@@ -4,7 +4,10 @@ services:
     container_name: DAppNodeCore-vpn.dnp.dappnode.eth
     image: "vpn.dnp.dappnode.eth:0.2.5"
     logging:
-      driver: journald
+      driver: json-file
+      options:
+        max-file: "3"
+        max-size: 10m
     networks:
       dncore_network:
         aliases:

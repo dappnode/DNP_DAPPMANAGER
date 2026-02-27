@@ -153,6 +153,40 @@ describe("setDappnodeComposeDefaults", () => {
     expect(composeWithDefaults).to.deep.equal(expectedCompose);
   });
 
+  it("Should override any package-provided logging config", () => {
+    const compose: Compose = {
+      version: "3.5",
+      services: {
+        serviceA: {
+          image: "some.image:1.0.0",
+          logging: {
+            driver: "journald",
+            options: {
+              tag: "do-not-keep"
+            }
+          }
+        }
+      }
+    };
+
+    const manifest: Manifest = {
+      name: "some.dnp.dappnode.eth",
+      version: "1.0.0",
+      description: "Test package",
+      type: "service",
+      architectures: ["linux/amd64"],
+      author: "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
+      license: "GPL-3.0"
+    };
+
+    const composeWithDefaults = setDappnodeComposeDefaults(compose, manifest);
+
+    expect(composeWithDefaults.services.serviceA.logging).to.deep.equal({
+      driver: "json-file",
+      options: { "max-size": "10m", "max-file": "3" }
+    });
+  });
+
   it("Should set dappnode defaults to a validated compose from a core package", () => {
     const compose: Compose = {
       version: "3.5",

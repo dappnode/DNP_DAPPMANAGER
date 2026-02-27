@@ -30,6 +30,16 @@ export function setDappnodeComposeDefaults(composeUnsafe: Compose, manifest: Man
     services: mapValues(composeUnsafe.services, (serviceUnsafe, serviceName) => {
       return sortServiceKeys({
         // OVERRIDABLE VALUES: values that in case of not been set, it will take the following values
+        restart: "unless-stopped",
+
+        // SAFE KEYS: values that are whitelisted
+        ...pick(
+          serviceUnsafe,
+          dockerComposeSafeKeys.filter((safeKey) => safeKey !== "build" && safeKey !== "logging")
+        ),
+
+        // MANDATORY VALUES: values that will be overwritten with dappnode defaults
+        // Force `json-file` and prevent packages from injecting journald logging.
         logging: {
           driver: "json-file",
           options: {
@@ -37,15 +47,6 @@ export function setDappnodeComposeDefaults(composeUnsafe: Compose, manifest: Man
             "max-file": "3"
           }
         },
-        restart: "unless-stopped",
-
-        // SAFE KEYS: values that are whitelisted
-        ...pick(
-          serviceUnsafe,
-          dockerComposeSafeKeys.filter((safeKey) => safeKey !== "build")
-        ),
-
-        // MANDATORY VALUES: values that will be overwritten with dappnode defaults
         container_name: getContainerName({ dnpName, serviceName, isCore }),
         image: getImageTag({ serviceName, dnpName, version }),
         environment: parseEnvironment(serviceUnsafe.environment || {}),

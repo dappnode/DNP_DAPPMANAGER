@@ -32,5 +32,3 @@ services:
           - dappmanager.dappnode
           - my.dappnode
           - dappnode.local
-    logging:
-      driver: journald
