@@ -18,6 +18,11 @@ describe("verify compose", () => {
     expect(() => verifyCompose(compose)).to.throw("variable substitution not allowed");
   });
 
+  it("Should not throw if compose contains variable substitution for dappmanager", () => {
+    const compose = getTestCompose({ environment: { PORT: "${PORT}" } });
+    expect(() => verifyCompose(compose, true)).to.not.throw();
+  });
+
   it("Should not throw with a regular compose", () => {
     const compose = getTestCompose({ environment: { PORT: "8000" } });
     expect(() => verifyCompose(compose)).to.not.throw();

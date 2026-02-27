@@ -13,6 +13,7 @@ import { startRepositoryHealthDaemon } from "./repositoryHealth/index.js";
 import { setMaxListeners } from "events"; // Import setMaxListeners
 import { startDockerNetworkConfigsDaemon } from "./dockerNetworkConfigs/index.js";
 import { Consensus, Execution, MevBoost, Signer } from "@dappnode/stakers";
+import { params } from "@dappnode/params";
 
 // DAEMONS EXPORT
 
@@ -36,7 +37,7 @@ export function startDaemons(
   startTelegramBotDaemon();
   startBindDaemon(signal);
   startInternetConnectionDaemon(signal);
-  startHostRebootDaemon(signal);
+  if (!params.DISABLE_HOST_SCRIPTS) startHostRebootDaemon(signal);
   startRepositoryHealthDaemon(signal);
   startDockerNetworkConfigsDaemon(signal, execution, consensus, signer, mevBoost);
 }
