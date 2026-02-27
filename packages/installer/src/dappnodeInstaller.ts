@@ -46,7 +46,12 @@ export function getIpfsUrl(): string {
 
 export class DappnodeInstaller extends DappnodeRepository {
   constructor(ipfsUrl: string, provider: JsonRpcApiProvider) {
-    super(ipfsUrl, provider);
+    super(
+      ipfsUrl,
+      provider,
+      { baseUrl: params.CONTENT_MIRROR_BASE_URL, timeoutMs: params.CONTENT_MIRROR_TIMEOUT_MS, maxBytes: params.CONTENT_MIRROR_MAX_BYTES },
+      () => db.mirrorProviderEnabled.get()
+    );
   }
 
   private async updateProviders(): Promise<void> {
@@ -245,7 +250,8 @@ export class DappnodeInstaller extends DappnodeRepository {
     if (!distributedFile || !distributedFile.hash) return "";
 
     if (distributedFile.source === "ipfs") return `/ipfs/${this.normalizeHash(distributedFile.hash)}`;
-    else return "";
+    if (distributedFile.source === "mirror") return fileToGatewayUrl(distributedFile); // full HTTP URL; resolveAvatarUrl handles it
+    return "";
   }
 
   /**

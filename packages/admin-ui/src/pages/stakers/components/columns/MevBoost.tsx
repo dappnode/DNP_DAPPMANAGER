@@ -26,6 +26,7 @@ export default function MevBoost({
   newRelays,
   setNewRelays,
   isSelected,
+  isDisabled,
   ...props
 }: {
   network: Network;
@@ -35,14 +36,17 @@ export default function MevBoost({
   newRelays: string[];
   setNewRelays: React.Dispatch<React.SetStateAction<string[]>>;
   isSelected: boolean;
+  isDisabled?: boolean;
 }) {
   const navigate = useNavigate();
 
   return (
-    <Card {...props} className={`mev-boost ${joinCssClass({ isSelected })}`} shadow={isSelected}>
+    <Card {...props} className={`mev-boost ${joinCssClass({ isSelected, isDisabled })}`} shadow={isSelected}>
       <div
         onClick={
-          mevBoost.status === "ok"
+          isDisabled
+            ? undefined
+            : mevBoost.status === "ok"
             ? isSelected
               ? () => setNewMevBoost(null)
               : () => setNewMevBoost(mevBoost)
@@ -232,13 +236,6 @@ const getDefaultRelays = (network: Network): RelayIface[] => {
           docs: "https://aestus.live/",
           url:
             "https://0xa15b52576bcbf1072f4a011c0f99f9fb6c66f3e1ff321f11f461d15e31b1cb359caa092c71bbded0bae5b5ea401aab7e@aestus.live"
-        },
-        {
-          operator: "Manifold",
-          ofacCompliant: false,
-          docs: "https://kb.manifoldfinance.com/",
-          url:
-            "https://0x98650451ba02064f7b000f5768cf0cf4d4e492317d82871bdc87ef841a0743f69f0f1eea11168503240ac35d101c9135@mainnet-relay.securerpc.com"
         }
       ];
     case "prater":

@@ -58,16 +58,16 @@ export const params = {
   // Host script paths
   HOST_SCRIPTS_DIR_FROM_HOST: path.join(HOST_HOME, "DNCORE/scripts/host"),
   HOST_SCRIPTS_DIR: "DNCORE/scripts/host",
-  HOST_SCRIPTS_SOURCE_DIR: process.env.TEST ? "/app/packages/hostScriptsServices/hostScripts" : "hostScripts",
+  HOST_SCRIPTS_SOURCE_DIR: "hostScripts",
   // Host services paths
   HOST_SERVICES_DIR_FROM_HOST: path.join(HOST_HOME, "DNCORE/services/host"),
   HOST_SYSTEMD_DIR_FROM_HOST: "/etc/systemd/system",
   HOST_SERVICES_DIR: "DNCORE/services/host",
-  HOST_SERVICES_SOURCE_DIR: process.env.TEST ? "/app/packages/hostScriptsServices/hostServices" : "hostServices",
+  HOST_SERVICES_SOURCE_DIR: "hostServices",
   // Host timer paths
   HOST_TIMERS_DIR_FROM_HOST: path.join(HOST_HOME, "DNCORE/timers/host"),
   HOST_TIMERS_DIR: "DNCORE/timers/host",
-  HOST_TIMERS_SOURCE_DIR: process.env.TEST ? "/app/packages/hostScriptsServices/hostTimers" : "hostTimers",
+  HOST_TIMERS_SOURCE_DIR: "hostTimers",
   // Local fallback versions, to be able to install and eth client without connecting to remote
   FALLBACK_VERSIONS_PATH: path.join(DNCORE_DIR, "packages-content-hash.csv"),
   // Version data file, created in the docker image build process
@@ -170,6 +170,10 @@ export const params = {
   IPFS_LOCAL: "http://ipfs.dappnode:8080",
   IPFS_REMOTE: "https://ipfs-gateway.dappnode.net",
 
+  // Mirror content provider
+  CONTENT_MIRROR_BASE_URL: "https://packages.dappnode.net",
+  CONTENT_MIRROR_TIMEOUT_MS: 30 * MINUTE,
+  CONTENT_MIRROR_MAX_BYTES: 20 * 1024 * 1024 * 1024, // 20 GB
   // Web3 parameters
   ETH_MAINNET_RPC_URL_REMOTE: process.env.ETH_MAINNET_RPC_URL_REMOTE || "https://web3.dappnode.net",
   ETH_MAINNET_CHECKPOINTSYNC_URL_REMOTE: "https://checkpoint-sync.dappnode.net",
