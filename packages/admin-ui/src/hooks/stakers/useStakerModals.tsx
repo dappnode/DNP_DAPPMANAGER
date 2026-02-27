@@ -24,7 +24,7 @@ export function useStakerModals({ network, isExecutionChanged, isSignerSelected 
   const disclaimerModalResolveRef = useRef<((value: boolean) => void) | null>(null);
 
   /**
-   * Handles the premium modal close action
+   * Handles the non-premium modal close action
    */
   const handleNonPremiumModalClose = (shouldContinue: boolean) => {
     setShowNonPremiumModal(false);
@@ -35,7 +35,7 @@ export function useStakerModals({ network, isExecutionChanged, isSignerSelected 
   };
 
   /**
-   * Handles the non-premium modal close action
+   * Handles the premium modal close action
    */
   const handlePremiumModalClose = (shouldContinue: boolean) => {
     setShowPremiumModal(false);

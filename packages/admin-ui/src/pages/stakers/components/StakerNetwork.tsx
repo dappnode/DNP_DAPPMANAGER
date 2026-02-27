@@ -56,7 +56,7 @@ export default function StakerNetwork({ network, description }: { network: Netwo
     newExecClient?.dnpName !==
     currentStakerConfigReq.data?.executionClients.find((ec) => ec.status === "ok" && ec.isSelected)?.dnpName;
 
-  const isSignerSelected = Boolean(newWeb3signer?.isSelected);
+  const isSignerSelected = Boolean(newWeb3signer);
 
   // Configuration flow with modals
   const {
