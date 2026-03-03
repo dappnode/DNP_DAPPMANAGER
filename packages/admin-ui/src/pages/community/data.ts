@@ -15,7 +15,8 @@ export const communityTypes: CommunityItem[] = [
     title: "Discord",
     icon: FaDiscord,
     actions: [DiscordActions],
-    text: "DAppNode has a vibrant community. You can get support, share your experience, and just hang out with other Node Runners in our Discord Server"
+    text:
+      "DAppNode has a vibrant community. You can get support, share your experience, and just hang out with other Node Runners in our Discord Server"
   },
   {
     subPath: "gitcoin",
@@ -29,7 +30,8 @@ export const communityTypes: CommunityItem[] = [
     title: "Discourse",
     icon: FaDiscourse,
     actions: [DiscourseActions],
-    text: "How-tos, Deep Dives, support questions… our Forum is the place where information that shouldn’t be lost in a chat should go!"
+    text:
+      "How-tos, Deep Dives, support questions… our Forum is the place where information that shouldn’t be lost in a chat should go!"
   },
   {
     subPath: "github",

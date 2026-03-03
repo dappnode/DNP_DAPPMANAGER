@@ -74,7 +74,7 @@ export const dappnodeForumUrl = "https://forum.dappnode.io";
 export const topicBaseUrl = `https://forum.dappnode.io/new-topic`;
 export const discordInviteUrl = "https://discord.gg/dappnode";
 // zkEvm
-export const packageInfoPath = `/packages/my/${zkevmDnpName}/info`;
+export const packageInfoPath = `/staking/packages/my/${zkevmDnpName}/info`;
 export const zkevmUiUrl = "http://ui.zkevm-tokens-withdrawal.dappnode/";
 
 export const sdkPublishAppUrl = "https://dappnode.github.io/sdk-publish/";

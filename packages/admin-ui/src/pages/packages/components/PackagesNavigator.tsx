@@ -45,7 +45,7 @@ export const PackagesNavigator: React.FC = () => {
   ];
 
   // Hide navbar when in a package detail view
-  const scopePath: string = "/packages/:scope";
+  const scopePath: string = "/staking/packages/:scope";
   const match = useMatch({ path: scopePath, end: true });
   const isBaseSubpath = !!match && routesForNavbar.some((r) => r.link === (match.params?.scope ?? ""));
 

@@ -16,6 +16,8 @@ import "./dappnode_styles.scss";
 import "./dappnode_colors.scss";
 import "./light_dark.scss";
 import "./layout.scss";
+// Tailwind CSS v4 — isolated, prefixed, no preflight
+import "./styles/tailwind.css";
 import { PwaInstallProvider } from "pages/system/components/App/PwaInstallContext";
 
 // This process.env. vars will be substituted at build time
