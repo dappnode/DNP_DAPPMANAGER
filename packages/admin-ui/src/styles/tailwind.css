@@ -9,5 +9,5 @@
 /* Tailwind utilities only */
 @import "tailwindcss/utilities.css" layer(utilities) prefix(tw) source(none);
 
-/* Restrict Tailwind scanning to new UI folders only */
-@source "../pages-new/**/*.tsx";
+/* Scan all tsx files under src for tw: classes */
+@source "../**/*.tsx";

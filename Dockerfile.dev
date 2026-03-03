@@ -21,7 +21,7 @@ ENV COMPOSE_HTTP_TIMEOUT=300 \
 WORKDIR /app
 
 RUN apk update && apk add --no-cache docker curl docker-cli-compose xz zip unzip libltdl bash git bind bind-tools bind-dev \ 
-  miniupnpc dbus tmux avahi-tools
+  miniupnpc dbus tmux avahi-tools inotify-tools
 RUN corepack enable
 
 # Copy git data
@@ -31,4 +31,6 @@ COPY packages packages
 
 ENTRYPOINT ["/bin/sh", "-c", "mkdir -p /app/packages/dappmanager/dnp_repo /app/packages/dappmanager/DNCORE && \
   ln -sf /app/packages/admin-ui/build/ /app/packages/dappmanager/dist && \
-  yarn && yarn build && yarn run dev"]
+  yarn && yarn build && \
+  cd /app/packages/admin-ui && yarn dev:tw-watch & \
+  cd /app && yarn run dev"]
