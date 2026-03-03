@@ -1,6 +1,11 @@
 import deepmerge from "deepmerge";
 import { orderInstallPackages } from "./orderInstallPackages.js";
-import { ComposeEditor, ComposeFileEditor } from "@dappnode/dockercompose";
+import {
+  ComposeEditor,
+  ComposeFileEditor,
+  parseVolumeMappings,
+  stringifyVolumeMappings
+} from "@dappnode/dockercompose";
 import { getContainersStatus, listPackages } from "@dappnode/dockerapi";
 import { parseTimeoutSeconds } from "../utils.js";
 import {
@@ -12,9 +17,10 @@ import {
   NotificationsConfig,
   NotificationsSettingsAllDnps
 } from "@dappnode/types";
-import { getBackupPath, getDockerComposePath, getImagePath, getManifestPath } from "@dappnode/utils";
+import { getBackupPath, getDockerComposePath, getImagePath, getManifestPath, isNotFoundError } from "@dappnode/utils";
 import { gt } from "semver";
 import { logs } from "@dappnode/logger";
+import { params } from "@dappnode/params";
 
 interface GetInstallerPackageDataArg {
   releases: PackageRelease[];
@@ -89,6 +95,9 @@ function getInstallerPackageData(
   const compose = new ComposeEditor(release.compose, { dnpName });
   compose.applyUserSettings(nextUserSet, { dnpName });
 
+  // Persist critical dappmanager env vars and volume paths across updates
+  persistDappmanagerSettings(compose, dnpName, isCore);
+
   const dockerTimeout = parseTimeoutSeconds(release.manifest.dockerTimeout);
 
   return {
@@ -114,6 +123,78 @@ function getInstallerPackageData(
     dockerTimeout,
     containersStatus
   };
+}
+
+/**
+ * When updating the dappmanager package, certain environment variables and volume
+ * settings from the currently installed compose must be preserved, even if the new
+ * compose being installed doesn't define them. This ensures:
+ * - DISABLE_HOST_SCRIPTS is not lost during upgrades
+ * - DAPPNODE_CORE_DIR is not lost during upgrades
+ * - The DNCORE volume bind mount uses the correct host path from DAPPNODE_CORE_DIR
+ */
+function persistDappmanagerSettings(compose: ComposeEditor, dnpName: string, isCore: boolean): void {
+  if (dnpName !== params.dappmanagerDnpName) return;
+
+  // Read the currently installed compose to get persisted env values
+  let installedCompose: ComposeFileEditor;
+  try {
+    installedCompose = new ComposeFileEditor(dnpName, isCore);
+  } catch (e) {
+    if (!isNotFoundError(e)) throw e;
+    // Fresh install - no existing compose to read from
+    logs.info("No installed dappmanager compose found, skipping settings persistence");
+    return;
+  }
+
+  const envsToPreserve = ["DISABLE_HOST_SCRIPTS", "DAPPNODE_CORE_DIR"];
+  const DNCORE_CONTAINER_PATH = "/usr/src/app/DNCORE";
+
+  // Collect env values from the installed compose services
+  const installedEnvs: Record<string, string> = {};
+  for (const serviceEditor of Object.values(installedCompose.services())) {
+    const envs = serviceEditor.getEnvs();
+    for (const envName of envsToPreserve) {
+      if (envs[envName] !== undefined && envs[envName] !== "") {
+        installedEnvs[envName] = envs[envName];
+      }
+    }
+  }
+
+  if (Object.keys(installedEnvs).length === 0) return;
+
+  logs.info("Persisting dappmanager settings from installed compose", installedEnvs);
+
+  // Apply persisted envs and volume mapping to new compose services
+  for (const serviceEditor of Object.values(compose.services())) {
+    // Merge preserved envs into the new compose (installed values take priority)
+    const envsToInject: Record<string, string> = {};
+    for (const envName of envsToPreserve) {
+      if (installedEnvs[envName] !== undefined) {
+        envsToInject[envName] = installedEnvs[envName];
+      }
+    }
+    if (Object.keys(envsToInject).length > 0) {
+      serviceEditor.mergeEnvs(envsToInject);
+    }
+
+    // Update the DNCORE volume host path to match DAPPNODE_CORE_DIR
+    if (installedEnvs["DAPPNODE_CORE_DIR"]) {
+      const dncoreHostDir = installedEnvs["DAPPNODE_CORE_DIR"];
+      const service = serviceEditor.get();
+      if (service.volumes) {
+        const volumeMappings = parseVolumeMappings(service.volumes);
+        const updatedVolumes = volumeMappings.map((vol) => {
+          // Match the volume whose container side is /usr/src/app/DNCORE
+          if (vol.container === DNCORE_CONTAINER_PATH) {
+            return { ...vol, host: dncoreHostDir, name: undefined };
+          }
+          return vol;
+        });
+        service.volumes = stringifyVolumeMappings(updatedVolumes);
+      }
+    }
+  }
 }
 
 /**
