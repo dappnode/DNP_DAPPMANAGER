@@ -133,7 +133,7 @@ function getInstallerPackageData(
  * - DAPPNODE_CORE_DIR is not lost during upgrades
  * - The DNCORE volume bind mount uses the correct host path from DAPPNODE_CORE_DIR
  */
-function persistDappmanagerSettings(compose: ComposeEditor, dnpName: string, isCore: boolean): void {
+export function persistDappmanagerSettings(compose: ComposeEditor, dnpName: string, isCore: boolean): void {
   if (dnpName !== params.dappmanagerDnpName) return;
 
   // Read the currently installed compose to get persisted env values
