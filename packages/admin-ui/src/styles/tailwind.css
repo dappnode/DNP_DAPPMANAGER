@@ -1,0 +1,13 @@
+@layer theme, base, components, utilities;
+
+/* Tailwind theme */
+@import "tailwindcss/theme.css" layer(theme) prefix(tw);
+
+/* IMPORTANT: do NOT import preflight.css */
+/* This is required so Tailwind does not reset Bootstrap/legacy HTML styles */
+
+/* Tailwind utilities only */
+@import "tailwindcss/utilities.css" layer(utilities) prefix(tw) source(none);
+
+/* Restrict Tailwind scanning to new UI folders only */
+@source "../pages-new/**/*.tsx";

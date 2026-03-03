@@ -37,8 +37,11 @@ export default function SideBar({ screenWidth }: { screenWidth: number }) {
           .filter((item) => item.show === true)
           .map((item) => {
             const basePath = item.href.split("/")[0];
-            const baseLocationPath = location.pathname.substring(1).split("/")[0];
-            const isActive = baseLocationPath === basePath;
+            // Sidebar renders inside /staking, so location is /staking/<page>/...
+            // Compare the first href segment against the second path segment
+            const pathSegments = location.pathname.substring(1).split("/");
+            const currentPage = pathSegments[0] === "staking" ? pathSegments[1] : pathSegments[0];
+            const isActive = currentPage === basePath;
             return (
               <NavLink
                 className={`sidenav-item selectable ${isActive && "active"} ${item.name === premiumLabel &&

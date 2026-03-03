@@ -21,10 +21,7 @@ export function LegacyNotifications() {
         </p>
         <p>
           🔁 To enable them, make sure you check out the new{" "}
-          <Link to={`/notifications/${subPaths.settings}`}>
-            Settings Notifications tab
-          </Link>{" "}
-          <br />
+          <Link to={`/staking/notifications/${subPaths.settings}`}>Settings Notifications tab</Link> <br />
           📘 For full details about the new system, see our{" "}
           <Link to={docsUrl.notificationsOverview} target="_blank" rel="noopener noreferrer">
             Notifications Documentation

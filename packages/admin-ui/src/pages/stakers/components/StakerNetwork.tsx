@@ -176,7 +176,7 @@ export default function StakerNetwork({ network, description }: { network: Netwo
             <b>Sepolia network is not intended for staking</b>, as it only supports whitelisted validators. Running a
             Sepolia node is still useful for L2s, infrastructure testing, and other use cases. To test staking, run a{" "}
             <b>
-              <Link to="/stakers/hoodi">Hoodi node</Link>
+              <Link to="/staking/stakers/hoodi">Hoodi node</Link>
             </b>{" "}
             instead.
           </p>
