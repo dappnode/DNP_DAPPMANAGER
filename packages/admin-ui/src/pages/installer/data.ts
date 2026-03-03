@@ -1,8 +1,8 @@
 // This will be used later in our root reducer and selectors
 export const relativePath = "installer/dnp";
 export const getInstallerPath = (dnpName: string) => {
-  if (dnpName.includes("public")) return "/installer/public";
-  return "/installer/dnp";
+  if (dnpName.includes("public")) return "/staking/installer/public";
+  return "/staking/installer/dnp";
 };
 export const rootPath = "installer/*";
 export const title = "DAppStore";

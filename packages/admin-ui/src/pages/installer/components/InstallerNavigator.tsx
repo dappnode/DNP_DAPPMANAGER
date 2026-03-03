@@ -46,7 +46,7 @@ Nobody, DAppNode Association, DAppNodeDAO or anyone, will be held responsible fo
           ]
         })
       );
-      navigate("/installer/public");
+      navigate("/staking/installer/public");
     } catch {
       // user cancelled
     }

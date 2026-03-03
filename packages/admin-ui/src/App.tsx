@@ -1,24 +1,21 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import { Routes, Route, useLocation, useNavigate, Navigate } from "react-router-dom";
 import { startApi, apiAuth, LoginStatus } from "api";
 // Components
-import { ToastContainer } from "react-toastify";
-import NotificationsMain from "./components/NotificationsMain";
 import ErrorBoundary from "./components/ErrorBoundary";
 import Loading from "components/Loading";
-import Welcome from "components/welcome/Welcome";
-import SideBar from "components/sidebar/SideBar";
-import { TopBar } from "components/topbar/TopBar";
-// Pages
+// Legacy pages
 import { pages } from "./pages";
 import { Login } from "./start-pages/Login";
 import { Register } from "./start-pages/Register";
 import { NoConnection } from "start-pages/NoConnection";
+// New pages
+import { NewHomePage } from "./pages-new/home/HomePage";
+import { AiLayout } from "./pages-new/ai/AiLayout";
+// Layouts
+import { LegacyStakingLayout } from "./layouts/LegacyStakingLayout";
 // Types
 import { AppContextIface, Theme } from "types";
-import Smooth from "components/Smooth";
-import { PwaPermissionsAlert, PwaPermissionsModal } from "components/PwaPermissions";
-import { LocalProxyBanner } from "pages/wifi/components/localProxying/LocalProxyBanner";
 
 export const AppContext = React.createContext<AppContextIface>({
   theme: "light",
@@ -86,16 +83,30 @@ function MainApp({ username }: { username: string }) {
   return (
     <AppContext.Provider value={appContext}>
       <div className="body" id={theme}>
-        <SideBar screenWidth={screenWidth} />
-        <TopBar username={username} appContext={appContext} />
-        <div id="main">
-          <ErrorBoundary>
-            <LocalProxyBanner />
-            <NotificationsMain />
-          </ErrorBoundary>
-          <PwaPermissionsAlert />
-          <Routes>
-            {/** Provide the app context only to the dashboard (where the modules switch is handled) */}
+        <Routes>
+          {/* New UI routes — Tailwind + shadcn, no legacy chrome */}
+          <Route
+            path="/"
+            element={
+              <ErrorBoundary>
+                <NewHomePage />
+              </ErrorBoundary>
+            }
+          />
+          <Route
+            path="/ai/*"
+            element={
+              <ErrorBoundary>
+                <AiLayout />
+              </ErrorBoundary>
+            }
+          />
+
+          {/* Legacy routes — Bootstrap + SCSS, with sidebar/topbar/legacy chrome */}
+          <Route
+            path="/staking"
+            element={<LegacyStakingLayout screenWidth={screenWidth} username={username} appContext={appContext} />}
+          >
             {Object.values(pages).map(({ RootComponent, rootPath }) => (
               <Route
                 key={rootPath}
@@ -107,17 +118,13 @@ function MainApp({ username }: { username: string }) {
                 }
               />
             ))}
-            {/* Redirection for routes with hashes */}
-            {/* 404 routes redirect to dashboard or default page */}
-            <Route path="*" element={<DefaultRedirect />} />
-          </Routes>
-        </div>
+            {/* Default: redirect /staking to /staking/dashboard */}
+            <Route index element={<Navigate to="dashboard" replace />} />
+          </Route>
 
-        {/* Place here non-page components */}
-        <Welcome />
-        <Smooth />
-        <PwaPermissionsModal />
-        <ToastContainer />
+          {/* 404 routes redirect to home */}
+          <Route path="*" element={<DefaultRedirect />} />
+        </Routes>
       </div>
     </AppContext.Provider>
   );
@@ -128,8 +135,9 @@ function DefaultRedirect() {
   const location = useLocation();
 
   useEffect(() => {
-    if (location.pathname === "/") {
-      navigate("/dashboard", { replace: true });
+    // Catch-all: redirect unknown routes to the new home page
+    if (location.pathname !== "/") {
+      navigate("/", { replace: true });
     }
   }, [location, navigate]);
 

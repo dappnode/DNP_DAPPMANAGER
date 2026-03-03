@@ -27,7 +27,7 @@ export default function Notifications() {
   }, [unseenNotificationsReq.data]);
 
   return (
-    <div onClick={() => navigate("/notifications/inbox")} className="tn-dropdown tn-dropdown-toggle">
+    <div onClick={() => navigate("/staking/notifications/inbox")} className="tn-dropdown tn-dropdown-toggle">
       <FaRegBell size={"1.4em"} />
       {newNotifications && <div className={`icon-bubble success`} />}
     </div>
