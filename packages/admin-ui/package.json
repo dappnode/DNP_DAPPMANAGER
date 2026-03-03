@@ -12,7 +12,8 @@
     "server-mock:check-types": "tsc --noEmit --project tsconfig.server-mock.json",
     "mock-standalone": "VITE_APP_MOCK=true yarn start",
     "mock-standalone:build": "VITE_APP_MOCK=true yarn build",
-    "dev": "VITE_APP_API_TEST=true vite build --watch"
+    "dev": "VITE_APP_API_TEST=true vite build --watch",
+    "dev:tw-watch": "while inotifywait -r -e modify --exclude 'styles/' src/; do touch src/styles/tailwind.css; done"
   },
   "dependencies": {
     "@dappnode/common": "workspace:^0.1.0",
