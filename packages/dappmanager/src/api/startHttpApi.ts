@@ -99,8 +99,9 @@ export function startHttpApi({
   app.use(bodyParser.json());
   app.use(bodyParser.text());
   app.use(bodyParser.urlencoded({ extended: true }));
-  // Serve locally-downloaded package avatars
+  // Serve locally-downloaded package avatars (non-core from REPO_DIR, core from DNCORE_DIR)
   app.use("/avatars", express.static(path.resolve(dappnodeParams.avatarStaticDir), { maxAge: "1d" }));
+  app.use("/avatars", express.static(path.resolve(dappnodeParams.coreAvatarStaticDir), { maxAge: "1d" }));
   // Intercept UI requests. Must go before express.static
   app.use(counterViewsMiddleware);
   // Express uses "ETags" (hashes of the files requested) to know when the file changed

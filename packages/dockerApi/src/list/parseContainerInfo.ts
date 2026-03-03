@@ -32,6 +32,9 @@ export function parseContainerInfo(container: ContainerInfo): PackageContainer {
     // NOTE: /containers/json will always return Aliases: null even if there are aliases
     // aliases: network.Aliases || []
   }));
+  // Declared here for reusability purposes
+  const isDnp = Boolean(labels.dnpName) || containerName.includes(CONTAINER_NAME_PREFIX);
+  const isCore = typeof labels.isCore === "boolean" ? labels.isCore : containerName.includes(CONTAINER_CORE_NAME_PREFIX);
 
   return {
     // Identification
@@ -41,8 +44,8 @@ export function parseContainerInfo(container: ContainerInfo): PackageContainer {
     instanceName: labels.instanceName || "",
     dnpName,
     version: labels.version || (container.Image || "").split(":")[1] || "0.0.0",
-    isDnp: Boolean(labels.dnpName) || containerName.includes(CONTAINER_NAME_PREFIX),
-    isCore: typeof labels.isCore === "boolean" ? labels.isCore : containerName.includes(CONTAINER_CORE_NAME_PREFIX),
+    isDnp,
+    isCore,
 
     // Docker data
     created: container.Created,
@@ -66,7 +69,7 @@ export function parseContainerInfo(container: ContainerInfo): PackageContainer {
 
     // Additional package metadata to avoid having to read the manifest
     dependencies: labels.dependencies || {},
-    avatarUrl: resolveAvatarUrl(labels.avatar, dnpName),
+    avatarUrl: resolveAvatarUrl(labels.avatar, dnpName, isCore),
     origin: labels.origin,
     chain: labels.chain,
     canBeFullnode: allowedFullnodeDnpNames.includes(dnpName),
@@ -106,12 +109,13 @@ export function parseDnpNameFromContainerName(containerName: string): string {
  * Otherwise falls back to the remote IPFS gateway or HTTP mirror URL.
  * @param avatar - The raw Docker label value ("/ipfs/Qm..." or HTTP URL). May be empty.
  * @param dnpName - Package name, used to locate the local avatar file.
+ * @param isCore - Whether the package is a core DAppNode package.
  * @returns A URL string that can be used to fetch the avatar image.
  */
-export function resolveAvatarUrl(avatar: string | undefined, dnpName: string): string {
+export function resolveAvatarUrl(avatar: string | undefined, dnpName: string, isCore: boolean): string {
   // Prefer locally-downloaded avatar if it exists on disk
   try {
-    const localPath = getAvatarPath(dnpName);
+    const localPath = getAvatarPath(dnpName, isCore);
     if (fs.existsSync(localPath)) return `/avatars/${dnpName}.png`;
   } catch {
     // Ignore filesystem errors — fall through to remote resolution
