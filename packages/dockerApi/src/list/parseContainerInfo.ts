@@ -1,10 +1,11 @@
+import fs from "fs";
 import { ContainerInfo } from "dockerode";
 import { params } from "@dappnode/params";
 import { PackageContainer, VolumeMapping, ContainerState } from "@dappnode/types";
 import { parsePortMappings, parseVolumeMappings, readContainerLabels } from "@dappnode/dockercompose";
 import { parseExitCodeFromStatus } from "./parseExitCodeFromStatus.js";
 import { ensureUniquePortsFromDockerApi } from "../utils.js";
-import { fileToGatewayUrl, normalizeHash, parseEnvironment } from "@dappnode/utils";
+import { fileToGatewayUrl, getAvatarPath, normalizeHash, parseEnvironment } from "@dappnode/utils";
 
 const CONTAINER_NAME_PREFIX = params.CONTAINER_NAME_PREFIX;
 const CONTAINER_CORE_NAME_PREFIX = params.CONTAINER_CORE_NAME_PREFIX;
@@ -65,7 +66,7 @@ export function parseContainerInfo(container: ContainerInfo): PackageContainer {
 
     // Additional package metadata to avoid having to read the manifest
     dependencies: labels.dependencies || {},
-    avatarUrl: labels.avatar ? resolveAvatarUrl(labels.avatar) : "",
+    avatarUrl: resolveAvatarUrl(labels.avatar, dnpName),
     origin: labels.origin,
     chain: labels.chain,
     canBeFullnode: allowedFullnodeDnpNames.includes(dnpName),
@@ -101,10 +102,22 @@ export function parseDnpNameFromContainerName(containerName: string): string {
 
 /**
  * Resolves an avatar label value to a usable URL.
- * Accepts either an IPFS multiaddress ("/ipfs/Qm...") or a plain HTTP URL.
+ * Prefers a locally-downloaded avatar file when one exists on disk.
+ * Otherwise falls back to the remote IPFS gateway or HTTP mirror URL.
+ * @param avatar - The raw Docker label value ("/ipfs/Qm..." or HTTP URL). May be empty.
+ * @param dnpName - Package name, used to locate the local avatar file.
  * @returns A URL string that can be used to fetch the avatar image.
  */
-export function resolveAvatarUrl(avatar: string): string {
+export function resolveAvatarUrl(avatar: string | undefined, dnpName: string): string {
+  // Prefer locally-downloaded avatar if it exists on disk
+  try {
+    const localPath = getAvatarPath(dnpName);
+    if (fs.existsSync(localPath)) return `/avatars/${dnpName}.png`;
+  } catch {
+    // Ignore filesystem errors — fall through to remote resolution
+  }
+
+  if (!avatar) return "";
   if (avatar.startsWith("http")) return avatar; // Avatar URL is already an HTTP URL. Package was likely installed from mirror
   return fileToGatewayUrl({ source: "ipfs", hash: normalizeHash(avatar), size: 0 }); // Convert IPFS multiaddress to a gateway URL.
 }

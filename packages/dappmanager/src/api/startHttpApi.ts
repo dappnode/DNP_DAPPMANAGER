@@ -17,6 +17,7 @@ import { EventBus } from "@dappnode/eventbus";
 import { subscriptionsFactory } from "@dappnode/common";
 import { RpcPayload, RpcResponse, LoggerMiddleware, Routes } from "@dappnode/types";
 import { getRpcHandler } from "./handler/index.js";
+import { params as dappnodeParams } from "@dappnode/params";
 
 export interface HttpApiParams extends ClientSideCookiesParams, AuthPasswordSessionParams {
   AUTH_IP_ALLOW_LOCAL_IP: boolean;
@@ -98,6 +99,8 @@ export function startHttpApi({
   app.use(bodyParser.json());
   app.use(bodyParser.text());
   app.use(bodyParser.urlencoded({ extended: true }));
+  // Serve locally-downloaded package avatars
+  app.use("/avatars", express.static(path.resolve(dappnodeParams.avatarStaticDir), { maxAge: "1d" }));
   // Intercept UI requests. Must go before express.static
   app.use(counterViewsMiddleware);
   // Express uses "ETags" (hashes of the files requested) to know when the file changed

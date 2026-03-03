@@ -20,6 +20,7 @@ export { parseEnvironment, stringifyEnvironment, mergeEnvs } from "./environment
 export { writeEnvFile, createGlobalEnvsEnvFile } from "./globalEnvs.js";
 export { getManifestPath } from "./getManifestPath.js";
 export { getImagePath } from "./getImagePath.js";
+export { getAvatarPath } from "./getAvatarPath.js";
 export { getIsMonoService } from "./getIsMonoService.js";
 export { getEnvFilePath } from "./getEnvFilePath.js";
 export { getBackupPath } from "./getBackupPath.js";
