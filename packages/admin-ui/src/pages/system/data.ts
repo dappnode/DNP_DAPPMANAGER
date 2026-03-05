@@ -22,6 +22,7 @@ export const subPaths = {
   profile: "profile",
   advanced: "advanced",
   hardware: "hardware",
+  host: "host",
   app: "app"
 };
 
