@@ -15,6 +15,7 @@ import { NewFeatureId } from "@dappnode/types";
 // styles
 import "./welcome.scss";
 import EnableNotifications from "./features/EnableNotifications";
+import { params } from "@dappnode/params";
 
 /**
  * This internal Welcome status allows to freeze featureIds
@@ -36,7 +37,9 @@ function getRouteIdComponent(routeId: NewFeatureId): React.FC<RouteProps> | unde
   switch (routeId) {
     case "system-auto-updates":
       return (props: RouteProps) => <SystemAutoUpdates {...props} />;
+
     case "change-host-password":
+      if (params.DISABLE_HOST_SCRIPTS) return undefined;
       return (props: RouteProps) => <ChangeHostPassword {...props} />;
 
     // Disabling ethical metrics in the onboarding for now as we want to rethink how we present it
