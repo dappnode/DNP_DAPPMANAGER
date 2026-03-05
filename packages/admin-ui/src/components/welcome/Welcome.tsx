@@ -8,7 +8,7 @@ import Start from "./Start";
 import Finished from "./Finished";
 import SystemAutoUpdates from "./features/SystemAutoUpdates";
 import ChangeHostPassword from "./features/ChangeHostPassword";
-import EnableEthicalMetrics from "./features/EnableEthicalMetrics";
+// import EnableEthicalMetrics from "./features/EnableEthicalMetrics";
 // Utils
 import { isEqual } from "lodash-es";
 import { NewFeatureId } from "@dappnode/types";
@@ -38,8 +38,10 @@ function getRouteIdComponent(routeId: NewFeatureId): React.FC<RouteProps> | unde
       return (props: RouteProps) => <SystemAutoUpdates {...props} />;
     case "change-host-password":
       return (props: RouteProps) => <ChangeHostPassword {...props} />;
-    case "enable-ethical-metrics":
-      return (props: RouteProps) => <EnableEthicalMetrics {...props} />;
+
+    // Disabling ethical metrics in the onboarding for now as we want to rethink how we present it
+    // case "enable-ethical-metrics":
+    //   return (props: RouteProps) => <EnableEthicalMetrics {...props} />;
     case "enable-notifications":
       return (props: RouteProps) => <EnableNotifications {...props} />;
     default:
