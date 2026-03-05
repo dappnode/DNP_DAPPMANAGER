@@ -6,14 +6,12 @@ import Title from "components/Title";
 import AutoUpdates from "./AutoUpdates";
 import App from "./App";
 import Security from "./Security";
-import PowerManagment from "./Host/PowerManagment";
 import SystemUpdate from "./SystemUpdate";
 import Ipfs from "./Ipfs";
 import SystemInfo from "./SystemInfo";
 import Profile from "./Profile";
 import { Network } from "./Network";
 import { Advanced } from "./Advanced";
-import Hardware from "./Hardware";
 import { SectionNavigator } from "components/SectionNavigator";
 import Host from "./Host";
 
@@ -40,11 +38,6 @@ const SystemRoot: React.FC = () => {
       element: <Profile />
     },
     {
-      name: "Power",
-      subPath: subPaths.power,
-      element: <PowerManagment />
-    },
-    {
       name: "Network",
       subPath: subPaths.network,
       element: <Network />
@@ -69,11 +62,6 @@ const SystemRoot: React.FC = () => {
       name: "Security",
       subPath: subPaths.security,
       element: <Security />
-    },
-    {
-      name: "Hardware",
-      subPath: subPaths.hardware,
-      element: <Hardware />
     },
     {
       name: "Host",
