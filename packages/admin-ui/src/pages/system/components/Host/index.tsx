@@ -6,8 +6,14 @@ import { UpdateUpgrade } from "./UpdateUpgrade";
 import { DockerUpgrade } from "./DockerUpgrade";
 import { SshManager } from "./SshManager";
 import ChangeHostUserPassword from "./ChangeHostUserPassword";
+import Card from "components/Card";
+import { params } from "@dappnode/params";
 
 export default function Host() {
+  if (params.DISABLE_HOST_SCRIPTS) {
+    return <Card spacing>Host integration features are disabled in this environment.</Card>;
+  }
+
   return (
     <>
       <SubTitle>SSH</SubTitle>
