@@ -7,7 +7,62 @@ type KeystoresByProtocol = Record<string, string[]>;
 const ACTIVE_STATUSES = new Set(["active_ongoing", "active_exiting", "active_slashed"]);
 
 /** Timeout in milliseconds for each individual network's validators data request */
-const VALIDATORS_TIMEOUT_MS = 5_000;
+const VALIDATORS_TIMEOUT_MS = 10_000;
+
+const BATCH_SIZE = 50;
+
+/** Cache for SLOTS_PER_EPOCH per network — this value never changes at runtime */
+const slotsPerEpochCache = new Map<string, number>();
+
+/** Builds the base URL for a network's beacon chain API */
+const ccBaseUrl = (network: Network) => `http://beacon-chain.${network}.dncore.dappnode:3500`;
+
+/**
+ * Fetches SLOTS_PER_EPOCH from the beacon node's /eth/v1/config/spec endpoint.
+ * The result is cached per network since it is a protocol constant that never changes.
+ */
+async function getSlotsPerEpoch(network: Network): Promise<number> {
+  const cached = slotsPerEpochCache.get(network);
+  if (cached !== undefined) return cached;
+
+  const url = new URL(`/eth/v1/config/spec`, ccBaseUrl(network));
+  const res = await fetch(url.toString(), { headers: { Accept: "application/json" } });
+  if (!res.ok) {
+    throw new Error(`Beacon API ${network} config/spec responded ${res.status} ${res.statusText}`);
+  }
+  const json: { data?: Record<string, string> } = await res.json();
+  const raw = json.data?.SLOTS_PER_EPOCH;
+  const value = raw ? parseInt(raw, 10) : NaN;
+  if (!Number.isFinite(value) || value <= 0) {
+    throw new Error(`Beacon API ${network} config/spec returned invalid SLOTS_PER_EPOCH: ${raw}`);
+  }
+  slotsPerEpochCache.set(network, value);
+  return value;
+}
+
+/**
+ * Fetches the current head epoch and previous (liveness) epoch for a network.
+ * Uses the dynamic SLOTS_PER_EPOCH from the beacon config.
+ */
+async function getHeadEpochInfo(network: Network): Promise<{ currentEpoch: number; livenessEpoch: number }> {
+  const [slotsPerEpoch, headSlot] = await Promise.all([
+    getSlotsPerEpoch(network),
+    (async () => {
+      const url = new URL(`/eth/v1/beacon/headers/head`, ccBaseUrl(network));
+      const res = await fetch(url.toString(), { headers: { Accept: "application/json" } });
+      if (!res.ok) {
+        throw new Error(`Beacon API ${network} headers/head responded ${res.status} ${res.statusText}`);
+      }
+      const json: { data?: { header?: { message?: { slot?: string } } } } = await res.json();
+      const slotStr = json?.data?.header?.message?.slot;
+      if (!slotStr) throw new Error(`Beacon API ${network} headers/head missing data.header.message.slot`);
+      return Number(slotStr);
+    })()
+  ]);
+
+  const currentEpoch = Math.floor(headSlot / slotsPerEpoch);
+  return { currentEpoch, livenessEpoch: currentEpoch - 1 };
+}
 
 type ValidatorEntry = {
   index: string;
@@ -74,35 +129,23 @@ async function fetchValidatorsBatch(
 }
 
 /**
- * Query the liveness endpoint using precomputed index mappings.
+ * Query the liveness endpoint using precomputed index mappings and a
+ * pre-fetched liveness epoch (avoids redundant headers/head calls per batch).
  * Returns attesting pubkeys.
  */
 async function fetchAttestingFromLiveness(
   network: Network,
   pubkeys: string[],
   pubkeyToIndex: Map<string, string>,
-  indexToPubkey: Map<string, string>
+  indexToPubkey: Map<string, string>,
+  livenessEpoch: number
 ): Promise<string[]> {
-  const base = `http://beacon-chain.${network}.dncore.dappnode:3500`;
   const normPubkeys = pubkeys.map((p) => p.toLowerCase());
-
-  // Get current epoch from head
-  const headHeaderUrl = new URL(`/eth/v1/beacon/headers/head`, base);
-  const headRes = await fetch(headHeaderUrl.toString(), { headers: { Accept: "application/json" } });
-  if (!headRes.ok) {
-    throw new Error(`Beacon API ${network} headers/head responded ${headRes.status} ${headRes.statusText}`);
-  }
-
-  const headJson: { data?: { header?: { message?: { slot?: string } } } } = await headRes.json();
-  const slotStr = headJson?.data?.header?.message?.slot;
-  if (!slotStr) throw new Error(`Beacon API ${network} headers/head missing data.header.message.slot`);
-  const currentEpoch = Math.floor(Number(slotStr) / 32);
-  const livenessEpoch = currentEpoch - 1;
 
   const indices = normPubkeys.map((pk) => pubkeyToIndex.get(pk)).filter((x): x is string => !!x);
   if (indices.length === 0) return [];
 
-  const livenessUrl = new URL(`/eth/v1/validator/liveness/${livenessEpoch}`, base);
+  const livenessUrl = new URL(`/eth/v1/validator/liveness/${livenessEpoch}`, ccBaseUrl(network));
   const res = await fetch(livenessUrl.toString(), {
     method: "POST",
     headers: { "Content-Type": "application/json", Accept: "application/json" },
@@ -134,7 +177,8 @@ function extractPubkeys(keystores: object | null | undefined): string[] {
   if (!keystores || typeof keystores !== "object") return [];
   const byProtocol = keystores as KeystoresByProtocol;
   const all = Object.values(byProtocol).flat();
-  return all.map((p) => p.toLowerCase());
+  // Deduplicate: a pubkey might appear in multiple protocols
+  return [...new Set(all.map((p) => p.toLowerCase()))];
 }
 
 /**
@@ -156,8 +200,6 @@ export async function validatorsFilterActiveByNetwork({
 
   const keystoresByNetwork = await keystoresGetByNetwork({ networks });
 
-  const BATCH_SIZE = 50;
-
   await Promise.all(
     networks.map(async (network) => {
       const keystores = keystoresByNetwork[network];
@@ -171,15 +213,27 @@ export async function validatorsFilterActiveByNetwork({
       try {
         const fetchActive = async (): Promise<{ validators: string[]; beaconError?: Error }> => {
           const batches = chunk(pubkeys, BATCH_SIZE);
-          const activeSets = await Promise.all(
+          // Use allSettled so one failing batch doesn't discard all results
+          const settled = await Promise.allSettled(
             batches.map(async (b) => {
               const { activePubkeys } = await fetchValidatorsBatch(network, b);
               return activePubkeys;
             })
           );
 
+          let beaconError: Error | undefined;
+          const activeSets: string[][] = [];
+          for (const s of settled) {
+            if (s.status === "fulfilled") {
+              activeSets.push(s.value);
+            } else {
+              beaconError = s.reason instanceof Error ? s.reason : new Error(String(s.reason));
+              logs.error(`Batch error fetching active validators for ${network}: ${beaconError.message}`);
+            }
+          }
+
           const activeSet = new Set(activeSets.flat());
-          return { validators: pubkeys.filter((pk) => activeSet.has(pk)) };
+          return { validators: pubkeys.filter((pk) => activeSet.has(pk)), beaconError };
         };
 
         const activeResult = await Promise.race([
@@ -206,18 +260,27 @@ export async function validatorsFilterActiveByNetwork({
  * Extracted so it can be wrapped with a timeout.
  */
 async function fetchValidatorsDataForNetwork(network: Network, pubkeys: string[]): Promise<ValidatorsNetworkData> {
-  const BATCH_SIZE = 50;
   const batches = chunk(pubkeys, BATCH_SIZE);
 
-  // For each batch, call fetchValidatorsBatch ONCE and reuse results for all three concerns
-  const batchResults = await Promise.all(
+  // Fetch head epoch info ONCE for the whole network before processing batches.
+  // This avoids redundant headers/head calls and ensures all batches use the same epoch.
+  const { livenessEpoch } = await getHeadEpochInfo(network);
+
+  // Use allSettled so one failing batch doesn't discard all results
+  const settled = await Promise.allSettled(
     batches.map(async (batch) => {
       const { activePubkeys, balances, pubkeyToIndex, indexToPubkey } = await fetchValidatorsBatch(network, batch);
 
       let attestingPubkeys: string[] = [];
       let attestingError: Error | undefined;
       try {
-        attestingPubkeys = await fetchAttestingFromLiveness(network, batch, pubkeyToIndex, indexToPubkey);
+        attestingPubkeys = await fetchAttestingFromLiveness(
+          network,
+          batch,
+          pubkeyToIndex,
+          indexToPubkey,
+          livenessEpoch
+        );
       } catch (err) {
         attestingError = err as Error;
       }
@@ -226,28 +289,42 @@ async function fetchValidatorsDataForNetwork(network: Network, pubkeys: string[]
     })
   );
 
-  // Merge batch results
+  // Merge batch results, tolerating individual batch failures
   const allActive: string[] = [];
   const mergedBalances: Record<string, string> = {};
   const allAttesting: string[] = [];
   let attestingBeaconError: Error | undefined;
+  let activeBeaconError: Error | undefined;
 
-  for (const br of batchResults) {
-    allActive.push(...br.activePubkeys);
-    Object.assign(mergedBalances, br.balances);
-    allAttesting.push(...br.attestingPubkeys);
-    if (br.attestingError) attestingBeaconError = br.attestingError;
+  for (const s of settled) {
+    if (s.status === "fulfilled") {
+      const br = s.value;
+      allActive.push(...br.activePubkeys);
+      Object.assign(mergedBalances, br.balances);
+      allAttesting.push(...br.attestingPubkeys);
+      if (br.attestingError) attestingBeaconError = br.attestingError;
+    } else {
+      // A batch entirely failed (fetchValidatorsBatch threw)
+      const err = s.reason instanceof Error ? s.reason : new Error(String(s.reason));
+      logs.error(`Batch error fetching validators data for ${network}: ${err.message}`);
+      activeBeaconError = err;
+      attestingBeaconError = err;
+    }
   }
 
   const activeSet = new Set(allActive);
   const attestingSet = new Set(allAttesting);
 
   return {
-    active: { validators: pubkeys.filter((pk) => activeSet.has(pk)) },
+    active: activeBeaconError
+      ? { validators: pubkeys, beaconError: activeBeaconError }
+      : { validators: pubkeys.filter((pk) => activeSet.has(pk)) },
     attesting: attestingBeaconError
       ? { validators: pubkeys, beaconError: attestingBeaconError }
       : { validators: pubkeys.filter((pk) => attestingSet.has(pk)) },
-    balances: { balances: mergedBalances }
+    balances: activeBeaconError
+      ? { balances: mergedBalances, beaconError: activeBeaconError }
+      : { balances: mergedBalances }
   };
 }
 

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import {
   ClientError,
   ClientResult,
@@ -99,6 +99,84 @@ function getNetworksWithInstalledClients(
 
 type SignersStatusByNetwork = Partial<Record<Network, SignerStatus>>;
 
+/**
+ * Builds the NetworkStatus entry for a single network from collected data.
+ */
+function buildNetworkStatus(
+  network: DashboardSupportedNetwork,
+  nodesStatusByNetwork: NodeStatusByNetwork | undefined,
+  validatorsData: ValidatorsDataByNetwork | undefined,
+  signersStatusByNetwork: SignersStatusByNetwork | undefined,
+  consensusClientsByNetwork: Partial<Record<Network, string | null | undefined>> | undefined,
+  executionClientsByNetwork: Partial<Record<Network, string | null | undefined>> | undefined,
+  installedDnpNames: Set<string>
+) {
+  const features = networkFeatures[network];
+  const nodeStatusData: NodeStatus | undefined = nodesStatusByNetwork?.[network];
+  const consensusClientDnp = consensusClientsByNetwork?.[network];
+  const executionClientDnp = executionClientsByNetwork?.[network];
+
+  const ecInstalled = executionClientDnp ? installedDnpNames.has(executionClientDnp) : false;
+  const ccInstalled = consensusClientDnp ? installedDnpNames.has(consensusClientDnp) : false;
+
+  const filteredNodeStatus: NodeStatus | undefined = nodeStatusData
+    ? {
+        ec: ecInstalled ? nodeStatusData.ec : null,
+        cc: ccInstalled ? nodeStatusData.cc : null
+      }
+    : undefined;
+
+  const validatorsActive = validatorsData?.[network]?.active;
+  const validatorsAttesting = validatorsData?.[network]?.attesting;
+  const balancesObj = validatorsData?.[network]?.balances?.balances;
+  const signerStatus = signersStatusByNetwork?.[network] ?? { isInstalled: false, brainRunning: false };
+
+  let total = 0;
+  let attesting = 0;
+  let balance = 0;
+  let beaconError = undefined;
+
+  if (features.hasValidators && validatorsActive) {
+    total = validatorsActive.validators.length;
+    beaconError = validatorsActive.beaconError;
+  }
+  if (features.hasValidators && validatorsAttesting && !validatorsAttesting.beaconError) {
+    attesting = validatorsAttesting.validators.length;
+  }
+  if (features.hasValidators && balancesObj && validatorsActive) {
+    balance = validatorsActive.validators.reduce((acc, pk) => acc + (parseFloat(balancesObj[pk]) || 0), 0);
+  }
+
+  const validatorsInfo = features.hasValidators
+    ? {
+        validators: {
+          total,
+          balance,
+          attesting,
+          beaconError,
+          signerStatus,
+          pubKeys: validatorsActive?.validators || []
+        }
+      }
+    : undefined;
+
+  const hasEc = filteredNodeStatus?.ec !== null && filteredNodeStatus?.ec !== undefined;
+  const hasCc = filteredNodeStatus?.cc !== null && filteredNodeStatus?.cc !== undefined;
+  if (filteredNodeStatus && (hasEc || hasCc)) {
+    return {
+      nodeStatus: filteredNodeStatus,
+      clientsDnps: {
+        ecDnp: ecInstalled ? executionClientDnp || null : null,
+        ccDnp: ccInstalled ? consensusClientDnp || null : null
+      },
+      ...validatorsInfo,
+      hasValidators: features.hasValidators,
+      beaconExplorer: features.beaconExplorer || undefined
+    };
+  }
+  return undefined;
+}
+
 export function useNetworkStats() {
   // Step 1: Fetch consensus and execution clients for all supported networks
   const consensusClientsReq = useApi.consensusClientsGetByNetworks({ networks: supportedNetworks });
@@ -107,88 +185,168 @@ export function useNetworkStats() {
   const consensusClientsByNetwork = consensusClientsReq.data;
   const executionClientsByNetwork = executionClientsReq.data;
 
-  // States fetched only for networks with installed clients
+  // Per-network progressive state: data merges in as each network responds
   const [nodesStatusByNetwork, setNodesStatusByNetwork] = useState<NodeStatusByNetwork | undefined>(undefined);
-  const [nodesStatusLoading, setNodesStatusLoading] = useState(false);
   const [validatorsData, setValidatorsData] = useState<ValidatorsDataByNetwork | undefined>(undefined);
   const [signersStatusByNetwork, setSignersStatusByNetwork] = useState<SignersStatusByNetwork | undefined>(undefined);
-  const [validatorsLoading, setValidatorsLoading] = useState(false);
   const [installedDnpNames, setInstalledDnpNames] = useState<Set<string>>(new Set());
 
-  const lastFetchedNetworksKey = useRef<string>("");
+  // Track which networks are still loading their node status or validators
+  const [networksLoadingNodes, setNetworksLoadingNodes] = useState<Set<DashboardSupportedNetwork>>(new Set());
+  const [networksLoadingValidators, setNetworksLoadingValidators] = useState<Set<DashboardSupportedNetwork>>(
+    new Set()
+  );
 
+  // True until the initial discovery phase completes (client lists + installed packages)
+  const [initialLoading, setInitialLoading] = useState(true);
+  // The set of networks that have clients installed — undefined means not yet determined
+  const [networksWithClients, setNetworksWithClients] = useState<DashboardSupportedNetwork[] | undefined>(undefined);
+
+  const prevNetworksKeyRef = useRef<string>("");
+
+  // Track which networks have completed at least one successful fetch.
+  // Using refs (not state) so we can read them synchronously without re-renders.
+  const fetchedNodesRef = useRef(new Set<string>());
+  const fetchedValidatorsRef = useRef(new Set<string>());
+
+  /**
+   * Fetches node status, validators, and signer data for a SINGLE network
+   * and merges results into state progressively.
+   *
+   * Loading flags are only set when we don't already have data for this network.
+   * On subsequent polls the existing cards stay visible and values update in-place.
+   */
+  const fetchSingleNetworkData = useCallback(async (network: DashboardSupportedNetwork) => {
+    // Only show loading spinners on the first fetch — when there's no data yet.
+    // On subsequent poll cycles, keep current data visible and silently replace it.
+    // Using refs for synchronous reads — no state-inside-state anti-patterns.
+    if (!fetchedNodesRef.current.has(network)) {
+      setNetworksLoadingNodes((s) => new Set(s).add(network));
+    }
+    if (!fetchedValidatorsRef.current.has(network)) {
+      setNetworksLoadingValidators((s) => new Set(s).add(network));
+    }
+
+    // Fire all three requests for this network in parallel
+    const nodeStatusPromise = api
+      .nodeStatusGetByNetwork({ networks: [network] })
+      .then((result) => {
+        // Merge this network's node status into state immediately
+        setNodesStatusByNetwork((prev) => ({ ...prev, ...result }));
+        fetchedNodesRef.current.add(network);
+      })
+      .catch((e) => console.error(`Error fetching node status for ${network}`, e))
+      .finally(() => {
+        setNetworksLoadingNodes((prev) => {
+          const next = new Set(prev);
+          next.delete(network);
+          return next;
+        });
+      });
+
+    const validatorsPromise = api
+      .validatorsDataByNetwork({ networks: [network] })
+      .then((result) => {
+        setValidatorsData((prev) => ({ ...prev, ...result }));
+        fetchedValidatorsRef.current.add(network);
+      })
+      .catch((e) => console.error(`Error fetching validators data for ${network}`, e))
+      .finally(() => {
+        setNetworksLoadingValidators((prev) => {
+          const next = new Set(prev);
+          next.delete(network);
+          return next;
+        });
+      });
+
+    const signerPromise = api
+      .signerByNetworkGet({ networks: [network] })
+      .then((result) => {
+        setSignersStatusByNetwork((prev) => ({ ...prev, ...result }));
+      })
+      .catch((e) => console.error(`Error fetching signer status for ${network}`, e));
+
+    await Promise.allSettled([nodeStatusPromise, validatorsPromise, signerPromise]);
+  }, []);
+
+  /**
+   * Discovery + per-network fetch orchestration.
+   * Called on mount and every polling interval.
+   */
   const fetchNetworkData = useCallback(async () => {
     if (!consensusClientsByNetwork || !executionClientsByNetwork) return;
 
-    // Step 2: Collect all dnpNames from both client responses
+    // Collect all dnpNames from both client responses
     const dnpNames = collectDnpNames(consensusClientsByNetwork, executionClientsByNetwork);
     if (dnpNames.size === 0) {
       setNodesStatusByNetwork({});
       setValidatorsData({});
       setSignersStatusByNetwork({});
+      setNetworksWithClients([]);
+      setInitialLoading(false);
       return;
     }
 
-    // Step 3: Verify which packages are installed
-    let installedDnpNames: Set<string>;
+    // Verify which packages are installed
+    let resolvedInstalledDnpNames: Set<string>;
     try {
       const installedPackages = await api.packagesGet();
       const allInstalledNames = new Set(installedPackages.map((pkg) => pkg.dnpName));
-      installedDnpNames = new Set([...dnpNames].filter((name) => allInstalledNames.has(name)));
-      setInstalledDnpNames(installedDnpNames);
+      resolvedInstalledDnpNames = new Set([...dnpNames].filter((name) => allInstalledNames.has(name)));
+      setInstalledDnpNames(resolvedInstalledDnpNames);
     } catch (e) {
       console.error("Error fetching installed packages for node status", e);
       return;
     }
 
-    if (installedDnpNames.size === 0) {
+    if (resolvedInstalledDnpNames.size === 0) {
       setNodesStatusByNetwork({});
       setValidatorsData({});
       setSignersStatusByNetwork({});
+      setNetworksWithClients([]);
+      setInitialLoading(false);
       return;
     }
 
-    const networksWithClients = getNetworksWithInstalledClients(
+    const networks = getNetworksWithInstalledClients(
       consensusClientsByNetwork,
       executionClientsByNetwork,
-      installedDnpNames
+      resolvedInstalledDnpNames
     );
+    setNetworksWithClients(networks);
+    setInitialLoading(false);
 
-    if (networksWithClients.length === 0) {
+    if (networks.length === 0) {
       setNodesStatusByNetwork({});
       setValidatorsData({});
       setSignersStatusByNetwork({});
       return;
     }
 
-    // Avoid re-fetching if the networks list hasn't changed
-    const networksKey = JSON.stringify(networksWithClients);
-    if (networksKey === lastFetchedNetworksKey.current) return;
-    lastFetchedNetworksKey.current = networksKey;
+    // On subsequent polls, check if the networks list changed
+    const networksKey = JSON.stringify(networks);
+    const networksChanged = networksKey !== prevNetworksKeyRef.current;
+    prevNetworksKeyRef.current = networksKey;
 
-    // Step 4: Fetch node status, combined validators data, and signer data
-    // validatorsDataByNetwork combines active, attesting, and balances in a single
-    // backend call, reducing beacon chain API requests
-    try {
-      setNodesStatusLoading(true);
-      setValidatorsLoading(true);
-
-      const [nodeStatus, validatorsResult, signersStatus] = await Promise.all([
-        api.nodeStatusGetByNetwork({ networks: networksWithClients }),
-        api.validatorsDataByNetwork({ networks: networksWithClients }),
-        api.signerByNetworkGet({ networks: networksWithClients })
-      ]);
-
-      setNodesStatusByNetwork(nodeStatus);
-      setValidatorsData(validatorsResult);
-      setSignersStatusByNetwork(signersStatus);
-    } catch (e) {
-      console.error("Error fetching network data", e);
-    } finally {
-      setNodesStatusLoading(false);
-      setValidatorsLoading(false);
+    // If networks changed, clear stale data for networks no longer present
+    if (networksChanged) {
+      const networkSet = new Set<string>(networks);
+      setNodesStatusByNetwork((prev) => {
+        if (!prev) return prev;
+        const cleaned: NodeStatusByNetwork = {};
+        for (const [k, v] of Object.entries(prev)) {
+          if (networkSet.has(k)) cleaned[k as DashboardSupportedNetwork] = v;
+        }
+        return cleaned;
+      });
     }
-  }, [consensusClientsByNetwork, executionClientsByNetwork]);
+
+    // Fire each network's fetch independently — cards appear as each resolves
+    for (const network of networks) {
+      // Don't await — let them run concurrently and merge state as each finishes
+      fetchSingleNetworkData(network);
+    }
+  }, [consensusClientsByNetwork, executionClientsByNetwork, fetchSingleNetworkData]);
 
   useEffect(() => {
     fetchNetworkData();
@@ -196,91 +354,67 @@ export function useNetworkStats() {
     return () => clearInterval(interval);
   }, [fetchNetworkData]);
 
-  const clientsLoading =
-    nodesStatusLoading ||
-    consensusClientsReq.isValidating ||
-    executionClientsReq.isValidating ||
-    nodesStatusByNetwork === undefined;
+  // Initial loading: true until we've determined which networks exist.
+  // Once initialLoading is false, we always have enough data to render cards.
+  // Do NOT include SWR isValidating here — revalidation should never replace
+  // the dashboard with a spinner; existing cards stay visible during refresh.
+  const clientsLoading = initialLoading;
 
-  const networkStats: NetworkStats = {};
+  // Per-network loading: a specific network's node status is still being fetched
+  const isNetworkNodeLoading = useCallback(
+    (network: DashboardSupportedNetwork) => networksLoadingNodes.has(network),
+    [networksLoadingNodes]
+  );
 
-  for (const network of supportedNetworks) {
-    const features = networkFeatures[network];
-    const nodeStatusData: NodeStatus | undefined = nodesStatusByNetwork?.[network];
-    const consensusClientDnp = consensusClientsByNetwork?.[network];
-    const executionClientDnp = executionClientsByNetwork?.[network];
+  // Per-network validators loading
+  const isNetworkValidatorsLoading = useCallback(
+    (network: DashboardSupportedNetwork) => networksLoadingValidators.has(network),
+    [networksLoadingValidators]
+  );
 
-    // Only include client results if the corresponding package is actually installed
-    const ecInstalled = executionClientDnp ? installedDnpNames.has(executionClientDnp) : false;
-    const ccInstalled = consensusClientDnp ? installedDnpNames.has(consensusClientDnp) : false;
+  // Global validators loading: at least one network is still loading validators
+  const validatorsLoading = networksLoadingValidators.size > 0;
 
-    const filteredNodeStatus: NodeStatus | undefined = nodeStatusData
-      ? {
-          ec: ecInstalled ? nodeStatusData.ec : null,
-          cc: ccInstalled ? nodeStatusData.cc : null
-        }
-      : undefined;
-
-    const validatorsActive = validatorsData?.[network]?.active;
-    const validatorsAttesting = validatorsData?.[network]?.attesting;
-    const balancesObj = validatorsData?.[network]?.balances?.balances;
-    const signerStatus = signersStatusByNetwork?.[network] ?? { isInstalled: false, brainRunning: false };
-
-    let total = 0;
-    let attesting = 0;
-    let balance = 0;
-    let beaconError = undefined;
-
-    if (features.hasValidators && validatorsActive) {
-      total = validatorsActive.validators.length;
-      beaconError = validatorsActive.beaconError;
+  const networkStats: NetworkStats = useMemo(() => {
+    const stats: NetworkStats = {};
+    for (const network of supportedNetworks) {
+      const entry = buildNetworkStatus(
+        network,
+        nodesStatusByNetwork,
+        validatorsData,
+        signersStatusByNetwork,
+        consensusClientsByNetwork,
+        executionClientsByNetwork,
+        installedDnpNames
+      );
+      if (entry) {
+        stats[network] = entry;
+      }
     }
-    if (features.hasValidators && validatorsAttesting && !validatorsAttesting.beaconError) {
-      attesting = validatorsAttesting.validators.length;
-    }
-    if (features.hasValidators && balancesObj && validatorsActive) {
-      // Sum balances for active validators
-      balance = validatorsActive.validators.reduce((acc, pk) => acc + (parseFloat(balancesObj[pk]) || 0), 0);
-    }
-
-    const validatorsInfo = features.hasValidators
-      ? {
-          validators: {
-            total,
-            balance,
-            attesting,
-            beaconError,
-            signerStatus,
-            pubKeys: validatorsActive?.validators || []
-          }
-        }
-      : undefined;
-
-    // Show network when any client has data or an error (but not when both are null)
-    const hasEc = filteredNodeStatus?.ec !== null && filteredNodeStatus?.ec !== undefined;
-    const hasCc = filteredNodeStatus?.cc !== null && filteredNodeStatus?.cc !== undefined;
-    if (filteredNodeStatus && (hasEc || hasCc)) {
-      networkStats[network] = {
-        nodeStatus: filteredNodeStatus,
-        clientsDnps: {
-          ecDnp: ecInstalled ? executionClientDnp || null : null,
-          ccDnp: ccInstalled ? consensusClientDnp || null : null
-        },
-        ...validatorsInfo,
-        hasValidators: features.hasValidators,
-        beaconExplorer: features.beaconExplorer || undefined
-      };
-    } else {
-      delete networkStats[network];
-    }
-  }
+    return stats;
+  }, [
+    nodesStatusByNetwork,
+    validatorsData,
+    signersStatusByNetwork,
+    consensusClientsByNetwork,
+    executionClientsByNetwork,
+    installedDnpNames
+  ]);
 
   // Provide a function to get the logo for a network
   function getNetworkLogo(network: DashboardSupportedNetwork) {
     return networkFeatures[network]?.logo || EthLogo;
   }
 
-  return { networkStats, clientsLoading, getNetworkLogo, validatorsLoading };
+  return {
+    networkStats,
+    clientsLoading,
+    getNetworkLogo,
+    validatorsLoading,
+    networksWithClients,
+    isNetworkNodeLoading,
+    isNetworkValidatorsLoading
+  };
 }
 
 export function isClientError(result: ClientResult): result is ClientError {

@@ -7,50 +7,72 @@ import Loading from "components/Loading";
 import "./networkStats.scss";
 
 export default function NetworkStats() {
-  const { networkStats, clientsLoading, getNetworkLogo, validatorsLoading } = useNetworkStats();
+  const {
+    networkStats,
+    clientsLoading,
+    getNetworkLogo,
+    networksWithClients,
+    isNetworkNodeLoading,
+    isNetworkValidatorsLoading
+  } = useNetworkStats();
+
+  // Show global spinner only during the initial discovery phase
+  // (fetching client lists + installed packages)
+  if (clientsLoading) {
+    return (
+      <div className="network-stats">
+        <Loading />
+      </div>
+    );
+  }
+
+  // After discovery: if no networks have clients, show the empty state
+  if (!networksWithClients || networksWithClients.length === 0) {
+    return (
+      <div className="network-stats">
+        <NoNodesCard />
+      </div>
+    );
+  }
+
   return (
     <div className="network-stats">
-      {clientsLoading ? (
-        <Loading />
-      ) : Object.entries(networkStats).length === 0 ? (
-        <NoNodesCard />
-      ) : (
-        <>
-          {Object.entries(networkStats).map(([network, data]) => {
-            if (!data) return null;
-            const NetworkLogo = getNetworkLogo(network as DashboardSupportedNetwork);
-            return (
-              <div key={network}>
-                <div className="network-header">
-                  <NetworkLogo width={24} height={24} />
-                  <SubTitle>{(network === Network.Mainnet ? "ethereum" : network).toUpperCase()}</SubTitle>
-                </div>
+      {networksWithClients.map((network) => {
+        const data = networkStats[network];
+        const NetworkLogo = getNetworkLogo(network as DashboardSupportedNetwork);
+        const nodeLoading = isNetworkNodeLoading(network);
+        const validatorsLoading = isNetworkValidatorsLoading(network);
 
-                <div className="network-cards-container">
-                  <StatusCard
-                    network={network}
-                    data={data.nodeStatus}
-                    clientsLoading={clientsLoading}
-                    clientsDnps={data.clientsDnps}
-                  />
+        return (
+          <div key={network}>
+            <div className="network-header">
+              <NetworkLogo width={24} height={24} />
+              <SubTitle>{(network === Network.Mainnet ? "ethereum" : network).toUpperCase()}</SubTitle>
+            </div>
 
-                  {data.hasValidators && (
-                    <ValidatorsCard network={network} validatorsLoading={validatorsLoading} data={data.validators} />
-                  )}
+            <div className="network-cards-container">
+              <StatusCard
+                network={network}
+                data={data?.nodeStatus}
+                clientsLoading={nodeLoading}
+                clientsDnps={data?.clientsDnps}
+              />
 
-                  {data.beaconExplorer && data.validators && data.validators.total > 0 && (
-                    <RewardsCard
-                      network={network}
-                      beaconExplorer={data.beaconExplorer}
-                      pubKeys={data.validators.pubKeys}
-                    />
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </>
-      )}
+              {data && data.hasValidators && (
+                <ValidatorsCard network={network} validatorsLoading={validatorsLoading} data={data.validators} />
+              )}
+
+              {data && data.beaconExplorer && data.validators && data.validators.total > 0 && (
+                <RewardsCard
+                  network={network}
+                  beaconExplorer={data.beaconExplorer}
+                  pubKeys={data.validators.pubKeys}
+                />
+              )}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
