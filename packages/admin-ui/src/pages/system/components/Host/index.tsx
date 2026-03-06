@@ -5,12 +5,16 @@ import PowerManagment from "./PowerManagment";
 import { UpdateUpgrade } from "./UpdateUpgrade";
 import { DockerUpgrade } from "./DockerUpgrade";
 import { SshManager } from "./SshManager";
+import ChangeHostUserPassword from "./ChangeHostUserPassword";
 
 export default function Host() {
   return (
     <>
       <SubTitle>SSH</SubTitle>
       <SshManager />
+
+      <SubTitle>Host user password</SubTitle>
+      <ChangeHostUserPassword />
 
       <SubTitle>Docker update</SubTitle>
       <DockerUpgrade />
