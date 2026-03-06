@@ -32,11 +32,17 @@ async function fetchValidatorsBatch(
   const base = `http://beacon-chain.${network}.dncore.dappnode:3500`;
   const normPubkeys = pubkeys.map((p) => p.toLowerCase());
   const url = new URL(`/eth/v1/beacon/states/head/validators`, base);
-  const params = new URLSearchParams();
-  for (const pk of normPubkeys) params.append("id", pk);
-  url.search = params.toString();
 
-  const res = await fetch(url.toString(), { headers: { Accept: "application/json" } });
+  // Use POST with JSON body instead of GET with query params.
+  // The GET endpoint has a maxItems:64 limit and some beacon clients
+  // (e.g. Lodestar) fail to parse repeated `id` query params as an array,
+  // producing: "querystring/id must be array".
+  // The POST variant uses `ids` in the body and avoids these issues.
+  const res = await fetch(url.toString(), {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify({ ids: normPubkeys })
+  });
   if (!res.ok) {
     throw new Error(`Beacon API ${network} validators responded ${res.status} ${res.statusText}`);
   }
@@ -150,7 +156,7 @@ export async function validatorsFilterActiveByNetwork({
 
   const keystoresByNetwork = await keystoresGetByNetwork({ networks });
 
-  const BATCH_SIZE = 100;
+  const BATCH_SIZE = 50;
 
   await Promise.all(
     networks.map(async (network) => {
@@ -200,7 +206,7 @@ export async function validatorsFilterActiveByNetwork({
  * Extracted so it can be wrapped with a timeout.
  */
 async function fetchValidatorsDataForNetwork(network: Network, pubkeys: string[]): Promise<ValidatorsNetworkData> {
-  const BATCH_SIZE = 100;
+  const BATCH_SIZE = 50;
   const batches = chunk(pubkeys, BATCH_SIZE);
 
   // For each batch, call fetchValidatorsBatch ONCE and reuse results for all three concerns
