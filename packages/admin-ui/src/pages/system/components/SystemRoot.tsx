@@ -6,15 +6,14 @@ import Title from "components/Title";
 import AutoUpdates from "./AutoUpdates";
 import App from "./App";
 import Security from "./Security";
-import PowerManagment from "./PowerManagment";
 import SystemUpdate from "./SystemUpdate";
 import Ipfs from "./Ipfs";
 import SystemInfo from "./SystemInfo";
 import Profile from "./Profile";
 import { Network } from "./Network";
 import { Advanced } from "./Advanced";
-import Hardware from "./Hardware";
 import { SectionNavigator } from "components/SectionNavigator";
+import Host from "./Host";
 
 const SystemRoot: React.FC = () => {
   const availableRoutes: RouteType[] = [
@@ -37,11 +36,6 @@ const SystemRoot: React.FC = () => {
       name: "Profile",
       subPath: subPaths.profile,
       element: <Profile />
-    },
-    {
-      name: "Power",
-      subPath: subPaths.power,
-      element: <PowerManagment />
     },
     {
       name: "Network",
@@ -70,9 +64,9 @@ const SystemRoot: React.FC = () => {
       element: <Security />
     },
     {
-      name: "Hardware",
-      subPath: subPaths.hardware,
-      element: <Hardware />
+      name: "Host",
+      subPath: subPaths.host,
+      element: <Host />
     },
     {
       name: "Advanced",
