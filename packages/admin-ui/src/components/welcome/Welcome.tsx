@@ -36,10 +36,13 @@ function getRouteIdComponent(routeId: NewFeatureId): React.FC<RouteProps> | unde
   switch (routeId) {
     case "system-auto-updates":
       return (props: RouteProps) => <SystemAutoUpdates {...props} />;
+
     case "change-host-password":
       return (props: RouteProps) => <ChangeHostPassword {...props} />;
+
     case "enable-ethical-metrics":
       return (props: RouteProps) => <EnableEthicalMetrics {...props} />;
+
     case "enable-notifications":
       return (props: RouteProps) => <EnableNotifications {...props} />;
     default:
@@ -65,6 +68,7 @@ export default function Welcome() {
     featureId: NewFeatureId;
     render: React.FC<RouteProps>;
   }[] = [];
+
   for (const featureId of intFeatureIds) {
     const render = getRouteIdComponent(featureId);
     if (render) routes.push({ featureId, render });

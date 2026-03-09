@@ -36,12 +36,14 @@ export function IpfsClient({
   clientTarget: selectedClientTarget,
   gatewayTarget,
   onClientTargetChange,
-  onGatewayTargetChange
+  onGatewayTargetChange,
+  localRequiresInstall = false
 }: {
   clientTarget: IpfsClientTarget | null;
   gatewayTarget: string | null;
   onClientTargetChange: (newTarget: IpfsClientTarget) => void;
   onGatewayTargetChange: (newTarget: string) => void;
+  localRequiresInstall?: boolean;
 }) {
   return (
     <div className="ipfs-multi-clients">
@@ -49,6 +51,8 @@ export function IpfsClient({
         .filter(({ option }) => option.length > 0)
         .map(({ title, description, option }) => {
           const selected = selectedClientTarget && option === selectedClientTarget;
+
+          const showLocalInstallNotice = option === IpfsClientTarget.local && localRequiresInstall;
 
           return (
             <Card
@@ -64,6 +68,12 @@ export function IpfsClient({
               <div className="description">
                 <RenderMarkdown source={description} />
               </div>
+
+              {showLocalInstallNotice ? (
+                <div className="description">
+                  IPFS package isn&apos;t installed. Switching to <strong>Local</strong> will install it automatically.
+                </div>
+              ) : null}
 
               {option === "remote" && (
                 <Input

@@ -2,6 +2,7 @@ import * as db from "@dappnode/db";
 import { getVersionData } from "../utils/getVersionData.js";
 import { NewFeatureId, SystemInfo } from "@dappnode/types";
 import { isCoreUpdateEnabled } from "@dappnode/daemons";
+import { params } from "@dappnode/params";
 
 /**
  * Returns the current DAppNode system info
@@ -43,14 +44,14 @@ function getNewFeatureIds(): NewFeatureId[] {
   // auto-updates: Show only if all are disabled
   if (!isCoreUpdateEnabled()) newFeatureIds.push("system-auto-updates");
 
-  // enable-ethical-metrics: Show only if not seen
-  if (db.newFeatureStatus.get("enable-ethical-metrics") !== "seen") newFeatureIds.push("enable-ethical-metrics");
+  // enable-ethical-metrics: Disabled in the onboarding for now as we want to rethink how we present it
+  // if (db.newFeatureStatus.get("enable-ethical-metrics") !== "seen") newFeatureIds.push("enable-ethical-metrics");
 
   // enable-notifications: Show only if not seen
   if (db.newFeatureStatus.get("enable-notifications") !== "seen") newFeatureIds.push("enable-notifications");
 
-  // change-host-password: Show only if insecure
-  if (!db.passwordIsSecure.get()) newFeatureIds.push("change-host-password");
+  // change-host-password: Show only if insecure and host scripts are enabled
+  if (!db.passwordIsSecure.get() && !params.DISABLE_HOST_SCRIPTS) newFeatureIds.push("change-host-password");
 
   // Filter out features that the user has already seen or set
   return newFeatureIds.filter((featureId) => {

@@ -14,8 +14,10 @@ import { Network } from "./Network";
 import { Advanced } from "./Advanced";
 import { SectionNavigator } from "components/SectionNavigator";
 import Host from "./Host";
+import { useApi } from "api";
 
 const SystemRoot: React.FC = () => {
+  const disableHostScripts = useApi.disableHostScriptsGet();
   const availableRoutes: RouteType[] = [
     {
       name: "Info",
@@ -63,11 +65,16 @@ const SystemRoot: React.FC = () => {
       subPath: subPaths.security,
       element: <Security />
     },
-    {
-      name: "Host",
-      subPath: subPaths.host,
-      element: <Host />
-    },
+    // Remove host section if host scripts are disabled
+    ...(disableHostScripts.data
+      ? []
+      : [
+          {
+            name: "Host",
+            subPath: subPaths.host,
+            element: <Host />
+          }
+        ]),
     {
       name: "Advanced",
       subPath: subPaths.advanced,
