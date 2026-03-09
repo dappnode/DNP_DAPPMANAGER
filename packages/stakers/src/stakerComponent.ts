@@ -162,18 +162,14 @@ export class StakerComponent {
     // we can't ensure the changes of the compose file are due to meaningful changes or just due to
     // normalization of the compose file such as quotes or order of the keys, so we want to avoid recreating the containers
     // if not needed as it can cause unnecessary downtime to the users
-    let noRecreate = true;
     if (pkg.containers.some((c) => !c.running)) {
       logs.info(`At least one container of ${dnpName} is not running, recreating containers to apply changes`);
-      noRecreate = false;
+      // start all containers
+      await dockerComposeUpPackage({
+        composeArgs: { dnpName },
+        upAll: true
+      });
     }
-
-    // start all containers
-    await dockerComposeUpPackage({
-      composeArgs: { dnpName },
-      upAll: true,
-      dockerComposeUpOptions: { noRecreate }
-    });
   }
 
   /**
