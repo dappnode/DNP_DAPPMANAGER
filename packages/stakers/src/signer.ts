@@ -74,11 +74,11 @@ export class Signer extends StakerComponent {
     const signerDnp = await listPackageNoThrow({ dnpName: signerDnpName });
     const isRunning = signerDnp?.containers.some((container) => container.running);
 
-    if (isRunning) {
+    if (isRunning && signerDnp) {
       const dnpName = Signer.CompatibleSigners[network].dnpName;
       const userSettings = this.getUserSettings(network);
 
-      await this.setStakerPkgConfig({ dnpName, isInstalled: true, userSettings });
+      await this.setStakerPkgConfig({ dnpName, pkg: signerDnp, userSettings });
     }
   }
 
