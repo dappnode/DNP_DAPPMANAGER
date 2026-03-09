@@ -13,6 +13,7 @@ export { diagnose } from "./diagnose.js";
 export { dockerUpgradeCheck, dockerUpgrade } from "./dockerUpgrade.js";
 export { dappnodeWebNameSet } from "./dappnodeWebNameSet.js";
 export { disableEthicalMetrics, enableEthicalMetrics, getEthicalMetricsConfig } from "./ethicalMetrics.js";
+export { disableHostScriptsGet } from "./disableHostScriptsGet.js";
 export { executionClientsGetByNetworks } from "./executionClientGet.js";
 export { fetchCoreUpdateData } from "./fetchCoreUpdateData.js";
 export { fetchDirectory } from "./fetchDirectory.js";

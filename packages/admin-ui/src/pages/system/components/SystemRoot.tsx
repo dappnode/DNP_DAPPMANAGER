@@ -14,9 +14,10 @@ import { Network } from "./Network";
 import { Advanced } from "./Advanced";
 import { SectionNavigator } from "components/SectionNavigator";
 import Host from "./Host";
-import { params } from "@dappnode/params";
+import { useApi } from "api";
 
 const SystemRoot: React.FC = () => {
+  const disableHostScripts = useApi.disableHostScriptsGet();
   const availableRoutes: RouteType[] = [
     {
       name: "Info",
@@ -65,7 +66,7 @@ const SystemRoot: React.FC = () => {
       element: <Security />
     },
     // Remove host section if host scripts are disabled
-    ...(params.DISABLE_HOST_SCRIPTS
+    ...(disableHostScripts.data
       ? []
       : [
           {

@@ -8,14 +8,13 @@ import Start from "./Start";
 import Finished from "./Finished";
 import SystemAutoUpdates from "./features/SystemAutoUpdates";
 import ChangeHostPassword from "./features/ChangeHostPassword";
-// import EnableEthicalMetrics from "./features/EnableEthicalMetrics";
+import EnableEthicalMetrics from "./features/EnableEthicalMetrics";
 // Utils
 import { isEqual } from "lodash-es";
 import { NewFeatureId } from "@dappnode/types";
 // styles
 import "./welcome.scss";
 import EnableNotifications from "./features/EnableNotifications";
-import { params } from "@dappnode/params";
 
 /**
  * This internal Welcome status allows to freeze featureIds
@@ -39,12 +38,11 @@ function getRouteIdComponent(routeId: NewFeatureId): React.FC<RouteProps> | unde
       return (props: RouteProps) => <SystemAutoUpdates {...props} />;
 
     case "change-host-password":
-      if (params.DISABLE_HOST_SCRIPTS) return undefined;
       return (props: RouteProps) => <ChangeHostPassword {...props} />;
 
-    // Disabling ethical metrics in the onboarding for now as we want to rethink how we present it
-    // case "enable-ethical-metrics":
-    //   return (props: RouteProps) => <EnableEthicalMetrics {...props} />;
+    case "enable-ethical-metrics":
+      return (props: RouteProps) => <EnableEthicalMetrics {...props} />;
+
     case "enable-notifications":
       return (props: RouteProps) => <EnableNotifications {...props} />;
     default:
@@ -70,6 +68,7 @@ export default function Welcome() {
     featureId: NewFeatureId;
     render: React.FC<RouteProps>;
   }[] = [];
+
   for (const featureId of intFeatureIds) {
     const render = getRouteIdComponent(featureId);
     if (render) routes.push({ featureId, render });
