@@ -303,8 +303,11 @@ export class ComposeEditor {
       if (typeof service.environment === "object" && !Array.isArray(service.environment))
         service.environment = stringifyEnvironment(service.environment);
 
-      // Remove hardcoded DNS
-      service.dns = undefined;
+      // Remove hardcoded DNS — use delete to fully remove the key from the object.
+      // Setting to undefined would leave the key present, causing yamlDump to serialize
+      // it as `dns: null`, which Docker Compose treats as a config change and triggers
+      // unnecessary container recreation.
+      delete service.dns;
 
       return {
         ...omitBy(service, (el) => isObject(el) && isEmpty(el)),

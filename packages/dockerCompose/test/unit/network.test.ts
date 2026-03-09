@@ -55,8 +55,7 @@ describe("modules / compose / networks", () => {
             image,
             networks: {
               [networkName]: { aliases }
-            },
-            dns: undefined
+            }
           }
         },
         networks: {
@@ -71,8 +70,7 @@ describe("modules / compose / networks", () => {
         services: {
           "sample.dnp.dappnode.eth": {
             container_name,
-            image,
-            dns: undefined
+            image
           }
         },
         networks: {}

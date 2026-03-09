@@ -6,6 +6,7 @@ import { InstalledPackageData, StakerItem, UserSettings, Network } from "@dappno
 import { getIsInstalled, getIsUpdated, getIsRunning, fileToGatewayUrl } from "@dappnode/utils";
 import { lt } from "semver";
 import { params } from "@dappnode/params";
+import fs from "fs";
 
 export class StakerComponent {
   protected dappnodeInstaller: DappnodeInstaller;
@@ -153,22 +154,37 @@ protected async getAll({
     dnpName: string;
     userSettings: UserSettings;
   }): Promise<void> {
+    let composeChanged = false;
+
     if (userSettings) {
       const composeEditor = new ComposeFileEditor(dnpName, false);
 
+      // Read the current compose YAML from disk before applying settings
+      const yamlBefore = fs.readFileSync(composeEditor.composePath, "utf8");
+
       composeEditor.applyUserSettings(userSettings, { dnpName });
-      // it must be called write after applying user settings otherwise the new settings will be lost and therefore the compose up will not have effect
       composeEditor.write();
+
+      // Compare the YAML after writing to detect actual changes
+      const yamlAfter = fs.readFileSync(composeEditor.composePath, "utf8");
+      composeChanged = yamlBefore !== yamlAfter;
+
+      if (composeChanged) {
+        logs.info(`Compose file changed for ${dnpName}, containers will be recreated`);
+      }
     }
 
-    // start all containers
+    // Ensure all containers are running.
+    // Use --no-recreate when the compose file hasn't changed to prevent
+    // unnecessary container recreation (which causes brief downtime).
+    // When the compose DID change (e.g. new backup beacon nodes), allow
+    // Docker Compose to recreate containers with the updated config.
     await dockerComposeUpPackage({
       composeArgs: { dnpName },
-      upAll: true
-      // dockerComposeUpOptions: { noRecreate: true }
+      upAll: true,
+      dockerComposeUpOptions: composeChanged ? undefined : { noRecreate: true }
     });
   }
-
   /**
    * Unset staker pkg:
    * - disconnects the staker pkg from the staker network
