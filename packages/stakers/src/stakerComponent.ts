@@ -14,19 +14,19 @@ export class StakerComponent {
     this.dappnodeInstaller = dappnodeInstaller;
   }
 
-  protected async getAll({
-    dnpNames,
-    currentClient,
-    relays,
-    starknetSignerOperationalAddress,
-    starknetSignerPrivateKey
-  }: {
-    dnpNames: string[];
-    currentClient?: boolean | string | null;
-    relays?: string[];
-    starknetSignerOperationalAddress?: string;
-    starknetSignerPrivateKey?: string;
-  }): Promise<StakerItem[]> {
+protected async getAll({
+  dnpNames,
+  currentClient,
+  relays,
+  starknetSignerOperationalAddress,
+  starknetSignerPrivateKey
+}: {
+  dnpNames: string[];
+  currentClient?: boolean | string | null;
+  relays?: string[];
+  starknetSignerOperationalAddress?: string;
+  starknetSignerPrivateKey?: string;
+}): Promise<StakerItem[]> {
     const dnpList = await listPackages();
 
     return await Promise.all(
@@ -95,13 +95,18 @@ export class StakerComponent {
     }
 
     if (!newStakerDnpName) return;
-
     // set staker config
     await this.setStakerPkgConfig({
       dnpName: newStakerDnpName,
-      pkg: await listPackageNoThrow({ dnpName: newStakerDnpName }),
+      isInstalled: Boolean(await listPackageNoThrow({ dnpName: newStakerDnpName })),
       userSettings
     });
+  }
+
+  protected async isPackageInstalled(dnpName: string): Promise<boolean> {
+    const dnp = await listPackageNoThrow({ dnpName });
+
+    return Boolean(dnp);
   }
 
   protected getComposeRootNetworks(network: Network): NonNullable<UserSettings["networks"]>["rootNetworks"] {
@@ -124,15 +129,15 @@ export class StakerComponent {
    */
   protected async setStakerPkgConfig({
     dnpName,
-    pkg,
+    isInstalled,
     userSettings
   }: {
     dnpName: string;
-    pkg: InstalledPackageData | null;
+    isInstalled: boolean;
     userSettings: UserSettings;
   }): Promise<void> {
-    if (pkg) {
-      await this.setInstalledStakerPkgConfig({ dnpName, pkg, userSettings });
+    if (isInstalled) {
+      await this.setInstalledStakerPkgConfig({ dnpName, userSettings });
     } else {
       await packageInstall(this.dappnodeInstaller, {
         name: dnpName,
@@ -143,11 +148,9 @@ export class StakerComponent {
 
   private async setInstalledStakerPkgConfig({
     dnpName,
-    pkg,
     userSettings
   }: {
     dnpName: string;
-    pkg: InstalledPackageData;
     userSettings: UserSettings;
   }): Promise<void> {
     if (userSettings) {
@@ -158,18 +161,12 @@ export class StakerComponent {
       composeEditor.write();
     }
 
-    // only recreate containers if any container is not running.
-    // we can't ensure the changes of the compose file are due to meaningful changes or just due to
-    // normalization of the compose file such as quotes or order of the keys, so we want to avoid recreating the containers
-    // if not needed as it can cause unnecessary downtime to the users
-    if (pkg.containers.some((c) => !c.running)) {
-      logs.info(`At least one container of ${dnpName} is not running, recreating containers to apply changes`);
-      // start all containers
-      await dockerComposeUpPackage({
-        composeArgs: { dnpName },
-        upAll: true
-      });
-    }
+    // start all containers
+    await dockerComposeUpPackage({
+      composeArgs: { dnpName },
+      upAll: true
+      // dockerComposeUpOptions: { noRecreate: true }
+    });
   }
 
   /**

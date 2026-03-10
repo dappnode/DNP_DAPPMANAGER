@@ -44,7 +44,7 @@ export class Signer extends StakerComponent {
       minVersion: "0.1.0"
     },
     [Network.Sepolia]: {
-      dnpName: SignerSepolia.Web3signer,
+      dnpName: SignerSepolia.Web3signer, 
       minVersion: "0.1.0"
     },
     // TODO: dont exist but need to be added
@@ -78,7 +78,7 @@ export class Signer extends StakerComponent {
       const dnpName = Signer.CompatibleSigners[network].dnpName;
       const userSettings = this.getUserSettings(network);
 
-      await this.setStakerPkgConfig({ dnpName, pkg: signerDnp, userSettings });
+      await this.setStakerPkgConfig({ dnpName, isInstalled: true, userSettings });
     }
   }
 
