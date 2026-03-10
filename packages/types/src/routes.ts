@@ -239,6 +239,11 @@ export interface Routes {
   disableEthicalMetrics: () => Promise<void>;
 
   /**
+   * Returns true if host scripts are disabled
+   */
+  disableHostScriptsGet: () => Promise<boolean>;
+
+  /**
    * Returns current core version in string if core was installed, else returns empty string
    */
   getCoreVersion: () => Promise<string>;
@@ -912,6 +917,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   getCoreVersion: {},
   getEthicalMetricsConfig: { log: true },
   disableEthicalMetrics: { log: true },
+  disableHostScriptsGet: {},
   fetchCoreUpdateData: {},
   fetchDirectory: {},
   fetchRegistry: {},

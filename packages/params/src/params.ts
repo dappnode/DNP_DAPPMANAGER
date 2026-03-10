@@ -250,12 +250,7 @@ export const params = {
     "ipfs.dnp.dappnode.eth",
     "wifi.dnp.dappnode.eth"
   ],
-  corePackagesNotRemovable: [
-    "bind.dnp.dappnode.eth",
-    "dappmanager.dnp.dappnode.eth",
-    "ipfs.dnp.dappnode.eth",
-    "wifi.dnp.dappnode.eth"
-  ],
+  corePackagesNotRemovable: ["bind.dnp.dappnode.eth", "dappmanager.dnp.dappnode.eth"],
 
   // DYNDNS parameters
   DYNDNS_HOST: "https://ns.dappnode.io",

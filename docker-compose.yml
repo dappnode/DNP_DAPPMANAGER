@@ -14,7 +14,7 @@ services:
     volumes:
       - "/run/dbus/system_bus_socket:/run/dbus/system_bus_socket"
       - "dappmanagerdnpdappnodeeth_data:/usr/src/app/dnp_repo/"
-      - "${DAPPNODE_CORE_DIR:-/usr/src/dappnode/DNCORE}:/usr/src/app/DNCORE/"
+      - "/usr/src/dappnode/DNCORE:/usr/src/app/DNCORE/"
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "/etc/hostname:/etc/dappnodename:ro"
     environment:
@@ -25,7 +25,6 @@ services:
       - ALWAYS_DAPPGETBASIC=
       - SKIP_COMPOSE_VALIDATION=
       - TEST=
-      - DISABLE_HOST_SCRIPTS=${DISABLE_HOST_SCRIPTS:-false}
     networks:
       dncore_network:
         aliases:
