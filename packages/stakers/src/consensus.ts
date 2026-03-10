@@ -134,9 +134,9 @@ export class Consensus extends StakerComponent {
   async persistSelectedConsensusIfInstalled(network: Network): Promise<void> {
     const currentConsensusDnpName = this.DbHandlers[network].get();
     if (currentConsensusDnpName) {
-      const isInstalled = await this.isPackageInstalled(currentConsensusDnpName);
+      const pkg = await listPackageNoThrow({ dnpName: currentConsensusDnpName });
 
-      if (!isInstalled) {
+      if (!pkg) {
         // update status in db
         this.DbHandlers[network].set(undefined);
         return;
@@ -144,7 +144,7 @@ export class Consensus extends StakerComponent {
 
       const userSettings = await this.getUserSettings(network, currentConsensusDnpName);
 
-      await this.setStakerPkgConfig({ dnpName: currentConsensusDnpName, isInstalled, userSettings });
+      await this.setStakerPkgConfig({ dnpName: currentConsensusDnpName, pkg, userSettings });
 
       await this.DbHandlers[network].set(currentConsensusDnpName);
     }
@@ -196,8 +196,8 @@ export class Consensus extends StakerComponent {
     }
 
     try {
-      const isPrevInstalled = await this.isPackageInstalled(prevConsClientDnpName);
-      if (isPrevInstalled) {
+      const pkg = await listPackageNoThrow({ dnpName: prevConsClientDnpName });
+      if (pkg) {
         const composeEditor = new ComposeFileEditor(prevConsClientDnpName, false);
         const validatorService = composeEditor.services()["validator"]; // WARNING: assumes service is named "validator"
         if (validatorService) {
@@ -221,8 +221,8 @@ export class Consensus extends StakerComponent {
   ): Promise<UserSettings> {
     if (!newConsensusDnpName) return {};
 
-    const isPkgInstalled = await this.isPackageInstalled(newConsensusDnpName);
-    let environment = isPkgInstalled ? {} : getDefaultConsensusUserSettings({ network }).environment;
+    const pkg = await listPackageNoThrow({ dnpName: newConsensusDnpName });
+    let environment = pkg ? {} : getDefaultConsensusUserSettings({ network }).environment;
 
     // Only for Mainnet, Gnosis and Hoodi, try to get backup beacon node
     if (network === Network.Mainnet || network === Network.Gnosis || network === Network.Hoodi) {
