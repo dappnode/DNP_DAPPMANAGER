@@ -516,7 +516,8 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
       isInstalled: false,
       brainRunning: false
     }
-  })
+  }),
+  disableHostScriptsGet: async () => false
 };
 
 export const calls: Routes = {

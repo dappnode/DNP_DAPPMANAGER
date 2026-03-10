@@ -30,7 +30,7 @@ async function monitorHostReboot(): Promise<void> {
             body: `A reboot is required to install updates from some linux packages`,
             callToAction: {
               title: "Reboot",
-              url: "http://my.dappnode/system/power"
+              url: "http://my.dappnode/system/host"
             },
             category: Category.system,
             priority: Priority.low,
