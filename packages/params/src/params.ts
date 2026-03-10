@@ -38,6 +38,7 @@ export const params = {
   userActionLogsFilename: path.join(DNCORE_DIR, "userActionLogs.log"),
   // Static files serve
   avatarStaticDir: path.join(REPO_DIR, "avatars"),
+  coreAvatarStaticDir: path.join(DNCORE_DIR, "avatars"),
   // lowdb requires an absolute path
   DB_MAIN_PATH: path.resolve(DNCORE_DIR, "maindb.json"),
   DB_CACHE_PATH: path.resolve(DNCORE_DIR, "dappmanagerdb.json"),
