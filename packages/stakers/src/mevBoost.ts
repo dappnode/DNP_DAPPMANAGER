@@ -90,7 +90,7 @@ export class MevBoost extends StakerComponent {
 
       await this.setStakerPkgConfig({
         dnpName: mevBoostDnpName,
-        pkg: mevBoostDnp,
+        isInstalled: true,
         userSettings
       });
 
@@ -120,14 +120,14 @@ export class MevBoost extends StakerComponent {
       // If the package is not installed, we use the default environment
       environment: newRelays
         ? {
-            [mevBoostServiceName]: {
-              ["RELAYS"]:
-                newRelays
-                  .join(",")
-                  .trim()
-                  .replace(/(^,)|(,$)/g, "") || ""
-            }
+          [mevBoostServiceName]: {
+            ["RELAYS"]:
+              newRelays
+                .join(",")
+                .trim()
+                .replace(/(^,)|(,$)/g, "") || ""
           }
+        }
         : {},
       networks: this.getStakerNetworkSettings(network)
     };

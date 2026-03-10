@@ -16,7 +16,7 @@ import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller } from "@dappnode/installer";
 import * as db from "@dappnode/db";
 import { params } from "@dappnode/params";
-import { listPackageNoThrow } from "@dappnode/dockerapi";
+import { listPackage } from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
 import { gt } from "semver";
 
@@ -30,16 +30,16 @@ export class Execution extends StakerComponent {
       set: (globEnvValue: string | null | undefined) => Promise<void>;
     }
   > = {
-    [Network.Mainnet]: db.executionClientMainnet,
-    [Network.Gnosis]: db.executionClientGnosis,
-    [Network.Prater]: db.executionClientPrater,
-    [Network.Holesky]: db.executionClientHolesky,
-    [Network.Sepolia]: db.executionClientSepolia,
-    [Network.Hoodi]: db.executionClientHoodi,
-    [Network.Lukso]: db.executionClientLukso,
-    [Network.StarknetMainnet]: db.executionStarknetMainnet,
-    [Network.StarknetSepolia]: db.executionStarknetSepolia
-  };
+      [Network.Mainnet]: db.executionClientMainnet,
+      [Network.Gnosis]: db.executionClientGnosis,
+      [Network.Prater]: db.executionClientPrater,
+      [Network.Holesky]: db.executionClientHolesky,
+      [Network.Sepolia]: db.executionClientSepolia,
+      [Network.Hoodi]: db.executionClientHoodi,
+      [Network.Lukso]: db.executionClientLukso,
+      [Network.StarknetMainnet]: db.executionStarknetMainnet,
+      [Network.StarknetSepolia]: db.executionStarknetSepolia
+    };
 
   protected static readonly CompatibleExecutions: Record<Network, { dnpName: string; minVersion: string }[]> = {
     [Network.Mainnet]: [
@@ -104,9 +104,9 @@ export class Execution extends StakerComponent {
   async persistSelectedExecutionIfInstalled(network: Network): Promise<void> {
     const currentExecutionDnpName = this.DbHandlers[network].get();
     if (currentExecutionDnpName) {
-      const pkg = await listPackageNoThrow({ dnpName: currentExecutionDnpName });
+      const isInstalled = await this.isPackageInstalled(currentExecutionDnpName);
 
-      if (!pkg) {
+      if (!isInstalled) {
         // update status in db
         this.DbHandlers[network].set(undefined);
         return;
@@ -114,11 +114,7 @@ export class Execution extends StakerComponent {
 
       const userSettings = await this.getUserSettings(network, currentExecutionDnpName);
 
-      await this.setStakerPkgConfig({
-        dnpName: currentExecutionDnpName,
-        pkg,
-        userSettings
-      });
+      await this.setStakerPkgConfig({ dnpName: currentExecutionDnpName, isInstalled, userSettings });
 
       await this.DbHandlers[network].set(currentExecutionDnpName);
     }
@@ -197,10 +193,10 @@ export class Execution extends StakerComponent {
   }
 
   private async getExecutionVersion(dnpName: string): Promise<string> {
-    const pkg = await listPackageNoThrow({ dnpName });
+    const isInstalled = await this.isPackageInstalled(dnpName);
 
-    if (pkg) {
-      const version = pkg.version;
+    if (isInstalled) {
+      const version = (await listPackage({ dnpName })).version;
       logs.info(`Execution ${dnpName} is installed. Using version ${version}`);
       return version;
     } else {
