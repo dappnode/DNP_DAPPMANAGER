@@ -39,7 +39,7 @@ const networkFeatures: Record<DashboardSupportedNetwork, NetworkFeatures> = {
   [Network.Gnosis]: {
     hasValidators: true,
     logo: GnosisLogo,
-    beaconExplorer: { url: "https://beaconchain.gnosischain.com/", name: "Beacon Beaconchain" }
+    beaconExplorer: { url: "https://beaconchain.gnosischain.com/", name: "Gnosis Beaconchain" }
   },
   [Network.Lukso]: {
     hasValidators: true,
@@ -193,9 +193,7 @@ export function useNetworkStats() {
 
   // Track which networks are still loading their node status or validators
   const [networksLoadingNodes, setNetworksLoadingNodes] = useState<Set<DashboardSupportedNetwork>>(new Set());
-  const [networksLoadingValidators, setNetworksLoadingValidators] = useState<Set<DashboardSupportedNetwork>>(
-    new Set()
-  );
+  const [networksLoadingValidators, setNetworksLoadingValidators] = useState<Set<DashboardSupportedNetwork>>(new Set());
 
   // True until the initial discovery phase completes (client lists + installed packages)
   const [initialLoading, setInitialLoading] = useState(true);
@@ -361,10 +359,9 @@ export function useNetworkStats() {
   const clientsLoading = initialLoading;
 
   // Per-network loading: a specific network's node status is still being fetched
-  const isNetworkNodeLoading = useCallback(
-    (network: DashboardSupportedNetwork) => networksLoadingNodes.has(network),
-    [networksLoadingNodes]
-  );
+  const isNetworkNodeLoading = useCallback((network: DashboardSupportedNetwork) => networksLoadingNodes.has(network), [
+    networksLoadingNodes
+  ]);
 
   // Per-network validators loading
   const isNetworkValidatorsLoading = useCallback(
