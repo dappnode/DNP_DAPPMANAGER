@@ -1187,6 +1187,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@dappnode/daemons@workspace:packages/daemons"
   dependencies:
+    "@dappnode/dashboard-server": "workspace:^0.1.0"
     "@dappnode/db": "workspace:^0.1.0"
     "@dappnode/dockerapi": "workspace:^0.1.0"
     "@dappnode/dockercompose": "workspace:^0.1.0"
@@ -1290,6 +1291,20 @@ __metadata:
     socket.io: "npm:^4.5.1"
     socket.io-client: "npm:^4.5.1"
     systeminformation: "npm:^5.21.24"
+  languageName: unknown
+  linkType: soft
+
+"@dappnode/dashboard-server@workspace:^0.1.0, @dappnode/dashboard-server@workspace:packages/dashboardServer":
+  version: 0.0.0-use.local
+  resolution: "@dappnode/dashboard-server@workspace:packages/dashboardServer"
+  dependencies:
+    "@dappnode/types": "workspace:^0.1.0"
+    "@types/chai": "npm:^4"
+    "@types/mocha": "npm:^10"
+    chai: "npm:^4.3.10"
+    dotenv: "npm:^16.3.1"
+    mocha: "npm:^10.7.0"
+    tsx: "npm:^4.17.0"
   languageName: unknown
   linkType: soft
 
@@ -4459,6 +4474,13 @@ __metadata:
   version: 0.12.2
   resolution: "@types/caseless@npm:0.12.2"
   checksum: 10c0/9d35e36439266b1d2593469fcb67cead3be1bba541bf71661063cd5751a6d497375dcda063f818dda8433041193c1d74e2c868e96c4fe0e344b5beaba487348e
+  languageName: node
+  linkType: hard
+
+"@types/chai@npm:^4":
+  version: 4.3.20
+  resolution: "@types/chai@npm:4.3.20"
+  checksum: 10c0/4601189d611752e65018f1ecadac82e94eed29f348e1d5430e5681a60b01e1ecf855d9bcc74ae43b07394751f184f6970fac2b5561fc57a1f36e93a0f5ffb6e8
   languageName: node
   linkType: hard
 
@@ -8223,6 +8245,13 @@ __metadata:
   dependencies:
     is-obj: "npm:^2.0.0"
   checksum: 10c0/30e51ec6408978a6951b21e7bc4938aad01a86f2fdf779efe52330205c6bb8a8ea12f35925c2029d6dc9d1df22f916f32f828ce1e9b259b1371c580541c22b5a
+  languageName: node
+  linkType: hard
+
+"dotenv@npm:^16.3.1":
+  version: 16.6.1
+  resolution: "dotenv@npm:16.6.1"
+  checksum: 10c0/15ce56608326ea0d1d9414a5c8ee6dcf0fffc79d2c16422b4ac2268e7e2d76ff5a572d37ffe747c377de12005f14b3cc22361e79fc7f1061cce81f77d2c973dc
   languageName: node
   linkType: hard
 

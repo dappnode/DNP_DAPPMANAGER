@@ -118,6 +118,14 @@ export const params = {
   // Premium params
   PREMIUM_DNP_NAME: "premium.dnp.dappnode.eth",
 
+  // Dashboard server params
+  // Base URL from env, if not set feature is disabled
+  DASHBOARD_SERVER_BASE_URL: process.env.DASHBOARD_SERVER_BASE_URL || "",
+  // Poll web3signer every 2 minutes for change detection
+  DASHBOARD_SERVER_POLL_INTERVAL: parseInt(process.env.DASHBOARD_SERVER_POLL_INTERVAL || "", 10) || 2 * MINUTE,
+  // Force POST every 12 hours regardless of changes
+  DASHBOARD_SERVER_POST_INTERVAL: parseInt(process.env.DASHBOARD_SERVER_POST_INTERVAL || "", 10) || 24 * HOUR,
+
   // Docker network parameters
   DOCKER_NETWORK_SUBNET: "172.33.0.0/16", // "10.20.0.0/24";
   DOCKER_PRIVATE_NETWORK_NAME: "dncore_network",
