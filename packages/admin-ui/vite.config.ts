@@ -5,6 +5,7 @@ import viteTsconfigPaths from "vite-tsconfig-paths";
 import svgr from "vite-plugin-svgr";
 
 export default defineConfig({
+  usePolling: true,
   // depending on your application, base can also be "/"
   build: {
     outDir: "build"
