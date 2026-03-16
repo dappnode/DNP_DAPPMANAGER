@@ -53,6 +53,11 @@ class WireguardClient {
   // - local:     '/dappnode_admin?local'
   // - local qr:  '/dappnode_admin?local&qr'
   async getDeviceCredentials(device: string): Promise<WireguardDeviceCredentials> {
+    // SSRF fix: Only allow devices that exist in the allowed devices list
+    const devices = this.getDevices();
+    if (!devices.includes(device)) {
+      throw Error(`Device '${device}' is not registered or allowed`);
+    }
     const url = urlJoin(WIREGUARD_API_URL, device);
     const remoteConfigUrl = url;
     const localConfigUrl = `${url}?local=true`;
