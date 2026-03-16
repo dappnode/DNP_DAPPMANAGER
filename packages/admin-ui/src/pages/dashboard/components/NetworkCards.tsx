@@ -238,7 +238,16 @@ const ClientSection = ({
             </div>
           </div>
         </div>
-        {showProgress && progress !== undefined && <ProgressBar animated now={progress} />}
+        {showProgress && progress !== undefined && (
+          <OverlayTrigger
+            overlay={
+              <Tooltip id={`${clientData.name}-${network}-progress-tooltip`}>Syncing progress: {progress}%</Tooltip>
+            }
+            placement="top"
+          >
+            <ProgressBar animated now={progress} />
+          </OverlayTrigger>
+        )}
       </div>
     );
   }
