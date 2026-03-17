@@ -1,0 +1,107 @@
+/**
+ * Scoped Bootstrap styles.
+ *
+ * Bootstrap styles (reboot + class-based components) are nested under
+ * `.legacy-bootstrap` so they only apply to the legacy /staking/* routes
+ * wrapped in <LegacyStakingLayout>.
+ *
+ * New routes (/, /ai, etc.) are NOT affected by Bootstrap styles.
+ *
+ * Strategy:
+ *  1. Import Bootstrap's configuration at root level (no CSS output).
+ *  2. Import _root.scss at root level for --bs-* CSS custom properties.
+ *  3. Nest _reboot.scss + all class-based partials under .legacy-bootstrap.
+ *  4. Apply body-level typography on .legacy-bootstrap itself (since the
+ *     scoped `body` rule won't match the real <body>).
+ *  5. Import custom SCSS overrides inside .legacy-bootstrap so they share
+ *     the same specificity as the Bootstrap component selectors.
+ *  6. Import portal-based components (modal, tooltip, popover, offcanvas)
+ *     at root level — they render on <body> via React portals.
+ *  7. Import structural/theme SCSS at root level (uses :root/body/#id).
+ */
+
+// 1. Configuration — no CSS output, needed by the partials below
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/variables-dark";
+@import "bootstrap/scss/maps";
+@import "bootstrap/scss/mixins";
+@import "bootstrap/scss/utilities";
+
+// 2. CSS custom properties on :root
+@import "bootstrap/scss/root";
+
+// DAppNode color variables on :root (extracted from dappnode_colors.scss).
+@import "./dappnode-color-vars";
+
+// 3. Reboot is imported inside .legacy-bootstrap (below) so its element
+//    resets (a, *, body, button, etc.) don't leak to new routes.
+
+// 4. Class-based component styles — scoped under .legacy-bootstrap
+.legacy-bootstrap {
+  // Reboot (element-level normalisation) — scoped so it only affects
+  // legacy routes.  Body-level styles are re-applied on & below.
+  @import "bootstrap/scss/reboot";
+
+  // Apply body-level styles to the wrapper itself so typography,
+  // colors, and font-family are inherited by descendants.
+  margin: 0;
+  font-family: var(--#{$prefix}body-font-family);
+  @include font-size(var(--#{$prefix}body-font-size));
+  font-weight: var(--#{$prefix}body-font-weight);
+  line-height: var(--#{$prefix}body-line-height);
+  color: var(--#{$prefix}body-color);
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: rgba($black, 0);
+
+  // ── Layout & components ─────────────────────────────────────────
+  @import "bootstrap/scss/type";
+  @import "bootstrap/scss/images";
+  @import "bootstrap/scss/containers";
+  @import "bootstrap/scss/grid";
+  @import "bootstrap/scss/tables";
+  @import "bootstrap/scss/forms";
+  @import "bootstrap/scss/buttons";
+  @import "bootstrap/scss/transitions";
+  @import "bootstrap/scss/dropdown";
+  @import "bootstrap/scss/button-group";
+  @import "bootstrap/scss/nav";
+  @import "bootstrap/scss/navbar";
+  @import "bootstrap/scss/card";
+  @import "bootstrap/scss/accordion";
+  @import "bootstrap/scss/breadcrumb";
+  @import "bootstrap/scss/pagination";
+  @import "bootstrap/scss/badge";
+  @import "bootstrap/scss/alert";
+  @import "bootstrap/scss/progress";
+  @import "bootstrap/scss/list-group";
+  @import "bootstrap/scss/close";
+  @import "bootstrap/scss/toasts";
+  @import "bootstrap/scss/carousel";
+  @import "bootstrap/scss/spinners";
+  @import "bootstrap/scss/placeholders";
+
+  // Helpers
+  @import "bootstrap/scss/helpers";
+
+  // Utilities
+  @import "bootstrap/scss/utilities/api";
+
+  // 5. Custom overrides — INSIDE the scope so they have the same
+  //    .legacy-bootstrap ancestor specificity as the Bootstrap
+  //    component selectors they need to override.
+  @import "../dappnode_styles";
+  @import "../dappnode_colors";
+}
+
+// Portal-based components — rendered outside .legacy-bootstrap (appended to
+// <body> by react-bootstrap).  Must be at root level so selectors match.
+@import "bootstrap/scss/modal";
+@import "bootstrap/scss/tooltip";
+@import "bootstrap/scss/popover";
+@import "bootstrap/scss/offcanvas";
+
+// 6. Structural / theme styles — stay at root level because they target
+//    :root, body, html, #sidebar, #main, #topbar (outside .legacy-bootstrap).
+@import "../light_dark";
+@import "../layout";

@@ -191,7 +191,7 @@ body.dark {
     .nav a,
     .nav .sidenav-item,
     .sidebar-media-footer {
-      color: var(--color-dark-secondarytext);
+      color: var(--color-dark-secondarytext) !important;
       svg {
         opacity: 1;
       }
