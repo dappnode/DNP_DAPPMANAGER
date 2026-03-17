@@ -10,7 +10,7 @@ export default function Dashboard() {
   return (
     <div className="dashboard-container">
       <div className="dashboard-header">
-        <Title title="Welcome back, Node Runner" />
+        <Title title="Welcome back, Node Runnero" />
         <hr />
       </div>
 
