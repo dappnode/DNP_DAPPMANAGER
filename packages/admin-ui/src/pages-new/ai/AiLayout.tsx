@@ -10,9 +10,7 @@ function AiHome() {
     <div className="tw:flex tw:items-center tw:justify-center tw:min-h-[50vh]">
       <div className="tw:text-center">
         <h1 className="tw:text-3xl tw:font-bold tw:mb-4">AI</h1>
-        <p className="tw:text-lg tw:text-muted-foreground tw:mb-8">
-          AI-powered features — coming soon
-        </p>
+        <p className="tw:text-lg tw:text-muted-foreground tw:mb-8">AI-powered features — coming soon</p>
 
         <div className="tw:flex tw:flex-col tw:gap-6 tw:items-center">
           {/* All variants */}
@@ -36,8 +34,12 @@ function AiHome() {
           {/* Disabled state */}
           <div className="tw:flex tw:flex-wrap tw:gap-3 tw:justify-center">
             <Button disabled>Disabled Default</Button>
-            <Button variant="outline" disabled>Disabled Outline</Button>
-            <Button variant="destructive" disabled>Disabled Destructive</Button>
+            <Button variant="outline" disabled>
+              Disabled Outline
+            </Button>
+            <Button variant="destructive" disabled>
+              Disabled Destructive
+            </Button>
           </div>
         </div>
       </div>

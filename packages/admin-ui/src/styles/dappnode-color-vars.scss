@@ -1,0 +1,57 @@
+/**
+ * DAppNode color variables — extracted from dappnode_colors.scss.
+ *
+ * These CSS custom properties are used throughout the legacy UI and must
+ * live on :root (not scoped under .legacy-bootstrap) so they cascade
+ * to all descendants.  The class-based overrides (btn-dappnode, badges,
+ * toast colors, etc.) remain in dappnode_colors.scss and are imported
+ * inside the .legacy-bootstrap scope for correct specificity.
+ */
+:root {
+  --dappnode-white-color: #fff;
+  --dappnode-strong-main-color: #00b1f4;
+  --dappnode-darker-main-color: #007dfc;
+  --dappnode-shadow-main-color: #06d4e7;
+  --dappnode-light-main-color: #a0bdbb;
+  --dappnode-gray-main-color: #748888;
+  --dappnode-links-color: #00b1f4;
+  --dappnode-links-darker-color: #007dfc;
+  --dappnode-complimentary-color: #bc2f39;
+  // Border colors
+  --border-color: #e5e5e5;
+  --color-light-border: #e5e5e5;
+  --color-dark-border: #616161;
+  --border-style-light: var(--border-size) solid var(--color-light-border);
+  --border-style-dark: var(--border-size) solid var(--color-dark-border);
+
+  // LIGHT mode
+  --color-light-background-sidebar-topbar: white;
+  --color-light-background-main: #f7f9f9;
+
+  // DARK mode
+  --color-dark-background-sidebar: #212121;
+  --color-dark-background-topbar: #313131;
+  --color-dark-background-main: #313131;
+  --color-dark-maintext: #ffffff;
+  --color-dark-secondarytext: #dddddd;
+  --color-dark-tertiarytext: #cccccc;
+  --color-dark-quaternarytext: #c1c1c1;
+  --color-dark-card: #414141;
+  --color-dark-card-hover: #6a6a6a;
+  --color-dark-danger-background: #8d2222;
+
+  // Buttons
+  --dappnode-white-color: #fff;
+
+  // Alert colors
+  --danger-color: var(--dappnode-complimentary-color);
+  --warning-color: #ffcc00;
+  --success-color: var(--dappnode-strong-main-color);
+  --success-green-color: #34a853;
+  /* Shortcuts */
+  --dappnode-color: var(--dappnode-strong-main-color);
+  /* Text colors */
+  --light-text-color: #757575;
+  /* Opacity shades */
+  --opacity-soft: 0.6;
+}

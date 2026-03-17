@@ -27,7 +27,7 @@ export function LegacyStakingLayout({
   appContext: AppContextIface;
 }) {
   return (
-    <>
+    <div className="legacy-bootstrap">
       <SideBar screenWidth={screenWidth} />
       <TopBar username={username} appContext={appContext} />
       <div id="main">
@@ -44,6 +44,6 @@ export function LegacyStakingLayout({
       <Smooth />
       <PwaPermissionsModal />
       <ToastContainer />
-    </>
+    </div>
   );
 }

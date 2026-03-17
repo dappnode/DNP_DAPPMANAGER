@@ -1,131 +1,135 @@
-.tn-dropdown {
-  position: relative;
+.legacy-bootstrap {
+  .tn-dropdown {
+    position: relative;
 
-  .icon-bubble {
-    position: absolute;
-    right: -5px;
-    top: -5px;
-    background: transparent;
-    border-radius: var(--bubble-size);
-    height: var(--bubble-size);
-    width: var(--bubble-size);
+    .icon-bubble {
+      position: absolute;
+      right: -5px;
+      top: -5px;
+      background: transparent;
+      border-radius: var(--bubble-size);
+      height: var(--bubble-size);
+      width: var(--bubble-size);
 
-    &.success {
-      background: var(--success-color);
-    }
-    &.warning {
-      background: var(--warning-color);
-    }
-    &.danger {
-      background: var(--danger-color);
-    }
-  }
-
-  > .menu {
-    /* Does not need a z-index, it has the topbar z-index */
-    background-color: white;
-    border: var(--border-style);
-    border-radius: 0.5rem;
-    padding: 0.5rem 0;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    /* Positioning */
-    position: absolute;
-    top: 2.5rem;
-    /* Display control */
-    display: none;
-    /* Sizing */
-    width: 25rem;
-    right: 0;
-    max-height: 30rem;
-    overflow-y: auto;
-
-    &.show {
-      display: block;
+      &.success {
+        background: var(--success-color);
+      }
+      &.warning {
+        background: var(--warning-color);
+      }
+      &.danger {
+        background: var(--danger-color);
+      }
     }
 
-    @media (max-width: 40rem) {
-      width: calc(100vw - 1rem);
-      max-width: 16rem;
-    }
+    > .menu {
+      /* Does not need a z-index, it has the topbar z-index */
+      background-color: white;
+      border: var(--border-style);
+      border-radius: 0.5rem;
+      padding: 0.5rem 0;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      /* Positioning */
+      position: absolute;
+      top: 2.5rem;
+      /* Display control */
+      display: none;
+      /* Sizing */
+      width: 25rem;
+      right: 0;
+      max-height: 30rem;
+      overflow-y: auto;
 
-    /* Menu items */
-    > div {
-      padding: 0.75rem 1rem;
-      overflow-wrap: break-word;
+      &.show {
+        display: block;
+      }
 
-      .title {
-        display: flex;
-        align-items: center;
-        .text {
-          flex: auto;
-        }
-        .title-actions {
+      @media (max-width: 40rem) {
+        width: calc(100vw - 1rem);
+        max-width: 16rem;
+      }
+
+      /* Menu items */
+      > div {
+        padding: 0.75rem 1rem;
+        overflow-wrap: break-word;
+
+        .title {
           display: flex;
           align-items: center;
-          gap: 0.5rem;
-          .help {
-            font-size: 140%;
+          .text {
+            flex: auto;
+          }
+          .title-actions {
             display: flex;
-            color: #6c757d;
+            align-items: center;
+            gap: 0.5rem;
+            .help {
+              font-size: 140%;
+              display: flex;
+              color: #6c757d;
+            }
           }
         }
       }
-    }
-    > div:not(:last-child) {
-      border-bottom: var(--border-style);
-    }
-    > .header {
-      color: #6c757d;
-      font-weight: 600;
-      font-size: 1.1rem;
-      padding: 0.75rem 1rem;
-      background-color: rgba(0, 0, 0, 0.02);
-    }
-    > .placeholder {
-      color: #6c757d;
-      opacity: 0.8;
-      text-align: center;
-      padding: 1rem;
-    }
-    .progress {
-      margin: 0.5rem 0;
-    }
-  }
-
-  &.installer {
-    > .menu {
-      right: -3rem;
-      > div {
+      > div:not(:last-child) {
+        border-bottom: var(--border-style);
+      }
+      > .header {
+        color: #6c757d;
+        font-weight: 600;
+        font-size: 1.1rem;
+        padding: 0.75rem 1rem;
+        background-color: rgba(0, 0, 0, 0.02);
+      }
+      > .placeholder {
+        color: #6c757d;
+        opacity: 0.8;
+        text-align: center;
         padding: 1rem;
+      }
+      .progress {
+        margin: 0.5rem 0;
       }
     }
 
-    .progress-logs {
-      width: 100%;
-      margin: 0.5rem 0;
+    &.installer {
+      > .menu {
+        right: -3rem;
+        > div {
+          padding: 1rem;
+        }
+      }
+
+      .progress-logs {
+        width: 100%;
+        margin: 0.5rem 0;
+      }
     }
-  }
-  &.dappnodeidentity {
-    > .menu {
-      width: 20rem;
+    &.dappnodeidentity {
+      > .menu {
+        width: 20rem;
+      }
+
+      .sign-out {
+        cursor: pointer;
+        color: #dc3545 !important;
+      }
     }
 
-    .sign-out {
-      cursor: pointer;
-      color: #dc3545 !important;
+    // Regulate size of toggle icons
+    &.notifications .tn-dropdown-toggle svg {
+      font-size: 1.3rem;
     }
-  }
-
-  // Regulate size of toggle icons
-  &.notifications .tn-dropdown-toggle svg {
-    font-size: 1.3rem;
   }
 }
 
-.tn-dropdown-toggle {
-  /* flex automatically centers the toggle icons */
-  padding: 0.25rem;
-  display: flex;
-  opacity: 0.6;
-  cursor: pointer;
+.legacy-bootstrap {
+  .tn-dropdown-toggle {
+    /* flex automatically centers the toggle icons */
+    padding: 0.25rem;
+    display: flex;
+    opacity: 0.6;
+    cursor: pointer;
+  }
 }

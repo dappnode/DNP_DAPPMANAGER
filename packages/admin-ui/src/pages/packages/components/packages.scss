@@ -67,7 +67,7 @@
 
   /* Customize name inside NavLink */
   a:hover {
-    color: var(--dappnode-color);
+    color: var(--dappnode-color) !important;
     text-decoration: none;
     transition: color 0.2s ease;
   }
