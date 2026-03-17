@@ -7,6 +7,9 @@
     "moduleResolution": "node",
 
     "baseUrl": "src",
+    "paths": {
+      "@/*": ["*"]
+    },
 
     "types": ["vite/client"],
 
