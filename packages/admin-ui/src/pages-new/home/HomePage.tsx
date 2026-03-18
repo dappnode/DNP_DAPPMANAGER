@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/primitives/card";
 import { ShieldCheck, Sparkles, Check, ArrowRight } from "lucide-react";
 import dappnodeLogo from "img/dappnode-logo-only.png";
 
