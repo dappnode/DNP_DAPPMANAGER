@@ -13,9 +13,11 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarInset,
-  SidebarTrigger
+  SidebarTrigger,
+  useSidebar
 } from "components/primitives/sidebar";
 import { Separator } from "components/primitives/separator";
+import { DecorativeBackground } from "pages-new/layouts";
 import { StorePage } from "./StorePage";
 import { PackagesPage } from "./PackagesPage";
 
@@ -34,12 +36,39 @@ function AiHome() {
     <div className="tw:flex tw:flex-col tw:gap-section tw:px-page-x tw:py-page-y">
       <header>
         <h1 className="tw:text-3xl tw:font-bold tw:tracking-tight tw:text-foreground">AI Overview</h1>
-        <p className="tw:mt-2 tw:text-muted-foreground tw:max-w-2xl">
+        <p className="tw:mt-header-gap tw:text-muted-foreground tw:max-w-2xl">
           AI-powered features to help you manage and optimise your Dappnode. Explore the Store to discover models and
           tools, or check your installed Packages.
         </p>
       </header>
     </div>
+  );
+}
+
+/* ── Sidebar brand header (collapse-aware) ──────────────────────────── */
+
+function SidebarBrandHeader({ onNavigateHome }: { onNavigateHome: () => void }) {
+  const { state } = useSidebar();
+  const isCollapsed = state === "collapsed";
+
+  return (
+    <SidebarHeader>
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <SidebarMenuButton size="lg" onClick={onNavigateHome} tooltip="Back to Home">
+            <div className="tw:flex tw:items-center tw:justify-center tw:size-8 tw:rounded-lg tw:bg-primary/10">
+              <img className="tw:size-5" src={dappnodeLogo} alt="Dappnode" />
+            </div>
+            {!isCollapsed && (
+              <div className="tw:flex tw:flex-col tw:gap-0.5 tw:leading-none">
+                <span className="tw:font-semibold">Dappnode</span>
+                <span className="tw:text-xs tw:text-muted-foreground">AI</span>
+              </div>
+            )}
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    </SidebarHeader>
   );
 }
 
@@ -53,22 +82,7 @@ export function AiLayout() {
     <div className="tw-base">
       <SidebarProvider>
         <Sidebar variant="sidebar" collapsible="icon">
-          {/* Logo / brand header */}
-          <SidebarHeader>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton size="lg" onClick={() => navigate("/")} tooltip="Back to Home">
-                  <div className="tw:flex tw:items-center tw:justify-center tw:size-8 tw:rounded-lg tw:bg-primary/10">
-                    <img className="tw:size-5" src={dappnodeLogo} alt="Dappnode" />
-                  </div>
-                  <div className="tw:flex tw:flex-col tw:gap-0.5 tw:leading-none">
-                    <span className="tw:font-semibold">Dappnode</span>
-                    <span className="tw:text-xs tw:text-muted-foreground">AI</span>
-                  </div>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarHeader>
+          <SidebarBrandHeader onNavigateHome={() => navigate("/")} />
 
           {/* Navigation */}
           <SidebarContent>
@@ -102,16 +116,19 @@ export function AiLayout() {
           </SidebarContent>
         </Sidebar>
 
-        <SidebarInset>
+        <SidebarInset className="tw:relative tw:overflow-hidden">
+          {/* Decorative orb background behind page content */}
+          <DecorativeBackground />
+
           {/* Top bar */}
-          <header className="tw:flex tw:h-12 tw:shrink-0 tw:items-center tw:gap-2 tw:border-b tw:px-4">
+          <header className="tw:relative tw:z-10 tw:flex tw:h-topbar-h tw:shrink-0 tw:items-center tw:gap-2 tw:border-b tw:px-page-x">
             <SidebarTrigger className="tw:-ml-1" />
             <Separator orientation="vertical" className="tw:mr-2 tw:!h-4" />
             <span className="tw:text-sm tw:font-medium tw:text-muted-foreground">AI</span>
           </header>
 
           {/* Page content */}
-          <div className="tw:flex-1 tw:overflow-auto">
+          <div className="tw:relative tw:z-10 tw:flex-1 tw:overflow-auto">
             <Routes>
               <Route index element={<AiHome />} />
               <Route path="store" element={<StorePage />} />
