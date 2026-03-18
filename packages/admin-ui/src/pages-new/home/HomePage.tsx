@@ -3,34 +3,15 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "components/primitives/card";
 import { ShieldCheck, Sparkles, Check, ArrowRight } from "lucide-react";
 import dappnodeLogo from "img/dappnode-logo-only.png";
+import { NewPageLayout } from "pages-new/layouts";
 
 export function NewHomePage() {
   const navigate = useNavigate();
 
   return (
-    <div className="tw-base tw:relative tw:flex tw:flex-col tw:min-h-screen tw:bg-background tw:overflow-hidden">
-      {/* ── Background decoration ────────────────────────────────── */}
-      <div className="tw:pointer-events-none tw:absolute tw:inset-0 tw:overflow-hidden" aria-hidden>
-        {/* Orb — top-left (purple) */}
-        <div className="tw:absolute tw:-top-40 tw:-left-40 tw:size-[600px] tw:rounded-full tw:opacity-20 tw:blur-3xl tw:bg-dn-purple" />
-        {/* Orb — top-right (orange) */}
-        <div className="tw:absolute tw:-top-24 tw:-right-32 tw:size-[400px] tw:rounded-full tw:opacity-15 tw:blur-3xl tw:bg-dn-orange" />
-        {/* Orb — bottom-left (blue) */}
-        <div className="tw:absolute tw:-bottom-32 tw:-left-20 tw:size-[450px] tw:rounded-full tw:opacity-12 tw:blur-3xl tw:bg-dn-blue" />
-        {/* Orb — bottom-right (pink) */}
-        <div className="tw:absolute tw:-bottom-40 tw:-right-40 tw:size-[550px] tw:rounded-full tw:opacity-15 tw:blur-3xl tw:bg-dn-pink" />
-        {/* Subtle dot-grid overlay */}
-        <div
-          className="tw:absolute tw:inset-0 tw:opacity-[0.03]"
-          style={{
-            backgroundImage: "radial-gradient(circle, currentColor 1px, transparent 1px)",
-            backgroundSize: "24px 24px"
-          }}
-        />
-      </div>
-
+    <NewPageLayout>
       {/* ── Content ──────────────────────────────────────────────── */}
-      <div className="tw:relative tw:z-10 tw:flex tw:flex-1 tw:flex-col tw:items-center tw:justify-center tw:px-page-x tw:py-page-y tw:gap-section">
+      <div className="tw:flex tw:flex-1 tw:flex-col tw:items-center tw:justify-center tw:px-page-x tw:py-page-y tw:gap-section">
         {/* Hero section */}
         <header className="tw:text-center tw:max-w-2xl tw:space-y-5">
           {/* Dappnode logo mark */}
@@ -51,7 +32,7 @@ export function NewHomePage() {
         </header>
 
         {/* ── Navigation cards ───────────────────────────────────── */}
-        <div className="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-card tw:w-full tw:max-w-4xl">
+        <div className="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-card tw:w-full tw:max-w-content-max">
           {/* Staking Card */}
           <Card
             className="tw:group tw:relative tw:flex tw:flex-col tw:justify-between tw:border-0 tw:ring-1 tw:ring-border tw:bg-card/80 tw:backdrop-blur-sm tw:transition-all tw:duration-300 tw:hover:ring-2 tw:hover:ring-accent/50 tw:hover:shadow-xl tw:hover:shadow-accent/5 tw:hover:-translate-y-1 tw:cursor-pointer"
@@ -119,10 +100,10 @@ export function NewHomePage() {
       </div>
 
       {/* ── Footer ───────────────────────────────────────────────── */}
-      <footer className="tw:relative tw:z-10 tw:py-6 tw:text-center tw:text-xs tw:text-muted-foreground/60">
+      <footer className="tw:py-6 tw:text-center tw:text-xs tw:text-muted-foreground/60">
         Powered by Dappnode — decentralise everything
       </footer>
-    </div>
+    </NewPageLayout>
   );
 }
 

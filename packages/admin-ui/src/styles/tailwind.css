@@ -27,6 +27,7 @@
 
 /*
  * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ *  ⚠️  MIGRATION NOTE — TEMPORARY CODE
  *  Scoped base reset for new Tailwind pages
  *
  *  Since Tailwind preflight is disabled (to keep Bootstrap working on
@@ -36,6 +37,19 @@
  *  This gives new pages proper box-sizing, font-family, line-height,
  *  and removes the fixed `height:100%` constraint from the legacy
  *  layout.scss that breaks `min-h-svh` on the sidebar.
+ *
+ *  This entire `.tw-base` block (including the scoped reset rules
+ *  below) can be DELETED once the Bootstrap → Tailwind migration is
+ *  complete. At that point:
+ *    1. Remove Bootstrap and its scoped import (bootstrap-scoped.scss).
+ *    2. Enable Tailwind preflight by adding:
+ *         @import "tailwindcss/preflight.css" layer(base);
+ *       after the theme import at the top of this file.
+ *    3. Delete every `.tw-base` rule in the @layer base {} block.
+ *    4. Remove the `.tw-base` wrapper class from layouts and
+ *       components (NewPageLayout, AiLayout, sidebar SheetContent…).
+ *  Preflight will then apply these same resets globally, making the
+ *  scoped approach unnecessary.
  * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  */
 @layer base {
@@ -55,6 +69,13 @@
     tab-size: 4;
   }
 
+  /*
+   * Scoped preflight — applies to everything inside .tw-base.
+   *
+   * The mobile sidebar (rendered via a React portal on <body>) also
+   * gets these resets because the sidebar component adds the .tw-base
+   * class to its SheetContent wrapper.
+   */
   .tw-base *,
   .tw-base *::before,
   .tw-base *::after {
@@ -64,7 +85,7 @@
     border-color: var(--border);
   }
 
-  /* Reset common elements inside .tw-base */
+  /* Reset common elements */
   .tw-base h1,
   .tw-base h2,
   .tw-base h3,
@@ -190,6 +211,9 @@
   --spacing-page-y: var(--page-padding-y);
   --spacing-section: var(--section-gap);
   --spacing-card: var(--card-gap);
+  --spacing-header-gap: var(--header-gap);
+  --spacing-topbar-h: var(--topbar-height);
+  --spacing-content-max: var(--content-max-w);
 }
 
 /*
@@ -214,9 +238,11 @@
 
   /* ── Layout primitives ────────────────────────────────────────── */
   --page-padding-x: 1.5rem;
-  --page-padding-y: 4rem;
-  --section-gap: 4rem;
-  --card-gap: 2rem;
+  --page-padding-y: 2rem;
+  --section-gap: 2rem;
+  --card-gap: 1rem;
+  --header-gap: 0.5rem;
+  --topbar-height: 3rem;
   --content-max-w: 64rem;
   --radius: 0.625rem;
 
