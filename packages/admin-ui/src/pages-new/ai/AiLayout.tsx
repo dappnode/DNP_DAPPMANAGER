@@ -1,6 +1,6 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import { Button } from "components/ui/button";
+import { Button } from "@/components/primitives/button";
 
 /**
  * Layout for the /ai/* routes using Tailwind v4 + shadcn/ui.
