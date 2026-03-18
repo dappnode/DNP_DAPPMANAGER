@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/primitives/card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "components/primitives/card";
 import { ShieldCheck, Sparkles, Check, ArrowRight } from "lucide-react";
 import dappnodeLogo from "img/dappnode-logo-only.png";
 
@@ -8,7 +8,7 @@ export function NewHomePage() {
   const navigate = useNavigate();
 
   return (
-    <div className="tw:relative tw:flex tw:flex-col tw:min-h-screen tw:bg-background tw:overflow-hidden">
+    <div className="tw-base tw:relative tw:flex tw:flex-col tw:min-h-screen tw:bg-background tw:overflow-hidden">
       {/* ── Background decoration ────────────────────────────────── */}
       <div className="tw:pointer-events-none tw:absolute tw:inset-0 tw:overflow-hidden" aria-hidden>
         {/* Orb — top-left (purple) */}
