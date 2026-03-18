@@ -54,7 +54,7 @@ function useSidebar() {
 }
 
 function SidebarProvider({
-  defaultOpen = true,
+  defaultOpen = false,
   open: openProp,
   onOpenChange: setOpenProp,
   className,
@@ -189,7 +189,7 @@ function Sidebar({
           data-sidebar="sidebar"
           data-slot="sidebar"
           data-mobile="true"
-          className="tw:w-(--sidebar-width) tw:bg-sidebar tw:p-0 tw:text-sidebar-foreground tw:[&>button]:hidden"
+          className="tw-base tw:w-(--sidebar-width) tw:bg-sidebar tw:p-0 tw:text-sidebar-foreground tw:[&>button]:hidden"
           style={
             {
               "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
