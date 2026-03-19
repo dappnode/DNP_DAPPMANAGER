@@ -16,6 +16,43 @@ function Card({ className, size = "default", ...props }: React.ComponentProps<"d
   );
 }
 
+/**
+ * An interactive card rendered as a `<button>` element.
+ *
+ * Use this when the entire card surface should be clickable (e.g.
+ * navigation cards, selection tiles). It provides:
+ * - `role="button"` semantics (native `<button>`)
+ * - Keyboard activation (Enter / Space)
+ * - Focus-visible ring
+ * - Hover lift + ring highlight
+ *
+ * Accepts all the same children as `Card` (`CardHeader`, `CardContent`, …).
+ */
+function ClickableCard({
+  className,
+  size = "default",
+  ...props
+}: React.ComponentProps<"button"> & { size?: "default" | "sm" }) {
+  return (
+    <button
+      data-slot="card"
+      data-size={size}
+      className={cn(
+        /* base card styles */
+        "tw:group/card tw:flex tw:w-full tw:flex-col tw:gap-4 tw:overflow-hidden tw:rounded-xl tw:bg-card tw:py-4 tw:text-left tw:text-sm tw:text-card-foreground tw:ring-1 tw:ring-foreground/10 tw:has-data-[slot=card-footer]:pb-0 tw:has-[>img:first-child]:pt-0 tw:data-[size=sm]:gap-3 tw:data-[size=sm]:py-3 tw:data-[size=sm]:has-data-[slot=card-footer]:pb-0 tw:*:[img:first-child]:rounded-t-xl tw:*:[img:last-child]:rounded-b-xl",
+        /* interactive styles */
+        "tw:cursor-pointer tw:outline-none tw:transition-all tw:duration-200",
+        "tw:hover:ring-2 tw:hover:ring-primary/50 tw:hover:shadow-lg tw:hover:shadow-primary/5 tw:hover:-translate-y-0.5",
+        "tw:focus-visible:ring-2 tw:focus-visible:ring-ring tw:focus-visible:ring-offset-2 tw:focus-visible:ring-offset-background",
+        "tw:active:translate-y-0 tw:active:shadow-sm",
+        "tw:disabled:pointer-events-none tw:disabled:opacity-50",
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
 function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -74,4 +111,4 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-export { Card, CardHeader, CardFooter, CardTitle, CardAction, CardDescription, CardContent };
+export { Card, ClickableCard, CardHeader, CardFooter, CardTitle, CardAction, CardDescription, CardContent };

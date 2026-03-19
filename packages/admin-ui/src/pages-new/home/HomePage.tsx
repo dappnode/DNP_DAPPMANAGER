@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "components/primitives/card";
+import { ClickableCard, CardHeader, CardTitle, CardDescription, CardContent } from "components/primitives/card";
 import { ShieldCheck, Sparkles, Check, ArrowRight } from "lucide-react";
 import dappnodeLogo from "img/dappnode-logo-only.png";
 import { NewPageLayout } from "pages-new/layouts";
@@ -21,7 +21,7 @@ export function NewHomePage() {
         {/* Hero section */}
         <header className="tw:text-center tw:max-w-2xl tw:space-y-5">
           {/* Dappnode logo mark */}
-          <div className="tw:mx-auto tw:mb-4 tw:flex tw:items-center tw:justify-center tw:size-20 tw:rounded-2xl tw:bg-primary/10 tw:ring-1 tw:ring-primary/20">
+          <div className="tw:mx-auto tw:mb-4 tw:flex tw:items-center tw:justify-center tw:size-20 tw:rounded-2xl tw:ring-1 tw:bg-card tw:ring-foreground/10">
             <img className="tw:size-10" src={dappnodeLogo} alt="Dappnode Logo" />
           </div>
 
@@ -40,10 +40,7 @@ export function NewHomePage() {
         {/* ── Navigation cards ───────────────────────────────────── */}
         <div className="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-card tw:w-full tw:max-w-content-max">
           {/* Staking Card */}
-          <Card
-            className="tw:group tw:relative tw:flex tw:flex-col tw:justify-between tw:border-0 tw:ring-1 tw:ring-border tw:bg-card/80 tw:backdrop-blur-sm tw:transition-all tw:duration-300 tw:hover:ring-2 tw:hover:ring-accent/50 tw:hover:shadow-xl tw:hover:shadow-accent/5 tw:hover:-translate-y-1 tw:cursor-pointer"
-            onClick={() => navigate("/staking")}
-          >
+          <ClickableCard className="tw:group tw:bg-card/80 tw:backdrop-blur-sm" onClick={() => navigate("/staking")}>
             <CardHeader>
               <div className="tw:flex tw:items-center tw:gap-4 tw:mb-2">
                 <div className="tw:flex tw:items-center tw:justify-center tw:size-12 tw:rounded-xl tw:bg-accent/10 tw:text-accent tw:ring-1 tw:ring-accent/20 tw:transition-colors tw:group-hover:bg-accent/20">
@@ -69,13 +66,10 @@ export function NewHomePage() {
                 <ArrowRight className="tw:ml-1 tw:size-4 tw:transition-transform tw:group-hover:translate-x-0.5" />
               </div>
             </CardContent>
-          </Card>
+          </ClickableCard>
 
           {/* AI Card */}
-          <Card
-            className="tw:group tw:relative tw:flex tw:flex-col tw:justify-between tw:border-0 tw:ring-1 tw:ring-border tw:bg-card/80 tw:backdrop-blur-sm tw:transition-all tw:duration-300 tw:hover:ring-2 tw:hover:ring-primary/50 tw:hover:shadow-xl tw:hover:shadow-primary/5 tw:hover:-translate-y-1 tw:cursor-pointer"
-            onClick={() => navigate("/ai")}
-          >
+          <ClickableCard className="tw:group tw:bg-card/80 tw:backdrop-blur-sm " onClick={() => navigate("/ai")}>
             <CardHeader>
               <div className="tw:flex tw:items-center tw:gap-4 tw:mb-2">
                 <div className="tw:flex tw:items-center tw:justify-center tw:size-12 tw:rounded-xl tw:bg-primary/10 tw:text-primary tw:ring-1 tw:ring-primary/20 tw:transition-colors tw:group-hover:bg-primary/20">
@@ -101,7 +95,7 @@ export function NewHomePage() {
                 <ArrowRight className="tw:ml-1 tw:size-4 tw:transition-transform tw:group-hover:translate-x-0.5" />
               </div>
             </CardContent>
-          </Card>
+          </ClickableCard>
         </div>
       </div>
 
