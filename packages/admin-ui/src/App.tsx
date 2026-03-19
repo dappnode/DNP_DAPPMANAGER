@@ -8,11 +8,16 @@ import Loading from "components/Loading";
 import { ThemeProvider, useTheme } from "components/ThemeProvider";
 // Legacy pages
 import { pages } from "./pages";
-import { Login } from "./start-pages/Login";
-import { Register } from "./start-pages/Register";
-import { NoConnection } from "start-pages/NoConnection";
 // New pages
 import { NewHomePage } from "./pages-new/home/HomePage";
+
+// Old start pages (keep until deleted)
+// import { Login } from "./start-pages/Login";
+// import { Register } from "./start-pages/Register";
+// import { NoConnection } from "start-pages/NoConnection";
+import { LoginPage } from "./pages-new/home/LoginPage";
+import { RegisterPage } from "./pages-new/home/RegisterPage";
+import { NoConnectionPage } from "./pages-new/home/NoConnectionPage";
 import { AiLayout } from "./pages-new/ai/AiLayout";
 // Layouts
 import { LegacyStakingLayout } from "./layouts/LegacyStakingLayout";
@@ -179,12 +184,16 @@ function AppInner() {
     case "logged-in":
       return <MainApp username={loginStatus.username} />;
     case "not-logged-in":
-      return <Login refetchStatus={onFetchLoginStatus} />;
+      // return <Login refetchStatus={onFetchLoginStatus} />;
+      return <LoginPage refetchStatus={onFetchLoginStatus} />;
     case "not-registered":
-      return <Register refetchStatus={onFetchLoginStatus} />;
+      // return <Register refetchStatus={onFetchLoginStatus} />;
+      return <RegisterPage refetchStatus={onFetchLoginStatus} />;
     case "error":
-      return <NoConnection error={loginStatus.error} />;
+      // return <NoConnection error={loginStatus.error} />;
+      return <NoConnectionPage error={loginStatus.error} />;
     default:
-      return <NoConnection />;
+      // return <NoConnection />;
+      return <NoConnectionPage />;
   }
 }

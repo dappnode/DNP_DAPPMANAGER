@@ -9,6 +9,7 @@ const alertVariants = cva(
     variants: {
       variant: {
         default: "tw:bg-card tw:text-card-foreground",
+        warning: "tw:bg-card tw:text-caution tw:*:data-[slot=alert-description]:text-caution/90 tw:*:[svg]:text-current",
         destructive:
           "tw:bg-card tw:text-destructive tw:*:data-[slot=alert-description]:text-destructive/90 tw:*:[svg]:text-current",
       },
