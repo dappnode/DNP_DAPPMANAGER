@@ -14,7 +14,15 @@ import { toast } from "sonner";
 
 /* ── Existing primitives ─────────────────────────────────────────── */
 import { Button } from "components/primitives/button";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "components/primitives/card";
+import {
+  Card,
+  ClickableCard,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter
+} from "components/primitives/card";
 import { Input } from "components/primitives/input";
 import { Separator } from "components/primitives/separator";
 import {
@@ -280,6 +288,39 @@ export function OverviewPage() {
                 <p className="tw:text-sm tw:text-destructive/80">Please check your configuration.</p>
               </CardContent>
             </Card>
+          </div>
+
+          <p className="tw:text-sm tw:text-muted-foreground tw:mt-2">Clickable variant</p>
+          <div className="tw:grid tw:grid-cols-1 tw:md:grid-cols-3 tw:gap-card">
+            <ClickableCard onClick={() => toast("Card clicked", { description: "You clicked the first card." })}>
+              <CardHeader>
+                <CardTitle>Clickable Card</CardTitle>
+                <CardDescription>Click the entire surface.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="tw:text-sm tw:text-muted-foreground">Hover, focus and press states built in.</p>
+              </CardContent>
+            </ClickableCard>
+
+            <ClickableCard onClick={() => toast("Navigation card", { description: "This could navigate somewhere." })}>
+              <CardHeader>
+                <CardTitle>Navigation</CardTitle>
+                <CardDescription>Tab to me and press Enter.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="tw:text-sm tw:text-muted-foreground">Keyboard accessible via native button semantics.</p>
+              </CardContent>
+            </ClickableCard>
+
+            <ClickableCard disabled>
+              <CardHeader>
+                <CardTitle>Disabled</CardTitle>
+                <CardDescription>This card is not interactive.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="tw:text-sm tw:text-muted-foreground">Pointer events and opacity are reduced.</p>
+              </CardContent>
+            </ClickableCard>
           </div>
         </Section>
 
