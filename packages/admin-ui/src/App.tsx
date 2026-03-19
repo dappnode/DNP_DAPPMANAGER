@@ -34,11 +34,7 @@ function MainApp({ username }: { username: string }) {
 
   // Resolve "system" to actual light/dark for legacy code that expects a binary value
   const resolvedTheme =
-    theme === "system"
-      ? window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "dark"
-        : "light"
-      : theme;
+    theme === "system" ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : theme;
 
   useEffect(() => {
     const handleResize = () => setScreenWidth(window.innerWidth);
