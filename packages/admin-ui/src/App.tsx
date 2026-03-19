@@ -4,6 +4,8 @@ import { startApi, apiAuth, LoginStatus } from "api";
 // Components
 import ErrorBoundary from "./components/ErrorBoundary";
 import Loading from "components/Loading";
+// Theme
+import { ThemeProvider, useTheme } from "components/ThemeProvider";
 // Legacy pages
 import { pages } from "./pages";
 import { Login } from "./start-pages/Login";
@@ -15,34 +17,12 @@ import { AiLayout } from "./pages-new/ai/AiLayout";
 // Layouts
 import { LegacyStakingLayout } from "./layouts/LegacyStakingLayout";
 // Types
-import { AppContextIface, Theme } from "types";
+import { AppContextIface } from "types";
 
 export const AppContext = React.createContext<AppContextIface>({
   theme: "light",
   toggleTheme: () => {}
 });
-
-const useLocalStorage = <T extends string>(
-  key: string,
-  initialValue: T
-): [T, React.Dispatch<React.SetStateAction<T>>] => {
-  const [storedValue, setStoredValue] = useState<T>(() => {
-    try {
-      const item = window.localStorage.getItem(key);
-      // Assert that either the item or initialValue is of type T
-      return (item as T) || initialValue;
-    } catch (error) {
-      console.error(error);
-      return initialValue;
-    }
-  });
-
-  useEffect(() => {
-    window.localStorage.setItem(key, storedValue);
-  }, [key, storedValue]);
-
-  return [storedValue, setStoredValue];
-};
 
 function MainApp({ username }: { username: string }) {
   // App is the parent container of any other component.
@@ -50,7 +30,15 @@ function MainApp({ username }: { username: string }) {
   // Check ONCE what is the status of the VPN and redirect to the login page.
 
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
-  const [theme, setTheme] = useLocalStorage<Theme>("theme", "light");
+  const { theme, setTheme } = useTheme();
+
+  // Resolve "system" to actual light/dark for legacy code that expects a binary value
+  const resolvedTheme =
+    theme === "system"
+      ? window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light"
+      : theme;
 
   useEffect(() => {
     const handleResize = () => setScreenWidth(window.innerWidth);
@@ -64,25 +52,22 @@ function MainApp({ username }: { username: string }) {
     window.scrollTo(0, 0);
   }, [screenLocation.pathname]);
 
+  // Legacy AppContext — derives from the ThemeProvider
   const appContext: AppContextIface = {
-    theme,
-    toggleTheme: () => setTheme((curr: Theme) => (curr === "light" ? "dark" : "light"))
+    theme: resolvedTheme,
+    toggleTheme: () => setTheme(resolvedTheme === "light" ? "dark" : "light")
   };
 
+  // Keep <body> class in sync for legacy CSS that targets body.dark / body.light
   useEffect(() => {
-    const html = document.documentElement;
     const body = document.body;
-
-    html.classList.remove("light", "dark");
     body.classList.remove("light", "dark");
-
-    html.classList.add(theme);
-    body.classList.add(theme);
-  }, [theme]);
+    body.classList.add(resolvedTheme);
+  }, [resolvedTheme]);
 
   return (
     <AppContext.Provider value={appContext}>
-      <div className="body" id={theme}>
+      <div className="body" id={resolvedTheme}>
         <Routes>
           {/* New UI routes — Tailwind + shadcn, no legacy chrome */}
           <Route
@@ -145,6 +130,14 @@ function DefaultRedirect() {
 }
 
 export default function App() {
+  return (
+    <ThemeProvider defaultTheme="system" storageKey="dappnode-ui-theme">
+      <AppInner />
+    </ThemeProvider>
+  );
+}
+
+function AppInner() {
   const [loginStatus, setLoginStatus] = useState<LoginStatus>();
   // Handles the login, register and connecting logic. Nothing else will render
   // Until the app has been logged in

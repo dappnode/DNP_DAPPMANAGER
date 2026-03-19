@@ -4,12 +4,18 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "compo
 import { ShieldCheck, Sparkles, Check, ArrowRight } from "lucide-react";
 import dappnodeLogo from "img/dappnode-logo-only.png";
 import { NewPageLayout } from "pages-new/layouts";
+import { ThemeToggle } from "components/ThemeToggle";
 
 export function NewHomePage() {
   const navigate = useNavigate();
 
   return (
     <NewPageLayout>
+      {/* Top-right theme toggle */}
+      <div className="tw:absolute tw:top-4 tw:right-4 tw:z-20">
+        <ThemeToggle />
+      </div>
+
       {/* ── Content ──────────────────────────────────────────────── */}
       <div className="tw:flex tw:flex-1 tw:flex-col tw:items-center tw:justify-center tw:px-page-x tw:py-page-y tw:gap-section">
         {/* Hero section */}
