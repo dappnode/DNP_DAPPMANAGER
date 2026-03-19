@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import { Routes, Route, useNavigate, useLocation, Link } from "react-router-dom";
 import { Sparkles, ShoppingBag, Package, Home } from "lucide-react";
 import dappnodeLogo from "img/dappnode-logo-only.png";
 import {
@@ -17,6 +17,15 @@ import {
   useSidebar
 } from "components/primitives/sidebar";
 import { Separator } from "components/primitives/separator";
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator
+} from "components/primitives/breadcrumb";
+import { ThemeToggle } from "components/ThemeToggle";
 import { DecorativeBackground } from "pages-new/layouts";
 import { StorePage } from "./StorePage";
 import { PackagesPage } from "./PackagesPage";
@@ -28,6 +37,12 @@ const navItems = [
   { label: "Store", icon: ShoppingBag, path: "/ai/store" },
   { label: "Packages", icon: Package, path: "/ai/packages" }
 ];
+
+/** Map a pathname to the current page label for the breadcrumb. */
+function getPageLabel(pathname: string): string {
+  const match = navItems.find((item) => item.path === pathname);
+  return match?.label ?? "Overview";
+}
 
 /* ── AI Overview (index page) ───────────────────────────────────────── */
 
@@ -124,7 +139,33 @@ export function AiLayout() {
           <header className="tw:relative tw:z-10 tw:flex tw:h-topbar-h tw:shrink-0 tw:items-center tw:gap-2 tw:border-b tw:px-page-x">
             <SidebarTrigger className="tw:-ml-1" />
             <Separator orientation="vertical" className="tw:mr-2 tw:!h-4" />
-            <span className="tw:text-sm tw:font-medium tw:text-muted-foreground">AI</span>
+
+            {/* Responsive breadcrumb */}
+            <Breadcrumb className="tw:flex-1">
+              <BreadcrumbList>
+                <BreadcrumbItem className="tw:hidden tw:md:block">
+                  <BreadcrumbLink asChild>
+                    <Link to="/ai">AI</Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                {location.pathname !== "/ai" && (
+                  <>
+                    <BreadcrumbSeparator className="tw:hidden tw:md:block" />
+                    <BreadcrumbItem>
+                      <BreadcrumbPage>{getPageLabel(location.pathname)}</BreadcrumbPage>
+                    </BreadcrumbItem>
+                  </>
+                )}
+                {location.pathname === "/ai" && (
+                  <BreadcrumbItem className="tw:md:hidden">
+                    <BreadcrumbPage>AI</BreadcrumbPage>
+                  </BreadcrumbItem>
+                )}
+              </BreadcrumbList>
+            </Breadcrumb>
+
+            {/* Dark / light mode toggle */}
+            <ThemeToggle />
           </header>
 
           {/* Page content */}
