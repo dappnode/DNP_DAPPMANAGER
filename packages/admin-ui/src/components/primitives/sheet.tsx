@@ -26,7 +26,7 @@ function SheetOverlay({ className, ...props }: React.ComponentProps<typeof Sheet
     <SheetPrimitive.Overlay
       data-slot="sheet-overlay"
       className={cn(
-        "tw:fixed tw:inset-0 tw:z-50 tw:bg-black/10 tw:duration-100 tw:supports-backdrop-filter:backdrop-blur-xs tw:data-open:animate-in tw:data-open:fade-in-0 tw:data-closed:animate-out tw:data-closed:fade-out-0",
+        "tw-base tw:fixed tw:inset-0 tw:z-50 tw:bg-black/10 tw:duration-100 tw:supports-backdrop-filter:backdrop-blur-xs tw:data-[state=open]:animate-in tw:data-[state=open]:fade-in-0 tw:data-[state=closed]:animate-out tw:data-[state=closed]:fade-out-0",
         className
       )}
       {...props}
@@ -51,7 +51,7 @@ function SheetContent({
         data-slot="sheet-content"
         data-side={side}
         className={cn(
-          "tw:fixed tw:z-50 tw:flex tw:flex-col tw:gap-4 tw:bg-background tw:bg-clip-padding tw:text-sm tw:shadow-lg tw:transition tw:duration-200 tw:ease-in-out tw:data-[side=bottom]:inset-x-0 tw:data-[side=bottom]:bottom-0 tw:data-[side=bottom]:h-auto tw:data-[side=bottom]:border-t tw:data-[side=left]:inset-y-0 tw:data-[side=left]:left-0 tw:data-[side=left]:h-full tw:data-[side=left]:w-3/4 tw:data-[side=left]:border-r tw:data-[side=right]:inset-y-0 tw:data-[side=right]:right-0 tw:data-[side=right]:h-full tw:data-[side=right]:w-3/4 tw:data-[side=right]:border-l tw:data-[side=top]:inset-x-0 tw:data-[side=top]:top-0 tw:data-[side=top]:h-auto tw:data-[side=top]:border-b tw:data-[side=left]:sm:max-w-sm tw:data-[side=right]:sm:max-w-sm tw:data-open:animate-in tw:data-open:fade-in-0 tw:data-[side=bottom]:data-open:slide-in-from-bottom-10 tw:data-[side=left]:data-open:slide-in-from-left-10 tw:data-[side=right]:data-open:slide-in-from-right-10 tw:data-[side=top]:data-open:slide-in-from-top-10 tw:data-closed:animate-out tw:data-closed:fade-out-0 tw:data-[side=bottom]:data-closed:slide-out-to-bottom-10 tw:data-[side=left]:data-closed:slide-out-to-left-10 tw:data-[side=right]:data-closed:slide-out-to-right-10 tw:data-[side=top]:data-closed:slide-out-to-top-10",
+          "tw-base tw:fixed tw:z-50 tw:flex tw:flex-col tw:gap-4 tw:bg-background tw:bg-clip-padding tw:text-sm tw:shadow-lg tw:transition tw:duration-200 tw:ease-in-out tw:data-[side=bottom]:inset-x-0 tw:data-[side=bottom]:bottom-0 tw:data-[side=bottom]:h-auto tw:data-[side=bottom]:border-t tw:data-[side=left]:inset-y-0 tw:data-[side=left]:left-0 tw:data-[side=left]:h-full tw:data-[side=left]:w-3/4 tw:data-[side=left]:border-r tw:data-[side=right]:inset-y-0 tw:data-[side=right]:right-0 tw:data-[side=right]:h-full tw:data-[side=right]:w-3/4 tw:data-[side=right]:border-l tw:data-[side=top]:inset-x-0 tw:data-[side=top]:top-0 tw:data-[side=top]:h-auto tw:data-[side=top]:border-b tw:data-[side=left]:sm:max-w-sm tw:data-[side=right]:sm:max-w-sm tw:data-[state=open]:animate-in tw:data-[state=open]:fade-in-0 tw:data-[side=bottom]:data-[state=open]:slide-in-from-bottom-10 tw:data-[side=left]:data-[state=open]:slide-in-from-left-10 tw:data-[side=right]:data-[state=open]:slide-in-from-right-10 tw:data-[side=top]:data-[state=open]:slide-in-from-top-10 tw:data-[state=closed]:animate-out tw:data-[state=closed]:fade-out-0 tw:data-[side=bottom]:data-[state=closed]:slide-out-to-bottom-10 tw:data-[side=left]:data-[state=closed]:slide-out-to-left-10 tw:data-[side=right]:data-[state=closed]:slide-out-to-right-10 tw:data-[side=top]:data-[state=closed]:slide-out-to-top-10",
           className
         )}
         {...props}

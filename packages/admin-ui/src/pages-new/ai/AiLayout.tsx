@@ -26,7 +26,9 @@ import {
   BreadcrumbSeparator
 } from "components/primitives/breadcrumb";
 import { ThemeToggle } from "components/ThemeToggle";
+import { Toaster } from "components/primitives/sonner";
 import { DecorativeBackground } from "pages-new/layouts";
+import { OverviewPage } from "./OverviewPage";
 import { StorePage } from "./StorePage";
 import { PackagesPage } from "./PackagesPage";
 
@@ -42,22 +44,6 @@ const navItems = [
 function getPageLabel(pathname: string): string {
   const match = navItems.find((item) => item.path === pathname);
   return match?.label ?? "Overview";
-}
-
-/* ── AI Overview (index page) ───────────────────────────────────────── */
-
-function AiHome() {
-  return (
-    <div className="tw:flex tw:flex-col tw:gap-section tw:px-page-x tw:py-page-y">
-      <header>
-        <h1 className="tw:text-3xl tw:font-bold tw:tracking-tight tw:text-foreground">AI Overview</h1>
-        <p className="tw:mt-header-gap tw:text-muted-foreground tw:max-w-2xl">
-          AI-powered features to help you manage and optimise your Dappnode. Explore the Store to discover models and
-          tools, or check your installed Packages.
-        </p>
-      </header>
-    </div>
-  );
 }
 
 /* ── Sidebar brand header (collapse-aware) ──────────────────────────── */
@@ -131,12 +117,12 @@ export function AiLayout() {
           </SidebarContent>
         </Sidebar>
 
-        <SidebarInset className="tw:relative tw:overflow-hidden">
+        <SidebarInset>
           {/* Decorative orb background behind page content */}
           <DecorativeBackground />
 
           {/* Top bar */}
-          <header className="tw:relative tw:z-10 tw:flex tw:h-topbar-h tw:shrink-0 tw:items-center tw:gap-2 tw:border-b tw:px-page-x">
+          <header className="tw:sticky tw:top-0 tw:z-10 tw:flex tw:h-topbar-h tw:shrink-0 tw:items-center tw:gap-2 tw:border-b tw:border-border tw:bg-background/80 tw:backdrop-blur-sm tw:px-page-x">
             <SidebarTrigger className="tw:-ml-1" />
             <Separator orientation="vertical" className="tw:mr-2 tw:!h-4" />
 
@@ -169,13 +155,16 @@ export function AiLayout() {
           </header>
 
           {/* Page content */}
-          <div className="tw:relative tw:z-10 tw:flex-1 tw:overflow-auto">
+          <div className="tw:relative tw:flex-1">
             <Routes>
-              <Route index element={<AiHome />} />
+              <Route index element={<OverviewPage />} />
               <Route path="store" element={<StorePage />} />
               <Route path="packages" element={<PackagesPage />} />
             </Routes>
           </div>
+
+          {/* Toast notifications */}
+          <Toaster />
         </SidebarInset>
       </SidebarProvider>
     </div>

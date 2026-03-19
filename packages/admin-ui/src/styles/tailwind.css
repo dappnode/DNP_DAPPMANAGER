@@ -54,10 +54,6 @@
  */
 @layer base {
   .tw-base {
-    /* Escape the legacy `height: 100%` constraint from layout.scss */
-    height: auto !important;
-    min-height: 100svh;
-
     /* Apply the same resets Tailwind preflight would, scoped */
     box-sizing: border-box;
     font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
@@ -67,6 +63,17 @@
     -moz-osx-font-smoothing: grayscale;
     -webkit-text-size-adjust: 100%;
     tab-size: 4;
+  }
+
+  /*
+   * Page-level layout overrides — only for the top-level .tw-base wrapper
+   * used by layouts (AiLayout, NewPageLayout), NOT for portal elements.
+   * The `:not([data-slot])` selector excludes Radix portal content which
+   * always carries a data-slot attribute.
+   */
+  .tw-base:not([data-slot]) {
+    height: auto !important;
+    min-height: 100svh;
   }
 
   /*
@@ -152,6 +159,28 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
+  /*
+   * Sonner toaster reset — Sonner renders a <section> into <body>,
+   * outside .tw-base.  Give it the same critical resets.
+   */
+  [data-sonner-toaster],
+  [data-sonner-toaster] *,
+  [data-sonner-toaster] *::before,
+  [data-sonner-toaster] *::after {
+    box-sizing: border-box;
+    border-width: 0;
+    border-style: solid;
+    border-color: var(--border);
+  }
+
+  [data-sonner-toaster] {
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+      Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 }
 
 /* shadcn tokens + Dappnode design tokens */
@@ -173,6 +202,10 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-caution: var(--caution);
+  --color-caution-foreground: var(--caution-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -263,6 +296,10 @@
   --accent-foreground: oklch(0.99 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.985 0 0);
+  --success: oklch(0.6 0.19 145);
+  --success-foreground: oklch(0.985 0 0);
+  --caution: oklch(0.75 0.18 65);
+  --caution-foreground: oklch(0.25 0.05 65);
   --border: oklch(0.91 0.01 220);
   --input: oklch(0.91 0.01 220);
   --ring: var(--dn-blue);
@@ -300,6 +337,10 @@
   --accent-foreground: oklch(0.99 0 0);
   --destructive: oklch(0.704 0.191 22.216);
   --destructive-foreground: oklch(0.985 0 0);
+  --success: oklch(0.65 0.2 145);
+  --success-foreground: oklch(0.985 0 0);
+  --caution: oklch(0.8 0.16 65);
+  --caution-foreground: oklch(0.15 0.05 65);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: var(--dn-blue);
