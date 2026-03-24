@@ -1,84 +1,80 @@
-import React from "react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "components/primitives/card";
-import { ShoppingBag, Download, Star } from "lucide-react";
+import React, { useEffect, useMemo } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { DirectoryItemOk } from "@dappnode/types";
+import { getDnpDirectory, getDirectoryRequestStatus } from "services/dnpDirectory/selectors";
+import { fetchDnpDirectory } from "services/dnpDirectory/actions";
+import { TypographyH3, TypographyMuted } from "components/primitives/typography";
+import { Alert, AlertTitle, AlertDescription } from "components/primitives/alert";
+import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from "components/primitives/empty";
+import { PackageOpen, TriangleAlert } from "lucide-react";
+import { StoreGrid } from "./store/StoreGrid";
+import { StoreGridSkeleton } from "./store/StoreGridSkeleton";
+
+const AI_CATEGORY = "AI";
 
 /**
- * AI Store page — browse and install AI models and tools.
+ * AI Store page — displays a grid of all DNP packages that belong to the
+ * "AI" category, pulled from the on-chain directory via Redux.
  */
 export function StorePage() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const directory = useSelector(getDnpDirectory);
+  const requestStatus = useSelector(getDirectoryRequestStatus);
+
+  useEffect(() => {
+    dispatch(fetchDnpDirectory());
+  }, [dispatch]);
+
+  /** Only keep "ok" packages whose categories include "AI". */
+  const aiPackages = useMemo<DirectoryItemOk[]>(
+    () =>
+      directory.filter(
+        (item): item is DirectoryItemOk => item.status === "ok" && item.categories.includes(AI_CATEGORY)
+      ),
+    [directory]
+  );
+
+  function handlePackageClick(name: string) {
+    const encodedName = encodeURIComponent(name);
+    navigate(`/staking/installer/dnp/${encodedName}`);
+  }
+
   return (
     <div className="tw:flex tw:flex-col tw:gap-section tw:px-page-x tw:py-page-y">
+      {/* Page header */}
       <header>
-        <h1 className="tw:text-3xl tw:font-bold tw:tracking-tight tw:text-foreground">Store</h1>
-        <p className="tw:mt-header-gap tw:text-muted-foreground tw:max-w-2xl">
-          Browse, discover and install AI models, agents and tools to extend your Dappnode with intelligent
-          capabilities.
-        </p>
+        <TypographyH3 className="tw:border-none tw:pb-0">AI Store</TypographyH3>
+        <TypographyMuted className="tw:mt-header-gap tw:max-w-2xl">
+          Browse and install AI-powered packages from the Dappnode directory.
+        </TypographyMuted>
       </header>
 
-      <div className="tw:grid tw:grid-cols-1 tw:sm:grid-cols-2 tw:lg:grid-cols-3 tw:gap-card">
-        <StoreItemCard
-          icon={<ShoppingBag className="tw:size-5" />}
-          title="Local LLM Runtime"
-          description="Run large language models privately on your own hardware."
-          downloads={1240}
-          rating={4.8}
-        />
-        <StoreItemCard
-          icon={<ShoppingBag className="tw:size-5" />}
-          title="Node Diagnostics Agent"
-          description="AI-powered agent that monitors and diagnoses node health issues."
-          downloads={870}
-          rating={4.5}
-        />
-        <StoreItemCard
-          icon={<ShoppingBag className="tw:size-5" />}
-          title="Smart Config Wizard"
-          description="Automatically tune client settings based on your hardware profile."
-          downloads={630}
-          rating={4.3}
-        />
-      </div>
+      {/* Content area */}
+      {requestStatus.loading && !directory.length ? (
+        <StoreGridSkeleton />
+      ) : requestStatus.error ? (
+        <Alert variant="destructive">
+          <TriangleAlert className="tw:size-4" />
+          <AlertTitle>Failed to load packages</AlertTitle>
+          <AlertDescription>{requestStatus.error}</AlertDescription>
+        </Alert>
+      ) : aiPackages.length === 0 ? (
+        <Empty className="tw:border tw:py-16">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <PackageOpen />
+            </EmptyMedia>
+            <EmptyTitle>No AI packages found</EmptyTitle>
+            <EmptyDescription>
+              There are no packages with the "AI" category in the Dappnode directory yet. Check back soon!
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+      ) : (
+        <StoreGrid packages={aiPackages} onPackageClick={handlePackageClick} />
+      )}
     </div>
-  );
-}
-
-function StoreItemCard({
-  icon,
-  title,
-  description,
-  downloads,
-  rating
-}: {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  downloads: number;
-  rating: number;
-}) {
-  return (
-    <Card className="tw:transition-all tw:duration-200 tw:hover:ring-2 tw:hover:ring-primary/30 tw:hover:-translate-y-0.5">
-      <CardHeader>
-        <div className="tw:flex tw:items-center tw:gap-3">
-          <div className="tw:flex tw:items-center tw:justify-center tw:size-10 tw:rounded-lg tw:bg-primary/10 tw:text-primary">
-            {icon}
-          </div>
-          <CardTitle>{title}</CardTitle>
-        </div>
-        <CardDescription className="tw:mt-2">{description}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="tw:flex tw:items-center tw:gap-4 tw:text-xs tw:text-muted-foreground">
-          <span className="tw:flex tw:items-center tw:gap-1">
-            <Download className="tw:size-3" />
-            {downloads.toLocaleString()}
-          </span>
-          <span className="tw:flex tw:items-center tw:gap-1">
-            <Star className="tw:size-3" />
-            {rating}
-          </span>
-        </div>
-      </CardContent>
-    </Card>
   );
 }
