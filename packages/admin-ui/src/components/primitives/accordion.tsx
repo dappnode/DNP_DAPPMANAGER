@@ -30,7 +30,7 @@ function AccordionTrigger({ className, children, ...props }: React.ComponentProp
       <AccordionPrimitive.Trigger
         data-slot="accordion-trigger"
         className={cn(
-          "tw:group/accordion-trigger tw:relative tw:flex tw:flex-1 tw:items-start tw:justify-between tw:rounded-lg tw:border tw:border-transparent tw:py-2.5 tw:text-left tw:text-sm tw:font-medium tw:text-foreground tw:transition-all tw:outline-none tw:hover:underline tw:focus-visible:border-ring tw:focus-visible:ring-3 tw:focus-visible:ring-ring/50 tw:focus-visible:after:border-ring tw:disabled:pointer-events-none tw:disabled:opacity-50 tw:**:data-[slot=accordion-trigger-icon]:ml-auto tw:**:data-[slot=accordion-trigger-icon]:size-4 tw:**:data-[slot=accordion-trigger-icon]:text-muted-foreground",
+          "tw:group/accordion-trigger tw:relative tw:flex tw:flex-1 tw:items-start tw:justify-between tw:rounded-lg tw:bg-background tw:border tw:border-transparent tw:py-2.5 tw:text-left tw:text-sm tw:font-medium tw:text-foreground tw:transition-all tw:outline-none tw:hover:underline tw:focus-visible:border-ring tw:focus-visible:ring-3 tw:focus-visible:ring-ring/50 tw:focus-visible:after:border-ring tw:disabled:pointer-events-none tw:disabled:opacity-50 tw:**:data-[slot=accordion-trigger-icon]:ml-auto tw:**:data-[slot=accordion-trigger-icon]:size-4 tw:**:data-[slot=accordion-trigger-icon]:text-muted-foreground",
           className
         )}
         {...props}

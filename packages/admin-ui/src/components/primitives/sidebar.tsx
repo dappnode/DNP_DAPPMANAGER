@@ -473,7 +473,7 @@ const sidebarMenuButtonVariants = cva(
   {
     variants: {
       variant: {
-        default: "tw:hover:bg-sidebar-accent tw:hover:text-sidebar-accent-foreground",
+        default: "tw:bg-sidebar-primary-foreground tw:hover:bg-sidebar-accent tw:hover:text-sidebar-accent-foreground",
         outline:
           "tw:bg-background tw:shadow-[0_0_0_1px_hsl(var(--sidebar-border))] tw:hover:bg-sidebar-accent tw:hover:text-sidebar-accent-foreground tw:hover:shadow-[0_0_0_1px_hsl(var(--sidebar-accent))]",
       },
