@@ -59,7 +59,7 @@ export function PackagesPage() {
       <header>
         <h1 className="tw:text-3xl tw:font-bold tw:tracking-tight tw:text-foreground">Packages</h1>
         <p className="tw:mt-header-gap tw:text-muted-foreground tw:max-w-2xl">
-          View and manage the AI packages installed on your Dappnode. Monitor status, versions and control lifecycle.
+          View and manage the AI packages installed on your Dappnode. Monitor the status, versions and updates.
         </p>
       </header>
 
