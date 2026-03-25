@@ -5,6 +5,7 @@ import { Badge } from "components/primitives/badge";
 import { TypographyMuted } from "components/primitives/typography";
 import defaultAvatar from "img/defaultAvatar.png";
 import { prettyDnpName } from "utils/format";
+import { CheckCircle, ArrowUpCircle, Download } from "lucide-react";
 
 /**
  * A package card for the AI Store grid.
@@ -13,8 +14,6 @@ import { prettyDnpName } from "utils/format";
  * and categories. The entire card is clickable.
  */
 export function StorePackageCard({ item, onClick }: { item: DirectoryItemOk; onClick: () => void }) {
-  console.log("Rendering StorePackageCard for", item.name, item.description);
-
   return (
     <ClickableCard onClick={onClick} size="sm">
       <CardHeader>
@@ -24,12 +23,13 @@ export function StorePackageCard({ item, onClick }: { item: DirectoryItemOk; onC
             alt={`${item.name} avatar`}
             className="tw:size-10 tw:shrink-0 tw:rounded-lg tw:object-cover tw:bg-muted"
           />
-          <div className="tw:flex tw:flex-col tw:gap-0.5 tw:min-w-0">
+          <div className="tw:flex tw:flex-col tw:gap-0.5 tw:min-w-0 tw:flex-1">
             <span className="tw:text-sm tw:font-semibold tw:leading-snug tw:truncate tw:text-foreground">
               {prettyDnpName(item.name)}
             </span>
             <TypographyMuted className="tw:truncate">{item.name}</TypographyMuted>
           </div>
+          <StatusIndicator isInstalled={item.isInstalled} isUpdated={item.isUpdated} />
         </div>
       </CardHeader>
 
@@ -52,16 +52,37 @@ export function StorePackageCard({ item, onClick }: { item: DirectoryItemOk; onC
   );
 }
 
+function StatusIndicator({ isInstalled, isUpdated }: { isInstalled: boolean; isUpdated: boolean }) {
+  if (isUpdated) {
+    return (
+      <div className="tw:flex tw:size-8 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:bg-success/15">
+        <CheckCircle className="tw:size-4 tw:text-success" />
+      </div>
+    );
+  }
+  if (isInstalled) {
+    return (
+      <div className="tw:flex tw:size-8 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:bg-caution/15">
+        <ArrowUpCircle className="tw:size-4 tw:text-caution" />
+      </div>
+    );
+  }
+  return (
+    <div className="tw:flex tw:size-8 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:bg-primary/10">
+      <Download className="tw:size-4 tw:text-primary" />
+    </div>
+  );
+}
+
 /**
- * Small badge indicating whether the package can be installed, updated, or is
- * already up-to-date.
+ * Small text badge in the footer reinforcing the status.
  */
 function StatusBadge({ isInstalled, isUpdated }: { isInstalled: boolean; isUpdated: boolean }) {
   if (isUpdated) {
     return <Badge variant="success">Up to date</Badge>;
   }
   if (isInstalled) {
-    return <Badge variant="caution">Update</Badge>;
+    return <Badge variant="caution">Update available</Badge>;
   }
-  return <Badge variant="outline">Get</Badge>;
+  return <Badge variant="outline">Install</Badge>;
 }

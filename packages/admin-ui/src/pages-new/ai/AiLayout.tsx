@@ -29,8 +29,9 @@ import { ThemeToggle } from "components/ThemeToggle";
 import { Toaster } from "components/primitives/sonner";
 import { DecorativeBackground } from "pages-new/layouts";
 import { OverviewPage } from "./OverviewPage";
-import { StorePage } from "./StorePage";
+import { StorePage } from "./store/StorePage";
 import { PackagesPage } from "./PackagesPage";
+import { InstallerPage } from "./installer/InstallerPage";
 
 /* ── Navigation items ───────────────────────────────────────────────── */
 
@@ -42,6 +43,10 @@ const navItems = [
 
 /** Map a pathname to the current page label for the breadcrumb. */
 function getPageLabel(pathname: string): string {
+  // Handle installer routes: /ai/install/:id
+  if (pathname.startsWith("/ai/install/")) {
+    return "Installer";
+  }
   const match = navItems.find((item) => item.path === pathname);
   return match?.label ?? "Overview";
 }
@@ -134,15 +139,27 @@ export function AiLayout() {
                     <Link to="/ai">AI</Link>
                   </BreadcrumbLink>
                 </BreadcrumbItem>
-                {location.pathname !== "/ai" && (
+                {location.pathname.startsWith("/ai/install/") ? (
+                  <>
+                    <BreadcrumbSeparator className="tw:hidden tw:md:block" />
+                    <BreadcrumbItem className="tw:hidden tw:md:block">
+                      <BreadcrumbLink asChild>
+                        <Link to="/ai/store">Store</Link>
+                      </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator className="tw:hidden tw:md:block" />
+                    <BreadcrumbItem>
+                      <BreadcrumbPage>{getPageLabel(location.pathname)}</BreadcrumbPage>
+                    </BreadcrumbItem>
+                  </>
+                ) : location.pathname !== "/ai" ? (
                   <>
                     <BreadcrumbSeparator className="tw:hidden tw:md:block" />
                     <BreadcrumbItem>
                       <BreadcrumbPage>{getPageLabel(location.pathname)}</BreadcrumbPage>
                     </BreadcrumbItem>
                   </>
-                )}
-                {location.pathname === "/ai" && (
+                ) : (
                   <BreadcrumbItem className="tw:md:hidden">
                     <BreadcrumbPage>AI</BreadcrumbPage>
                   </BreadcrumbItem>
@@ -159,6 +176,7 @@ export function AiLayout() {
             <Routes>
               <Route index element={<OverviewPage />} />
               <Route path="store" element={<StorePage />} />
+              <Route path="install/:id/*" element={<InstallerPage />} />
               <Route path="packages" element={<PackagesPage />} />
             </Routes>
           </div>
