@@ -245,6 +245,7 @@
   --spacing-section: var(--section-gap);
   --spacing-card: var(--card-gap);
   --spacing-header-gap: var(--header-gap);
+  --spacing-step: var(--step-gap);
   --spacing-topbar-h: var(--topbar-height);
   --spacing-content-max: var(--content-max-w);
 }
@@ -275,6 +276,7 @@
   --section-gap: 2rem;
   --card-gap: 1rem;
   --header-gap: 0.5rem;
+  --step-gap: 1.5rem;
   --topbar-height: 3rem;
   --content-max-w: 64rem;
   --radius: 0.625rem;

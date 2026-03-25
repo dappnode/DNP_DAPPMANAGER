@@ -8,8 +8,8 @@ import { TypographyH3, TypographyMuted } from "components/primitives/typography"
 import { Alert, AlertTitle, AlertDescription } from "components/primitives/alert";
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from "components/primitives/empty";
 import { PackageOpen, TriangleAlert } from "lucide-react";
-import { StoreGrid } from "./store/StoreGrid";
-import { StoreGridSkeleton } from "./store/StoreGridSkeleton";
+import { StoreGrid } from "./StoreGrid";
+import { StoreGridSkeleton } from "./StoreGridSkeleton";
 
 const AI_CATEGORY = "AI";
 
@@ -36,9 +36,15 @@ export function StorePage() {
     [directory]
   );
 
-  function handlePackageClick(name: string) {
-    const encodedName = encodeURIComponent(name);
-    navigate(`/staking/installer/dnp/${encodedName}`);
+  function handlePackageClick(item: DirectoryItemOk) {
+    const encodedName = encodeURIComponent(item.name);
+    if (item.isUpdated) {
+      // Already installed & up-to-date → navigate to its detail view
+      navigate(`/staking/packages/my/${encodedName}/info`);
+    } else {
+      // Not installed or updateable → navigate to the new AI installer
+      navigate(`/ai/install/${encodedName}`);
+    }
   }
 
   return (
