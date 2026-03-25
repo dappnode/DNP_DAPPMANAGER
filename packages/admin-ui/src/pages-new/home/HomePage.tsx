@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { ClickableCard, CardHeader, CardTitle, CardDescription, CardContent } from "components/primitives/card";
-import { ShieldCheck, Sparkles, Check, ArrowRight } from "lucide-react";
+import { UserRoundKey, Sparkles, Check, ArrowRight } from "lucide-react";
 import dappnodeLogo from "img/dappnode-logo-only.png";
 import { NewPageLayout } from "pages-new/layouts";
 import { ThemeToggle } from "components/ThemeToggle";
@@ -33,7 +33,7 @@ export function NewHomePage() {
           </h1>
 
           <p className="tw:text-lg tw:sm:text-xl tw:text-muted-foreground tw:max-w-lg tw:mx-auto tw:leading-relaxed">
-            Your gateway to decentralised infrastructure. Choose a path below to get started.
+            Your gateway to decentralised infrastructure.
           </p>
         </header>
 
@@ -44,7 +44,7 @@ export function NewHomePage() {
             <CardHeader>
               <div className="tw:flex tw:items-center tw:gap-4 tw:mb-2">
                 <div className="tw:flex tw:items-center tw:justify-center tw:size-12 tw:rounded-xl tw:bg-accent/10 tw:text-accent tw:ring-1 tw:ring-accent/20 tw:transition-colors tw:group-hover:bg-accent/20">
-                  <ShieldCheck className="tw:size-6" />
+                  <UserRoundKey className="tw:size-6" />
                 </div>
                 <CardTitle className="tw:text-2xl tw:font-bold">Staking</CardTitle>
               </div>
@@ -61,8 +61,8 @@ export function NewHomePage() {
               </ul>
             </CardContent>
             <CardContent className="tw:flex-1">
-              <div className="tw:w-full tw:mt-5 tw:flex tw:justify-center tw:items-center tw:font-semibold tw:group-hover:text-primary">
-                Open Staking
+              <div className="tw:w-full tw:mt-5 tw:py-2 tw:flex tw:justify-center tw:items-center tw:bg-secondary tw:rounded-2xl tw:font-semibold tw:group-hover:bg-secondary/80 tw:group-hover:text-primary ">
+                View Staking
                 <ArrowRight className="tw:ml-1 tw:size-4 tw:transition-transform tw:group-hover:translate-x-0.5" />
               </div>
             </CardContent>
@@ -78,20 +78,20 @@ export function NewHomePage() {
                 <CardTitle className="tw:text-2xl tw:font-bold">AI</CardTitle>
               </div>
               <CardDescription className="tw:text-base tw:leading-relaxed">
-                Explore AI-powered features to manage and optimise your Dappnode experience.
+                Explore AI powered features to maximize your daily productivity with Dappnode.
               </CardDescription>
             </CardHeader>
 
             <CardContent className="tw:flex-1">
               <ul className="tw:space-y-3">
-                <FeatureItem>Run local private models</FeatureItem>
-                <FeatureItem>Run and manage Agents</FeatureItem>
+                <FeatureItem>Run models privately: local and cloud</FeatureItem>
+                <FeatureItem>Run and manage AI agents</FeatureItem>
                 <FeatureItem>Discover powerful AI tools</FeatureItem>
               </ul>
             </CardContent>
             <CardContent className="tw:flex-1">
-              <div className="tw:w-full tw:mt-5 tw:flex tw:justify-center tw:items-center tw:font-semibold tw:group-hover:text-primary">
-                Open AI
+              <div className="tw:w-full tw:mt-5 tw:py-2 tw:flex tw:justify-center tw:items-center tw:bg-secondary tw:rounded-2xl tw:font-semibold tw:group-hover:bg-secondary/80 tw:group-hover:text-primary ">
+                View AI
                 <ArrowRight className="tw:ml-1 tw:size-4 tw:transition-transform tw:group-hover:translate-x-0.5" />
               </div>
             </CardContent>

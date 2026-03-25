@@ -55,7 +55,7 @@ export function StorePage() {
       <header>
         <TypographyH3 className="tw:border-none tw:pb-0">AI Store</TypographyH3>
         <TypographyMuted className="tw:mt-header-gap tw:max-w-2xl">
-          Browse and install AI-powered packages from the Dappnode directory.
+          Browse and install AI powered packages on your Dappnode.
         </TypographyMuted>
       </header>
 
