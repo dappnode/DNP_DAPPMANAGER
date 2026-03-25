@@ -26,6 +26,8 @@ import { InstallerDisclaimerStep } from "./InstallerDisclaimerStep";
 import { InstallerNotificationsStep } from "./InstallerNotificationsStep";
 import { InstallerSetupWizard } from "./InstallerSetupWizard";
 import { AutoUpdatesDialog, shouldPromptAutoUpdates } from "./AutoUpdatesDialog";
+import { pathName as systemPathName, subPaths as systemSubPaths } from "pages/system/data";
+import { withLegacyBase } from "utils/path";
 
 interface InstallerViewProps {
   dnp: RequestedDnp;
@@ -372,7 +374,11 @@ export function InstallerView({ dnp, progressLogs }: InstallerViewProps) {
                   <strong>{prettyDnpName(dnpName)}</strong> requires at least Docker{" "}
                   <strong>{requiredDockerVersion}</strong>. Update Docker in <strong>System → Advanced</strong>.
                 </span>
-                <Button variant="destructive" size="sm" onClick={() => navigate("/staking/system/advanced")}>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => navigate(withLegacyBase(`${systemPathName}/${systemSubPaths.advanced}`))}
+                >
                   Go to Advanced
                   <ExternalLink className="tw:ml-1 tw:size-3" />
                 </Button>

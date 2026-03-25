@@ -10,6 +10,8 @@ import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from "co
 import { PackageOpen, TriangleAlert } from "lucide-react";
 import { StoreGrid } from "./StoreGrid";
 import { StoreGridSkeleton } from "./StoreGridSkeleton";
+import { relativePath as packagesRelativePath } from "pages/packages/data";
+import { withLegacyBase } from "utils/path";
 
 const AI_CATEGORY = "AI";
 
@@ -40,7 +42,7 @@ export function StorePage() {
     const encodedName = encodeURIComponent(item.name);
     if (item.isUpdated) {
       // Already installed & up-to-date → navigate to its detail view
-      navigate(`/staking/packages/my/${encodedName}/info`);
+      navigate(withLegacyBase(`${packagesRelativePath}/${encodedName}/info`));
     } else {
       // Not installed or updateable → navigate to the new AI installer
       navigate(`/ai/install/${encodedName}`);

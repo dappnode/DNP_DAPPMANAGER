@@ -8,6 +8,7 @@ import { Card } from "react-bootstrap";
 import { NetworkBackup } from "./NetworkBackup";
 import { availableNetworks, useBackupNodeData } from "hooks/premium/useBackupNodeData";
 import { Network } from "@dappnode/types";
+import { withLegacyBase } from "utils/path";
 
 import "./backupNode.scss";
 
@@ -22,8 +23,8 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
   // if no backup subroute selected, redirect automatically to first network
   useEffect(() => {
     if (
-      window.location.pathname === `/${basePath}/${subPaths.backupNode}` ||
-      window.location.pathname === `/${basePath}/${subPaths.backupNode}/`
+      window.location.pathname === withLegacyBase(`${basePath}/${subPaths.backupNode}`) ||
+      window.location.pathname === `${withLegacyBase(`${basePath}/${subPaths.backupNode}`)}/`
     )
       navigate(`ethereum`);
   }, []);

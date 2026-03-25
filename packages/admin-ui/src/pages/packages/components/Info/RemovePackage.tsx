@@ -11,6 +11,7 @@ import { prettyDnpName } from "utils/format";
 import { InstalledPackageDetailData } from "@dappnode/types";
 import { relativePath as packagesRelativePath } from "../../data";
 import { markdownList } from "utils/markdown";
+import { withLegacyBase } from "utils/path";
 import "./removePackage.scss";
 
 interface WarningItem {
@@ -87,7 +88,7 @@ export function RemovePackage({ dnp }: { dnp: InstalledPackageDetailData }) {
         message: `Removing ${name} ${deleteVolumes ? " and volumes" : ""}...`,
         onSuccess: `Removed ${name}`
       });
-      navigate("/" + packagesRelativePath);
+      navigate(withLegacyBase(packagesRelativePath));
     } catch (e) {
       console.error(e);
     }

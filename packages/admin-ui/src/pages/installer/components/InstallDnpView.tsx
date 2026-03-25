@@ -29,6 +29,7 @@ import { diff } from "semver";
 import Button from "components/Button";
 import { pathName as systemPathName, subPaths as systemSubPaths } from "pages/system/data";
 import { Notifications } from "./Steps/Notifications";
+import { withLegacyBase } from "utils/path";
 
 interface InstallDnpViewProps {
   dnp: RequestedDnp;
@@ -158,7 +159,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
         setTimeout(() => {
           if (componentIsMounted.current) {
             setShowSuccess(false);
-            navigate("/" + packagesRelativePath + "/" + dnpName + "/info");
+            navigate(withLegacyBase(`${packagesRelativePath}/${dnpName}/info`));
           }
         }, 1000);
       }
@@ -375,7 +376,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
             continuing the installation. You can do it with our update Docker button in{" "}
             <strong> System / Advanced</strong> tab.
           </div>
-          <NavLink to={"/" + systemPathName + "/" + systemSubPaths.advanced}>
+          <NavLink to={withLegacyBase(`${systemPathName}/${systemSubPaths.advanced}`)}>
             <Button variant="danger">{"Navigate there"}</Button>
           </NavLink>
         </div>
