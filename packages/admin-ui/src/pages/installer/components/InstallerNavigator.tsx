@@ -9,6 +9,7 @@ import { confirm } from "components/ConfirmDialog";
 import { subPaths } from "../data";
 import "./installer.scss";
 import { RouteType } from "types";
+import { withLegacyBase } from "utils/path";
 
 type NavRoute = {
   name: string;
@@ -46,7 +47,7 @@ Nobody, DAppNode Association, DAppNodeDAO or anyone, will be held responsible fo
           ]
         })
       );
-      navigate("/staking/installer/public");
+      navigate(withLegacyBase("installer/public"));
     } catch {
       // user cancelled
     }
