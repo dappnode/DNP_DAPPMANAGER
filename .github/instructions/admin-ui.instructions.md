@@ -192,14 +192,47 @@ export function MyPage() {
 
 ## API Integration
 
-- Use api instance from `src/api/index.ts` for making api calls.
-- Use `useApi` instance from `src/api/index.ts` for making api calls with SWR.
+- Use `api` instance from `src/api/index.ts` for imperative calls (mutations, actions).
+- Use `useApi` hook from `src/api/index.ts` for data fetching with SWR (auto-revalidation).
+- Use `apiRoutes` from `src/api/index.ts` for URL helpers (e.g., `apiRoutes.containerLogsUrl`, `apiRoutes.fileDownloadUrl`, `apiRoutes.downloadUrl`, `apiRoutes.uploadFile`).
+- For toasts in new pages, use **Sonner** (`import { toast } from "sonner"`), not the legacy `withToast`/`withToastNoThrow`.
+- For destructive confirmation dialogs, use the `AlertDialog` primitive, not the legacy `confirm()` helper.
+
+## Sidebar & Routing (AI Section)
+
+The AI section (`/ai/*`) uses `AiLayout.tsx` as the master layout. To add a new page:
+
+1. Create the page component under `src/pages-new/ai/[context]/`.
+2. Add a `<Route>` entry in `AiLayout.tsx` inside the `<Routes>` block.
+3. To make it appear in the sidebar, add an entry to the `navItems` array.
+4. The `isActive` check uses `startsWith` for prefix matching—sub-routes are automatically highlighted.
+
+### Package Detail Page Pattern
+
+For pages with sub-tabs (like package detail), use this pattern:
+
+- The parent route uses a wildcard: `<Route path="packages/:id/*" element={<PackageDetailPage />} />`
+- Inside the detail page, use `<NavLink>` elements with a bottom-border active style as the tab bar.
+- Each tab is a nested `<Route>` rendered inside the detail component.
+- Include a `<Navigate>` fallback to redirect to the default tab.
 
 ## UI/UX Guidelines
 
 - Use shared components from `src/components/` and `src/components/primitives/` whenever possible.
 - Ensure accessibility: use semantic HTML, proper ARIA attributes, and keyboard navigation.
 - Use `lucide-react` for icons (the project's configured icon library).
+- Use `prettyDnpName()` from `utils/format` to display human-readable package names.
+- Use `parseContainerState()` from `pages/packages/components/StateBadge/utils` for container status display (returns `{variant, state, title}`).
+- For navigation between new and legacy pages, use `withLegacyBase(path)` from `utils/path` which prepends the legacy route base (`/staking`).
+
+## Typography Primitives
+
+The project provides typography components in `src/components/primitives/typography.tsx`:
+
+- `TypographyH1` through `TypographyH4` — heading elements with consistent styling.
+- `TypographyMuted` — muted paragraph text for descriptions.
+- `TypographyInlineCode` — inline code snippets.
+- Use these instead of raw `<h1>`, `<p>` elements in new pages for consistent typography.
 
 ## Coding Conventions
 
