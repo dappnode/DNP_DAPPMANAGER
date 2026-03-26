@@ -30,7 +30,8 @@ import { Toaster } from "components/primitives/sonner";
 import { DecorativeBackground } from "pages-new/layouts";
 import { OverviewPage } from "./OverviewPage";
 import { StorePage } from "./store/StorePage";
-import { PackagesPage } from "./PackagesPage";
+import { PackagesPage } from "./packages/PackagesPage";
+import { PackageDetailPage } from "./packages/PackageDetailPage";
 import { InstallerPage } from "./installer/InstallerPage";
 
 /* ── Navigation items ───────────────────────────────────────────────── */
@@ -41,14 +42,17 @@ const navItems = [
   { label: "Packages", icon: Package, path: "/ai/packages" }
 ];
 
-/** Map a pathname to the current page label for the breadcrumb. */
-function getPageLabel(pathname: string): string {
-  // Handle installer routes: /ai/install/:id
-  if (pathname.startsWith("/ai/install/")) {
-    return "Installer";
-  }
-  const match = navItems.find((item) => item.path === pathname);
-  return match?.label ?? "Overview";
+function getBreadcrumbItems(pathname: string): { label: string; to: string }[] {
+  const segments = pathname.split("/").filter(Boolean);
+  const aiIndex = segments.indexOf("ai");
+  if (aiIndex === -1) return [];
+
+  const relevantSegments = segments.slice(aiIndex + 1);
+
+  return relevantSegments.map((segment, index) => ({
+    label: decodeURIComponent(segment),
+    to: `/ai/${relevantSegments.slice(0, index + 1).join("/")}`
+  }));
 }
 
 /* ── Sidebar brand header (collapse-aware) ──────────────────────────── */
@@ -83,6 +87,7 @@ function SidebarBrandHeader({ onNavigateHome }: { onNavigateHome: () => void }) 
 export function AiLayout() {
   const navigate = useNavigate();
   const location = useLocation();
+  const breadcrumbItems = getBreadcrumbItems(location.pathname);
 
   return (
     <div className="tw-base">
@@ -96,7 +101,7 @@ export function AiLayout() {
               <SidebarGroupLabel>Navigation</SidebarGroupLabel>
               <SidebarMenu>
                 {navItems.map((item) => {
-                  const isActive = location.pathname === item.path;
+                  const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + "/");
                   return (
                     <SidebarMenuItem key={item.path}>
                       <SidebarMenuButton isActive={isActive} onClick={() => navigate(item.path)} tooltip={item.label}>
@@ -139,26 +144,24 @@ export function AiLayout() {
                     <Link to="/ai">AI</Link>
                   </BreadcrumbLink>
                 </BreadcrumbItem>
-                {location.pathname.startsWith("/ai/install/") ? (
-                  <>
-                    <BreadcrumbSeparator className="tw:hidden tw:md:block" />
-                    <BreadcrumbItem className="tw:hidden tw:md:block">
-                      <BreadcrumbLink asChild>
-                        <Link to="/ai/store">Store</Link>
-                      </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator className="tw:hidden tw:md:block" />
-                    <BreadcrumbItem>
-                      <BreadcrumbPage>{getPageLabel(location.pathname)}</BreadcrumbPage>
-                    </BreadcrumbItem>
-                  </>
-                ) : location.pathname !== "/ai" ? (
-                  <>
-                    <BreadcrumbSeparator className="tw:hidden tw:md:block" />
-                    <BreadcrumbItem>
-                      <BreadcrumbPage>{getPageLabel(location.pathname)}</BreadcrumbPage>
-                    </BreadcrumbItem>
-                  </>
+                {breadcrumbItems.length > 0 ? (
+                  breadcrumbItems.map((item, index) => {
+                    const isLast = index === breadcrumbItems.length - 1;
+                    return (
+                      <React.Fragment key={item.to}>
+                        <BreadcrumbSeparator className="tw:hidden tw:md:block" />
+                        <BreadcrumbItem>
+                          {isLast ? (
+                            <BreadcrumbPage>{item.label}</BreadcrumbPage>
+                          ) : (
+                            <BreadcrumbLink asChild>
+                              <Link to={item.to}>{item.label}</Link>
+                            </BreadcrumbLink>
+                          )}
+                        </BreadcrumbItem>
+                      </React.Fragment>
+                    );
+                  })
                 ) : (
                   <BreadcrumbItem className="tw:md:hidden">
                     <BreadcrumbPage>AI</BreadcrumbPage>
@@ -178,6 +181,7 @@ export function AiLayout() {
               <Route path="store" element={<StorePage />} />
               <Route path="install/:id/*" element={<InstallerPage />} />
               <Route path="packages" element={<PackagesPage />} />
+              <Route path="packages/:id/*" element={<PackageDetailPage />} />
             </Routes>
           </div>
 
