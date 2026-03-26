@@ -20,6 +20,7 @@ export function groupPackagesFromContainers(containers: PackageContainer[]): Ins
           "avatarUrl",
           "origin",
           "chain",
+          "categories",
           "domainAlias",
           "canBeFullnode"
         ]),

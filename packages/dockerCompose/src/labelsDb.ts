@@ -57,6 +57,7 @@ const labelParseFns: {
       return valueParsed as ChainDriver;
     return undefined;
   },
+  "dappnode.dnp.categories": (value) => parseJsonSafe<string[]>(value) || undefined,
   "dappnode.dnp.isCore": parseBool,
   "dappnode.dnp.isMain": parseBool,
   "dappnode.dnp.dockerTimeout": parseNumber,
@@ -79,6 +80,7 @@ const labelStringifyFns: {
     value && chainDriversTypes.includes(value as ChainDriverType)
       ? writeString(value as ChainDriverType)
       : writeJson(value as ChainDriverSpecs),
+  "dappnode.dnp.categories": writeJson,
   "dappnode.dnp.isCore": writeBool,
   "dappnode.dnp.isMain": writeBool,
   "dappnode.dnp.dockerTimeout": writeNumber,
@@ -120,6 +122,7 @@ export function readContainerLabels(labelsRaw: ContainerLabelsRaw): Partial<{
   avatar: string;
   origin: string;
   chain: ChainDriver;
+  categories: string[];
   isCore: boolean;
   isMain: boolean;
   dockerTimeout: number;
@@ -137,6 +140,7 @@ export function readContainerLabels(labelsRaw: ContainerLabelsRaw): Partial<{
     avatar: labelValues["dappnode.dnp.avatar"],
     origin: labelValues["dappnode.dnp.origin"],
     chain: labelValues["dappnode.dnp.chain"],
+    categories: labelValues["dappnode.dnp.categories"],
     isCore: labelValues["dappnode.dnp.isCore"],
     isMain: labelValues["dappnode.dnp.isMain"],
     dockerTimeout: labelValues["dappnode.dnp.dockerTimeout"],
@@ -153,6 +157,7 @@ export function writeMetadataToLabels({
   dependencies,
   avatar,
   chain,
+  categories,
   origin,
   isCore,
   isMain,
@@ -164,6 +169,7 @@ export function writeMetadataToLabels({
   dependencies?: Dependencies;
   avatar?: string;
   chain?: ChainDriver;
+  categories?: string[];
   origin?: string;
   isCore?: boolean;
   isMain?: boolean;
@@ -177,6 +183,7 @@ export function writeMetadataToLabels({
     "dappnode.dnp.avatar": avatar,
     "dappnode.dnp.origin": origin,
     "dappnode.dnp.chain": chain,
+    "dappnode.dnp.categories": categories,
     "dappnode.dnp.isCore": isCore,
     "dappnode.dnp.isMain": isMain,
     "dappnode.dnp.dockerTimeout": dockerTimeout

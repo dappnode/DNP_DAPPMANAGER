@@ -49,7 +49,11 @@ export class DappnodeInstaller extends DappnodeRepository {
     super(
       ipfsUrl,
       provider,
-      { baseUrl: params.CONTENT_MIRROR_BASE_URL, timeoutMs: params.CONTENT_MIRROR_TIMEOUT_MS, maxBytes: params.CONTENT_MIRROR_MAX_BYTES },
+      {
+        baseUrl: params.CONTENT_MIRROR_BASE_URL,
+        timeoutMs: params.CONTENT_MIRROR_TIMEOUT_MS,
+        maxBytes: params.CONTENT_MIRROR_MAX_BYTES
+      },
       () => db.mirrorProviderEnabled.get()
     );
   }
@@ -225,6 +229,7 @@ export class DappnodeInstaller extends DappnodeRepository {
           dependencies: sanitizeDependencies(metadata.dependencies || {}),
           avatar: this.fileToMultiaddress(avatarFile),
           chain: metadata.chain,
+          categories: metadata.categories,
           origin,
           isCore,
           isMain:

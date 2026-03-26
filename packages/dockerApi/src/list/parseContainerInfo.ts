@@ -34,7 +34,8 @@ export function parseContainerInfo(container: ContainerInfo): PackageContainer {
   }));
   // Declared here for reusability purposes
   const isDnp = Boolean(labels.dnpName) || containerName.includes(CONTAINER_NAME_PREFIX);
-  const isCore = typeof labels.isCore === "boolean" ? labels.isCore : containerName.includes(CONTAINER_CORE_NAME_PREFIX);
+  const isCore =
+    typeof labels.isCore === "boolean" ? labels.isCore : containerName.includes(CONTAINER_CORE_NAME_PREFIX);
 
   return {
     // Identification
@@ -72,6 +73,7 @@ export function parseContainerInfo(container: ContainerInfo): PackageContainer {
     avatarUrl: resolveAvatarUrl(labels.avatar, dnpName, isCore),
     origin: labels.origin,
     chain: labels.chain,
+    categories: labels.categories,
     canBeFullnode: allowedFullnodeDnpNames.includes(dnpName),
     isMain: labels.isMain,
     // Default settings on the original package version's docker-compose
