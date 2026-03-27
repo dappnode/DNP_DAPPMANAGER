@@ -9,7 +9,7 @@ import { Alert, AlertTitle, AlertDescription } from "components/primitives/alert
 import { Button } from "components/primitives/button";
 import { TypographyH3 } from "components/primitives/typography";
 import { ArrowLeft, TriangleAlert, ArrowUpCircle } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import defaultAvatar from "img/defaultAvatar.png";
 
 import { InfoTab } from "./tabs/InfoTab";
@@ -18,6 +18,7 @@ import { LogsTab } from "./tabs/LogsTab";
 import { NetworkTab } from "./tabs/NetworkTab";
 import { FileManagerTab } from "./tabs/FileManagerTab";
 import { BackupTab } from "./tabs/BackupTab";
+import { packagesRelativePath } from "./data";
 
 /* ── Tab definitions ────────────────────────────────────────────────── */
 
@@ -184,13 +185,11 @@ export function PackageDetailPage() {
 /* ── Back button ────────────────────────────────────────────────────── */
 
 function BackButton() {
+  const navigate = useNavigate();
   return (
-    <Link
-      to="/ai/packages"
-      className="tw:inline-flex tw:items-center tw:gap-1.5 tw:text-sm tw:text-muted-foreground tw:hover:text-foreground tw:transition-colors tw:self-start"
-    >
+    <Button variant="link" onClick={() => navigate(packagesRelativePath)} className="tw:inline-flex tw:self-start">
       <ArrowLeft className="tw:size-3.5" />
       Packages
-    </Link>
+    </Button>
   );
 }
