@@ -1,6 +1,6 @@
 import React from "react";
 import { Routes, Route, useNavigate, useLocation, Link } from "react-router-dom";
-import { Sparkles, ShoppingBag, Package, Home } from "lucide-react";
+import { Sparkles, ShoppingBag, Package, Home, Globe } from "lucide-react";
 import dappnodeLogo from "img/dappnode-logo-only.png";
 import {
   SidebarProvider,
@@ -33,13 +33,18 @@ import { StorePage } from "./store/StorePage";
 import { PackagesPage } from "./packages/PackagesPage";
 import { PackageDetailPage } from "./packages/PackageDetailPage";
 import { InstallerPage } from "./installer/InstallerPage";
+import { NexusPage } from "./nexus/NexusPage";
+import { storeRelativePath } from "./store/data";
+import { packagesRelativePath } from "./packages/data";
+import { nexusRelativePath } from "./nexus/data";
 
 /* ── Navigation items ───────────────────────────────────────────────── */
 
 const navItems = [
   { label: "Overview", icon: Sparkles, path: "/ai" },
-  { label: "Store", icon: ShoppingBag, path: "/ai/store" },
-  { label: "Packages", icon: Package, path: "/ai/packages" }
+  { label: "Store", icon: ShoppingBag, path: storeRelativePath },
+  { label: "Packages", icon: Package, path: packagesRelativePath },
+  { label: "Nexus", icon: Globe, path: nexusRelativePath }
 ];
 
 function getBreadcrumbItems(pathname: string): { label: string; to: string }[] {
@@ -182,6 +187,7 @@ export function AiLayout() {
               <Route path="install/:id/*" element={<InstallerPage />} />
               <Route path="packages" element={<PackagesPage />} />
               <Route path="packages/:id/*" element={<PackageDetailPage />} />
+              <Route path="nexus" element={<NexusPage />} />
             </Routes>
           </div>
 
