@@ -34,8 +34,7 @@ export function parseContainerInfo(container: ContainerInfo): PackageContainer {
   }));
   // Declared here for reusability purposes
   const isDnp = Boolean(labels.dnpName) || containerName.includes(CONTAINER_NAME_PREFIX);
-  const isCore =
-    typeof labels.isCore === "boolean" ? labels.isCore : containerName.includes(CONTAINER_CORE_NAME_PREFIX);
+  const isCore = typeof labels.isCore === "boolean" ? labels.isCore : containerName.includes(CONTAINER_CORE_NAME_PREFIX);
 
   return {
     // Identification
