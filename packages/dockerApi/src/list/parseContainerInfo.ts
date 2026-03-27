@@ -72,6 +72,7 @@ export function parseContainerInfo(container: ContainerInfo): PackageContainer {
     avatarUrl: resolveAvatarUrl(labels.avatar, dnpName, isCore),
     origin: labels.origin,
     chain: labels.chain,
+    categories: labels.categories,
     canBeFullnode: allowedFullnodeDnpNames.includes(dnpName),
     isMain: labels.isMain,
     // Default settings on the original package version's docker-compose
