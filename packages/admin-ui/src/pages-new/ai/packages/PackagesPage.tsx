@@ -13,6 +13,8 @@ import { CircleCheck, CirclePause, CircleX, RefreshCw, TriangleAlert, PackageOpe
 import { InstalledPackageDataApiReturn } from "@dappnode/types";
 import { parseContainerState, SimpleState } from "pages/packages/components/StateBadge/utils";
 import defaultAvatar from "img/defaultAvatar.png";
+import { Button } from "components/primitives/button";
+import { storeRelativePath } from "../store/data";
 
 /* ── Status helpers ─────────────────────────────────────────────────── */
 
@@ -49,11 +51,11 @@ export function PackagesPage() {
   const error = dnpsRequest.error;
   const loading = dnpsRequest.isValidating && !dnps;
 
-  /** Only AI-category packages (non-core). */
+  /** Only AI-category packages (non-core && categories include "AI"). */
   const packages = useMemo(() => {
     if (!dnps) return [];
     return sortBy(
-      dnps.filter((d) => !d.isCore),
+      dnps.filter((d) => !d.isCore && d.categories?.includes("AI")),
       (d) => d.dnpName
     );
   }, [dnps]);
@@ -96,6 +98,9 @@ export function PackagesPage() {
             </EmptyMedia>
             <EmptyTitle>No packages installed</EmptyTitle>
             <EmptyDescription>Head over to the Store to install your first AI package.</EmptyDescription>
+            <Button variant="link" onClick={() => navigate(storeRelativePath)}>
+              Go to Store
+            </Button>
           </EmptyHeader>
         </Empty>
       ) : (

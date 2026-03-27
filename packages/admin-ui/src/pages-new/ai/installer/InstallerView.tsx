@@ -28,6 +28,7 @@ import { InstallerSetupWizard } from "./InstallerSetupWizard";
 import { AutoUpdatesDialog, shouldPromptAutoUpdates } from "./AutoUpdatesDialog";
 import { pathName as systemPathName, subPaths as systemSubPaths } from "pages/system/data";
 import { withLegacyBase } from "utils/path";
+import { packagesRelativePath } from "../packages/data";
 
 interface InstallerViewProps {
   dnp: RequestedDnp;
@@ -190,9 +191,7 @@ export function InstallerView({ dnp, progressLogs }: InstallerViewProps) {
         if (shouldPrompt && componentIsMounted.current) {
           setAutoUpdatesDialogOpen(true);
         } else if (componentIsMounted.current) {
-          setTimeout(() => {
-            if (componentIsMounted.current) navigate("/ai/store");
-          }, 1500);
+          navigate(`${packagesRelativePath}/${encodeURIComponent(dnpName)}/info`);
         }
       });
     }
@@ -439,7 +438,7 @@ export function InstallerView({ dnp, progressLogs }: InstallerViewProps) {
           setAutoUpdatesDialogOpen(open);
           // When the dialog closes, redirect to the store
           if (!open && componentIsMounted.current) {
-            navigate("/ai/store");
+            navigate(`${packagesRelativePath}/${encodeURIComponent(dnpName)}/info`);
           }
         }}
       />
