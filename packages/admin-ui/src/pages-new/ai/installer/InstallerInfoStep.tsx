@@ -343,7 +343,7 @@ function StatusPill({
     <button
       type="button"
       onClick={onClick}
-      className="tw:inline-flex tw:items-center tw:gap-1.5 tw:rounded-full tw:border tw:border-border tw:bg-card tw:px-3 tw:py-1 tw:text-xs tw:font-medium tw:transition-all tw:hover:bg-muted tw:hover:shadow-sm tw:cursor-pointer"
+      className="tw:inline-flex tw:items-center tw:gap-1.5 tw:rounded-full tw:border tw:border-border tw:bg-card tw:px-3 tw:py-1 tw:text-xs tw:font-medium tw:text-foreground tw:transition-all tw:hover:bg-muted tw:hover:shadow-sm tw:cursor-pointer"
     >
       {loading ? (
         <Loader2 className="tw:size-3 tw:animate-spin tw:text-muted-foreground" />

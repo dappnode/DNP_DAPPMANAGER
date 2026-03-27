@@ -501,7 +501,7 @@ export function OverviewPage() {
         <Section title="Collapsible">
           <Collapsible open={collapsibleOpen} onOpenChange={setCollapsibleOpen} className="tw:max-w-sm tw:space-y-2">
             <div className="tw:flex tw:items-center tw:justify-between tw:gap-4 tw:rounded-md tw:border tw:border-border tw:px-4 tw:py-3">
-              <h4 className="tw:text-sm tw:font-semibold">@dappnode/toolkit has 3 repositories</h4>
+              <TypographyH4 className="tw:text-sm tw:font-semibold">@dappnode/toolkit has 3 repositories</TypographyH4>
               <CollapsibleTrigger asChild>
                 <Button variant="ghost" size="icon-sm">
                   <ChevronsUpDown className="tw:size-4" />
@@ -509,14 +509,16 @@ export function OverviewPage() {
                 </Button>
               </CollapsibleTrigger>
             </div>
-            <div className="tw:rounded-md tw:border tw:border-border tw:px-4 tw:py-3 tw:text-sm">@dappnode/types</div>
+            <TypographyP className="tw:rounded-md tw:border tw:border-border tw:px-4 tw:py-3 tw:text-sm">
+              @dappnode/types
+            </TypographyP>
             <CollapsibleContent className="tw:space-y-2">
-              <div className="tw:rounded-md tw:border tw:border-border tw:px-4 tw:py-3 tw:text-sm">
+              <TypographyP className="tw:rounded-md tw:border tw:border-border tw:px-4 tw:py-3 tw:text-sm">
                 @dappnode/common
-              </div>
-              <div className="tw:rounded-md tw:border tw:border-border tw:px-4 tw:py-3 tw:text-sm">
+              </TypographyP>
+              <TypographyP className="tw:rounded-md tw:border tw:border-border tw:px-4 tw:py-3 tw:text-sm">
                 @dappnode/toolkit
-              </div>
+              </TypographyP>
             </CollapsibleContent>
           </Collapsible>
         </Section>
