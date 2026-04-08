@@ -14,6 +14,7 @@ import { toast } from "sonner";
 
 /* ── Existing primitives ─────────────────────────────────────────── */
 import { Button } from "components/primitives/button";
+import { PageContainer, PageHeader } from "components/primitives/page";
 import {
   Card,
   ClickableCard,
@@ -174,15 +175,12 @@ export function OverviewPage() {
 
   return (
     <TooltipProvider delayDuration={0}>
-      <div className="tw:flex tw:flex-col tw:gap-section tw:px-page-x tw:py-page-y tw:max-w-content-max">
+      <PageContainer className="tw:max-w-content-max">
         {/* Page header */}
-        <header>
-          <h1 className="tw:text-3xl tw:font-bold tw:tracking-tight tw:text-foreground">AI Overview</h1>
-          <p className="tw:mt-header-gap tw:text-muted-foreground tw:max-w-2xl">
-            Component showcase — every shadcn primitive rendered with all its variants. Use this page to verify
-            consistency across light and dark mode.
-          </p>
-        </header>
+        <PageHeader
+          title="AI Overview"
+          description="Component showcase — every shadcn primitive rendered with all its variants. Use this page to verify consistency across light and dark mode."
+        />
 
         <Separator />
 
@@ -925,7 +923,7 @@ export function OverviewPage() {
 
         {/* Bottom spacer */}
         <div className="tw:h-8" />
-      </div>
+      </PageContainer>
     </TooltipProvider>
   );
 }

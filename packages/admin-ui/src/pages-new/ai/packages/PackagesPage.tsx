@@ -8,7 +8,7 @@ import { Badge } from "components/primitives/badge";
 import { Alert, AlertTitle, AlertDescription } from "components/primitives/alert";
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from "components/primitives/empty";
 import { Skeleton } from "components/primitives/skeleton";
-import { TypographyH3, TypographyMuted } from "components/primitives/typography";
+import { PageContainer, PageHeader } from "components/primitives/page";
 import { CircleCheck, CirclePause, CircleX, RefreshCw, TriangleAlert, PackageOpen } from "lucide-react";
 import { InstalledPackageDataApiReturn } from "@dappnode/types";
 import { parseContainerState, SimpleState } from "pages/packages/components/StateBadge/utils";
@@ -62,33 +62,42 @@ export function PackagesPage() {
 
   if (loading) {
     return (
-      <div className="tw:flex tw:flex-col tw:gap-section tw:px-page-x tw:py-page-y">
-        <PageHeader />
+      <PageContainer>
+        <PageHeader
+          title="Packages"
+          description="View and manage the AI packages installed on your Dappnode. Monitor the status, versions and updates."
+        />
         <div className="tw:grid tw:grid-cols-1 tw:sm:grid-cols-2 tw:lg:grid-cols-3 tw:gap-card">
           {Array.from({ length: 6 }).map((_, i) => (
             <Skeleton key={i} className="tw:h-36 tw:rounded-xl" />
           ))}
         </div>
-      </div>
+      </PageContainer>
     );
   }
 
   if (error) {
     return (
-      <div className="tw:flex tw:flex-col tw:gap-section tw:px-page-x tw:py-page-y">
-        <PageHeader />
+      <PageContainer>
+        <PageHeader
+          title="Packages"
+          description="View and manage the AI packages installed on your Dappnode. Monitor the status, versions and updates."
+        />
         <Alert variant="destructive">
           <TriangleAlert className="tw:size-4" />
           <AlertTitle>Failed to load packages</AlertTitle>
           <AlertDescription>{error.message}</AlertDescription>
         </Alert>
-      </div>
+      </PageContainer>
     );
   }
 
   return (
-    <div className="tw:flex tw:flex-col tw:gap-section tw:px-page-x tw:py-page-y">
-      <PageHeader />
+    <PageContainer>
+      <PageHeader
+        title="Packages"
+        description="View and manage the AI packages installed on your Dappnode. Monitor the status, versions and updates."
+      />
 
       {packages.length === 0 ? (
         <Empty className="tw:border tw:py-16">
@@ -141,17 +150,6 @@ export function PackagesPage() {
           })}
         </div>
       )}
-    </div>
-  );
-}
-
-function PageHeader() {
-  return (
-    <header>
-      <TypographyH3 className="tw:border-none tw:pb-0">Packages</TypographyH3>
-      <TypographyMuted className="tw:mt-header-gap">
-        View and manage the AI packages installed on your Dappnode. Monitor the status, versions and updates.
-      </TypographyMuted>
-    </header>
+    </PageContainer>
   );
 }
