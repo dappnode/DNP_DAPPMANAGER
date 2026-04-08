@@ -1,6 +1,7 @@
 import React from "react";
-import { Routes, Route, useNavigate, useLocation, Link } from "react-router-dom";
-import { Sparkles, ShoppingBag, Package, Home, Globe } from "lucide-react";
+import { Routes, Route, Navigate, useNavigate, useLocation, Link } from "react-router-dom";
+import { ShoppingBag, Package, Home, Globe } from "lucide-react";
+// import { Sparkles } from "lucide-react";
 import dappnodeLogo from "img/dappnode-logo-only.png";
 import {
   SidebarProvider,
@@ -28,7 +29,7 @@ import {
 import { ThemeToggle } from "components/ThemeToggle";
 import { Toaster } from "components/primitives/sonner";
 import { DecorativeBackground } from "pages-new/layouts";
-import { OverviewPage } from "./OverviewPage";
+// import { OverviewPage } from "./OverviewPage";
 import { StorePage } from "./store/StorePage";
 import { PackagesPage } from "./packages/PackagesPage";
 import { PackageDetailPage } from "./packages/PackageDetailPage";
@@ -41,9 +42,9 @@ import { nexusRelativePath } from "./nexus/data";
 /* ── Navigation items ───────────────────────────────────────────────── */
 
 const navItems = [
-  { label: "Overview", icon: Sparkles, path: "/ai" },
-  { label: "Store", icon: ShoppingBag, path: storeRelativePath },
+  // { label: "Overview", icon: Sparkles, path: "/ai" },
   { label: "Packages", icon: Package, path: packagesRelativePath },
+  { label: "Store", icon: ShoppingBag, path: storeRelativePath },
   { label: "Nexus", icon: Globe, path: nexusRelativePath }
 ];
 
@@ -182,11 +183,12 @@ export function AiLayout() {
           {/* Page content */}
           <div className="tw:relative tw:flex-1">
             <Routes>
-              <Route index element={<OverviewPage />} />
-              <Route path="store" element={<StorePage />} />
-              <Route path="install/:id/*" element={<InstallerPage />} />
+              {/* <Route index element={<OverviewPage />} /> */}
+              <Route index element={<Navigate to={packagesRelativePath} replace />} />
               <Route path="packages" element={<PackagesPage />} />
               <Route path="packages/:id/*" element={<PackageDetailPage />} />
+              <Route path="store" element={<StorePage />} />
+              <Route path="install/:id/*" element={<InstallerPage />} />
               <Route path="nexus" element={<NexusPage />} />
             </Routes>
           </div>
