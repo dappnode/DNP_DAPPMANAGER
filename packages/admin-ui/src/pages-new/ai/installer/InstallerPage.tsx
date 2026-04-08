@@ -6,6 +6,7 @@ import { getProgressLogsByDnp } from "services/isInstallingLogs/selectors";
 import { Alert, AlertTitle, AlertDescription } from "components/primitives/alert";
 import { Skeleton } from "components/primitives/skeleton";
 import { Spinner } from "components/primitives/spinner";
+import { PageContainer } from "components/primitives/page";
 import { TriangleAlert } from "lucide-react";
 import { InstallerView } from "./InstallerView";
 
@@ -21,13 +22,13 @@ export function InstallerPage() {
 
   if (!id) {
     return (
-      <div className="tw:px-page-x tw:py-page-y">
+      <PageContainer>
         <Alert variant="destructive">
           <TriangleAlert className="tw:size-4" />
           <AlertTitle>Missing package ID</AlertTitle>
           <AlertDescription>No package ID was provided in the URL.</AlertDescription>
         </Alert>
-      </div>
+      </PageContainer>
     );
   }
 
@@ -38,19 +39,19 @@ export function InstallerPage() {
 
   if (error) {
     return (
-      <div className="tw:px-page-x tw:py-page-y">
+      <PageContainer>
         <Alert variant="destructive">
           <TriangleAlert className="tw:size-4" />
           <AlertTitle>Failed to load package</AlertTitle>
           <AlertDescription>{typeof error === "string" ? error : error.message}</AlertDescription>
         </Alert>
-      </div>
+      </PageContainer>
     );
   }
 
   if (!dnp) {
     return (
-      <div className="tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-6 tw:py-24 tw:px-page-x">
+      <PageContainer className="tw:items-center tw:justify-center tw:py-24">
         <Spinner className="tw:size-10 tw:text-primary" />
         <div className="tw:flex tw:flex-col tw:items-center tw:gap-2">
           <p className="tw:text-sm tw:font-medium tw:text-foreground">Loading package…</p>
@@ -59,7 +60,7 @@ export function InstallerPage() {
             <Skeleton className="tw:h-3 tw:w-3/4 tw:rounded-full" />
           </div>
         </div>
-      </div>
+      </PageContainer>
     );
   }
 
