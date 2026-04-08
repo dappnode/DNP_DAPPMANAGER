@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { DirectoryItemOk } from "@dappnode/types";
 import { getDnpDirectory, getDirectoryRequestStatus } from "services/dnpDirectory/selectors";
 import { fetchDnpDirectory } from "services/dnpDirectory/actions";
-import { TypographyH3, TypographyMuted } from "components/primitives/typography";
+import { PageContainer, PageHeader } from "components/primitives/page";
 import { Alert, AlertTitle, AlertDescription } from "components/primitives/alert";
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from "components/primitives/empty";
 import { PackageOpen, TriangleAlert } from "lucide-react";
@@ -50,14 +50,9 @@ export function StorePage() {
   }
 
   return (
-    <div className="tw:flex tw:flex-col tw:gap-section tw:px-page-x tw:py-page-y">
+    <PageContainer>
       {/* Page header */}
-      <header>
-        <TypographyH3 className="tw:border-none tw:pb-0">AI Store</TypographyH3>
-        <TypographyMuted className="tw:mt-header-gap tw:max-w-2xl">
-          Browse and install AI powered packages on your Dappnode.
-        </TypographyMuted>
-      </header>
+      <PageHeader title="AI Store" description="Browse and install AI powered packages on your Dappnode." />
 
       {/* Content area */}
       {requestStatus.loading && !directory.length ? (
@@ -83,6 +78,6 @@ export function StorePage() {
       ) : (
         <StoreGrid packages={aiPackages} onPackageClick={handlePackageClick} />
       )}
-    </div>
+    </PageContainer>
   );
 }

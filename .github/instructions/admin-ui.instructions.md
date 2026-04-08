@@ -166,29 +166,60 @@ When creating a new page:
 
 1. **Place it inside `src/pages-new/`** in the appropriate context folder.
 2. **Wrap it with `<NewPageLayout>`** (or `<div className="tw-base">` for custom layouts).
-3. **Use layout spacing tokens** (`tw:px-page-x`, `tw:py-page-y`, `tw:gap-section`, `tw:gap-card`, `tw:mt-header-gap`).
+3. **Use the page layout primitives** from `components/primitives/page` for consistent structure.
 4. **Add a route** in `src/App.tsx` under the "New UI routes" section.
 5. **Never modify legacy pages** in `src/pages/`.
+
+### Page Layout Primitives
+
+The project provides layout primitives in `src/components/primitives/page.tsx` that **must** be used for all page-level structure:
+
+| Component         | Purpose                                                   |
+| ----------------- | --------------------------------------------------------- |
+| `PageContainer`   | Outermost wrapper — applies `px-page-x`, `py-page-y`, `gap-section`, flexbox column layout. Replaces the repeated `<div className="tw:flex tw:flex-col tw:gap-section tw:px-page-x tw:py-page-y">` pattern. |
+| `PageHeader`      | Semantic `<header>` with optional `title` and `description` shorthand props. Also accepts `children` for composed content. |
+| `PageTitle`       | Wraps `TypographyH3` (`<h3>`, 2xl, semibold, tracking-tight) for consistent page headings. |
+| `PageDescription` | Wraps `TypographyMuted` with `mt-header-gap` spacing and `max-w-2xl`. |
+
+**Do not** duplicate the container/header pattern with raw HTML + utility classes — always use these primitives.
 
 ### Standard Page Structure
 
 ```tsx
-import { NewPageLayout } from "pages-new/layouts";
+import { PageContainer, PageHeader } from "components/primitives/page";
 
 export function MyPage() {
   return (
-    <NewPageLayout>
-      <div className="tw:flex tw:flex-col tw:gap-section tw:px-page-x tw:py-page-y">
-        <header>
-          <h1 className="tw:text-3xl tw:font-bold tw:tracking-tight tw:text-foreground">Title</h1>
-          <p className="tw:mt-header-gap tw:text-muted-foreground tw:max-w-2xl">Description</p>
-        </header>
-        {/* Page content */}
-      </div>
-    </NewPageLayout>
+    <PageContainer>
+      <PageHeader title="My Page" description="A short description of this page." />
+      {/* Page content */}
+    </PageContainer>
   );
 }
 ```
+
+### Composed Header (custom content)
+
+```tsx
+import { PageContainer, PageHeader, PageTitle, PageDescription } from "components/primitives/page";
+
+export function MyPage() {
+  return (
+    <PageContainer>
+      <PageHeader>
+        <PageTitle>My Page</PageTitle>
+        <PageDescription>Description with <strong>rich content</strong>.</PageDescription>
+        <Button>Custom action</Button>
+      </PageHeader>
+      {/* Page content */}
+    </PageContainer>
+  );
+}
+```
+
+### PageContainer with custom gap
+
+The detail page uses `<PageContainer className="tw:gap-6">` to override the default `gap-section` when tighter spacing is needed (e.g., for tab layouts).
 
 ## API Integration
 
@@ -232,7 +263,8 @@ The project provides typography components in `src/components/primitives/typogra
 - `TypographyH1` through `TypographyH4` — heading elements with consistent styling.
 - `TypographyMuted` — muted paragraph text for descriptions.
 - `TypographyInlineCode` — inline code snippets.
-- Use these instead of raw `<h1>`, `<p>` elements in new pages for consistent typography.
+
+**For page-level titles and descriptions**, prefer the page layout primitives (`PageTitle`, `PageDescription`) from `components/primitives/page` — they wrap `TypographyH3` and `TypographyMuted` respectively, adding consistent spacing tokens. Use the typography primitives directly for content-level headings within cards, sections, or prose.
 
 ## Coding Conventions
 

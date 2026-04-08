@@ -29,6 +29,7 @@ import { AutoUpdatesDialog, shouldPromptAutoUpdates } from "./AutoUpdatesDialog"
 import { pathName as systemPathName, subPaths as systemSubPaths } from "pages/system/data";
 import { withLegacyBase } from "utils/path";
 import { packagesRelativePath } from "../packages/data";
+import { PageContainer } from "components/primitives/page";
 
 interface InstallerViewProps {
   dnp: RequestedDnp;
@@ -349,7 +350,7 @@ export function InstallerView({ dnp, progressLogs }: InstallerViewProps) {
   /* ── Render ───────────────────────────────────────────────────── */
 
   return (
-    <div className="tw:flex tw:flex-col tw:gap-section tw:px-page-x tw:py-page-y">
+    <PageContainer>
       {/* ── Blocking alerts ──────────────────────────────────────── */}
       {(requiresCoreUpdate || requiresDockerUpdate || packagesToBeUninstalled.length > 0) && (
         <div className="tw:flex tw:flex-col tw:gap-3">
@@ -442,6 +443,6 @@ export function InstallerView({ dnp, progressLogs }: InstallerViewProps) {
           }
         }}
       />
-    </div>
+    </PageContainer>
   );
 }

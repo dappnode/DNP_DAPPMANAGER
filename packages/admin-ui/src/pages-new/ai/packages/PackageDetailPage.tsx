@@ -7,7 +7,7 @@ import { InstalledPackageDetailData } from "@dappnode/types";
 import { Skeleton } from "components/primitives/skeleton";
 import { Alert, AlertTitle, AlertDescription } from "components/primitives/alert";
 import { Button } from "components/primitives/button";
-import { TypographyH3 } from "components/primitives/typography";
+import { PageContainer, PageTitle } from "components/primitives/page";
 import { ArrowLeft, TriangleAlert, ArrowUpCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import defaultAvatar from "img/defaultAvatar.png";
@@ -81,11 +81,11 @@ export function PackageDetailPage() {
   /* ── Loading ──────────────────────────────────────────────────────── */
   if (!dnp && dnpRequest.isValidating) {
     return (
-      <div className="tw:flex tw:flex-col tw:gap-section tw:px-page-x tw:py-page-y">
+      <PageContainer>
         <Skeleton className="tw:h-8 tw:w-48" />
         <Skeleton className="tw:h-10 tw:w-full" />
         <Skeleton className="tw:h-96 tw:w-full tw:rounded-xl" />
-      </div>
+      </PageContainer>
     );
   }
 
@@ -93,7 +93,7 @@ export function PackageDetailPage() {
   if (!dnp) {
     const notFound = dnpRequest.error?.message?.includes("package not found");
     return (
-      <div className="tw:flex tw:flex-col tw:gap-section tw:px-page-x tw:py-page-y">
+      <PageContainer>
         <BackButton />
         <Alert variant="destructive">
           <TriangleAlert className="tw:size-4" />
@@ -104,14 +104,14 @@ export function PackageDetailPage() {
               : dnpRequest.error?.message || "Failed to load package."}
           </AlertDescription>
         </Alert>
-      </div>
+      </PageContainer>
     );
   }
 
   const availableTabs = tabDefs.filter((t) => t.available(dnp));
 
   return (
-    <div className="tw:flex tw:flex-col tw:gap-6 tw:px-page-x tw:py-page-y">
+    <PageContainer className="tw:gap-6">
       {/* Back + title */}
       <div className="tw:flex tw:flex-col tw:gap-3">
         <BackButton />
@@ -122,7 +122,7 @@ export function PackageDetailPage() {
             className="tw:size-10 tw:rounded-lg tw:bg-muted tw:object-cover"
           />
           <div>
-            <TypographyH3 className="tw:border-none tw:pb-0 tw:mb-0">{prettyDnpName(dnp.dnpName)}</TypographyH3>
+            <PageTitle>{prettyDnpName(dnp.dnpName)}</PageTitle>
             <span className="tw:text-sm tw:text-muted-foreground">v{dnp.version}</span>
           </div>
         </div>
@@ -178,7 +178,7 @@ export function PackageDetailPage() {
         {/* Default redirect to first available tab */}
         <Route path="*" element={<Navigate to={availableTabs[0]?.subPath || "info"} replace />} />
       </Routes>
-    </div>
+    </PageContainer>
   );
 }
 
