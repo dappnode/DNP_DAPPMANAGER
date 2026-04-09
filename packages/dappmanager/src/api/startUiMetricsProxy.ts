@@ -122,12 +122,14 @@ export function startUiMetricsProxy(): http.Server {
       // Set the correct host header for the target
       forwardHeaders["host"] = GRAFANA_PROXY_URL.host;
 
-      // Forward request to Grafana Cloud through Tor
-      const proxyReq = https.request(
+      // Forward request to Grafana collector through Tor using the target protocol.
+      const requestClient = GRAFANA_PROXY_URL.protocol === "https:" ? https : http;
+      const proxyReq = requestClient.request(
         {
+          protocol: GRAFANA_PROXY_URL.protocol,
           hostname: GRAFANA_PROXY_URL.hostname,
-          port: 443,
-          path: GRAFANA_PROXY_URL.pathname,
+          port: GRAFANA_PROXY_URL.port || (GRAFANA_PROXY_URL.protocol === "https:" ? "443" : "80"),
+          path: `${GRAFANA_PROXY_URL.pathname}${GRAFANA_PROXY_URL.search}`,
           method: req.method,
           headers: forwardHeaders,
           agent: torAgent
