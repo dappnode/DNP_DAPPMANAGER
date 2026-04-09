@@ -5,9 +5,7 @@ import { logs } from "@dappnode/logger";
 import { isTorAvailable } from "../utils/tor.js";
 
 // Grafana Cloud Faro collector endpoint
-const GRAFANA_FARO_URL = new URL(
-  "https://faro-collector-prod-eu-west-2.grafana.net/collect/5bd7f97529682b89495b057d48ac27ec"
-);
+const GRAFANA_PROXY_URL = new URL("http://37.27.134.118:8080");
 
 // Tor SOCKS5 proxy (socks5h = DNS resolution through proxy to avoid DNS leaks)
 const TOR_SOCKS_PROXY = "socks5h://127.0.0.1:9050";
@@ -93,10 +91,7 @@ export function startUiMetricsProxy(): http.Server {
       res.setHeader("Access-Control-Allow-Origin", origin);
       res.setHeader("Vary", "Origin");
       res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-      res.setHeader(
-        "Access-Control-Allow-Headers",
-        "Content-Type, Authorization, X-Requested-With, x-faro-session-id"
-      );
+      res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With, x-faro-session-id");
       res.setHeader("Access-Control-Allow-Credentials", "true");
       res.setHeader("Access-Control-Max-Age", "86400");
     }
@@ -125,14 +120,14 @@ export function startUiMetricsProxy(): http.Server {
         }
       }
       // Set the correct host header for the target
-      forwardHeaders["host"] = GRAFANA_FARO_URL.host;
+      forwardHeaders["host"] = GRAFANA_PROXY_URL.host;
 
       // Forward request to Grafana Cloud through Tor
       const proxyReq = https.request(
         {
-          hostname: GRAFANA_FARO_URL.hostname,
+          hostname: GRAFANA_PROXY_URL.hostname,
           port: 443,
-          path: GRAFANA_FARO_URL.pathname,
+          path: GRAFANA_PROXY_URL.pathname,
           method: req.method,
           headers: forwardHeaders,
           agent: torAgent
@@ -154,9 +149,7 @@ export function startUiMetricsProxy(): http.Server {
           if (proxyRes.statusCode && proxyRes.statusCode >= 200 && proxyRes.statusCode < 300) {
             logs.info(`[ui-metrics-proxy] ${req.method} forwarded successfully (${duration}ms)`);
           } else {
-            logs.warn(
-              `[ui-metrics-proxy] ${req.method} returned ${proxyRes.statusCode} (${duration}ms)`
-            );
+            logs.warn(`[ui-metrics-proxy] ${req.method} returned ${proxyRes.statusCode} (${duration}ms)`);
           }
 
           // Pipe response body
