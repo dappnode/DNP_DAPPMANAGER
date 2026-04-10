@@ -30,9 +30,67 @@ applyTo: "packages/admin-ui/src/**/*.ts,packages/admin-ui/src/**/*.tsx,packages/
 
 ### Layouts
 
-- Reusable layout wrappers live in `src/pages-new/layouts/`.
-- `NewPageLayout` — base wrapper for all new pages. Provides `.tw-base` reset, `min-h-screen`, `bg-background`, and an optional decorative gradient-orb background.
-- `DecorativeBackground` — standalone decorative layer that can be used independently.
+The project uses a two-tier layout system:
+
+#### Shared base layout: `SectionLayout` (`src/layouts/SectionLayout.tsx`)
+
+All new sections use `SectionLayout` as their base. It provides:
+- `.tw-base` scoped reset
+- Collapsible sidebar with configurable nav items
+- Sticky topbar with breadcrumbs and theme toggle
+- `DecorativeBackground` gradient orbs
+- Sonner `<Toaster />`
+- A "Back to Home" sidebar link (auto-hidden when `basePath="/"`)
+
+`SectionLayout` is configured via props:
+
+| Prop           | Type        | Description                                                |
+| -------------- | ----------- | ---------------------------------------------------------- |
+| `sectionLabel` | `string`    | Shown in sidebar subtitle and breadcrumb root (e.g. "AI"). |
+| `basePath`     | `string`    | Route prefix for breadcrumb links (e.g. `"/ai"`, `"/"`).   |
+| `navItems`     | `NavItem[]` | `{ label, icon, path }` entries rendered in the sidebar.   |
+| `children`     | `ReactNode` | Typically a `<Routes>` block with the section's pages.     |
+
+Import from the barrel: `import { SectionLayout, NavItem } from "layouts";`
+
+#### Section-specific layouts
+
+Each route section has a thin layout wrapper that passes configuration to `SectionLayout`:
+
+- **`HomeLayout`** (`src/pages-new/home/HomeLayout.tsx`) — `basePath="/"`, tabs: Home, System Info, Settings.
+- **`AiLayout`** (`src/pages-new/ai/AiLayout.tsx`) — `basePath="/ai"`, tabs: Packages, Store, Nexus.
+- **`LegacyStakingLayout`** (`src/layouts/LegacyStakingLayout.tsx`) — Bootstrap-based, does **not** use `SectionLayout`.
+
+#### `DecorativeBackground` (`src/layouts/DecorativeBackground.tsx`)
+
+Purely presentational gradient-orb layer used by `SectionLayout` and `NewPageLayout`. Import from `layouts/DecorativeBackground`.
+
+#### `NewPageLayout` (`src/pages-new/layouts/NewPageLayout.tsx`)
+
+Standalone page wrapper for pages outside any section (Login, Register, NoConnection). Provides `.tw-base`, `min-h-screen`, `bg-background`, and optional decorative background. **Not** used for pages inside a section — those inherit everything from `SectionLayout`.
+
+#### Adding a new section
+
+1. Create a folder under `src/pages-new/[section]/`.
+2. Create `[Section]Layout.tsx`:
+   ```tsx
+   import { SectionLayout, NavItem } from "layouts";
+   
+   const navItems: NavItem[] = [
+     { label: "Tab One", icon: SomeIcon, path: "/section/tab-one" },
+   ];
+   
+   export function SectionNameLayout() {
+     return (
+       <SectionLayout sectionLabel="Section" basePath="/section" navItems={navItems}>
+         <Routes>
+           <Route index element={<TabOnePage />} />
+         </Routes>
+       </SectionLayout>
+     );
+   }
+   ```
+3. Add a `<Route path="/section/*" element={<SectionNameLayout />} />` in `App.tsx`.
 
 ### Components
 
@@ -67,9 +125,8 @@ This project uses `baseUrl: "src"` in `tsconfig.json` with `vite-tsconfig-paths`
 - All Tailwind classes use the `tw:` prefix (e.g., `tw:flex`, `tw:bg-primary`).
 - Design tokens are defined in `src/styles/tailwind.css`.
 - The `.tw-base` class provides a scoped CSS reset (box-sizing, font-family, etc.) since Tailwind preflight is disabled to avoid breaking legacy Bootstrap styles.
-- Every new page must be wrapped with either:
-  - `<NewPageLayout>` from `pages-new/layouts` (provides `.tw-base` + optional decorative background), or
-  - A raw `<div className="tw-base">` wrapper if a custom layout is needed.
+- Pages inside a section (Home, AI, etc.) get `.tw-base` automatically from `SectionLayout` — no extra wrapper needed.
+- Standalone pages (Login, Register, NoConnection) must use `<NewPageLayout>` from `pages-new/layouts`, which provides `.tw-base` + optional decorative background.
 
 ### Legacy Pages (Bootstrap/SCSS)
 
@@ -162,13 +219,17 @@ Apply this to all `@/` prefixed imports in the generated file (`lib/utils`, `com
 
 ## Page Creation Rules
 
-When creating a new page:
+When creating a new page inside an existing section:
 
-1. **Place it inside `src/pages-new/`** in the appropriate context folder.
-2. **Wrap it with `<NewPageLayout>`** (or `<div className="tw-base">` for custom layouts).
-3. **Use the page layout primitives** from `components/primitives/page` for consistent structure.
-4. **Add a route** in `src/App.tsx` under the "New UI routes" section.
+1. **Place it inside `src/pages-new/[section]/`** in the appropriate context folder.
+2. **Use the page layout primitives** from `components/primitives/page` for consistent structure.
+3. **Add a `<Route>`** in the section's layout file (e.g. `AiLayout.tsx` or `HomeLayout.tsx`).
+4. **Add a nav item** to the section's `navItems` array if it should appear in the sidebar.
 5. **Never modify legacy pages** in `src/pages/`.
+
+Pages inside a section do **not** need a `<NewPageLayout>` or `.tw-base` wrapper — `SectionLayout` provides both automatically.
+
+For standalone pages outside any section (Login, Register, NoConnection), wrap with `<NewPageLayout>` from `pages-new/layouts`.
 
 ### Page Layout Primitives
 
@@ -229,21 +290,21 @@ The detail page uses `<PageContainer className="tw:gap-6">` to override the defa
 - For toasts in new pages, use **Sonner** (`import { toast } from "sonner"`), not the legacy `withToast`/`withToastNoThrow`.
 - For destructive confirmation dialogs, use the `AlertDialog` primitive, not the legacy `confirm()` helper.
 
-## Sidebar & Routing (AI Section)
+## Sidebar & Routing
 
-The AI section (`/ai/*`) uses `AiLayout.tsx` as the master layout. To add a new page:
+Each section (`/`, `/ai/*`, etc.) has its own thin layout that passes nav items and routes to the shared `SectionLayout`. To add a new page to an existing section:
 
-1. Create the page component under `src/pages-new/ai/[context]/`.
-2. Add a `<Route>` entry in `AiLayout.tsx` inside the `<Routes>` block.
-3. To make it appear in the sidebar, add an entry to the `navItems` array.
-4. The `isActive` check uses `startsWith` for prefix matching—sub-routes are automatically highlighted.
+1. Create the page component under `src/pages-new/[section]/[context]/`.
+2. Add a `<Route>` entry in the section's layout file (e.g. `AiLayout.tsx`, `HomeLayout.tsx`) inside the `<Routes>` block.
+3. To make it appear in the sidebar, add an entry to the section's `navItems` array.
+4. The `isActive` check uses exact match + `startsWith` prefix matching — sub-routes are automatically highlighted.
 
 ### Package Detail Page Pattern
 
 For pages with sub-tabs (like package detail), use this pattern:
 
 - The parent route uses a wildcard: `<Route path="packages/:id/*" element={<PackageDetailPage />} />`
-- Inside the detail page, use `<NavLink>` elements with a bottom-border active style as the tab bar.
+- Inside the detail page, use the `NavigationMenu` component (from `components/primitives/navigation-menu`) with `NavigationMenuLink asChild` wrapping React Router `NavLink` elements for the tab bar.
 - Each tab is a nested `<Route>` rendered inside the detail component.
 - Include a `<Navigate>` fallback to redirect to the default tab.
 
