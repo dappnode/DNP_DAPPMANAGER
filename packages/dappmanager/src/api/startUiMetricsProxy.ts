@@ -2,7 +2,7 @@ import http from "http";
 import https from "https";
 import { SocksProxyAgent } from "socks-proxy-agent";
 import { logs } from "@dappnode/logger";
-import { isTorAvailable } from "../utils/tor.js";
+import { isTorAvailable } from "../tor/index.js";
 
 // Grafana Cloud Faro collector endpoint
 const GRAFANA_PROXY_URL = new URL("http://37.27.134.118:8080");
