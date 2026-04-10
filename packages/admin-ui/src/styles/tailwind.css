@@ -273,7 +273,7 @@
   /* ── Layout primitives ────────────────────────────────────────── */
   --page-padding-x: 1.5rem;
   --page-padding-y: 2rem;
-  --section-gap: 2rem;
+  --section-gap: 1.5rem;
   --card-gap: 1rem;
   --header-gap: 0.5rem;
   --step-gap: 1.5rem;
