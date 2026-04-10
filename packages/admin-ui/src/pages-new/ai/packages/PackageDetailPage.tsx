@@ -8,6 +8,12 @@ import { Skeleton } from "components/primitives/skeleton";
 import { Alert, AlertTitle, AlertDescription } from "components/primitives/alert";
 import { Button } from "components/primitives/button";
 import { PageContainer, PageTitle } from "components/primitives/page";
+import {
+  NavigationMenu,
+  NavigationMenuList,
+  NavigationMenuItem,
+  NavigationMenuLink
+} from "components/primitives/navigation-menu";
 import { ArrowLeft, TriangleAlert, ArrowUpCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import defaultAvatar from "img/defaultAvatar.png";
@@ -150,25 +156,17 @@ export function PackageDetailPage() {
       )}
 
       {/* Tab navbar */}
-      <nav className="tw:flex tw:items-center tw:gap-1 tw:border-b tw:border-border tw:-mb-px">
-        {availableTabs.map((tab) => (
-          <NavLink
-            key={tab.subPath}
-            to={tab.subPath}
-            end
-            className={({ isActive }) =>
-              [
-                "tw:px-4 tw:py-2.5 tw:text-sm tw:font-medium tw:transition-colors tw:border-b-2 tw:whitespace-nowrap",
-                isActive
-                  ? "tw:border-primary tw:text-primary"
-                  : "tw:border-transparent tw:text-muted-foreground tw:hover:text-foreground tw:hover:border-border"
-              ].join(" ")
-            }
-          >
-            {tab.label}
-          </NavLink>
-        ))}
-      </nav>
+      <NavigationMenu viewport={false}>
+        <NavigationMenuList>
+          {availableTabs.map((tab) => (
+            <NavigationMenuItem key={tab.subPath}>
+              <NavigationMenuLink asChild>
+                <NavLink to={tab.subPath}>{tab.label}</NavLink>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+          ))}
+        </NavigationMenuList>
+      </NavigationMenu>
 
       {/* Tab content */}
       <Routes>
