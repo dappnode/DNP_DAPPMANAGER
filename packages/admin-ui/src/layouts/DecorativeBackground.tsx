@@ -4,8 +4,8 @@ import React from "react";
  * Decorative background layer with gradient orbs and dot-grid overlay.
  *
  * Designed to sit behind page content as an absolute-positioned layer.
- * Used by `NewPageLayout` to provide a consistent visual feel across
- * all new pages in `pages-new/`.
+ * Used by `SectionLayout` and `NewPageLayout` to provide a consistent
+ * visual feel across all new pages.
  *
  * Orb opacities are reduced in dark mode so the colours blend into the
  * dark background without overwhelming the UI.
