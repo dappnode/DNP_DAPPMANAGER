@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Route, useLocation, useNavigate, Navigate } from "react-router-dom";
+import { Route, useLocation, Navigate } from "react-router-dom";
 import { startApi, apiAuth, LoginStatus } from "api";
 // Components
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -9,7 +9,7 @@ import { ThemeProvider, useTheme } from "components/ThemeProvider";
 // Legacy pages
 import { pages } from "./pages";
 // New pages
-import { NewHomePage } from "./pages-new/home/HomePage";
+// import { NewHomePage } from "./pages-new/home/HomePage";
 
 // Old start pages (keep until deleted)
 // import { Login } from "./start-pages/Login";
@@ -19,6 +19,7 @@ import { LoginPage } from "./pages-new/home/LoginPage";
 import { RegisterPage } from "./pages-new/home/RegisterPage";
 import { NoConnectionPage } from "./pages-new/home/NoConnectionPage";
 import { AiLayout } from "./pages-new/ai/AiLayout";
+import { HomeLayout } from "./pages-new/home/HomeLayout";
 // Layouts
 import { LegacyStakingLayout } from "./layouts/LegacyStakingLayout";
 // Types
@@ -78,14 +79,6 @@ function MainApp({ username }: { username: string }) {
         <FaroRoutes>
           {/* New UI routes — Tailwind + shadcn, no legacy chrome */}
           <Route
-            path="/"
-            element={
-              <ErrorBoundary>
-                <NewHomePage />
-              </ErrorBoundary>
-            }
-          />
-          <Route
             path="/ai/*"
             element={
               <ErrorBoundary>
@@ -114,26 +107,19 @@ function MainApp({ username }: { username: string }) {
             <Route index element={<Navigate to="dashboard" replace />} />
           </Route>
 
-          {/* 404 routes redirect to home */}
-          <Route path="*" element={<DefaultRedirect />} />
+          {/* Home section — catch-all for / and /info, /settings etc. */}
+          <Route
+            path="/*"
+            element={
+              <ErrorBoundary>
+                <HomeLayout />
+              </ErrorBoundary>
+            }
+          />
         </FaroRoutes>
       </div>
     </AppContext.Provider>
   );
-}
-
-function DefaultRedirect() {
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  useEffect(() => {
-    // Catch-all: redirect unknown routes to the new home page
-    if (location.pathname !== "/") {
-      navigate("/", { replace: true });
-    }
-  }, [location, navigate]);
-
-  return null;
 }
 
 export default function App() {

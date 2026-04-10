@@ -1,5 +1,5 @@
 import React from "react";
-import { DecorativeBackground } from "./DecorativeBackground";
+import { DecorativeBackground } from "layouts/DecorativeBackground";
 
 /**
  * Base layout wrapper for all new pages in `pages-new/`.
