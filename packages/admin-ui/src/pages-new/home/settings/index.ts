@@ -1,0 +1,10 @@
+export { InfoTab } from "./info";
+export { WifiTab } from "./wifi";
+export { VpnTab } from "./vpn";
+export { UpdatesTab } from "./updates";
+export { AppTab } from "./app";
+export { ProfileTab } from "./profile";
+export { HostTab } from "./host";
+export { NetworkTab } from "./network";
+export { IpfsTab } from "./ipfs";
+export { AdvancedTab } from "./advanced";

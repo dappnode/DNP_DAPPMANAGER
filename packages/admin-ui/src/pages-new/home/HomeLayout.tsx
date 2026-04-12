@@ -4,7 +4,7 @@ import { House, Settings, Info } from "lucide-react";
 import { SectionLayout, NavItem } from "layouts";
 import { HomePage } from "./HomePage";
 import { SystemInfoPage } from "./SystemInfoPage";
-import { SettingsPage } from "./SettingsPage";
+import { SettingsPage } from "./settings/SettingsPage";
 
 /* ── Route constants ────────────────────────────────────────────────── */
 
@@ -28,7 +28,7 @@ export function HomeLayout() {
       <Routes>
         <Route index element={<HomePage />} />
         <Route path="info" element={<SystemInfoPage />} />
-        <Route path="settings" element={<SettingsPage />} />
+        <Route path="settings/*" element={<SettingsPage />} />
       </Routes>
     </SectionLayout>
   );
