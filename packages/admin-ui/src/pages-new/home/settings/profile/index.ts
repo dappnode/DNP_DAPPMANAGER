@@ -1,0 +1,1 @@
+export { ProfileTab } from "./ProfileTab";

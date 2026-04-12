@@ -1,0 +1,1 @@
+export { IpfsTab } from "./IpfsTab";
