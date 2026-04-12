@@ -7,18 +7,7 @@ import {
   NavigationMenuItem,
   NavigationMenuLink
 } from "components/primitives/navigation-menu";
-import {
-  InfoTab,
-  WifiTab,
-  VpnTab,
-  UpdatesTab,
-  AppTab,
-  ProfileTab,
-  HostTab,
-  NetworkTab,
-  IpfsTab,
-  AdvancedTab
-} from "./settings";
+import { InfoTab, WifiTab, VpnTab, UpdatesTab, AppTab, ProfileTab, HostTab, NetworkTab, IpfsTab, AdvancedTab } from ".";
 
 /* ── Tab definitions ────────────────────────────────────────────────── */
 
