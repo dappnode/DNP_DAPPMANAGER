@@ -1,9 +1,5 @@
 import React from "react";
-import {
-  dappnodeDiscord,
-  dappnodeGithub,
-  givethDappnodeGrantUrl
-} from "params";
+import { dappnodeDiscord, dappnodeGithub, givethDappnodeGrantUrl } from "params";
 import { Card, CardContent } from "components/primitives/card";
 import { Button } from "components/primitives/button";
 import { ExternalLink, Heart, Github } from "lucide-react";
@@ -36,8 +32,7 @@ const communityLinks: CommunityLink[] = [
   },
   {
     title: "GitHub",
-    description:
-      "Dappnode is Free Open Source Software. Review and contribute to its codebase on GitHub.",
+    description: "Dappnode is Free Open Source Software. Review and contribute to its codebase on GitHub.",
     icon: Github,
     url: dappnodeGithub,
     urlLabel: "View on GitHub"
@@ -56,9 +51,7 @@ export function CommunitySection() {
               </div>
               <p className="tw:font-semibold">{link.title}</p>
             </div>
-            <p className="tw:text-muted-foreground tw:leading-relaxed">
-              {link.description}
-            </p>
+            <p className="tw:text-muted-foreground tw:leading-relaxed">{link.description}</p>
             <Button variant="outline" size="sm" asChild className="tw:self-start tw:mt-auto">
               <a href={link.url} target="_blank" rel="noopener noreferrer">
                 <ExternalLink className="tw:size-3.5" />
