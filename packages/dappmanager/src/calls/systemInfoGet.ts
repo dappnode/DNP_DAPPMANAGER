@@ -50,6 +50,9 @@ function getNewFeatureIds(): NewFeatureId[] {
   // enable-notifications: Show only if not seen
   if (db.newFeatureStatus.get("enable-notifications") !== "seen") newFeatureIds.push("enable-notifications");
 
+  // enable-ui-telemetry: Show only if not seen
+  if (db.newFeatureStatus.get("enable-ui-telemetry") !== "seen") newFeatureIds.push("enable-ui-telemetry");
+
   // change-host-password: Show only if insecure and host scripts are enabled
   if (!db.passwordIsSecure.get() && !params.DISABLE_HOST_SCRIPTS) newFeatureIds.push("change-host-password");
 

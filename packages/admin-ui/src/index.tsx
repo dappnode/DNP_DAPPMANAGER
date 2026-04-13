@@ -18,59 +18,10 @@ import "./light_dark.scss";
 import "./layout.scss";
 // PWA
 import { PwaInstallProvider } from "pages/system/components/App/PwaInstallContext";
-// Grafana Faro for frontend monitoring and tracing
-import { createRoutesFromChildren, matchRoutes, Routes, useLocation, useNavigationType } from "react-router-dom";
-import {
-  createReactRouterV6Options,
-  getWebInstrumentations,
-  initializeFaro,
-  ReactIntegration
-} from "@grafana/faro-react";
-import { getDefaultOTELInstrumentations, TracingInstrumentation } from "@grafana/faro-web-tracing";
+// Grafana Faro for frontend monitoring and tracing (initialized paused until consent)
+import { initFaro } from "./faro";
 
-// Build metrics URL based on current browser location
-const getMetricsBaseUrl = () => {
-  const protocol = window.location.protocol; // e.g., "http:" or "https:"
-  const host = window.location.host; // e.g., "localhost:3000" or "my.dappnode:8080"
-  return `${protocol}//${host}:8080`;
-};
-
-const metricsBaseUrl = getMetricsBaseUrl();
-// Create a regex pattern that escapes special characters for the ignoreUrls
-const metricsUrlPattern = new RegExp(`^${metricsBaseUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`);
-
-initializeFaro({
-  url: metricsBaseUrl,
-  app: {
-    name: "dappnode",
-    version: "1.0.0",
-    environment: "production"
-  },
-  sessionTracking: {
-    samplingRate: 1,
-    persistent: true
-  },
-  instrumentations: [
-    // Mandatory, omits default instrumentations otherwise.
-    ...getWebInstrumentations({}),
-
-    // Tracing package to get end-to-end visibility for HTTP requests.
-    new TracingInstrumentation({
-      instrumentations: [...getDefaultOTELInstrumentations({ ignoreUrls: [metricsUrlPattern] })] // ignore ui-metrics endpoint to avoid having spam of requests in grafana-cloud
-    }),
-
-    // React integration for React applications.
-    new ReactIntegration({
-      router: createReactRouterV6Options({
-        createRoutesFromChildren,
-        matchRoutes,
-        Routes,
-        useLocation,
-        useNavigationType
-      })
-    })
-  ]
-});
+initFaro();
 
 // push version using grafana faro
 

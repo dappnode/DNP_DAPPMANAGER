@@ -21,6 +21,7 @@ import { PwaPermissionsAlert, PwaPermissionsModal } from "components/PwaPermissi
 import { LocalProxyBanner } from "pages/wifi/components/localProxying/LocalProxyBanner";
 // Grafana Faro for frontend monitoring and tracing
 import { FaroRoutes } from "@grafana/faro-react";
+import { useUiTelemetryConsent } from "hooks/useUiTelemetryConsent";
 
 export const AppContext = React.createContext<AppContextIface>({
   theme: "light",
@@ -53,6 +54,9 @@ function MainApp({ username }: { username: string }) {
   // App is the parent container of any other component.
   // If this re-renders, the whole app will. So DON'T RERENDER APP!
   // Check ONCE what is the status of the VPN and redirect to the login page.
+
+  // Sync Faro telemetry state with user consent from DB
+  useUiTelemetryConsent();
 
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const [theme, setTheme] = useLocalStorage<Theme>("theme", "light");

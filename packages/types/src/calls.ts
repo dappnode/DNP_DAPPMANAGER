@@ -1004,7 +1004,8 @@ export type NewFeatureId =
   | "system-auto-updates"
   | "enable-ethical-metrics"
   | "change-host-password"
-  | "enable-notifications";
+  | "enable-notifications"
+  | "enable-ui-telemetry";
 
 /**
  * =======
