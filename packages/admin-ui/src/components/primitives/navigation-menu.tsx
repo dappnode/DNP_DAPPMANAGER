@@ -109,7 +109,7 @@ function NavigationMenuLink({ className, ...props }: React.ComponentProps<typeof
     <NavigationMenuPrimitive.Link
       data-slot="navigation-menu-link"
       className={cn(
-        "tw:flex tw:items-center tw:gap-2 tw:rounded-lg tw:p-2 tw:text-sm tw:text-foreground tw:transition-all tw:outline-none tw:hover:bg-muted tw:focus:bg-muted tw:focus-visible:ring-3 tw:focus-visible:ring-ring/50 tw:focus-visible:outline-1 tw:in-data-[slot=navigation-menu-content]:rounded-md tw:data-active:bg-muted/50 tw:data-active:hover:bg-muted tw:data-active:focus:bg-muted tw:[&_svg:not([class*=size-])]:size-4",
+        "tw:flex tw:items-center tw:gap-2 tw:rounded-lg tw:p-2 tw:text-sm tw:text-foreground tw:transition-all tw:outline-none tw:hover:bg-muted tw:focus:bg-muted tw:focus-visible:ring-3 tw:focus-visible:ring-ring/50 tw:focus-visible:outline-1 tw:in-data-[slot=navigation-menu-content]:rounded-md tw:data-active:bg-muted/50 tw:data-active:hover:bg-muted tw:data-active:focus:bg-muted tw:[&.active]:bg-muted tw:[&.active]:hover:bg-muted/50 tw:[&.active]:focus:bg-muted tw:[&_svg:not([class*=size-])]:size-4",
         className
       )}
       {...props}
