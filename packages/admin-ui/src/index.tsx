@@ -28,8 +28,19 @@ import {
 } from "@grafana/faro-react";
 import { getDefaultOTELInstrumentations, TracingInstrumentation } from "@grafana/faro-web-tracing";
 
+// Build metrics URL based on current browser location
+const getMetricsBaseUrl = () => {
+  const protocol = window.location.protocol; // e.g., "http:" or "https:"
+  const host = window.location.host; // e.g., "localhost:3000" or "my.dappnode:8080"
+  return `${protocol}//${host}:8080`;
+};
+
+const metricsBaseUrl = getMetricsBaseUrl();
+// Create a regex pattern that escapes special characters for the ignoreUrls
+const metricsUrlPattern = new RegExp(`^${metricsBaseUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`);
+
 initializeFaro({
-  url: "http://my.dappnode:8080",
+  url: metricsBaseUrl,
   app: {
     name: "dappnode",
     version: "1.0.0",
@@ -41,13 +52,11 @@ initializeFaro({
   },
   instrumentations: [
     // Mandatory, omits default instrumentations otherwise.
-    ...getWebInstrumentations({
-      
-    }),
+    ...getWebInstrumentations({}),
 
     // Tracing package to get end-to-end visibility for HTTP requests.
     new TracingInstrumentation({
-      instrumentations: [...getDefaultOTELInstrumentations({ ignoreUrls: [/my.dappnode:8080/],})], // ignore ui-metrics endpoint to avoid having spam of requests in grafana-cloud
+      instrumentations: [...getDefaultOTELInstrumentations({ ignoreUrls: [metricsUrlPattern] })] // ignore ui-metrics endpoint to avoid having spam of requests in grafana-cloud
     }),
 
     // React integration for React applications.
@@ -64,7 +73,6 @@ initializeFaro({
 });
 
 // push version using grafana faro
-
 
 // This process.env. vars will be substituted at build time
 // The VITE_APP_ prefix is mandatory for the substitution to work
