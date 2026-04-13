@@ -115,7 +115,10 @@ export const docsUrl = {
   premiumBackupNode: `${docsBaseUrl}/docs/user/dappnode-premium/premium-services#backup-node-for-validators`,
   premiumBackupValidatorsLimit: `${docsBaseUrl}/docs/user/dappnode-premium/premium-services#validators-limit`,
   starknetDocs: `${docsBaseUrl}/docs/user/staking/starknet/solo`,
-  uiTelemetry: `${docsBaseUrl}/docs/user/ui-telemetry`
+  uiTelemetry: `${docsBaseUrl}/docs/user/ui-telemetry`,
+  publishPkgGuide: `${docsBaseUrl}/docs/dev/package-publishing/publish-packages-clients`,
+  ownershipPkgGuide: `${docsBaseUrl}/docs/dev/package-publishing/package-ownership`,
+  sdkGuideUrl: `${docsBaseUrl}/docs/dev/sdk/overview`
 };
 
 export const forumUrl = {
@@ -135,6 +138,7 @@ export const troubleShootMountpointsGuideUrl = "https://docs.dappnode.io/develop
 export const dappnodeUserGuideUrl = "https://docs.dappnode.io/user/faq/general";
 export const explorerGitcoinUrl =
   "https://explorer.gitcoin.co/#/round/1/0xdf22a2c8f6ba9376ff17ee13e6154b784ee92094/0xdf22a2c8f6ba9376ff17ee13e6154b784ee92094-17";
+export const givethDappnodeGrantUrl = "https://giveth.io/project/dappnode";
 export const dappnodeGithub = "https://github.com/dappnode/DAppNode";
 export const dappnodeDiscourse = "https://forum.dappnode.io/";
 export const dappnodeDiscord = "https://discord.gg/dappnode";
