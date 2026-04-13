@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import { useApi } from "api";
 import { notEmpty } from "utils/typescript";
 import * as formatDiagnose from "pages/support/formaters/autoDiagnoseTexts";
@@ -63,24 +63,20 @@ function DiagnoseItem({ result }: { result: DiagnoseResult }) {
 /* ── AutoDiagnoseSection ────────────────────────────────────────────── */
 
 export function AutoDiagnoseSection() {
-  const systemInfo = useApi.systemInfoGet();
   const publicIpRes = useApi.ipPublicGet();
-  const ipfsTest = useApi.ipfsTest();
-  const diskInfo = useApi.statsDiskGet();
+  const systemInfo = useApi.systemInfoGet();
+  const hostStats = useApi.statsDiskGet();
   const dnpInstalled = useApi.packagesGet();
+  const ipfsTest = useApi.ipfsTest();
 
-  const filteredResults: DiagnoseResult[] = useMemo(
-    () =>
-      [
-        formatDiagnose.ipfs(ipfsTest),
-        formatDiagnose.internetConnection(publicIpRes, systemInfo),
-        formatDiagnose.openPorts(systemInfo),
-        formatDiagnose.noNatLoopback(systemInfo),
-        formatDiagnose.diskSpace(diskInfo),
-        formatDiagnose.coreDnpsRunning(dnpInstalled)
-      ].filter(notEmpty),
-    [publicIpRes, systemInfo, ipfsTest, diskInfo, dnpInstalled]
-  );
+  const diagnosesArray: DiagnoseResult[] = [
+    formatDiagnose.ipfs(ipfsTest),
+    formatDiagnose.internetConnection(publicIpRes, systemInfo),
+    formatDiagnose.openPorts(systemInfo),
+    formatDiagnose.noNatLoopback(systemInfo),
+    formatDiagnose.diskSpace(hostStats),
+    formatDiagnose.coreDnpsRunning(dnpInstalled)
+  ].filter(notEmpty);
 
   return (
     <Card>
@@ -89,7 +85,7 @@ export function AutoDiagnoseSection() {
         <CardDescription>Automated check of your Dappnode health and connectivity.</CardDescription>
       </CardHeader>
       <CardContent className="tw:space-y-3">
-        {filteredResults.map((r, i) => (
+        {diagnosesArray.map((r, i) => (
           <DiagnoseItem key={i} result={r} />
         ))}
       </CardContent>
