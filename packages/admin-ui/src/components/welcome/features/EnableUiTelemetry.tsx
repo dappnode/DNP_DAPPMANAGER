@@ -16,15 +16,15 @@ export default function EnableUiTelemetry({ onBack, onNext }: { onBack?: () => v
   return (
     <>
       <div className="header">
-        <div className="title">Help improve DAppNode</div>
+        <div className="title">Help improve Dappnode</div>
         <div className="description">
           <p>
-            Enable anonymous telemetry to help us improve DAppNode. The data collected includes UI interactions, errors,
+            Enable anonymous telemetry to help us improve Dappnode. The data collected includes UI interactions, errors,
             and performance metrics.
           </p>
           <ul style={{ textAlign: "left", paddingLeft: "1.5rem" }}>
             <li>
-              <strong>Improve DAppNode:</strong> Your usage data helps us understand how features are used and where
+              <strong>Improve Dappnode:</strong> Your usage data helps us understand how features are used and where
               issues occur, so we can build a better product.
             </li>
             <li>
@@ -32,7 +32,7 @@ export default function EnableUiTelemetry({ onBack, onNext }: { onBack?: () => v
               never shared with our servers.
             </li>
             <li>
-              <strong>Better support:</strong> Logs and traces help the DAppNode team diagnose and resolve issues faster
+              <strong>Better support:</strong> Logs and traces help the Dappnode team diagnose and resolve issues faster
               when you reach out for support.
             </li>
           </ul>

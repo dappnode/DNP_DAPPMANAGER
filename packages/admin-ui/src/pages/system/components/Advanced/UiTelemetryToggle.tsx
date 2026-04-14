@@ -18,7 +18,7 @@ export function UiTelemetryToggle() {
   return (
     <div>
       <p>
-        Send anonymous usage data, errors, and performance metrics to help improve DAppNode. All telemetry is routed
+        Send anonymous usage data, errors, and performance metrics to help improve Dappnode. All telemetry is routed
         through Tor so your public IP is never shared.
       </p>
       <SwitchBig
