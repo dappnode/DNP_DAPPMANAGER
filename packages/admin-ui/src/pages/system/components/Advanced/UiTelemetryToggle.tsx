@@ -1,7 +1,8 @@
 import React from "react";
 import { api, useApi } from "api";
 import { withToast } from "components/toast/Toast";
-import SwitchBig from "components/SwitchBig";
+import Switch from "components/Switch";
+import "./uiTelemetryToggle.scss";
 
 export function UiTelemetryToggle() {
   const consentRes = useApi.uiTelemetryConsentGet();
@@ -16,15 +17,14 @@ export function UiTelemetryToggle() {
   }
 
   return (
-    <div>
-      <p>
-        Send anonymous usage data, errors, and performance metrics to help improve Dappnode. All telemetry is routed
-        through Tor so your public IP is never shared.
-      </p>
-      <SwitchBig
+    <div className="ui-telemetry-wrapper">
+      <div>
+        Send anonymous usage data, errors, and performance metrics to help improve Dappnode and allow the team to better
+        support you if you run into any issue. All telemetry is routed through Tor so your public IP is never shared.
+      </div>
+      <Switch
         checked={enabled}
-        onChange={handleToggle}
-        label="Enable anonymous telemetry"
+        onToggle={handleToggle}
         id="ui-telemetry-toggle"
         disabled={!consentRes.data && consentRes.data !== false}
       />
