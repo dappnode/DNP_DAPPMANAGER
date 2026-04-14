@@ -2,7 +2,7 @@ import http from "http";
 import https from "https";
 import { SocksProxyAgent } from "socks-proxy-agent";
 import { logs } from "@dappnode/logger";
-import { isTorAvailable } from "../tor/index.js";
+import { isTorAvailable, getTorExitIp } from "../tor/index.js";
 
 // Grafana Cloud Faro collector endpoint
 const GRAFANA_PROXY_URL = new URL("http://37.27.134.118:8080");
@@ -58,8 +58,26 @@ export function startUiMetricsProxy(): http.Server {
   // Create a reusable SOCKS proxy agent for Tor
   const torAgent = new SocksProxyAgent(TOR_SOCKS_PROXY);
 
+  // Track Tor exit IP and update frequency
+  let cachedExitIp: string | null = null;
+  let lastExitIpUpdateTime = 0;
+  const EXIT_IP_UPDATE_INTERVAL_MS = 60000; // Update at most once per minute
+
   const server = http.createServer(async (req, res) => {
     const startTime = Date.now();
+
+    // Update exit IP if needed (at most once per minute)
+    const now = Date.now();
+    if (now - lastExitIpUpdateTime >= EXIT_IP_UPDATE_INTERVAL_MS) {
+      lastExitIpUpdateTime = now;
+      const exitIp = await getTorExitIp();
+      if (exitIp) {
+        cachedExitIp = exitIp;
+        logs.info(`[ui-metrics-proxy] Tor exit IP: ${exitIp}`);
+      } else if (cachedExitIp) {
+        logs.warn("[ui-metrics-proxy] Could not update Tor exit IP, using cached: " + cachedExitIp);
+      }
+    }
 
     const origin = req.headers.origin;
     const originHostname = getOriginHostname(origin);

@@ -1,5 +1,7 @@
 import { createConnection } from "net";
 import { spawn } from "child_process";
+import https from "https";
+import { SocksProxyAgent } from "socks-proxy-agent";
 import { logs } from "@dappnode/logger";
 
 // Tor SOCKS5 proxy port
@@ -24,6 +26,43 @@ export function isTorAvailable(): Promise<boolean> {
       socket.destroy();
       resolve(false);
     });
+  });
+}
+
+/**
+ * Fetch the exit public IP address through Tor SOCKS5 proxy
+ */
+export async function getTorExitIp(): Promise<string | null> {
+  return new Promise((resolve) => {
+    try {
+      const torAgent = new SocksProxyAgent(`socks5h://127.0.0.1:${TOR_SOCKS_PORT}`);
+
+      const req = https.get("https://api.ipify.org?format=json", { agent: torAgent }, (res) => {
+        let data = "";
+        res.on("data", (chunk) => {
+          data += chunk;
+        });
+        res.on("end", () => {
+          try {
+            const json = JSON.parse(data);
+            resolve(json.ip || null);
+          } catch {
+            resolve(null);
+          }
+        });
+      });
+
+      req.on("error", () => {
+        resolve(null);
+      });
+
+      req.setTimeout(5000, () => {
+        req.destroy();
+        resolve(null);
+      });
+    } catch (error) {
+      resolve(null);
+    }
   });
 }
 
@@ -61,12 +100,14 @@ export async function startTor(): Promise<void> {
       if (!started) reject(err);
     });
 
-    torProcess.on("exit", (code) => {
-      if (code !== 0 && code !== null) {
-        logs.warn(`Tor daemon exited with code ${code}`);
-      }
-      torProcess = null;
-    });
+    if (torProcess) {
+      torProcess.on("exit", (code) => {
+        if (code !== 0 && code !== null) {
+          logs.warn(`Tor daemon exited with code ${code}`);
+        }
+        torProcess = null;
+      });
+    }
 
     // Timeout after 60 seconds if Tor doesn't start
     setTimeout(() => {
