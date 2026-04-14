@@ -113,8 +113,6 @@ const availableRoutes: RouteType[] = [
 const StakersRoot: React.FC = () => {
   const { testnetsSelected, filteredRoutes, handleNetworkFilter } = useFilterStakersNetworks(availableRoutes);
 
-  console.error("Failed to load stakers page");
-
   return (
     <>
       <Title title={title} />
