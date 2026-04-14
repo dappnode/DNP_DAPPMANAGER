@@ -13,6 +13,10 @@ const TOR_SOCKS_PROXY = "socks5h://127.0.0.1:9050";
 // UI Metrics proxy port
 const UI_METRICS_PORT = 8080;
 
+// Required upstream proxy auth header/value
+const PROXY_AUTH_HEADER = "X-Dappnode";
+const PROXY_AUTH_VALUE = "dappnode-ui-metrics";
+
 const ALLOWED_CORS_HOSTS = new Set([
   "my.dappnode",
   "dappmanager.dappnode",
@@ -76,7 +80,7 @@ export function startUiMetricsProxy(): http.Server {
         res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         res.setHeader(
           "Access-Control-Allow-Headers",
-          "Content-Type, Authorization, X-Requested-With, x-faro-session-id"
+          "Content-Type, Authorization, X-Requested-With, x-faro-session-id, X-Dappnode"
         );
         res.setHeader("Access-Control-Allow-Credentials", "true");
         res.setHeader("Access-Control-Max-Age", "86400");
@@ -91,7 +95,10 @@ export function startUiMetricsProxy(): http.Server {
       res.setHeader("Access-Control-Allow-Origin", origin);
       res.setHeader("Vary", "Origin");
       res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-      res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With, x-faro-session-id");
+      res.setHeader(
+        "Access-Control-Allow-Headers",
+        "Content-Type, Authorization, X-Requested-With, x-faro-session-id, X-Dappnode"
+      );
       res.setHeader("Access-Control-Allow-Credentials", "true");
       res.setHeader("Access-Control-Max-Age", "86400");
     }
@@ -121,6 +128,8 @@ export function startUiMetricsProxy(): http.Server {
       }
       // Set the correct host header for the target
       forwardHeaders["host"] = GRAFANA_PROXY_URL.host;
+      // Required by upstream proxy middleware
+      forwardHeaders[PROXY_AUTH_HEADER.toLowerCase()] = PROXY_AUTH_VALUE;
 
       // Forward request to Grafana collector through Tor using the target protocol.
       const requestClient = GRAFANA_PROXY_URL.protocol === "https:" ? https : http;
