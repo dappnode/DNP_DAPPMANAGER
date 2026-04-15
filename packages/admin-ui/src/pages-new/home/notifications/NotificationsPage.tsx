@@ -14,6 +14,7 @@ import { Button } from "components/primitives/button";
 import { Skeleton } from "components/primitives/skeleton";
 import { AlertCircle } from "lucide-react";
 import { InboxTab } from "./InboxTab";
+import { SettingsTab } from "./SettingsTab";
 import { withLegacyBase } from "utils/path";
 
 /* ── Tab definitions ────────────────────────────────────────────────── */
@@ -29,7 +30,7 @@ function buildTabs(isInstalled: boolean): NotificationsTabDef[] {
 
   return [
     { label: "Inbox", subPath: "inbox", element: isInstalled ? <InboxTab /> : installPrompt },
-    { label: "Settings", subPath: "settings", element: isInstalled ? <ComingSoon label="Settings" /> : installPrompt },
+    { label: "Settings", subPath: "settings", element: isInstalled ? <SettingsTab /> : installPrompt },
     { label: "Devices", subPath: "devices", element: isInstalled ? <ComingSoon label="Devices" /> : installPrompt }
   ];
 }
