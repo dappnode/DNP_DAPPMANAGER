@@ -29,21 +29,14 @@ export function useHandleNotificationsPkg() {
     }
   }, [notificationsStatusRequest.data]);
 
-  const startStopNotifications = useCallback(async (): Promise<void> => {
+  /**
+   * Core start/stop logic without any confirmation dialog.
+   * Used by the new UI which handles confirmation externally.
+   */
+  const startStopNotificationsNoConfirm = useCallback(async (): Promise<void> => {
     try {
       if (isInstalled && notificationsPkg) {
         const notificationsRunning = notRunningServices.length === 0;
-
-        if (notificationsRunning) {
-          await new Promise<void>((resolve) => {
-            confirm({
-              title: `Pause notifications package`,
-              text: `Attention, the notifications package may alert you to critical issues if they arise. Pausing this package could result in missing important notifications.`,
-              label: "Pause",
-              onClick: resolve
-            });
-          });
-        }
 
         await withToast(
           continueIfCalleDisconnected(
@@ -69,9 +62,37 @@ export function useHandleNotificationsPkg() {
     }
   }, [isInstalled, notificationsPkg, notRunningServices, notificationsStatusRequest]);
 
+  /**
+   * Start/stop with legacy confirmation dialog.
+   * Used by legacy pages (Settings.tsx, EnableNotifications.tsx).
+   */
+  const startStopNotifications = useCallback(async (): Promise<void> => {
+    try {
+      if (isInstalled && notificationsPkg) {
+        const notificationsRunning = notRunningServices.length === 0;
+
+        if (notificationsRunning) {
+          await new Promise<void>((resolve) => {
+            confirm({
+              title: `Pause notifications package`,
+              text: `Attention, the notifications package may alert you to critical issues if they arise. Pausing this package could result in missing important notifications.`,
+              label: "Pause",
+              onClick: resolve
+            });
+          });
+        }
+
+        await startStopNotificationsNoConfirm();
+      }
+    } catch (e) {
+      console.error(`Error on start/stop notifications package: ${e}`);
+    }
+  }, [isInstalled, notificationsPkg, notRunningServices, startStopNotificationsNoConfirm]);
+
   return {
     isLoading,
     isRunning,
-    startStopNotifications
+    startStopNotifications,
+    startStopNotificationsNoConfirm
   };
 }
