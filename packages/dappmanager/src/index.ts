@@ -19,14 +19,12 @@ import { createGlobalEnvsEnvFile } from "@dappnode/utils";
 import { startAvahiDaemon, startDaemons } from "@dappnode/daemons";
 import { executeMigrations } from "@dappnode/migrations";
 import { startTestApi } from "./api/startTestApi.js";
-import { startUiMetricsProxy } from "./api/startUiMetricsProxy.js";
 import { getLimiter, getViewsCounterMiddleware, getEthForwardMiddleware } from "./api/middlewares/index.js";
 import { AdminPasswordDb } from "./api/auth/adminPasswordDb.js";
 import { DeviceCalls } from "./calls/device/index.js";
 import { startHttpApi } from "./api/startHttpApi.js";
 import { DappNodeDirectory, DappNodeRegistry, MultiUrlJsonRpcProvider } from "@dappnode/toolkit";
 import { Consensus, Execution, MevBoost, Signer } from "@dappnode/stakers";
-import { startTor, stopTor } from "./tor/index.js";
 
 const controller = new AbortController();
 
@@ -41,14 +39,8 @@ process.on("uncaughtException", (err) => {
 process.on("SIGINT", () => {
   controller.abort();
   server.close();
-  uiMetricsServer.close();
-  // Stop Tor daemon if running
-  stopTor();
   process.exit(0);
 });
-
-// Start Tor daemon for anonymous UI metrics forwarding
-startTor().catch((e) => logs.error("Error starting Tor daemon", e));
 
 // Initialize DB must be the first step so the db has the required values
 initializeDb()
@@ -114,9 +106,6 @@ const server = startHttpApi({
 
 // Start Test API
 if (params.TEST) startTestApi();
-
-// Start UI Metrics Proxy (forwards metrics to Grafana Cloud via Tor)
-const uiMetricsServer = startUiMetricsProxy();
 
 // Create staker instances
 export const execution = new Execution(dappnodeInstaller);

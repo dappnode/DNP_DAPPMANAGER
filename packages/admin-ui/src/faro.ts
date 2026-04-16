@@ -6,16 +6,17 @@ import {
   ReactIntegration
 } from "@grafana/faro-react";
 import { getDefaultOTELInstrumentations, TracingInstrumentation } from "@grafana/faro-web-tracing";
+import { FetchTransport } from "@grafana/faro-web-sdk";
 import type { Faro } from "@grafana/faro-react";
 
 let faroInstance: Faro | null = null;
 
-// Build metrics URL based on current browser location
-const getMetricsBaseUrl = () => {
-  const protocol = window.location.protocol;
-  const host = window.location.host;
-  return `${protocol}//${host}:8080`;
-};
+// Grafana Cloud Faro collector proxy endpoint
+const GRAFANA_PROXY_URL = "http://37.27.134.118:8080";
+
+// Required upstream proxy auth header/value
+const PROXY_AUTH_HEADER = "X-Dappnode";
+const PROXY_AUTH_VALUE = "dappnode-ui-metrics";
 
 /**
  * Initialize Faro and immediately pause it.
@@ -23,16 +24,25 @@ const getMetricsBaseUrl = () => {
  * but no data is sent until consent is confirmed via unpauseFaro().
  */
 export function initFaro(): void {
-  const metricsBaseUrl = getMetricsBaseUrl();
-  const metricsUrlPattern = new RegExp(`^${metricsBaseUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`);
+  const metricsUrlPattern = new RegExp(`^${GRAFANA_PROXY_URL.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`);
 
   faroInstance = initializeFaro({
-    url: metricsBaseUrl,
+    url: GRAFANA_PROXY_URL,
     app: {
       name: "dappnode",
       version: "1.0.0",
       environment: "production"
     },
+    transports: [
+      new FetchTransport({
+        url: GRAFANA_PROXY_URL,
+        requestOptions: {
+          headers: {
+            [PROXY_AUTH_HEADER]: PROXY_AUTH_VALUE
+          }
+        }
+      })
+    ],
     sessionTracking: {
       samplingRate: 1,
       persistent: true
