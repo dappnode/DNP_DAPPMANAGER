@@ -15,6 +15,7 @@ import { Skeleton } from "components/primitives/skeleton";
 import { AlertCircle } from "lucide-react";
 import { InboxTab } from "./InboxTab";
 import { SettingsTab } from "./SettingsTab";
+import { DevicesTab } from "./devices";
 import { withLegacyBase } from "utils/path";
 
 /* ── Tab definitions ────────────────────────────────────────────────── */
@@ -31,7 +32,7 @@ function buildTabs(isInstalled: boolean): NotificationsTabDef[] {
   return [
     { label: "Inbox", subPath: "inbox", element: isInstalled ? <InboxTab /> : installPrompt },
     { label: "Settings", subPath: "settings", element: isInstalled ? <SettingsTab /> : installPrompt },
-    { label: "Devices", subPath: "devices", element: isInstalled ? <ComingSoon label="Devices" /> : installPrompt }
+    { label: "Devices", subPath: "devices", element: isInstalled ? <DevicesTab /> : installPrompt }
   ];
 }
 
@@ -51,17 +52,6 @@ function InstallRequired() {
         <Button asChild>
           <a href={withLegacyBase(`installer/${notificationsDnpName}`)}>Install Package</a>
         </Button>
-      </CardContent>
-    </Card>
-  );
-}
-
-function ComingSoon({ label }: { label: string }) {
-  return (
-    <Card>
-      <CardContent className="tw:flex tw:flex-col tw:items-center tw:gap-2 tw:py-10 tw:text-center">
-        <p className="tw:font-medium">{label}</p>
-        <p className="tw:text-muted-foreground">This tab will be available in a future update.</p>
       </CardContent>
     </Card>
   );
