@@ -27,7 +27,6 @@ export function initFaro(): void {
   const metricsUrlPattern = new RegExp(`^${GRAFANA_PROXY_URL.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`);
 
   faroInstance = initializeFaro({
-    url: GRAFANA_PROXY_URL,
     app: {
       name: "dappnode",
       version: "1.0.0",
