@@ -94,6 +94,7 @@ export function NotificationsPage() {
 
   const isInstalled = pkgStatus.data?.isInstalled ?? false;
   const tabs = buildTabs(isInstalled);
+  const defaultTab = tabs[0]?.subPath ?? "inbox";
 
   return (
     <PageContainer className="tw:gap-6">
@@ -117,7 +118,7 @@ export function NotificationsPage() {
         {tabs.map((tab) => (
           <Route key={tab.subPath} path={tab.subPath} element={tab.element} />
         ))}
-        <Route path="*" element={<Navigate to="inbox" replace />} />
+        <Route path="*" element={<Navigate to={defaultTab} replace />} />
       </Routes>
     </PageContainer>
   );
