@@ -40,6 +40,8 @@ const tabs: SettingsTabDef[] = [
  * Each tab is its own route under `/settings/*`.
  */
 export function SettingsPage() {
+  const defaultTab = tabs[0]?.navPath ?? tabs[0]?.subPath ?? "info";
+
   return (
     <PageContainer className="tw:gap-6">
       <PageHeader
@@ -65,7 +67,7 @@ export function SettingsPage() {
         {tabs.map((tab) => (
           <Route key={tab.subPath} path={tab.subPath} element={tab.element} />
         ))}
-        <Route path="*" element={<Navigate to="info" replace />} />
+        <Route path="*" element={<Navigate to={defaultTab} replace />} />
       </Routes>
     </PageContainer>
   );

@@ -51,10 +51,12 @@ function getBreadcrumbItems(pathname: string, basePath: string): { label: string
   // Strip the basePath prefix, then split into segments
   const trimmed = pathname.startsWith(basePath) ? pathname.slice(basePath.length) : pathname;
   const segments = trimmed.split("/").filter(Boolean);
+  // Normalize basePath so "/" doesn't produce double slashes
+  const prefix = basePath === "/" ? "" : basePath;
 
   return segments.map((segment, index) => ({
     label: decodeURIComponent(segment),
-    to: `${basePath}/${segments.slice(0, index + 1).join("/")}`
+    to: `${prefix}/${segments.slice(0, index + 1).join("/")}`
   }));
 }
 
