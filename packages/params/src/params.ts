@@ -396,9 +396,15 @@ export const params = {
     },
     {
       name: "Swarm Team",
-      dnpNameSuffix: ".public.dappnode.eth",
+      dnpNameSuffix: ".dnp.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
-      key: "0xdAD64d07A318476dc48257a0bB53a8e9a26C6B33"
+      key: "0xFE94943bC26289a6682141353dA9bb72f716F5F6"
+    },
+    {
+      name: "Aztec",
+      dnpNameSuffix: ".dnp.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0x8ed550F2C7532541dd8CB5efA250e067EABB1B18"
     },
     {
       name: "Bertho - Nektar Network",
