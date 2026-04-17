@@ -144,14 +144,14 @@ export function SectionLayout({ sectionLabel, basePath, navItems, children }: Se
 
             {/* Responsive breadcrumb */}
             <Breadcrumb className="tw:flex-1">
-              <BreadcrumbList>
-                <BreadcrumbItem className="tw:hidden tw:md:block">
-                  <BreadcrumbLink asChild>
-                    <Link to={basePath}>{sectionLabel}</Link>
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                {breadcrumbItems.length > 0 ? (
-                  breadcrumbItems.map((item, index) => {
+              {breadcrumbItems.length > 0 && (
+                <BreadcrumbList>
+                  <BreadcrumbItem className="tw:hidden tw:md:block">
+                    <BreadcrumbLink asChild>
+                      <Link to={basePath}>{sectionLabel}</Link>
+                    </BreadcrumbLink>
+                  </BreadcrumbItem>
+                  {breadcrumbItems.map((item, index) => {
                     const isLast = index === breadcrumbItems.length - 1;
                     return (
                       <React.Fragment key={item.to}>
@@ -167,13 +167,9 @@ export function SectionLayout({ sectionLabel, basePath, navItems, children }: Se
                         </BreadcrumbItem>
                       </React.Fragment>
                     );
-                  })
-                ) : (
-                  <BreadcrumbItem className="tw:md:hidden">
-                    <BreadcrumbPage>{sectionLabel}</BreadcrumbPage>
-                  </BreadcrumbItem>
-                )}
-              </BreadcrumbList>
+                  })}
+                </BreadcrumbList>
+              )}
             </Breadcrumb>
 
             {/* Dark / light mode toggle */}
