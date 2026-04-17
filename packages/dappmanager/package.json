@@ -70,6 +70,7 @@
     "http-proxy": "^1.18.0",
     "is-ip": "^3.0.0",
     "lodash-es": "^4.17.21",
+    "kubo-rpc-client": "^3.0.2",
     "memoizee": "^0.4.14",
     "multicodec": "^3.2.1",
     "multiformats": "^11.0.1",
@@ -81,7 +82,6 @@
   "devDependencies": {
     "@types/mocha": "^10",
     "dotenv": "^8.2.0",
-    "kubo-rpc-client": "^3.0.2",
     "mocha": "^10.7.0",
     "prettier": "^2.3.2",
     "rewiremock": "^3.13.7",

@@ -1,12 +1,14 @@
 import express from "express";
 import { params } from "@dappnode/params";
+import { ethers } from "ethers";
+import { create as createIpfsClient } from "kubo-rpc-client";
 import { getIpfsProxyHandler, ProxyType } from "./ipfsProxy.js";
 import { mainnetJsonRpc, ResolveDomainWithCache } from "./resolveDomain.js";
 import { logs } from "@dappnode/logger";
 import * as views from "./views/index.js";
 
 const ETH_API_URL = mainnetJsonRpc;
-const IPFS_API_URL = params.IPFS_HOST ? new URL("/api/v0/id", params.IPFS_HOST).toString() : "";
+const IPFS_API_URL = getIpfsApiUrl();
 const APIS_CHECK_TIMEOUT_MS = 3_000;
 const APIS_CHECK_CACHE_MS = 10_000;
 
@@ -87,20 +89,9 @@ async function ensureApisAvailability(): Promise<ApisAvailability> {
 
 async function isEthApiAvailable(): Promise<boolean> {
   try {
-    const response = await fetchWithTimeout(ETH_API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        jsonrpc: "2.0",
-        method: "web3_clientVersion",
-        params: [],
-        id: 1
-      })
-    });
-
-    return response.ok;
+    const provider = new ethers.JsonRpcProvider(ETH_API_URL);
+    await withTimeout(provider.send("web3_clientVersion", []), APIS_CHECK_TIMEOUT_MS);
+    return true;
   } catch (e) {
     logs.debug("ETHFORWARD ETH API check failed", e);
     return false;
@@ -108,29 +99,50 @@ async function isEthApiAvailable(): Promise<boolean> {
 }
 
 async function isIpfsApiAvailable(): Promise<boolean> {
+  if (!IPFS_API_URL) return false;
+
   try {
-    const response = await fetchWithTimeout(IPFS_API_URL, {
-      method: "POST"
+    const ipfsClient = createIpfsClient({
+      url: IPFS_API_URL,
+      timeout: APIS_CHECK_TIMEOUT_MS
     });
 
-    return response.ok;
+    await withTimeout(ipfsClient.id(), APIS_CHECK_TIMEOUT_MS);
+    return true;
   } catch (e) {
     logs.debug("ETHFORWARD IPFS API check failed", e);
     return false;
   }
 }
 
-async function fetchWithTimeout(url: string, init: RequestInit): Promise<Response> {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), APIS_CHECK_TIMEOUT_MS);
+function getIpfsApiUrl(): string {
+  try {
+    const ipfsUrl = params.IPFS_HOST || params.IPFS_LOCAL;
+    const url = new URL(ipfsUrl);
+    url.port = "5001";
+    url.pathname = "/";
+    url.search = "";
+    url.hash = "";
+    return url.toString();
+  } catch (e) {
+    logs.warn("ETHFORWARD Invalid IPFS URL for API check", e);
+    return "";
+  }
+}
+
+async function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
+  let timeoutHandle: ReturnType<typeof setTimeout>;
+
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timeoutHandle = setTimeout(() => {
+      reject(new Error(`Timeout after ${timeoutMs}ms`));
+    }, timeoutMs);
+  });
 
   try {
-    return await fetch(url, {
-      ...init,
-      signal: controller.signal
-    });
+    return await Promise.race([promise, timeoutPromise]);
   } finally {
-    clearTimeout(timeout);
+    clearTimeout(timeoutHandle!);
   }
 }
 
