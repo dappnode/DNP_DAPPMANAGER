@@ -1,7 +1,7 @@
 import React from "react";
 import { title } from "../data";
 import newTabProps from "utils/newTabProps";
-import { sdkPublishAppUrl, sdkGuideUrl } from "params";
+import { sdkPublishAppUrl, sdkRepoUrl } from "params";
 // Components
 import Title from "components/Title";
 import Card from "components/Card";
@@ -42,7 +42,7 @@ export default function SdkHome() {
           docker image and publish it on the Aragon Package Manager (APM) on the Ethereum mainnet
         </p>
 
-        <a className="btn btn-outline-secondary float-right" href={sdkGuideUrl} {...newTabProps}>
+        <a className="btn btn-outline-secondary float-right" href={sdkRepoUrl} {...newTabProps}>
           Full Guide
         </a>
       </Card>
