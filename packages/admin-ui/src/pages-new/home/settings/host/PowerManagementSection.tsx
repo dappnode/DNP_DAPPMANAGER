@@ -18,22 +18,22 @@ import { Power, RotateCcw } from "lucide-react";
 
 export function PowerManagementSection() {
   async function reboot() {
+    const toastId = toast.loading("Rebooting host...");
     try {
-      toast.loading("Rebooting host...");
       await api.rebootHost();
-      toast.success("Reboot command sent");
+      toast.success("Reboot command sent", { id: toastId });
     } catch (e) {
-      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`);
+      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`, { id: toastId });
     }
   }
 
   async function powerOff() {
+    const toastId = toast.loading("Powering off host...");
     try {
-      toast.loading("Powering off host...");
       await api.poweroffHost();
-      toast.success("Power off command sent");
+      toast.success("Power off command sent", { id: toastId });
     } catch (e) {
-      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`);
+      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`, { id: toastId });
     }
   }
 

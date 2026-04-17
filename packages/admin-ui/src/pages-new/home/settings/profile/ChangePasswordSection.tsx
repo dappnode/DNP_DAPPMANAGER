@@ -18,13 +18,13 @@ export function ChangePasswordSection() {
 
   async function onChangePassword() {
     if (!isValid) return;
+    const toastId = toast.loading("Changing password...");
     try {
-      toast.loading("Changing password...");
       await apiAuth.changePass({ password: oldPassword, newPassword });
-      toast.success("Password changed successfully. Please log in again.");
+      toast.success("Password changed successfully. Please log in again.", { id: toastId });
       await apiAuth.logoutAndReload();
     } catch (e) {
-      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`);
+      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`, { id: toastId });
     }
   }
 

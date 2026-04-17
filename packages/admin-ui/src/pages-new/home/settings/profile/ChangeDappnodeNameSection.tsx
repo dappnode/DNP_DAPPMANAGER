@@ -19,13 +19,13 @@ export function ChangeDappnodeNameSection() {
   }, [dappnodeWebName]);
 
   async function onChangeName() {
+    const toastId = toast.loading("Setting Dappnode name...");
     try {
-      toast.loading("Setting Dappnode name...");
       await api.dappnodeWebNameSet({ dappnodeWebName: input });
-      toast.success("Dappnode name changed successfully");
+      toast.success("Dappnode name changed successfully", { id: toastId });
       dispatch(fetchSystemInfo());
     } catch (e) {
-      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`);
+      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`, { id: toastId });
     }
   }
 

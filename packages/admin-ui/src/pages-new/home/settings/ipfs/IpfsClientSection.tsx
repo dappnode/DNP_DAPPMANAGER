@@ -35,8 +35,8 @@ export function IpfsClientSection() {
 
     // If switching to local but IPFS not installed, install it first
     if (switchingFromRemoteToLocal && !isIpfsInstalled) {
+      const installToastId = toast.loading(`Installing ${prettyDnpName(ipfsDnpName)}...`);
       try {
-        toast.loading(`Installing ${prettyDnpName(ipfsDnpName)}...`);
         await continueIfCalleDisconnected(
           () =>
             api.packageInstall({
@@ -48,26 +48,26 @@ export function IpfsClientSection() {
             }),
           ipfsDnpName
         )();
-        toast.success(`Installed ${prettyDnpName(ipfsDnpName)}`);
+        toast.success(`Installed ${prettyDnpName(ipfsDnpName)}`, { id: installToastId });
         packagesReq.revalidate();
       } catch (e) {
-        toast.error(`Install failed: ${e instanceof Error ? e.message : String(e)}`);
+        toast.error(`Install failed: ${e instanceof Error ? e.message : String(e)}`, { id: installToastId });
         return;
       }
     }
 
+    const toastId = toast.loading(`Setting IPFS mode to ${clientTarget}...`);
     try {
-      toast.loading(`Setting IPFS mode to ${clientTarget}...`);
       await api.ipfsClientTargetSet({
         ipfsRepository: {
           ipfsClientTarget: clientTarget,
           ipfsGateway: gatewayTarget
         }
       });
-      toast.success(`IPFS mode changed to ${clientTarget}`);
+      toast.success(`IPFS mode changed to ${clientTarget}`, { id: toastId });
       ipfsRepository.revalidate();
     } catch (e) {
-      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`);
+      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`, { id: toastId });
     }
   }
 

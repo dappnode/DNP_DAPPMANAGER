@@ -36,15 +36,15 @@ export function WifiCredentialsSection() {
       [wifiEnvSSID]: ssid,
       [wifiEnvWPA_PASSPHRASE]: password
     };
+    const toastId = toast.loading("Changing Wi-Fi credentials...");
     try {
-      toast.loading("Changing Wi-Fi credentials...");
       await api.packageSetEnvironment({
         dnpName: wifiDnpName,
         environmentByService: { [wifiDnpName]: envs }
       });
-      toast.success("Wi-Fi credentials changed");
+      toast.success("Wi-Fi credentials changed", { id: toastId });
     } catch (e) {
-      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`);
+      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`, { id: toastId });
     }
   }
 

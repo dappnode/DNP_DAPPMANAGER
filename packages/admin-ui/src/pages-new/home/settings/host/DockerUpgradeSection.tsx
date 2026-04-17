@@ -57,13 +57,13 @@ export function DockerUpgradeSection() {
     : null;
 
   async function dockerUpdate() {
+    const toastId = toast.loading("Updating Docker...");
     try {
-      toast.loading("Updating Docker...");
       await api.dockerUpgrade();
-      toast.success("Docker updated successfully");
+      toast.success("Docker updated successfully", { id: toastId });
       await dockerUpdateCheck();
     } catch (e) {
-      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`);
+      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`, { id: toastId });
     }
   }
 

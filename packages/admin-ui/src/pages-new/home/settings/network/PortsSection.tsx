@@ -48,13 +48,13 @@ export function PortsSection() {
   }
 
   async function onUpnpSwitchToggle(checked: boolean) {
+    const toastId = toast.loading("Refreshing UPnP port mapping...");
     try {
-      toast.loading("Refreshing UPnP port mapping...");
       await api.natRenewalEnable({ enableNatRenewal: checked });
-      toast.success("Successfully updated UPnP setting");
+      toast.success("Successfully updated UPnP setting", { id: toastId });
       natRenewalStatus.revalidate();
     } catch (e) {
-      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`);
+      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`, { id: toastId });
     }
   }
 

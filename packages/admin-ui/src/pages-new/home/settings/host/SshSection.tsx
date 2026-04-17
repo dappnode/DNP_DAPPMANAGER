@@ -41,13 +41,13 @@ export function SshSection() {
   }
 
   async function changeSshStatus(status: ShhStatus) {
+    const toastId = toast.loading(`${status === "enabled" ? "Enabling" : "Disabling"} SSH...`);
     try {
-      toast.loading(`${status === "enabled" ? "Enabling" : "Disabling"} SSH...`);
       await api.sshStatusSet({ status });
-      toast.success(`SSH ${status === "enabled" ? "enabled" : "disabled"}`);
+      toast.success(`SSH ${status === "enabled" ? "enabled" : "disabled"}`, { id: toastId });
       await fetchSshStatus();
     } catch (e) {
-      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`);
+      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`, { id: toastId });
     }
   }
 
@@ -67,12 +67,12 @@ export function SshSection() {
       toast.error("Port must be between 1 and 65535");
       return;
     }
+    const toastId = toast.loading("Changing SSH port...");
     try {
-      toast.loading("Changing SSH port...");
       await api.sshPortSet({ port: portNum });
-      toast.success("SSH port changed");
+      toast.success("SSH port changed", { id: toastId });
     } catch (e) {
-      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`);
+      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`, { id: toastId });
     }
   }
 

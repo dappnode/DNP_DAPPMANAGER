@@ -67,13 +67,13 @@ export function WifiStatusSection() {
   const isRunning = container?.state === "running";
 
   async function toggleWifi() {
+    const toastId = toast.loading(isRunning ? "Pausing Wi-Fi..." : "Starting Wi-Fi...");
     try {
-      toast.loading(isRunning ? "Pausing Wi-Fi..." : "Starting Wi-Fi...");
       await continueIfCalleDisconnected(() => api.packageStartStop({ dnpName: wifiDnpName }), wifiDnpName)();
-      toast.success(isRunning ? "Wi-Fi paused" : "Wi-Fi started");
+      toast.success(isRunning ? "Wi-Fi paused" : "Wi-Fi started", { id: toastId });
       wifiDnp.revalidate();
     } catch (e) {
-      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`);
+      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`, { id: toastId });
     }
   }
 
