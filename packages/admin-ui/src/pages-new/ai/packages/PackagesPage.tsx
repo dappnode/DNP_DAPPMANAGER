@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useApi } from "api";
 import { sortBy } from "lodash-es";
@@ -9,11 +9,16 @@ import { Alert, AlertTitle, AlertDescription } from "components/primitives/alert
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from "components/primitives/empty";
 import { Skeleton } from "components/primitives/skeleton";
 import { PageContainer, PageHeader } from "components/primitives/page";
+import { Switch } from "components/primitives/switch";
+import { Label } from "components/primitives/label";
+import { Separator } from "components/primitives/separator";
+import { TypographyH4 } from "components/primitives/typography";
 import { CircleCheck, CirclePause, CircleX, RefreshCw, TriangleAlert, PackageOpen } from "lucide-react";
 import { InstalledPackageDataApiReturn } from "@dappnode/types";
 import { parseContainerState, SimpleState } from "pages/packages/components/StateBadge/utils";
 import defaultAvatar from "img/defaultAvatar.png";
 import { Button } from "components/primitives/button";
+import { coreDnpName, tailscaleDnpName } from "params";
 import { storeRelativePath } from "../store/data";
 
 /* ── Status helpers ─────────────────────────────────────────────────── */
@@ -50,12 +55,22 @@ export function PackagesPage() {
   const dnps = dnpsRequest.data;
   const error = dnpsRequest.error;
   const loading = dnpsRequest.isValidating && !dnps;
+  const [showSystem, setShowSystem] = useState(false);
 
   /** Only AI-category packages (non-core && categories include "AI"). */
   const packages = useMemo(() => {
     if (!dnps) return [];
     return sortBy(
       dnps.filter((d) => !d.isCore && d.categories?.includes("AI")),
+      (d) => d.dnpName
+    );
+  }, [dnps]);
+
+  /** System (core) packages + Tailscale if installed. */
+  const systemPackages = useMemo(() => {
+    if (!dnps) return [];
+    return sortBy(
+      dnps.filter((d) => (d.isCore && d.dnpName !== coreDnpName) || d.dnpName === tailscaleDnpName),
       (d) => d.dnpName
     );
   }, [dnps]);
@@ -113,43 +128,73 @@ export function PackagesPage() {
           </EmptyHeader>
         </Empty>
       ) : (
-        <div className="tw:grid tw:grid-cols-1 tw:sm:grid-cols-2 tw:lg:grid-cols-3 tw:gap-card">
-          {packages.map((dnp) => {
-            const state = getAggregateState(dnp);
-            const prettyName = prettyDnpName(dnp.dnpName);
-            return (
-              <ClickableCard
-                key={dnp.dnpName}
-                className="tw:group"
-                onClick={() => navigate(`${encodeURIComponent(dnp.dnpName)}/info`)}
-              >
-                <CardHeader className="tw:flex tw:flex-row tw:items-start tw:gap-3 tw:space-y-0">
-                  <img
-                    src={dnp.avatarUrl || defaultAvatar}
-                    alt=""
-                    className="tw:size-10 tw:rounded-lg tw:bg-muted tw:object-cover"
-                  />
-                  <div className="tw:flex-1 tw:min-w-0">
-                    <CardTitle className="tw:truncate">{prettyName}</CardTitle>
-                    <CardDescription className="tw:mt-0.5">v{dnp.version}</CardDescription>
-                  </div>
-                </CardHeader>
-                <CardContent className="tw:flex tw:items-center tw:justify-between tw:pt-0">
-                  <div className={`tw:flex tw:items-center tw:gap-1.5 tw:text-sm tw:font-medium ${statusClass[state]}`}>
-                    {statusIcon[state]}
-                    <span className="tw:capitalize">{state}</span>
-                  </div>
-                  {dnp.updateAvailable && (
-                    <Badge variant="outline" className="tw:text-xs">
-                      Update available
-                    </Badge>
-                  )}
-                </CardContent>
-              </ClickableCard>
-            );
-          })}
+        <PackageGrid packages={packages} navigate={navigate} />
+      )}
+
+      {/* Show system packages toggle */}
+      <Separator />
+      <div className="tw:flex tw:items-center tw:gap-3">
+        <Switch id="show-system" checked={showSystem} onCheckedChange={setShowSystem} />
+        <Label htmlFor="show-system" className="tw:cursor-pointer">
+          Show system packages
+        </Label>
+      </div>
+
+      {showSystem && systemPackages.length > 0 && (
+        <div className="tw:space-y-4">
+          <TypographyH4>System Packages</TypographyH4>
+          <PackageGrid packages={systemPackages} navigate={navigate} />
         </div>
       )}
     </PageContainer>
+  );
+}
+
+/* ── Package grid ───────────────────────────────────────────────────── */
+
+function PackageGrid({
+  packages,
+  navigate
+}: {
+  packages: InstalledPackageDataApiReturn[];
+  navigate: ReturnType<typeof useNavigate>;
+}) {
+  return (
+    <div className="tw:grid tw:grid-cols-1 tw:sm:grid-cols-2 tw:lg:grid-cols-3 tw:gap-card">
+      {packages.map((dnp) => {
+        const state = getAggregateState(dnp);
+        const prettyName = prettyDnpName(dnp.dnpName);
+        return (
+          <ClickableCard
+            key={dnp.dnpName}
+            className="tw:group"
+            onClick={() => navigate(`${encodeURIComponent(dnp.dnpName)}/info`)}
+          >
+            <CardHeader className="tw:flex tw:flex-row tw:items-start tw:gap-3 tw:space-y-0">
+              <img
+                src={dnp.avatarUrl || defaultAvatar}
+                alt=""
+                className="tw:size-10 tw:rounded-lg tw:bg-muted tw:object-cover"
+              />
+              <div className="tw:flex-1 tw:min-w-0">
+                <CardTitle className="tw:truncate">{prettyName}</CardTitle>
+                <CardDescription className="tw:mt-0.5">v{dnp.version}</CardDescription>
+              </div>
+            </CardHeader>
+            <CardContent className="tw:flex tw:items-center tw:justify-between tw:pt-0">
+              <div className={`tw:flex tw:items-center tw:gap-1.5 tw:text-sm tw:font-medium ${statusClass[state]}`}>
+                {statusIcon[state]}
+                <span className="tw:capitalize">{state}</span>
+              </div>
+              {dnp.updateAvailable && (
+                <Badge variant="outline" className="tw:text-xs">
+                  Update available
+                </Badge>
+              )}
+            </CardContent>
+          </ClickableCard>
+        );
+      })}
+    </div>
   );
 }
