@@ -39,7 +39,7 @@ const networkFeatures: Record<DashboardSupportedNetwork, NetworkFeatures> = {
   [Network.Gnosis]: {
     hasValidators: true,
     logo: GnosisLogo,
-    beaconExplorer: { url: "https://beaconchain.gnosischain.com/", name: "Gnosis Beaconchain" }
+    beaconExplorer: { url: "https://beacon.gnosisscan.io/", name: "Beacon Gnosisscan" }
   },
   [Network.Lukso]: {
     hasValidators: true,
