@@ -523,6 +523,7 @@ export interface PackageContainer {
   avatarUrl: string;
   origin?: string;
   chain?: ChainDriver;
+  categories?: string[];
   domainAlias?: string[];
   canBeFullnode?: boolean;
   isMain?: boolean;
@@ -546,6 +547,7 @@ export type InstalledPackageData = Pick<
   | "avatarUrl"
   | "origin"
   | "chain"
+  | "categories"
   | "domainAlias"
   | "canBeFullnode"
 > & {
