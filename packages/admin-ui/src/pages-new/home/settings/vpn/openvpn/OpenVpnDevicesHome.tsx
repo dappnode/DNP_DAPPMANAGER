@@ -37,47 +37,47 @@ export function OpenVpnDevicesHome() {
 
   async function addDevice(id: string) {
     if (!id) return;
+    const toastId = toast.loading(`Adding ${id}...`);
     try {
-      toast.loading(`Adding ${id}...`);
       await api.deviceAdd({ id });
-      toast.success(`Added ${id}`);
+      toast.success(`Added ${id}`, { id: toastId });
       setInput("");
       devicesReq.revalidate();
     } catch (e) {
-      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`);
+      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`, { id: toastId });
     }
   }
 
   async function removeDevice(id: string) {
+    const toastId = toast.loading(`Removing ${id}...`);
     try {
-      toast.loading(`Removing ${id}...`);
       await api.deviceRemove({ id });
-      toast.success(`Removed ${id}`);
+      toast.success(`Removed ${id}`, { id: toastId });
       devicesReq.revalidate();
     } catch (e) {
-      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`);
+      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`, { id: toastId });
     }
   }
 
   async function resetDevice(id: string) {
+    const toastId = toast.loading(`Resetting ${id}...`);
     try {
-      toast.loading(`Resetting ${id}...`);
       await api.deviceReset({ id });
-      toast.success(`Reset ${id}`);
+      toast.success(`Reset ${id}`, { id: toastId });
       devicesReq.revalidate();
     } catch (e) {
-      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`);
+      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`, { id: toastId });
     }
   }
 
   async function toggleAdmin(id: string, isAdmin: boolean) {
+    const toastId = toast.loading(`${isAdmin ? "Granting" : "Revoking"} admin for ${id}...`);
     try {
-      toast.loading(`${isAdmin ? "Granting" : "Revoking"} admin for ${id}...`);
       await api.deviceAdminToggle({ id, isAdmin });
-      toast.success(`${isAdmin ? "Granted" : "Revoked"} admin for ${id}`);
+      toast.success(`${isAdmin ? "Granted" : "Revoked"} admin for ${id}`, { id: toastId });
       devicesReq.revalidate();
     } catch (e) {
-      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`);
+      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`, { id: toastId });
     }
   }
 

@@ -103,14 +103,14 @@ export function LocalNetworkProxySection() {
   const isCrashed = localProxyingStatus.data === "crashed";
 
   async function toggleProxy() {
+    const toastId = toast.loading(isRunning ? "Stopping Local Network Proxy..." : "Starting Local Network Proxy...");
     try {
       setToggling(true);
-      toast.loading(isRunning ? "Stopping Local Network Proxy..." : "Starting Local Network Proxy...");
       await api.localProxyingEnableDisable(!isRunning);
-      toast.success(isRunning ? "Stopped Local Network Proxy" : "Started Local Network Proxy");
+      toast.success(isRunning ? "Stopped Local Network Proxy" : "Started Local Network Proxy", { id: toastId });
       localProxyingStatus.revalidate();
     } catch (e) {
-      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`);
+      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`, { id: toastId });
     } finally {
       setToggling(false);
     }

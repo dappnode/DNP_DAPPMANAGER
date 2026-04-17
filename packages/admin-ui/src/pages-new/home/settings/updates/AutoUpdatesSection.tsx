@@ -14,13 +14,13 @@ export function AutoUpdatesSection() {
     const prettyName = prettyDnpName(id);
     const actioning = enabled ? "Enabling" : "Disabling";
     const actioned = enabled ? "Enabled" : "Disabled";
+    const toastId = toast.loading(`${actioning} auto updates for ${prettyName}...`);
     try {
-      toast.loading(`${actioning} auto updates for ${prettyName}...`);
       await api.autoUpdateSettingsEdit({ id, enabled });
-      toast.success(`${actioned} auto updates for ${prettyName}`);
+      toast.success(`${actioned} auto updates for ${prettyName}`, { id: toastId });
       autoUpdateDataReq.revalidate();
     } catch (e) {
-      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`);
+      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`, { id: toastId });
     }
   }
 

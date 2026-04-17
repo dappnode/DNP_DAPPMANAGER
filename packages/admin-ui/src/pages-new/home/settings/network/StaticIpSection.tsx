@@ -18,12 +18,12 @@ export function StaticIpSection() {
   }, [staticIp]);
 
   async function updateStaticIp(newStaticIp: string) {
+    const toastId = toast.loading("Setting static IP...");
     try {
-      toast.loading("Setting static IP...");
       await api.setStaticIp({ staticIp: newStaticIp });
-      toast.success(newStaticIp ? "Static IP set" : "Static IP disabled");
+      toast.success(newStaticIp ? "Static IP set" : "Static IP disabled", { id: toastId });
     } catch (e) {
-      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`);
+      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`, { id: toastId });
     }
   }
 

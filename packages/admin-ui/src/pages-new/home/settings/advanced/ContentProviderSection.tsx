@@ -10,13 +10,13 @@ export function ContentProviderSection() {
   const enabled = mirrorProviderReq.data?.enabled ?? false;
 
   async function handleToggle() {
+    const toastId = toast.loading(`${enabled ? "Disabling" : "Enabling"} content provider...`);
     try {
-      toast.loading(`${enabled ? "Disabling" : "Enabling"} content provider...`);
       await api.mirrorProviderSet({ enabled: !enabled });
-      toast.success(`Content provider ${enabled ? "disabled" : "enabled"}`);
+      toast.success(`Content provider ${enabled ? "disabled" : "enabled"}`, { id: toastId });
       mirrorProviderReq.revalidate();
     } catch (e) {
-      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`);
+      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`, { id: toastId });
     }
   }
 

@@ -290,6 +290,39 @@ The detail page uses `<PageContainer className="tw:gap-6">` to override the defa
 - For toasts in new pages, use **Sonner** (`import { toast } from "sonner"`), not the legacy `withToast`/`withToastNoThrow`.
 - For destructive confirmation dialogs, use the `AlertDialog` primitive, not the legacy `confirm()` helper.
 
+### Toast Pattern for Async Operations
+
+When showing a loading toast during an async operation, **always capture the toast ID** returned by `toast.loading()` and pass it to the subsequent `toast.success()` or `toast.error()` via `{ id: toastId }`. This replaces the loading toast instead of stacking a new one on top (which leaves the loading spinner visible forever).
+
+```tsx
+// ✅ Correct — loading toast is replaced by success/error
+async function handleAction() {
+  const toastId = toast.loading("Performing action...");
+  try {
+    await api.someCall();
+    toast.success("Action completed", { id: toastId });
+  } catch (e) {
+    toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`, { id: toastId });
+  }
+}
+
+// ❌ Wrong — loading toast stays visible after success/error appears
+async function handleAction() {
+  try {
+    toast.loading("Performing action...");
+    await api.someCall();
+    toast.success("Action completed");
+  } catch (e) {
+    toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`);
+  }
+}
+```
+
+**Key rules:**
+- Declare `const toastId = toast.loading(...)` **before** the `try` block (or at the top of it) so it's in scope for the `catch` block.
+- Pass `{ id: toastId }` to every `toast.success()` and `toast.error()` that should dismiss the loading toast.
+- For functions with multiple sequential async steps (each with their own loading state), use separate toast IDs for each step.
+
 ## Sidebar & Routing
 
 Each section (`/`, `/ai/*`, etc.) has its own thin layout that passes nav items and routes to the shared `SectionLayout`. To add a new page to an existing section:

@@ -17,12 +17,12 @@ import {
 
 export function ClearCacheSection() {
   async function cleanCache() {
+    const toastId = toast.loading("Deleting cache...");
     try {
-      toast.loading("Deleting cache...");
       await api.cleanCache();
-      toast.success("Cache deleted");
+      toast.success("Cache deleted", { id: toastId });
     } catch (e) {
-      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`);
+      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`, { id: toastId });
     }
   }
 

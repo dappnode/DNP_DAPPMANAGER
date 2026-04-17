@@ -34,25 +34,25 @@ export function WireguardDevicesHome() {
 
   async function addDevice(id: string) {
     if (!id) return;
+    const toastId = toast.loading(`Adding ${id}...`);
     try {
-      toast.loading(`Adding ${id}...`);
       await api.wireguardDeviceAdd(id);
-      toast.success(`Added ${id}`);
+      toast.success(`Added ${id}`, { id: toastId });
       setInput("");
       devicesReq.revalidate();
     } catch (e) {
-      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`);
+      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`, { id: toastId });
     }
   }
 
   async function removeDevice(id: string) {
+    const toastId = toast.loading(`Removing ${id}...`);
     try {
-      toast.loading(`Removing ${id}...`);
       await api.wireguardDeviceRemove(id);
-      toast.success(`Removed ${id}`);
+      toast.success(`Removed ${id}`, { id: toastId });
       devicesReq.revalidate();
     } catch (e) {
-      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`);
+      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`, { id: toastId });
     }
   }
 

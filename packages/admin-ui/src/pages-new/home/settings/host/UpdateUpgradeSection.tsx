@@ -18,12 +18,12 @@ import { ArrowUpCircle } from "lucide-react";
 
 export function UpdateUpgradeSection() {
   async function updateUpgrade() {
+    const toastId = toast.loading("Updating and upgrading...");
     try {
-      toast.loading("Updating and upgrading...");
       await api.updateUpgrade();
-      toast.success("Updated and upgraded successfully");
+      toast.success("Updated and upgraded successfully", { id: toastId });
     } catch (e) {
-      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`);
+      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`, { id: toastId });
     }
   }
 

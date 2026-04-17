@@ -112,13 +112,13 @@ function RemoveKeyButton({
   onRemoved: () => void;
 }) {
   async function removeKey() {
+    const toastId = toast.loading("Removing trusted key...");
     try {
-      toast.loading("Removing trusted key...");
       await api.releaseTrustedKeyRemove(keyName);
-      toast.success("Key removed");
+      toast.success("Key removed", { id: toastId });
       onRemoved();
     } catch (e) {
-      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`);
+      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`, { id: toastId });
     }
   }
 
@@ -164,13 +164,13 @@ function AddKeyForm({
       signatureProtocol: signatureProtocol as ReleaseSignatureProtocol,
       key
     };
+    const toastId = toast.loading("Adding trusted key...");
     try {
-      toast.loading("Adding trusted key...");
       await api.releaseTrustedKeyAdd(trustedKey);
-      toast.success("Key added");
+      toast.success("Key added", { id: toastId });
       onDone();
     } catch (e) {
-      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`);
+      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`, { id: toastId });
     }
   }
 

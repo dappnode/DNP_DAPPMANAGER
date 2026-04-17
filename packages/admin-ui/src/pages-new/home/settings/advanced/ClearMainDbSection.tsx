@@ -17,12 +17,12 @@ import {
 
 export function ClearMainDbSection() {
   async function cleanDb() {
+    const toastId = toast.loading("Deleting main database...");
     try {
-      toast.loading("Deleting main database...");
       await api.cleanDb();
-      toast.success("Main database deleted");
+      toast.success("Main database deleted", { id: toastId });
     } catch (e) {
-      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`);
+      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`, { id: toastId });
     }
   }
 
