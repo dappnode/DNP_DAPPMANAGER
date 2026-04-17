@@ -534,6 +534,10 @@ function SidebarMenuButton({
     }
   }
 
+  if (state === "expanded" ){
+    return button
+  }
+
   return (
     <Tooltip>
       <TooltipTrigger asChild>{button}</TooltipTrigger>
