@@ -6,6 +6,8 @@
     "module": "ESNext",
     "moduleResolution": "node",
 
+    "baseUrl": "src",
+
     "types": ["vite/client"],
 
     "useDefineForClassFields": true,
