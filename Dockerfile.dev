@@ -21,7 +21,7 @@ ENV COMPOSE_HTTP_TIMEOUT=300 \
 WORKDIR /app
 
 RUN apk update && apk add --no-cache docker curl docker-cli-compose xz zip unzip libltdl bash git bind bind-tools bind-dev \ 
-  miniupnpc dbus tmux avahi-tools tor
+  miniupnpc dbus tmux avahi-tools
 RUN corepack enable
 
 # Copy git data
