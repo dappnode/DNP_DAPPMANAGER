@@ -24,7 +24,7 @@ const PROXY_AUTH_VALUE = "dappnode-ui-metrics";
  * but no data is sent until consent is confirmed via unpauseFaro().
  */
 export function initFaro(): void {
-  const metricsUrlPattern = new RegExp(`^${GRAFANA_PROXY_URL.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`);
+  const metricsUrlPattern = /^https:\/\/grafana-cloud-proxy\.dappnode\.net/;
 
   faroInstance = initializeFaro({
     app: {
