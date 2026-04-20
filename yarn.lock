@@ -1561,6 +1561,7 @@ __metadata:
   dependencies:
     "@dappnode/types": "workspace:^0.1.0"
     "@ipld/car": "npm:^5.4.0"
+    "@ipld/dag-pb": "npm:^4.1.2"
     "@types/mocha": "npm:^10"
     "@types/semver": "npm:^7.3.13"
     esm: "npm:^3.2.25"
