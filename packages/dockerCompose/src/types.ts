@@ -18,6 +18,7 @@ export interface ContainerLabelTypes {
   "dappnode.dnp.avatar": string;
   "dappnode.dnp.origin": string;
   "dappnode.dnp.chain": ChainDriver;
+  "dappnode.dnp.categories": string[];
   "dappnode.dnp.isCore": boolean;
   "dappnode.dnp.isMain": boolean;
   "dappnode.dnp.dockerTimeout": number;

@@ -225,6 +225,7 @@ export class DappnodeInstaller extends DappnodeRepository {
           dependencies: sanitizeDependencies(metadata.dependencies || {}),
           avatar: this.fileToMultiaddress(avatarFile),
           chain: metadata.chain,
+          categories: metadata.categories,
           origin,
           isCore,
           isMain:
