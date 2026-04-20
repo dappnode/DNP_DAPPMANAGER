@@ -12,7 +12,7 @@ import type { Faro } from "@grafana/faro-react";
 let faroInstance: Faro | null = null;
 
 // Grafana Cloud Faro collector proxy endpoint
-const GRAFANA_PROXY_URL = "http://37.27.134.118:8080";
+const GRAFANA_PROXY_URL = "https://grafana-cloud-proxy.dappnode.net";
 
 // Required upstream proxy auth header/value
 const PROXY_AUTH_HEADER = "X-Dappnode";
