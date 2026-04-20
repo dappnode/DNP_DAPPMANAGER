@@ -15,6 +15,7 @@ import { NewFeatureId } from "@dappnode/types";
 // styles
 import "./welcome.scss";
 import EnableNotifications from "./features/EnableNotifications";
+import EnableUiTelemetry from "./features/EnableUiTelemetry";
 
 /**
  * This internal Welcome status allows to freeze featureIds
@@ -45,6 +46,9 @@ function getRouteIdComponent(routeId: NewFeatureId): React.FC<RouteProps> | unde
 
     case "enable-notifications":
       return (props: RouteProps) => <EnableNotifications {...props} />;
+
+    case "enable-ui-telemetry":
+      return (props: RouteProps) => <EnableUiTelemetry {...props} />;
     default:
       return undefined;
   }

@@ -775,6 +775,16 @@ export interface Routes {
   telegramStatusSet: (kwarg: { telegramStatus: boolean }) => Promise<void>;
 
   /**
+   * Gets UI telemetry consent status
+   */
+  uiTelemetryConsentGet: () => Promise<boolean>;
+
+  /**
+   * Sets UI telemetry consent status
+   */
+  uiTelemetryConsentSet: (kwargs: { enabled: boolean }) => Promise<void>;
+
+  /**
    * Get telegram configuration: token and user ID
    */
   telegramConfigGet: () => Promise<{
@@ -1015,6 +1025,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   telegramStatusSet: { log: true },
   telegramConfigGet: {},
   telegramConfigSet: { log: true },
+  uiTelemetryConsentGet: {},
+  uiTelemetryConsentSet: { log: true },
   updateUpgrade: { log: true },
   natRenewalEnable: {},
   natRenewalIsEnabled: {},

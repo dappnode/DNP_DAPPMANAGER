@@ -6,6 +6,7 @@ import { ClearCacheDb } from "./ClearCacheDb";
 import { ClearMainDb } from "./ClearMainDb";
 import { ContentProviderSelector } from "./ContentProviderSelector";
 import { ReleaseTrustedKeysEditor } from "./ReleaseTrustedKeysEditor";
+import { UiTelemetryToggle } from "./UiTelemetryToggle";
 
 export function Advanced() {
   return (
@@ -29,6 +30,11 @@ export function Advanced() {
 
       <SubTitle>Clear main db</SubTitle>
       <ClearMainDb />
+
+      <SubTitle>UI Telemetry</SubTitle>
+      <Card spacing>
+        <UiTelemetryToggle />
+      </Card>
     </>
   );
 }
