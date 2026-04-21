@@ -23,8 +23,6 @@ export function noEth(e: Error): string {
     "Ethereum node not available",
     `This feature is only available when running both IPFS and Ethereum nodes.
     <br />
-    Your mainnet ethereum node is not available.
-    <br />
     ${e.message}`,
     e
   );
@@ -44,8 +42,6 @@ export function noIpfs(e: Error): string {
   return base(
     "IPFS not available",
     `This feature is only available when running both IPFS and Ethereum nodes.
-    <br />
-    Make sure your IPFS node is available.
     <br />
     ${a(`${adminUiPackagesUrl}/${params.ipfsDnpName}`, "IPFS status")}`,
     e
