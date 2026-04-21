@@ -99,7 +99,7 @@ export function SshSection() {
             !sshStatus.loading &&
             (isEnabled ? (
               <AlertDialog>
-                <AlertDialogTrigger asChild>
+                <AlertDialogTrigger>
                   <Switch id="ssh-toggle" checked={true} />
                 </AlertDialogTrigger>
                 <AlertDialogContent>

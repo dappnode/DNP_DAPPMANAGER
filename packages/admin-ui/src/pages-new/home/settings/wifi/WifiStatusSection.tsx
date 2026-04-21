@@ -96,7 +96,7 @@ export function WifiStatusSection() {
           </div>
           {isRunning ? (
             <AlertDialog>
-              <AlertDialogTrigger asChild>
+              <AlertDialogTrigger>
                 <Switch checked={true} />
               </AlertDialogTrigger>
               <AlertDialogContent>
