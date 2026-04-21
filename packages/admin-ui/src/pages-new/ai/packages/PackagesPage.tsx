@@ -9,11 +9,18 @@ import { Alert, AlertTitle, AlertDescription } from "components/primitives/alert
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from "components/primitives/empty";
 import { Skeleton } from "components/primitives/skeleton";
 import { PageContainer, PageHeader } from "components/primitives/page";
-import { Switch } from "components/primitives/switch";
-import { Label } from "components/primitives/label";
 import { Separator } from "components/primitives/separator";
 import { TypographyH4 } from "components/primitives/typography";
-import { CircleCheck, CirclePause, CircleX, RefreshCw, TriangleAlert, PackageOpen } from "lucide-react";
+import {
+  CircleCheck,
+  CirclePause,
+  CircleX,
+  RefreshCw,
+  TriangleAlert,
+  PackageOpen,
+  ChevronDown,
+  ChevronUp
+} from "lucide-react";
 import { InstalledPackageDataApiReturn } from "@dappnode/types";
 import { parseContainerState, SimpleState } from "pages/packages/components/StateBadge/utils";
 import defaultAvatar from "img/defaultAvatar.png";
@@ -133,12 +140,15 @@ export function PackagesPage() {
 
       {/* Show system packages toggle */}
       <Separator />
-      <div className="tw:flex tw:items-center tw:gap-3">
-        <Switch id="show-system" checked={showSystem} onCheckedChange={setShowSystem} />
-        <Label htmlFor="show-system" className="tw:cursor-pointer">
-          Show system packages
-        </Label>
-      </div>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => setShowSystem((s) => !s)}
+        className="tw:w-full tw:justify-center tw:gap-1.5"
+      >
+        {showSystem ? "Hide" : "Show"} system packages ({systemPackages.length})
+        {showSystem ? <ChevronUp className="tw:size-4" /> : <ChevronDown className="tw:size-4" />}
+      </Button>
 
       {showSystem && systemPackages.length > 0 && (
         <div className="tw:space-y-4">
