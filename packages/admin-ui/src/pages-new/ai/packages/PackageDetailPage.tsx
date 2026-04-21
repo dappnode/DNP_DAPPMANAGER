@@ -18,10 +18,10 @@ import { ArrowLeft, TriangleAlert, ArrowUpCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import defaultAvatar from "img/defaultAvatar.png";
 
-import { InfoTab } from "./tabs/InfoTab";
+import { InfoTab } from "./tabs/info";
 import { ConfigTab } from "./tabs/ConfigTab";
 import { LogsTab } from "./tabs/LogsTab";
-import { NetworkTab } from "./tabs/NetworkTab";
+import { NetworkTab } from "./tabs/network";
 import { FileManagerTab } from "./tabs/FileManagerTab";
 import { BackupTab } from "./tabs/BackupTab";
 import { packagesRelativePath } from "./data";
