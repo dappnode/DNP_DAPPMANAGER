@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { useApi } from "api";
-import { formatTopicBody, formatTopicUrl } from "pages/support/formaters/discourseTopic";
+import { formatTopicBody, formatTopicUrl } from "pages-new/utils/discourseTopic";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "components/primitives/card";
 import { Button } from "components/primitives/button";
 import { ExternalLink } from "lucide-react";

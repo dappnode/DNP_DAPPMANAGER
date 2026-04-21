@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useApi } from "api";
 import { notEmpty } from "utils/typescript";
-import * as formatDiagnose from "pages/support/formaters/autoDiagnoseTexts";
+import * as formatDiagnose from "pages-new/utils/autoDiagnoseTexts";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "components/primitives/card";
 import { CheckCircle2, XCircle, Loader2, ChevronDown, ChevronUp } from "lucide-react";
 

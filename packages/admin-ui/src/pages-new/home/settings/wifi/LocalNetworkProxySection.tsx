@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { adminUiLocalDomain, docsUrl, httpsPortalDnpName } from "params";
-import { getInstallerPath } from "pages/installer";
+import { getInstallerPath } from "pages-new/utils/routeData";
 import { getDappnodeIdentityClean } from "services/dappnodeStatus/selectors";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "components/primitives/card";
 import { Button } from "components/primitives/button";
@@ -171,7 +171,7 @@ export function LocalNetworkProxySection() {
           </div>
           {isRunning ? (
             <AlertDialog>
-              <AlertDialogTrigger asChild>
+              <AlertDialogTrigger>
                 <Switch checked={true} disabled={toggling} />
               </AlertDialogTrigger>
               <AlertDialogContent>

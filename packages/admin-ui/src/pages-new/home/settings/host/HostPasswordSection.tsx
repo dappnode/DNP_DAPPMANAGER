@@ -1,15 +1,13 @@
 import React, { useState } from "react";
 import { useApi } from "api";
-import { useDispatch } from "react-redux";
 import { validateStrongPasswordAsDockerEnv, validatePasswordsMatch } from "utils/validation";
-import * as systemActions from "pages/system/actions";
+import { passwordChange } from "pages-new/utils/actions";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "components/primitives/card";
 import { Button } from "components/primitives/button";
 import { Input } from "components/primitives/input";
 import { Label } from "components/primitives/label";
 
 export function HostPasswordSection() {
-  const dispatch = useDispatch();
   const passwordIsSecureReq = useApi.passwordIsSecure();
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
@@ -19,7 +17,7 @@ export function HostPasswordSection() {
   const isValid = password && password2 && !passwordError && !password2Error;
 
   function onChangePassword() {
-    if (isValid) dispatch(systemActions.passwordChange(password));
+    if (isValid) passwordChange(password);
   }
 
   const showInsecureWarning = passwordIsSecureReq.data === false;

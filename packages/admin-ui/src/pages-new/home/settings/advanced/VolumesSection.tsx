@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { getVolumes } from "services/dappnodeStatus/selectors";
-import { volumeRemove, packageVolumeRemove } from "pages/system/actions";
+import { volumeRemove, packageVolumeRemove } from "pages-new/utils/actions";
 import { getPrettyVolumeName, getPrettyVolumeOwner, prettyBytes } from "utils/format";
 import { parseStaticDate } from "utils/dates";
 import type { VolumeData } from "@dappnode/types";
@@ -26,7 +26,6 @@ const MIN_VOLUME_SIZE = 10 * 1024 * 1024; // 10 MB
 export function VolumesSection() {
   const [showAll, setShowAll] = useState(false);
   const volumes = useSelector(getVolumes);
-  const dispatch = useDispatch();
 
   const getSize = (v: VolumeData) => v.size || v.fileSystem?.used || 0;
   const sorted = [...volumes]
@@ -63,9 +62,9 @@ export function VolumesSection() {
                 const namePretty = getPrettyVolumeName(vol);
                 const isDeletable = Boolean(vol.isOrphan || vol.owner);
                 const onDelete = vol.isOrphan
-                  ? () => dispatch(volumeRemove(vol.name))
+                  ? () => volumeRemove(vol.name)
                   : vol.owner
-                    ? () => dispatch(packageVolumeRemove(vol.owner!, vol.name))
+                    ? () => packageVolumeRemove(vol.owner!, vol.name)
                     : undefined;
 
                 return (
