@@ -129,7 +129,7 @@
     font-weight: inherit;
     line-height: inherit;
     letter-spacing: inherit;
-    color: inherit;
+    color: var(--foreground);
     margin: 0;
     padding: 0;
   }
