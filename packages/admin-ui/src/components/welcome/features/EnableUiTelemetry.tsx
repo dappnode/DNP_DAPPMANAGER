@@ -19,29 +19,43 @@ export default function EnableUiTelemetry({ onBack, onNext }: { onBack?: () => v
         <div className="title">Help improve Dappnode</div>
         <div className="description">
           <p>
-            Enable anonymous telemetry to help us improve Dappnode. The data collected includes UI interactions, errors,
-            and performance metrics.
+            You can optionally enable telemetry to help us improve Dappnode.
+            When enabled, we collect usage data such as UI interactions,
+            performance metrics, and error reports.
           </p>
-          <ul style={{ textAlign: "left", paddingLeft: "1.5rem" }}>
-            <li>
-              <strong>Improve Dappnode:</strong> Your usage data helps us understand how features are used and where
-              issues occur, so we can build a better product.
-            </li>
-            <li>
-              <strong>Privacy via Tor:</strong> All telemetry data is routed through Tor, so your public IP address is
-              never shared with our servers.
-            </li>
-            <li>
-              <strong>Better support:</strong> Logs and traces help the Dappnode team diagnose and resolve issues faster
-              when you reach out for support.
-            </li>
-          </ul>
-          <p style={{ fontSize: "0.85rem", opacity: 0.8 }}>
-            You can change this setting at any time in System &gt; Advanced.{" "}
-            <a href="https://gdpr-info.eu/" target="_blank" rel="noopener noreferrer">
-              Learn more about GDPR
-            </a>
+
+          <p>
+            By enabling this option, you consent to the collection and processing of this telemetry data.
+            You can disable telemetry at any time in System &gt; Advanced.
           </p>
+
+          <details style={{ textAlign: "left", marginTop: "0.5rem" }}>
+            <summary style={{ cursor: "pointer", fontWeight: 500 }}>What data is collected and why?</summary>
+
+            <ul style={{ paddingLeft: "1.5rem", marginTop: "0.5rem" }}>
+              <li>
+                <strong>Improve Dappnode:</strong> Your usage data helps us understand how features are used and where
+                issues occur, so we can build a better product.
+              </li>
+              <li>
+                <strong>Better support:</strong> Telemetry helps the Dappnode team diagnose and resolve issues faster
+                when you reach out for support.
+              </li>
+            </ul>
+
+            <p>
+              This data includes your IP address and a pseudonymous persistent session identifier to understand usage over time.
+              Telemetry is proxied through Dappnode infrastructure and processed using third-party services such as Grafana Cloud.
+            </p>
+
+            <p style={{ fontSize: "0.85rem", opacity: 0.8 }}>
+              Learn more in our{" "}
+              <a href="https://dappnode.com/pages/privacy-policy" target="_blank" rel="noopener noreferrer">
+                Privacy Policy
+              </a>
+              .
+            </p>
+          </details>
         </div>
       </div>
 
