@@ -2,6 +2,7 @@ import React from "react";
 import { api, useApi } from "api";
 import { withToast } from "components/toast/Toast";
 import Switch from "components/Switch";
+import { docsUrl, externalUrlProps } from "params";
 import "./uiTelemetryToggle.scss";
 
 export function UiTelemetryToggle() {
@@ -19,8 +20,11 @@ export function UiTelemetryToggle() {
   return (
     <div className="ui-telemetry-wrapper">
       <div>
-        Send usage data, errors, and performance metrics to help improve Dappnode and allow the team to better
-        support you if you run into any issue.
+        Send usage data, errors, and performance metrics to help improve Dappnode and allow the team to better support
+        you if you run into any issue.{" "}
+        <a href={docsUrl.uiTelemetry} {...externalUrlProps}>
+          Learn more
+        </a>
       </div>
       <Switch
         checked={enabled}

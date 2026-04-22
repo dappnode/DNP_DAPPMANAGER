@@ -113,7 +113,8 @@ export const docsUrl = {
   premiumOverview: `${docsBaseUrl}/docs/user/dappnode-premium/overview`,
   premiumBackupNode: `${docsBaseUrl}/docs/user/dappnode-premium/premium-services#backup-node-for-validators`,
   premiumBackupValidatorsLimit: `${docsBaseUrl}/docs/user/dappnode-premium/premium-services#validators-limit`,
-  starknetDocs: `${docsBaseUrl}/docs/user/staking/starknet/solo`
+  starknetDocs: `${docsBaseUrl}/docs/user/staking/starknet/solo`,
+  uiTelemetry: `${docsBaseUrl}/docs/user/ui-telemetry`
 };
 
 export const forumUrl = {
