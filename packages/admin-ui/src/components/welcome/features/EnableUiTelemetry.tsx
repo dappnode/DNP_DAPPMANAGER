@@ -25,6 +25,10 @@ export default function EnableUiTelemetry({ onBack, onNext }: { onBack?: () => v
             <a href={docsUrl.uiTelemetry} {...externalUrlProps}>
               Learn more
             </a>
+            {" · "}
+            <a href="https://dappnode.com/pages/privacy-policy" {...externalUrlProps}>
+              Privacy Policy
+            </a>
           </p>
         </div>
       </div>
