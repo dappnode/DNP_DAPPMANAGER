@@ -10,6 +10,7 @@ import { NexusPage } from "./nexus/NexusPage";
 import { storeRelativePath } from "./store/data";
 import { packagesRelativePath } from "./packages/data";
 import { nexusRelativePath } from "./nexus/data";
+import { BannerNotifications } from "../home/BannerNotifications";
 
 /* ── Navigation items ───────────────────────────────────────────────── */
 
@@ -24,6 +25,7 @@ const navItems: NavItem[] = [
 export function AiLayout() {
   return (
     <SectionLayout sectionLabel="AI" basePath="/ai" navItems={navItems}>
+      <BannerNotifications />
       <Routes>
         <Route index element={<Navigate to={packagesRelativePath} replace />} />
         <Route path="packages" element={<PackagesPage />} />
