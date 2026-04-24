@@ -9,7 +9,7 @@ import { cleanObj } from "utils/objects";
 
 // Init css
 import "react-toastify/dist/ReactToastify.css";
-// Bootstrap — scoped under .legacy-bootstrap so it only affects legacy /staking/* routes
+// Bootstrap — scoped under .legacy-bootstrap so it only affects legacy /legacy/* routes
 import "./styles/bootstrap-scoped.scss";
 // Custom styles
 

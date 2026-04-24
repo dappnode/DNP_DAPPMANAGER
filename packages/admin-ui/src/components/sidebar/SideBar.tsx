@@ -37,10 +37,10 @@ export default function SideBar({ screenWidth }: { screenWidth: number }) {
           .filter((item) => item.show === true)
           .map((item) => {
             const basePath = item.href.split("/")[0];
-            // Sidebar renders inside /staking, so location is /staking/<page>/...
+            // Sidebar renders inside /legacy, so location is /legacy/<page>/...
             // Compare the first href segment against the second path segment
             const pathSegments = location.pathname.substring(1).split("/");
-            const currentPage = pathSegments[0] === "staking" ? pathSegments[1] : pathSegments[0];
+            const currentPage = pathSegments[0] === "legacy" ? pathSegments[1] : pathSegments[0];
             const isActive = currentPage === basePath;
             return (
               <NavLink
