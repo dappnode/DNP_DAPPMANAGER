@@ -98,6 +98,9 @@ function getInstallerPackageData(
   // Persist critical dappmanager env vars and volume paths across updates
   persistDappmanagerSettings(compose, dnpName, isCore);
 
+  // Persist critical core env vars and volume paths across updates
+  persistCoreSettings(compose, dnpName, isCore);
+
   const dockerTimeout = parseTimeoutSeconds(release.manifest.dockerTimeout);
 
   return {
@@ -188,6 +191,70 @@ export function persistDappmanagerSettings(compose: ComposeEditor, dnpName: stri
           // Match the volume whose container side is /usr/src/app/DNCORE
           if (vol.container === DNCORE_CONTAINER_PATH) {
             return { ...vol, host: dncoreHostDir, name: undefined };
+          }
+          return vol;
+        });
+        service.volumes = stringifyVolumeMappings(updatedVolumes);
+      }
+    }
+  }
+}
+
+/**
+ * When updating the core package, certain environment variables and volume
+ * settings from the currently installed dappmanager compose must be propagated.
+ * This ensures:
+ * - DISABLE_HOST_SCRIPTS is present in the core compose environment
+ * - The /usr/src/dappnode/ volume bind mount uses the correct host path from DAPPNODE_CORE_DIR
+ */
+export function persistCoreSettings(compose: ComposeEditor, dnpName: string, _isCore: boolean): void {
+  if (dnpName !== params.coreDnpName) return;
+
+  // Read the currently installed dappmanager compose to get env values
+  let installedDappmanagerCompose: ComposeFileEditor;
+  try {
+    installedDappmanagerCompose = new ComposeFileEditor(params.dappmanagerDnpName, true);
+  } catch (e) {
+    if (!isNotFoundError(e)) throw e;
+    logs.info("No installed dappmanager compose found, skipping core settings persistence");
+    return;
+  }
+
+  const DAPPNODE_CONTAINER_PATH = "/usr/src/dappnode/";
+
+  // Collect env values from the installed dappmanager compose services
+  const installedEnvs: Record<string, string> = {};
+  for (const serviceEditor of Object.values(installedDappmanagerCompose.services())) {
+    const envs = serviceEditor.getEnvs();
+    if (envs["DISABLE_HOST_SCRIPTS"] !== undefined && envs["DISABLE_HOST_SCRIPTS"] !== "") {
+      installedEnvs["DISABLE_HOST_SCRIPTS"] = envs["DISABLE_HOST_SCRIPTS"];
+    }
+    if (envs["DAPPNODE_CORE_DIR"] !== undefined && envs["DAPPNODE_CORE_DIR"] !== "") {
+      installedEnvs["DAPPNODE_CORE_DIR"] = envs["DAPPNODE_CORE_DIR"];
+    }
+  }
+
+  if (Object.keys(installedEnvs).length === 0) return;
+
+  logs.info("Persisting core settings from installed dappmanager compose", installedEnvs);
+
+  // Apply persisted envs and volume mapping to new core compose services
+  for (const serviceEditor of Object.values(compose.services())) {
+    // Merge DISABLE_HOST_SCRIPTS into the core compose
+    if (installedEnvs["DISABLE_HOST_SCRIPTS"]) {
+      serviceEditor.mergeEnvs({ DISABLE_HOST_SCRIPTS: installedEnvs["DISABLE_HOST_SCRIPTS"] });
+    }
+
+    // Update the /usr/src/dappnode/ volume host path to match DAPPNODE_CORE_DIR
+    if (installedEnvs["DAPPNODE_CORE_DIR"]) {
+      const dappnodeHostDir = installedEnvs["DAPPNODE_CORE_DIR"];
+      const service = serviceEditor.get();
+      if (service.volumes) {
+        const volumeMappings = parseVolumeMappings(service.volumes);
+        const updatedVolumes = volumeMappings.map((vol) => {
+          // Match the volume whose container side is /usr/src/dappnode/
+          if (vol.container === DAPPNODE_CONTAINER_PATH) {
+            return { ...vol, host: dappnodeHostDir, name: undefined };
           }
           return vol;
         });
