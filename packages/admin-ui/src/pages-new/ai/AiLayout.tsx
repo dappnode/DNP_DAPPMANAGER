@@ -5,7 +5,6 @@ import { SectionLayout, NavItem } from "layouts";
 import { StorePage } from "./store/StorePage";
 import { PackagesPage } from "./packages/PackagesPage";
 import { PackageDetailPage } from "./packages/PackageDetailPage";
-import { InstallerPage } from "./installer/InstallerPage";
 import { NexusPage } from "./nexus/NexusPage";
 import { storeRelativePath } from "./store/data";
 import { packagesRelativePath } from "./packages/data";
@@ -31,7 +30,6 @@ export function AiLayout() {
         <Route path="packages" element={<PackagesPage />} />
         <Route path="packages/:id/*" element={<PackageDetailPage />} />
         <Route path="store" element={<StorePage />} />
-        <Route path="install/:id/*" element={<InstallerPage />} />
         <Route path="nexus" element={<NexusPage />} />
       </Routes>
     </SectionLayout>
