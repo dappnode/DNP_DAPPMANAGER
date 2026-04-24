@@ -6,6 +6,7 @@ import { HomePage } from "./HomePage";
 import { SettingsPage } from "./settings/SettingsPage";
 import { EcosystemPage } from "./ecosystem";
 import { NotificationsPage } from "./notifications";
+import { InstallerPage } from "../ai/installer/InstallerPage";
 
 /* ── Route constants ────────────────────────────────────────────────── */
 
@@ -34,6 +35,7 @@ export function HomeLayout() {
         <Route path="notifications/*" element={<NotificationsPage />} />
         <Route path="settings/*" element={<SettingsPage />} />
         <Route path="ecosystem" element={<EcosystemPage />} />
+        <Route path="installer/:id/*" element={<InstallerPage />} />
       </Routes>
     </SectionLayout>
   );

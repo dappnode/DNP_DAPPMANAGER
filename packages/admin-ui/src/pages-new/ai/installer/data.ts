@@ -1,3 +1,3 @@
-const installerRelativePath = "/ai/install";
+const installerRelativePath = "/installer";
 
 export { installerRelativePath };
