@@ -20,6 +20,7 @@ import { RegisterPage } from "./pages-new/home/RegisterPage";
 import { NoConnectionPage } from "./pages-new/home/NoConnectionPage";
 import { AiLayout } from "./pages-new/ai/AiLayout";
 import { HomeLayout } from "./pages-new/home/HomeLayout";
+import { StakingLayout } from "./pages-new/staking/StakingLayout";
 // Layouts
 import { LegacyStakingLayout } from "./layouts/LegacyStakingLayout";
 // Types
@@ -89,7 +90,7 @@ function MainApp({ username }: { username: string }) {
 
           {/* Legacy routes — Bootstrap + SCSS, with sidebar/topbar/legacy chrome */}
           <Route
-            path="/staking"
+            path="/legacy"
             element={<LegacyStakingLayout screenWidth={screenWidth} username={username} appContext={appContext} />}
           >
             {Object.values(pages).map(({ RootComponent, rootPath }) => (
@@ -103,9 +104,19 @@ function MainApp({ username }: { username: string }) {
                 }
               />
             ))}
-            {/* Default: redirect /staking to /staking/dashboard */}
+            {/* Default: redirect /legacy to /legacy/dashboard */}
             <Route index element={<Navigate to="dashboard" replace />} />
           </Route>
+
+          {/* Staking section — new Tailwind + shadcn pages */}
+          <Route
+            path="/staking/*"
+            element={
+              <ErrorBoundary>
+                <StakingLayout />
+              </ErrorBoundary>
+            }
+          />
 
           {/* Home section — catch-all for / and /info, /settings etc. */}
           <Route

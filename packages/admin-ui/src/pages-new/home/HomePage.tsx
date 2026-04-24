@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ClickableCard, CardHeader, CardTitle, CardDescription, CardContent } from "components/primitives/card";
 import { UserRoundKey, Sparkles, Check, ArrowRight } from "lucide-react";
 import dappnodeLogo from "img/dappnode-logo-only.png";
+import { LEGACY_BASE_PATH } from "utils/path";
 
 export function HomePage() {
   const navigate = useNavigate();
@@ -88,6 +89,17 @@ export function HomePage() {
           </CardContent>
         </ClickableCard>
       </div>
+
+      {/* ── Legacy UI link ──────────────────────────────────────── */}
+      <p className="tw:text-sm tw:text-muted-foreground">
+        Looking for the previous interface?{" "}
+        <button
+          onClick={() => navigate(LEGACY_BASE_PATH)}
+          className="tw:underline tw:underline-offset-3 tw:text-primary tw:hover:text-primary/80 tw:cursor-pointer tw:bg-transparent"
+        >
+          Open Legacy UI
+        </button>
+      </p>
 
       {/* ── Footer ───────────────────────────────────────────────── */}
       <footer className="tw:py-6 tw:text-center tw:text-xs tw:text-muted-foreground/60">

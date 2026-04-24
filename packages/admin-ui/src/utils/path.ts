@@ -1,4 +1,4 @@
-const LEGACY_BASE_PATH = "/staking";
+const LEGACY_BASE_PATH = "/legacy";
 
 /**
  * Prefixes a legacy route fragment with the mounted legacy app base path.
