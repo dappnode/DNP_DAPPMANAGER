@@ -2,7 +2,7 @@ import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { LayoutDashboard, ShieldCheck } from "lucide-react";
 import { SectionLayout, NavItem } from "layouts";
-import { DashboardPage } from "./DashboardPage";
+import { DashboardPage } from "./dashboard";
 import { ValidatorsPage } from "./ValidatorsPage";
 import { BannerNotifications } from "../home/BannerNotifications";
 
