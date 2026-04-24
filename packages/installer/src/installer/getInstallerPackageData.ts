@@ -220,7 +220,7 @@ export function persistCoreSettings(compose: ComposeEditor, dnpName: string, _is
     return;
   }
 
-  const DAPPNODE_CONTAINER_PATH = "/usr/src/dappnode/";
+  const DAPPNODE_CONTAINER_PATH = "/usr/src/dappnode";
 
   // Collect env values from the installed dappmanager compose services
   const installedEnvs: Record<string, string> = {};

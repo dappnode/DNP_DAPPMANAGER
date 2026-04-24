@@ -147,7 +147,8 @@ describe("persistCoreSettings", () => {
     persistCoreSettings(compose, coreDnpName, isCore);
 
     const service = compose.compose.services["core.dnp.dappnode.eth"];
-    expect(service.volumes).to.include(`${customDir}:/usr/src/dappnode/`);
+    // host path keeps trailing slash from env, container path is normalized
+    expect(service.volumes).to.include(`/custom/path/dappnode/:/usr/src/dappnode`);
     expect(service.volumes).to.include("/var/run/docker.sock:/var/run/docker.sock");
   });
 
@@ -175,7 +176,8 @@ describe("persistCoreSettings", () => {
     const envs = parseEnvironment(service.environment || []);
     expect(envs["DISABLE_HOST_SCRIPTS"]).to.equal("true");
     expect(envs["LOG_LEVEL"]).to.equal("debug");
-    expect(service.volumes).to.include(`${customDir}:/usr/src/dappnode/`);
+    // host path keeps trailing slash from env, container path is normalized
+    expect(service.volumes).to.include("/custom/path/dappnode/:/usr/src/dappnode");
   });
 
   it("Should not modify volumes when DAPPNODE_CORE_DIR is not set", () => {
