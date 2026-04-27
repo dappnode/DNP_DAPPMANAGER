@@ -294,4 +294,47 @@ describe("persistCoreSettings", () => {
     const envs = parseEnvironment(service.environment || []);
     expect(envs["DISABLE_HOST_SCRIPTS"]).to.equal("true");
   });
+
+  it("Should remove /etc:/etc volume when DISABLE_HOST_SCRIPTS is true", () => {
+    writeDappmanagerCompose(
+      buildDappmanagerCompose({
+        environment: {
+          DISABLE_HOST_SCRIPTS: "true"
+        }
+      })
+    );
+
+    const newCompose = buildCoreCompose({
+      environment: { LOG_LEVEL: "info" },
+      volumes: ["/etc:/etc", "/usr/src/dappnode/:/usr/src/dappnode/", "/var/run/docker.sock:/var/run/docker.sock"]
+    });
+    const compose = new ComposeEditor(newCompose, { dnpName: coreDnpName });
+
+    persistCoreSettings(compose, coreDnpName, isCore);
+
+    const service = compose.compose.services["core.dnp.dappnode.eth"];
+    expect(service.volumes).to.not.include("/etc:/etc");
+    expect(service.volumes).to.include("/var/run/docker.sock:/var/run/docker.sock");
+  });
+
+  it("Should keep /etc:/etc volume when DISABLE_HOST_SCRIPTS is not set", () => {
+    writeDappmanagerCompose(
+      buildDappmanagerCompose({
+        environment: {
+          DAPPNODE_CORE_DIR: "/custom/path/dappnode/"
+        }
+      })
+    );
+
+    const newCompose = buildCoreCompose({
+      environment: { LOG_LEVEL: "info" },
+      volumes: ["/etc:/etc", "/usr/src/dappnode/:/usr/src/dappnode/", "/var/run/docker.sock:/var/run/docker.sock"]
+    });
+    const compose = new ComposeEditor(newCompose, { dnpName: coreDnpName });
+
+    persistCoreSettings(compose, coreDnpName, isCore);
+
+    const service = compose.compose.services["core.dnp.dappnode.eth"];
+    expect(service.volumes).to.include("/etc:/etc");
+  });
 });

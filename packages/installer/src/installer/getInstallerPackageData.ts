@@ -245,6 +245,21 @@ export function persistCoreSettings(compose: ComposeEditor, dnpName: string, _is
       serviceEditor.mergeEnvs({ DISABLE_HOST_SCRIPTS: installedEnvs["DISABLE_HOST_SCRIPTS"] });
     }
 
+    // Remove /etc:/etc volume when DISABLE_HOST_SCRIPTS is enabled.
+    // This bind mount is not needed when host scripts are disabled and causes
+    // Docker failures on non-Linux platforms (e.g., macOS) because Docker cannot
+    // create its internal mountpoints (/etc/hostname, /etc/hosts) inside a bind-mounted /etc
+    if (installedEnvs["DISABLE_HOST_SCRIPTS"] === "true") {
+      const service = serviceEditor.get();
+      if (service.volumes) {
+        const volumeMappings = parseVolumeMappings(service.volumes);
+        const filteredVolumes = volumeMappings.filter((vol) => vol.container !== "/etc");
+        if (filteredVolumes.length !== volumeMappings.length) {
+          service.volumes = stringifyVolumeMappings(filteredVolumes);
+        }
+      }
+    }
+
     // Update the /usr/src/dappnode/ volume host path to match DAPPNODE_CORE_DIR
     if (installedEnvs["DAPPNODE_CORE_DIR"]) {
       const dappnodeHostDir = installedEnvs["DAPPNODE_CORE_DIR"];
