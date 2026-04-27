@@ -7,7 +7,6 @@ import { Button } from "components/primitives/button";
 import { Skeleton } from "components/primitives/skeleton";
 import { Separator } from "components/primitives/separator";
 import { Activity } from "lucide-react";
-import { withLegacyBase } from "utils/path";
 import { ClientRow } from "./ClientRow";
 
 export function NodeStatusCard({
@@ -78,7 +77,7 @@ export function NodeStatusCard({
         <Button
           variant="outline"
           className="tw:w-full"
-          onClick={() => navigate(withLegacyBase(`stakers/${network === Network.Mainnet ? "ethereum" : network}`))}
+          onClick={() => navigate(`/staking/stakers/${network === Network.Mainnet ? "ethereum" : network}`)}
         >
           View Setup
         </Button>
