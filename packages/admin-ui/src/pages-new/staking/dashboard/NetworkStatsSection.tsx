@@ -7,7 +7,6 @@ import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from "co
 import { TypographyH4 } from "components/primitives/typography";
 import { ServerOff } from "lucide-react";
 import { capitalize } from "utils/strings";
-import { withLegacyBase } from "utils/path";
 import { NodeStatusCard } from "./NodeStatusCard";
 import { ValidatorsCard } from "./ValidatorsCard";
 import { RewardsCard } from "./RewardsCard";
@@ -45,7 +44,7 @@ export function NetworkStatsSection() {
           <EmptyTitle>No nodes configured yet</EmptyTitle>
           <EmptyDescription>
             You haven't set up a node on any network.{" "}
-            <Link to={withLegacyBase("stakers")} className="tw:underline tw:text-primary">
+            <Link to="/staking/stakers" className="tw:underline tw:text-primary">
               Set up your nodes from the Stakers tab.
             </Link>
           </EmptyDescription>
