@@ -10,16 +10,17 @@ import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from "co
 import { PackageOpen, TriangleAlert } from "lucide-react";
 import { StoreGrid } from "./StoreGrid";
 import { StoreGridSkeleton } from "./StoreGridSkeleton";
-import { packagesRelativePath } from "../packages/data";
-import { installerRelativePath } from "../installer/data";
+import { PackagesConfig, matchesDirectoryFilter } from "../config";
 
-const AI_CATEGORY = "AI";
+interface StorePageProps {
+  config: PackagesConfig;
+}
 
 /**
- * AI Store page — displays a grid of all DNP packages that belong to the
- * "AI" category, pulled from the on-chain directory via Redux.
+ * Shared Store page — displays a grid of DNP packages from the on-chain
+ * directory, filtered by the supplied category configuration.
  */
-export function StorePage() {
+export function StorePage({ config }: StorePageProps) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const directory = useSelector(getDnpDirectory);
@@ -29,32 +30,31 @@ export function StorePage() {
     dispatch(fetchDnpDirectory());
   }, [dispatch]);
 
-  /** Only keep "ok" packages whose categories include "AI". */
-  const aiPackages = useMemo<DirectoryItemOk[]>(
+  /** Filter directory items by the section's category config. */
+  const filteredPackages = useMemo<DirectoryItemOk[]>(
     () =>
       directory.filter(
-        (item): item is DirectoryItemOk => item.status === "ok" && item.categories.includes(AI_CATEGORY)
+        (item): item is DirectoryItemOk => item.status === "ok" && matchesDirectoryFilter(item, config.categoryFilter)
       ),
-    [directory]
+    [directory, config.categoryFilter]
   );
 
   function handlePackageClick(item: DirectoryItemOk) {
     const encodedName = encodeURIComponent(item.name);
     if (item.isUpdated) {
-      // Already installed & up-to-date → navigate to its detail view
-      navigate(`${packagesRelativePath}/${encodedName}/info`);
+      navigate(`${config.packagesPath}/${encodedName}/info`);
     } else {
-      // Not installed or updateable → navigate to the new AI installer
-      navigate(`${installerRelativePath}/${encodedName}`);
+      navigate(`${config.installerPath}/${encodedName}`);
     }
   }
 
   return (
     <PageContainer>
-      {/* Page header */}
-      <PageHeader title="AI Store" description="Browse and install AI powered packages on your Dappnode." />
+      <PageHeader
+        title={`${config.sectionLabel} Store`}
+        description={`Browse and install ${config.sectionLabel} packages on your Dappnode.`}
+      />
 
-      {/* Content area */}
       {requestStatus.loading && !directory.length ? (
         <StoreGridSkeleton />
       ) : requestStatus.error ? (
@@ -63,20 +63,20 @@ export function StorePage() {
           <AlertTitle>Failed to load packages</AlertTitle>
           <AlertDescription>{requestStatus.error}</AlertDescription>
         </Alert>
-      ) : aiPackages.length === 0 ? (
+      ) : filteredPackages.length === 0 ? (
         <Empty className="tw:border tw:py-16">
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <PackageOpen />
             </EmptyMedia>
-            <EmptyTitle>No AI packages found</EmptyTitle>
+            <EmptyTitle>No packages found</EmptyTitle>
             <EmptyDescription>
-              There are no packages with the "AI" category in the Dappnode directory yet. Check back soon!
+              There are no matching packages in the Dappnode directory yet. Check back soon!
             </EmptyDescription>
           </EmptyHeader>
         </Empty>
       ) : (
-        <StoreGrid packages={aiPackages} onPackageClick={handlePackageClick} />
+        <StoreGrid packages={filteredPackages} onPackageClick={handlePackageClick} />
       )}
     </PageContainer>
   );

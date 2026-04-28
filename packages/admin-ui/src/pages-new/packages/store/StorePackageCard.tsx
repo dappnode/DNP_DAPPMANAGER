@@ -15,7 +15,7 @@ import { CheckCircle, ArrowUpCircle, Download } from "lucide-react";
  */
 export function StorePackageCard({ item, onClick }: { item: DirectoryItemOk; onClick: () => void }) {
   return (
-    <ClickableCard onClick={onClick} size="sm">
+    <ClickableCard onClick={onClick} size="sm" className="tw:justify-between">
       <CardHeader>
         <div className="tw:flex tw:items-center tw:gap-3">
           <img
