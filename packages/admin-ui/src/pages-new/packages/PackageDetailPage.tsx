@@ -1,5 +1,5 @@
 import React from "react";
-import { useParams, NavLink, Routes, Route, Navigate } from "react-router-dom";
+import { useParams, NavLink, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { useApi } from "api";
 import { isEmpty } from "lodash-es";
 import { prettyDnpName } from "utils/format";
@@ -15,16 +15,15 @@ import {
   NavigationMenuLink
 } from "components/primitives/navigation-menu";
 import { ArrowLeft, TriangleAlert, ArrowUpCircle } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import defaultAvatar from "img/defaultAvatar.png";
 
-import { InfoTab } from "./tabs/info";
-import { ConfigTab } from "./tabs/ConfigTab";
-import { LogsTab } from "./tabs/LogsTab";
-import { NetworkTab } from "./tabs/network";
-import { FileManagerTab } from "./tabs/FileManagerTab";
-import { BackupTab } from "./tabs/BackupTab";
-import { packagesRelativePath } from "./data";
+import { InfoTab } from "pages-new/ai/packages/tabs/info";
+import { ConfigTab } from "pages-new/ai/packages/tabs/ConfigTab";
+import { LogsTab } from "pages-new/ai/packages/tabs/LogsTab";
+import { NetworkTab } from "pages-new/ai/packages/tabs/network";
+import { FileManagerTab } from "pages-new/ai/packages/tabs/FileManagerTab";
+import { BackupTab } from "pages-new/ai/packages/tabs/BackupTab";
+import { PackagesConfig } from "./config";
 
 /* ── Tab definitions ────────────────────────────────────────────────── */
 
@@ -74,9 +73,15 @@ const tabDefs: TabDef[] = [
   }
 ];
 
+/* ── Props ──────────────────────────────────────────────────────────── */
+
+interface PackageDetailPageProps {
+  config: PackagesConfig;
+}
+
 /* ── Component ──────────────────────────────────────────────────────── */
 
-export function PackageDetailPage() {
+export function PackageDetailPage({ config }: PackageDetailPageProps) {
   const params = useParams();
   const id = params.id || "";
   const navigate = useNavigate();
@@ -100,7 +105,7 @@ export function PackageDetailPage() {
     const notFound = dnpRequest.error?.message?.includes("package not found");
     return (
       <PageContainer>
-        <BackButton />
+        <BackButton packagesPath={config.packagesPath} />
         <Alert variant="destructive">
           <TriangleAlert className="tw:size-4" />
           <AlertTitle>{notFound ? "Package not found" : "Error"}</AlertTitle>
@@ -120,7 +125,7 @@ export function PackageDetailPage() {
     <PageContainer className="tw:gap-6">
       {/* Back + title */}
       <div className="tw:flex tw:flex-col tw:gap-3">
-        <BackButton />
+        <BackButton packagesPath={config.packagesPath} />
         <div className="tw:flex tw:items-center tw:gap-3">
           <img
             src={dnp.avatarUrl || defaultAvatar}
@@ -147,7 +152,7 @@ export function PackageDetailPage() {
             <Button
               size="sm"
               variant="outline"
-              onClick={() => navigate(`/ai/install/${encodeURIComponent(dnp.dnpName)}`)}
+              onClick={() => navigate(`${config.installerPath}/${encodeURIComponent(dnp.dnpName)}`)}
             >
               Update
             </Button>
@@ -173,7 +178,6 @@ export function PackageDetailPage() {
         {availableTabs.map((tab) => (
           <Route key={tab.subPath} path={tab.subPath} element={tab.render(dnp)} />
         ))}
-        {/* Default redirect to first available tab */}
         <Route path="*" element={<Navigate to={availableTabs[0]?.subPath || "info"} replace />} />
       </Routes>
     </PageContainer>
@@ -182,10 +186,10 @@ export function PackageDetailPage() {
 
 /* ── Back button ────────────────────────────────────────────────────── */
 
-function BackButton() {
+function BackButton({ packagesPath }: { packagesPath: string }) {
   const navigate = useNavigate();
   return (
-    <Button variant="link" onClick={() => navigate(packagesRelativePath)} className="tw:inline-flex tw:self-start">
+    <Button variant="link" onClick={() => navigate(packagesPath)} className="tw:inline-flex tw:self-start">
       <ArrowLeft className="tw:size-3.5" />
       Packages
     </Button>

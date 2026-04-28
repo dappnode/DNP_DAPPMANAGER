@@ -26,7 +26,7 @@ import { parseContainerState, SimpleState } from "pages/packages/components/Stat
 import defaultAvatar from "img/defaultAvatar.png";
 import { Button } from "components/primitives/button";
 import { coreDnpName, tailscaleDnpName } from "params";
-import { storeRelativePath } from "../store/data";
+import { PackagesConfig, matchesInstalledFilter } from "./config";
 
 /* ── Status helpers ─────────────────────────────────────────────────── */
 
@@ -54,9 +54,15 @@ function getAggregateState(dnp: InstalledPackageDataApiReturn): SimpleState {
   return "running";
 }
 
+/* ── Props ──────────────────────────────────────────────────────────── */
+
+interface PackagesPageProps {
+  config: PackagesConfig;
+}
+
 /* ── Component ──────────────────────────────────────────────────────── */
 
-export function PackagesPage() {
+export function PackagesPage({ config }: PackagesPageProps) {
   const navigate = useNavigate();
   const dnpsRequest = useApi.packagesGet();
   const dnps = dnpsRequest.data;
@@ -64,14 +70,14 @@ export function PackagesPage() {
   const loading = dnpsRequest.isValidating && !dnps;
   const [showSystem, setShowSystem] = useState(false);
 
-  /** Only AI-category packages (non-core && categories include "AI"). */
+  /** Filter non-core packages by the section's category config. */
   const packages = useMemo(() => {
     if (!dnps) return [];
     return sortBy(
-      dnps.filter((d) => !d.isCore && d.categories?.includes("AI")),
+      dnps.filter((d) => !d.isCore && matchesInstalledFilter(d, config.categoryFilter)),
       (d) => d.dnpName
     );
-  }, [dnps]);
+  }, [dnps, config.categoryFilter]);
 
   /** System (core) packages + Tailscale if installed. */
   const systemPackages = useMemo(() => {
@@ -82,13 +88,12 @@ export function PackagesPage() {
     );
   }, [dnps]);
 
+  const description = `View and manage the ${config.sectionLabel} packages installed on your Dappnode. Monitor the status, versions and updates.`;
+
   if (loading) {
     return (
       <PageContainer>
-        <PageHeader
-          title="Packages"
-          description="View and manage the AI packages installed on your Dappnode. Monitor the status, versions and updates."
-        />
+        <PageHeader title="Packages" description={description} />
         <div className="tw:grid tw:grid-cols-1 tw:sm:grid-cols-2 tw:lg:grid-cols-3 tw:gap-card">
           {Array.from({ length: 6 }).map((_, i) => (
             <Skeleton key={i} className="tw:h-36 tw:rounded-xl" />
@@ -101,10 +106,7 @@ export function PackagesPage() {
   if (error) {
     return (
       <PageContainer>
-        <PageHeader
-          title="Packages"
-          description="View and manage the AI packages installed on your Dappnode. Monitor the status, versions and updates."
-        />
+        <PageHeader title="Packages" description={description} />
         <Alert variant="destructive">
           <TriangleAlert className="tw:size-4" />
           <AlertTitle>Failed to load packages</AlertTitle>
@@ -116,10 +118,7 @@ export function PackagesPage() {
 
   return (
     <PageContainer>
-      <PageHeader
-        title="Packages"
-        description="View and manage the AI packages installed on your Dappnode. Monitor the status, versions and updates."
-      />
+      <PageHeader title="Packages" description={description} />
 
       {packages.length === 0 ? (
         <Empty className="tw:border tw:py-16">
@@ -128,14 +127,16 @@ export function PackagesPage() {
               <PackageOpen />
             </EmptyMedia>
             <EmptyTitle>No packages installed</EmptyTitle>
-            <EmptyDescription>Head over to the Store to install your first AI package.</EmptyDescription>
-            <Button variant="link" onClick={() => navigate(storeRelativePath)}>
+            <EmptyDescription>
+              Head over to the Store to install your first {config.sectionLabel} package.
+            </EmptyDescription>
+            <Button variant="link" onClick={() => navigate(config.storePath)}>
               Go to Store
             </Button>
           </EmptyHeader>
         </Empty>
       ) : (
-        <PackageGrid packages={packages} navigate={navigate} />
+        <PackageGrid packages={packages} navigate={navigate} packagesPath={config.packagesPath} />
       )}
 
       {/* Show system packages toggle */}
@@ -153,7 +154,7 @@ export function PackagesPage() {
       {showSystem && systemPackages.length > 0 && (
         <div className="tw:space-y-4">
           <TypographyH4>System Packages</TypographyH4>
-          <PackageGrid packages={systemPackages} navigate={navigate} />
+          <PackageGrid packages={systemPackages} navigate={navigate} packagesPath={config.packagesPath} />
         </div>
       )}
     </PageContainer>
@@ -164,10 +165,12 @@ export function PackagesPage() {
 
 function PackageGrid({
   packages,
-  navigate
+  navigate,
+  packagesPath
 }: {
   packages: InstalledPackageDataApiReturn[];
   navigate: ReturnType<typeof useNavigate>;
+  packagesPath: string;
 }) {
   return (
     <div className="tw:grid tw:grid-cols-1 tw:sm:grid-cols-2 tw:lg:grid-cols-3 tw:gap-card">
@@ -178,7 +181,7 @@ function PackageGrid({
           <ClickableCard
             key={dnp.dnpName}
             className="tw:group"
-            onClick={() => navigate(`${encodeURIComponent(dnp.dnpName)}/info`)}
+            onClick={() => navigate(`${packagesPath}/${encodeURIComponent(dnp.dnpName)}/info`)}
           >
             <CardHeader className="tw:flex tw:flex-row tw:items-start tw:gap-3 tw:space-y-0">
               <img
