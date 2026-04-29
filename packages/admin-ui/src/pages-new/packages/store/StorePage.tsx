@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { DirectoryItemOk } from "@dappnode/types";
@@ -7,7 +7,11 @@ import { fetchDnpDirectory } from "services/dnpDirectory/actions";
 import { PageContainer, PageHeader } from "components/primitives/page";
 import { Alert, AlertTitle, AlertDescription } from "components/primitives/alert";
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from "components/primitives/empty";
+import { SearchBar } from "components/primitives/search";
 import { PackageOpen, TriangleAlert } from "lucide-react";
+import isIpfsHash from "utils/isIpfsHash";
+import isDnpDomain from "utils/isDnpDomain";
+import { correctPackageName } from "pages/installer/utils";
 import { StoreGrid } from "./StoreGrid";
 import { StoreGridSkeleton } from "./StoreGridSkeleton";
 import { PackagesConfig, matchesDirectoryFilter } from "../config";
@@ -16,27 +20,40 @@ interface StorePageProps {
   config: PackagesConfig;
 }
 
-/**
- * Shared Store page — displays a grid of DNP packages from the on-chain
- * directory, filtered by the supplied category configuration.
- */
 export function StorePage({ config }: StorePageProps) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const directory = useSelector(getDnpDirectory);
   const requestStatus = useSelector(getDirectoryRequestStatus);
 
+  const [search, setSearch] = useState("");
+  const trimmedSearch = search.trim();
+
   useEffect(() => {
     dispatch(fetchDnpDirectory());
   }, [dispatch]);
 
-  /** Filter directory items by the section's category config. */
-  const filteredPackages = useMemo<DirectoryItemOk[]>(
-    () =>
-      directory.filter(
-        (item): item is DirectoryItemOk => item.status === "ok" && matchesDirectoryFilter(item, config.categoryFilter)
-      ),
-    [directory, config.categoryFilter]
+  const filteredPackages = useMemo<DirectoryItemOk[]>(() => {
+    const sectionPackages = directory.filter(
+      (item): item is DirectoryItemOk => item.status === "ok" && matchesDirectoryFilter(item, config.categoryFilter)
+    );
+
+    const query = trimmedSearch.toLowerCase();
+    if (!query) return sectionPackages;
+
+    return sectionPackages.filter(
+      (item) =>
+        item.name.toLowerCase().includes(query) ||
+        (item.description ?? "").toLowerCase().includes(query) ||
+        item.categories.some((cat) => cat.toLowerCase().includes(query))
+    );
+  }, [directory, config.categoryFilter, trimmedSearch]);
+
+  const cleanedQuery = useMemo(() => correctPackageName(trimmedSearch), [trimmedSearch]);
+
+  const enterHint = useMemo(
+    () => cleanedQuery && (isIpfsHash(cleanedQuery) || isDnpDomain(cleanedQuery) || filteredPackages.length === 1),
+    [cleanedQuery, filteredPackages.length]
   );
 
   function handlePackageClick(item: DirectoryItemOk) {
@@ -48,11 +65,30 @@ export function StorePage({ config }: StorePageProps) {
     }
   }
 
+  function runQuery() {
+    if (!cleanedQuery) return;
+    if (isIpfsHash(cleanedQuery) || isDnpDomain(cleanedQuery)) {
+      navigate(`${config.installerPath}/${encodeURIComponent(cleanedQuery)}`);
+      return;
+    }
+    if (filteredPackages.length === 1) {
+      handlePackageClick(filteredPackages[0]);
+    }
+  }
+
   return (
     <PageContainer>
       <PageHeader
         title={`${config.sectionLabel} Store`}
         description={`Browse and install ${config.sectionLabel} packages on your Dappnode.`}
+      />
+
+      <SearchBar
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        onEnter={runQuery}
+        placeholder="Search packages — or paste a DNP name / IPFS hash and press Enter"
+        showEnterHint={!!enterHint}
       />
 
       {requestStatus.loading && !directory.length ? (
@@ -71,7 +107,9 @@ export function StorePage({ config }: StorePageProps) {
             </EmptyMedia>
             <EmptyTitle>No packages found</EmptyTitle>
             <EmptyDescription>
-              There are no matching packages in the Dappnode directory yet. Check back soon!
+              {trimmedSearch
+                ? `No packages match "${trimmedSearch}". Try a different search.`
+                : "There are no matching packages in the Dappnode directory yet. Check back soon!"}
             </EmptyDescription>
           </EmptyHeader>
         </Empty>
