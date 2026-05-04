@@ -19,8 +19,10 @@ let DNCORE_DIR = "/usr/src/app/DNCORE"; // Bind volume
 let REPO_DIR = "/usr/src/app/dnp_repo"; // Named volume
 const GLOBAL_ENVS_FILE_NAME = "dnp.dappnode.global.env";
 const HOST_HOME = "/usr/src/dappnode";
-/** Root of the application directory inside the container */
+/** Root of the application directory inside the container (production stage WORKDIR) */
 const APP_DIR = "/usr/src/app";
+/** Root of the application directory in the build stage (used as a fallback for alternative image layouts) */
+const ALT_APP_DIR = "/app";
 
 if (process.env.TEST) {
   DNCORE_DIR = "./DNCORE";
@@ -73,7 +75,7 @@ export const params = {
    * Fallback path for host service unit files inside the container when they have been copied
    * from the build stage into the packages directory (e.g. in alternative image layouts).
    */
-  HOST_SERVICES_SOURCE_DIR_FALLBACK: path.join("/app/packages/hostScriptsServices/hostServices"),
+  HOST_SERVICES_SOURCE_DIR_FALLBACK: path.join(ALT_APP_DIR, "packages/hostScriptsServices/hostServices"),
   // Host timer paths
   HOST_TIMERS_DIR_FROM_HOST: path.join(HOST_HOME, "DNCORE/timers/host"),
   HOST_TIMERS_DIR: "DNCORE/timers/host",
@@ -83,7 +85,7 @@ export const params = {
    * Fallback path for host timer unit files inside the container when they have been copied
    * from the build stage into the packages directory (e.g. in alternative image layouts).
    */
-  HOST_TIMERS_SOURCE_DIR_FALLBACK: path.join("/app/packages/hostScriptsServices/hostTimers"),
+  HOST_TIMERS_SOURCE_DIR_FALLBACK: path.join(ALT_APP_DIR, "packages/hostScriptsServices/hostTimers"),
   // Local fallback versions, to be able to install and eth client without connecting to remote
   FALLBACK_VERSIONS_PATH: path.join(DNCORE_DIR, "packages-content-hash.csv"),
   // Version data file, created in the docker image build process
