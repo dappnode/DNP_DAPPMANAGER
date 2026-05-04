@@ -28,14 +28,17 @@ describe("hostServices > runService", () => {
 
     it("should include the DNCORE bind-volume fallback path", () => {
       const paths = getCandidateServicePaths("docker-upgrade.service");
-      expect(paths).to.include("/usr/src/app/DNCORE/services/host/docker-upgrade.service");
+      const expected = path.join(params.DNCORE_DIR, "services/host", "docker-upgrade.service");
+      expect(paths).to.include(expected);
     });
 
     it("should include the build-stage fallback path", () => {
       const paths = getCandidateServicePaths("docker-upgrade.service");
-      expect(paths).to.include(
-        "/app/packages/hostScriptsServices/hostServices/docker-upgrade.service"
+      const expected = path.join(
+        params.HOST_SERVICES_SOURCE_DIR_FALLBACK,
+        "docker-upgrade.service"
       );
+      expect(paths).to.include(expected);
     });
   });
 

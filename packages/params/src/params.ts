@@ -61,16 +61,29 @@ export const params = {
   // Host script paths
   HOST_SCRIPTS_DIR_FROM_HOST: path.join(HOST_HOME, "DNCORE/scripts/host"),
   HOST_SCRIPTS_DIR: "DNCORE/scripts/host",
+  /** Absolute path inside the container where host script files are stored (build artifact) */
   HOST_SCRIPTS_SOURCE_DIR: path.join(APP_DIR, "hostScripts"),
   // Host services paths
   HOST_SERVICES_DIR_FROM_HOST: path.join(HOST_HOME, "DNCORE/services/host"),
   HOST_SYSTEMD_DIR_FROM_HOST: "/etc/systemd/system",
   HOST_SERVICES_DIR: "DNCORE/services/host",
+  /** Absolute path inside the container where host service unit files are stored (build artifact) */
   HOST_SERVICES_SOURCE_DIR: path.join(APP_DIR, "hostServices"),
+  /**
+   * Fallback path for host service unit files inside the container when they have been copied
+   * from the build stage into the packages directory (e.g. in alternative image layouts).
+   */
+  HOST_SERVICES_SOURCE_DIR_FALLBACK: path.join("/app/packages/hostScriptsServices/hostServices"),
   // Host timer paths
   HOST_TIMERS_DIR_FROM_HOST: path.join(HOST_HOME, "DNCORE/timers/host"),
   HOST_TIMERS_DIR: "DNCORE/timers/host",
+  /** Absolute path inside the container where host timer unit files are stored (build artifact) */
   HOST_TIMERS_SOURCE_DIR: path.join(APP_DIR, "hostTimers"),
+  /**
+   * Fallback path for host timer unit files inside the container when they have been copied
+   * from the build stage into the packages directory (e.g. in alternative image layouts).
+   */
+  HOST_TIMERS_SOURCE_DIR_FALLBACK: path.join("/app/packages/hostScriptsServices/hostTimers"),
   // Local fallback versions, to be able to install and eth client without connecting to remote
   FALLBACK_VERSIONS_PATH: path.join(DNCORE_DIR, "packages-content-hash.csv"),
   // Version data file, created in the docker image build process

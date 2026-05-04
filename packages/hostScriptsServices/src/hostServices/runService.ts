@@ -19,9 +19,9 @@ export function getCandidateServicePaths(serviceName: string): string[] {
     // Primary: absolute source dir set in params (Dockerfile copies hostServices here)
     path.join(params.HOST_SERVICES_SOURCE_DIR, serviceName),
     // Fallback 1: DNCORE bind-volume path inside the container
-    path.join("/usr/src/app/DNCORE/services/host", serviceName),
-    // Fallback 2: package directory copied by the build stage
-    path.join("/app/packages/hostScriptsServices/hostServices", serviceName)
+    path.join(params.DNCORE_DIR, "services/host", serviceName),
+    // Fallback 2: package directory copied by the build stage (alternative image layouts)
+    path.join(params.HOST_SERVICES_SOURCE_DIR_FALLBACK, serviceName)
   ];
 }
 

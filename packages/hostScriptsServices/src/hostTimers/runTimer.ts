@@ -24,9 +24,9 @@ export function getCandidateTimerPaths(timerName: string): string[] {
     // Primary: absolute source dir set in params (Dockerfile copies hostTimers here)
     path.join(params.HOST_TIMERS_SOURCE_DIR, timerName),
     // Fallback 1: DNCORE bind-volume path inside the container
-    path.join("/usr/src/app/DNCORE/timers/host", timerName),
-    // Fallback 2: package directory copied by the build stage
-    path.join("/app/packages/hostScriptsServices/hostTimers", timerName)
+    path.join(params.DNCORE_DIR, "timers/host", timerName),
+    // Fallback 2: package directory copied by the build stage (alternative image layouts)
+    path.join(params.HOST_TIMERS_SOURCE_DIR_FALLBACK, timerName)
   ];
 }
 
