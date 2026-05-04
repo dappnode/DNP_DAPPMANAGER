@@ -19,6 +19,8 @@ let DNCORE_DIR = "/usr/src/app/DNCORE"; // Bind volume
 let REPO_DIR = "/usr/src/app/dnp_repo"; // Named volume
 const GLOBAL_ENVS_FILE_NAME = "dnp.dappnode.global.env";
 const HOST_HOME = "/usr/src/dappnode";
+/** Root of the application directory inside the container */
+const APP_DIR = "/usr/src/app";
 
 if (process.env.TEST) {
   DNCORE_DIR = "./DNCORE";
@@ -59,16 +61,16 @@ export const params = {
   // Host script paths
   HOST_SCRIPTS_DIR_FROM_HOST: path.join(HOST_HOME, "DNCORE/scripts/host"),
   HOST_SCRIPTS_DIR: "DNCORE/scripts/host",
-  HOST_SCRIPTS_SOURCE_DIR: "hostScripts",
+  HOST_SCRIPTS_SOURCE_DIR: path.join(APP_DIR, "hostScripts"),
   // Host services paths
   HOST_SERVICES_DIR_FROM_HOST: path.join(HOST_HOME, "DNCORE/services/host"),
   HOST_SYSTEMD_DIR_FROM_HOST: "/etc/systemd/system",
   HOST_SERVICES_DIR: "DNCORE/services/host",
-  HOST_SERVICES_SOURCE_DIR: "hostServices",
+  HOST_SERVICES_SOURCE_DIR: path.join(APP_DIR, "hostServices"),
   // Host timer paths
   HOST_TIMERS_DIR_FROM_HOST: path.join(HOST_HOME, "DNCORE/timers/host"),
   HOST_TIMERS_DIR: "DNCORE/timers/host",
-  HOST_TIMERS_SOURCE_DIR: "hostTimers",
+  HOST_TIMERS_SOURCE_DIR: path.join(APP_DIR, "hostTimers"),
   // Local fallback versions, to be able to install and eth client without connecting to remote
   FALLBACK_VERSIONS_PATH: path.join(DNCORE_DIR, "packages-content-hash.csv"),
   // Version data file, created in the docker image build process
