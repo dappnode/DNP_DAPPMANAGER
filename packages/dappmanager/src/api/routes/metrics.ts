@@ -18,6 +18,7 @@ import { mevBoost, execution, consensus } from "../../index.js";
  *   - Fallback enabled
  *   - Dappnode graffiti or other
  *   - User sessions
+ *   - UI telemetry enabled
  */
 export const metrics = wrapHandler(async (_, res) => {
   // Return all metrics the Prometheus exposition format
@@ -215,6 +216,17 @@ register.registerMetric(
     collect() {
       const enabled = db.mirrorProviderEnabled.get();
       this.set({ mirrorContentProvider: "enabled" }, enabled ? 1 : 0);
+    }
+  })
+);
+
+// UI telemetry enabled or disabled
+register.registerMetric(
+  new client.Gauge({
+    name: "dappmanager_ui_telemetry_enabled",
+    help: "Whether UI telemetry is enabled (1) or disabled (0)",
+    collect() {
+      this.set(db.uiTelemetryConsent.get() ? 1 : 0);
     }
   })
 );
