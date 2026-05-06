@@ -8,7 +8,7 @@ import { shell } from "@dappnode/utils";
 const tempTransferDir = params.TEMP_TRANSFER_DIR;
 
 /**
- * Copy file to a DNP container:
+ * Copy file to a DNP container, starting it if necessary:
  *
  * @param containerName Name of a docker container
  * @param dataUri = "data:application/zip;base64,UEsDBBQAAAg..."
@@ -66,7 +66,7 @@ export async function copyFileToDockerContainer({
 
   dataUriToFile(dataUri, fromPath);
 
-  // docker cp works on containers in any state (created, running, stopped)
+  // Copy file from local file system to container
   await dockerCopyFileTo(containerName, fromPath, toPath);
 
   // Clean intermediate file
