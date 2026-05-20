@@ -1404,6 +1404,34 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                   version: "0.1.0"
                 }
               }
+            },
+            {
+              status: "ok",
+              dnpName: "nimbus-gnosis.dnp.dappnode.eth",
+              isInstalled: true,
+              isRunning: true,
+              isUpdated: true,
+              isSelected: false,
+              avatarUrl: "",
+              data: {
+                dnpName: "package",
+                reqVersion: "0.1.3",
+                semVersion: "0.1.3",
+                imageFile: {
+                  hash: "QM..",
+                  source: "ipfs",
+                  size: 123
+                },
+                warnings: {},
+                signedSafe: true,
+
+                manifest: {
+                  name: "nimbus-gnosis.dnp.dappnode.eth",
+                  description: "Nimbus consensus client",
+                  shortDescription: "Nimbus consensus client",
+                  version: "0.1.3"
+                }
+              }
             }
           ],
           web3Signer: {
