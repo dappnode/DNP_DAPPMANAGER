@@ -110,7 +110,8 @@ export enum MevBoostHoodi {
 export enum ConsensusClientGnosis {
   Lighthouse = "lighthouse-gnosis.dnp.dappnode.eth",
   Teku = "teku-gnosis.dnp.dappnode.eth",
-  Lodestar = "lodestar-gnosis.dnp.dappnode.eth"
+  Lodestar = "lodestar-gnosis.dnp.dappnode.eth",
+  Nimbus = "nimbus-gnosis.dnp.dappnode.eth"
 }
 export enum ExecutionClientGnosis {
   Nethermind = "nethermind-xdai.dnp.dappnode.eth",
