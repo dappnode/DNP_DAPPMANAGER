@@ -4,8 +4,6 @@ import fs from "fs";
 import dataUriToBuffer from "data-uri-to-buffer";
 import { params } from "@dappnode/params";
 import { shell } from "@dappnode/utils";
-import { dockerContainerInspect, dockerContainerStart, dockerContainerStop } from "./container.js";
-import { logs } from "@dappnode/logger";
 
 const tempTransferDir = params.TEMP_TRANSFER_DIR;
 
@@ -66,32 +64,13 @@ export async function copyFileToDockerContainer({
   // Remove existing file if it exists
   if (fs.existsSync(fromPath)) fs.rmSync(fromPath, { recursive: true, force: true });
 
-  /**
-   * Convert dataUri to local file
-   *
-   * In this conversion direction MIME types don't matter
-   * The extension is what decides the type and it's the user's
-   * responsability to specify it correctly on the UI. The code will
-   * not cause problems if the types are not setup corretly
-   */
   dataUriToFile(dataUri, fromPath);
-
-  // Container needs to be running to copy files
-  const containerInspect = await dockerContainerInspect(containerName);
-  const isInitiallyRunning = containerInspect.State.Running;
-
-  if (!isInitiallyRunning) await dockerContainerStart(containerName);
 
   // Copy file from local file system to container
   await dockerCopyFileTo(containerName, fromPath, toPath);
 
   // Clean intermediate file
   if (fs.existsSync(fromPath)) fs.rmSync(fromPath, { recursive: true, force: true });
-
-  if (!isInitiallyRunning)
-    dockerContainerStop(containerName).catch((err) =>
-      logs.error(`Error stopping container ${containerName} after copying a file to it: ${err}`)
-    );
 }
 
 function dockerCopyFileTo(id: string, fromPath: string, toPath: string): Promise<string> {
