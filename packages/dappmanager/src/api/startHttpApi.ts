@@ -17,6 +17,17 @@ import { EventBus } from "@dappnode/eventbus";
 import { subscriptionsFactory } from "@dappnode/common";
 import { RpcPayload, RpcResponse, LoggerMiddleware, Routes } from "@dappnode/types";
 import { getRpcHandler } from "./handler/index.js";
+import {
+  nexusChatCompletions,
+  nexusChatConfirm,
+  nexusChatHistoryDelete,
+  nexusChatHistoryGet,
+  nexusChatHistoryList,
+  nexusChatHistoryUpsert,
+  nexusListModels,
+  nexusStatus
+} from "./routes/nexus.js";
+import { handleMcpRequest } from "../mcp/server.js";
 import { params as dappnodeParams } from "@dappnode/params";
 
 export interface HttpApiParams extends ClientSideCookiesParams, AuthPasswordSessionParams {
@@ -159,6 +170,23 @@ export function startHttpApi({
   app.get("/download/:fileId", auth.onlyAdmin, routes.download);
   app.get("/user-action-logs", auth.onlyAdmin, routes.downloadUserActionLogs);
   app.post("/upload", auth.onlyAdmin, routes.upload);
+
+  // Nexus chat proxy (env-configured Nexus API key held server-side).
+  app.get("/nexus/status", auth.onlyAdmin, nexusStatus);
+  app.get("/nexus/models", auth.onlyAdmin, nexusListModels);
+  app.post("/nexus/chat/completions", auth.onlyAdmin, nexusChatCompletions);
+  app.post("/nexus/chat/confirm", auth.onlyAdmin, nexusChatConfirm);
+  app.get("/nexus/chat/history", auth.onlyAdmin, nexusChatHistoryList);
+  app.get("/nexus/chat/history/:id", auth.onlyAdmin, nexusChatHistoryGet);
+  app.put("/nexus/chat/history/:id", auth.onlyAdmin, nexusChatHistoryUpsert);
+  app.delete("/nexus/chat/history/:id", auth.onlyAdmin, nexusChatHistoryDelete);
+
+  // MCP server for this DAppNode — same tools the embedded chat uses, also
+  // reachable by external MCP clients (Claude Desktop, Cursor, etc.) once
+  // they authenticate as admin.
+  app.post("/mcp", auth.onlyAdmin, wrapHandler(handleMcpRequest));
+  app.get("/mcp", auth.onlyAdmin, wrapHandler(handleMcpRequest));
+  app.delete("/mcp", auth.onlyAdmin, wrapHandler(handleMcpRequest));
 
   // Open endpoints (no auth)
   app.get("/global-envs/:name?", routes.globalEnvs);

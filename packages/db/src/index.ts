@@ -7,6 +7,7 @@ export * from "./ipfsClient.js";
 export * from "./mirrorProvider.js";
 export * from "./fileTransferPath.js";
 export * from "./network.js";
+export * from "./nexus.js";
 export * from "./notification.js";
 export * from "./optimismConfig.js";
 export * from "./package.js";
