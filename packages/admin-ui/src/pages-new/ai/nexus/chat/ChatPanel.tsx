@@ -58,6 +58,7 @@ const SUGGESTIONS = [
 interface PendingConfirmation {
   id: string;
   tool: string;
+  displayName: string;
   args: unknown;
 }
 
@@ -207,7 +208,12 @@ export function ChatPanel({ variant = "page", getPageContext, onRequestClose }: 
             return next;
           });
         } else if (event.type === "confirm_required") {
-          setPendingConfirm({ id: event.id, tool: event.tool, args: event.args });
+          setPendingConfirm({
+            id: event.id,
+            tool: event.tool,
+            displayName: event.displayName,
+            args: event.args
+          });
         } else if (event.type === "confirm_resolved") {
           // Server-side resolution arrived (e.g. via another tab, or the
           // user clicked Approve/Deny — either way we can clear the dialog).
@@ -792,10 +798,15 @@ function ConfirmationCard({
         </div>
 
         <div className="tw:mt-3 tw:overflow-hidden tw:rounded-lg tw:border tw:border-border tw:bg-background">
-          <div className="tw:flex tw:items-center tw:justify-between tw:gap-2 tw:border-b tw:border-border tw:px-3 tw:py-1.5">
-            <code className="tw:font-mono tw:text-[12px] tw:font-semibold tw:text-foreground">
-              {confirmation.tool}
-            </code>
+          <div className="tw:flex tw:items-center tw:justify-between tw:gap-2 tw:border-b tw:border-border tw:px-3 tw:py-2">
+            <div className="tw:min-w-0 tw:flex tw:flex-col">
+              <span className="tw:truncate tw:text-[13px] tw:font-semibold tw:text-foreground">
+                {confirmation.displayName}
+              </span>
+              <code className="tw:truncate tw:font-mono tw:text-[10.5px] tw:text-muted-foreground">
+                {confirmation.tool}
+              </code>
+            </div>
             <span className="tw:font-mono tw:text-[10.5px] tw:uppercase tw:tracking-wide tw:text-muted-foreground">
               mutating
             </span>

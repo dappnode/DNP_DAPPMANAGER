@@ -174,13 +174,14 @@ export interface StreamChatOptions {
  */
 export type StreamEvent =
   | { type: "content"; delta: string }
-  | { type: "confirm_required"; id: string; tool: string; args: unknown }
+  | { type: "confirm_required"; id: string; tool: string; displayName: string; args: unknown }
   | { type: "confirm_resolved"; id: string; decision: "approve" | "deny"; reason?: string };
 
 interface DappmanagerEvent {
   type?: string;
   id?: string;
   tool?: string;
+  displayName?: string;
   args?: unknown;
   decision?: "approve" | "deny";
   reason?: string;
@@ -258,7 +259,13 @@ export async function* streamChat(options: StreamChatOptions): AsyncGenerator<St
     if (chunk.dappmanager) {
       const ev = chunk.dappmanager;
       if (ev.type === "confirm_required" && typeof ev.id === "string" && typeof ev.tool === "string") {
-        yield { type: "confirm_required", id: ev.id, tool: ev.tool, args: ev.args };
+        yield {
+          type: "confirm_required",
+          id: ev.id,
+          tool: ev.tool,
+          displayName: typeof ev.displayName === "string" && ev.displayName ? ev.displayName : ev.tool,
+          args: ev.args
+        };
       } else if (ev.type === "confirm_resolved" && typeof ev.id === "string" && (ev.decision === "approve" || ev.decision === "deny")) {
         yield { type: "confirm_resolved", id: ev.id, decision: ev.decision, reason: ev.reason };
       }

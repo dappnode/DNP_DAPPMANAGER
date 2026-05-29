@@ -690,6 +690,7 @@ async function runChatToolLoop(
         }
 
         const toolDef = dappnodeTools[toolName];
+        const displayName = toolDef?.displayName ?? toolName;
 
         // Mutating tools must pass through the confirmation flow before dispatch.
         if (toolDef?.mutating) {
@@ -698,6 +699,7 @@ async function runChatToolLoop(
             type: "confirm_required",
             id,
             tool: toolName,
+            displayName,
             args
           });
           const { decision, reason } = await promise;
@@ -711,7 +713,7 @@ async function runChatToolLoop(
             const reasonText = reason ? ` — ${reason}` : "";
             writeSyntheticContent(
               res,
-              `\n\n_skipped **${toolName}**${reasonText}_\n\n`,
+              `\n\n_Skipped **${displayName}**${reasonText}_\n\n`,
               responseModelId
             );
             messages.push({
@@ -723,7 +725,7 @@ async function runChatToolLoop(
           }
         }
 
-        writeSyntheticContent(res, `\n\n_using **${toolName}**…_\n\n`, responseModelId);
+        writeSyntheticContent(res, `\n\n_Running **${displayName}**…_\n\n`, responseModelId);
 
         const result = await dispatchTool(toolName, args);
         const payload = JSON.stringify(result.ok ? result.output : { error: result.error });
