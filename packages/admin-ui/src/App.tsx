@@ -21,6 +21,7 @@ import { NoConnectionPage } from "./pages-new/home/NoConnectionPage";
 import { AiLayout } from "./pages-new/ai/AiLayout";
 import { HomeLayout } from "./pages-new/home/HomeLayout";
 import { StakingLayout } from "./pages-new/staking/StakingLayout";
+import { FloatingChatLauncher } from "./pages-new/ai/nexus/chat/FloatingChatLauncher";
 // Layouts
 import { LegacyStakingLayout } from "./layouts/LegacyStakingLayout";
 // Types
@@ -128,6 +129,11 @@ function MainApp({ username }: { username: string }) {
             }
           />
         </FaroRoutes>
+
+        {/* App-wide chat launcher — sits outside the route tree so it
+            persists across navigations. Hides itself on /ai/nexus where the
+            full-page chat already lives. */}
+        <FloatingChatLauncher />
       </div>
     </AppContext.Provider>
   );
