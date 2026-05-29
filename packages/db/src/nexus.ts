@@ -1,4 +1,4 @@
-import { dbCache } from "./dbFactory.js";
+import { dbCache, dbMain } from "./dbFactory.js";
 
 /**
  * Persisted chat conversations. Stored in dbCache (non-critical — can be
@@ -24,3 +24,13 @@ export const nexusChatHistory = dbCache.indexedByKey<NexusStoredConversation, st
   rootKey: NEXUS_CHAT_HISTORY,
   getKey: (id) => id
 });
+
+/**
+ * Nexus API key configured from the admin UI. Stored in dbMain (critical,
+ * never wiped) since it's a credential the user can set in-app instead of
+ * passing the `NEXUS_API_KEY` env var to the dappmanager container. When set,
+ * it takes precedence over the env var.
+ */
+const NEXUS_API_KEY = "nexus-api-key";
+
+export const nexusApiKey = dbMain.staticKey<string>(NEXUS_API_KEY, "");

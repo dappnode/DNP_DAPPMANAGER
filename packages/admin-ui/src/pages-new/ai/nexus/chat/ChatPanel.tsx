@@ -35,12 +35,14 @@ import {
   ChatPageContext,
   NexusModel,
   NexusStatus,
+  clearNexusApiKey,
   deleteConversation,
   getNexusStatus,
   listChatHistory,
   listNexusModels,
   loadConversation,
   saveConversation,
+  setNexusApiKey,
   smoothStream,
   streamChat,
   submitChatConfirmation
@@ -94,6 +96,7 @@ export function ChatPanel({ variant = "page", getPageContext, onRequestClose }: 
   const [pendingConfirm, setPendingConfirm] = useState<PendingConfirmation | null>(null);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [historyList, setHistoryList] = useState<ChatHistorySummary[]>([]);
+  const [keyEditorOpen, setKeyEditorOpen] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
   // Mirror of `messages` so the post-stream save can read the final state
   // without races with React's state batching.
@@ -105,6 +108,28 @@ export function ChatPanel({ variant = "page", getPageContext, onRequestClose }: 
   // unchanged state (e.g. immediately after loading a conversation).
   const lastSavedRef = useRef<string>("");
 
+  // Loads the chat-capable models for a configured DAppNode and selects an
+  // initial model: last-used (if still available) → env default (if listed) →
+  // first listed. Shared by the mount effect and the post-key-save flow.
+  const loadModels = useCallback(async (s: NexusStatus) => {
+    setModelsError(null);
+    try {
+      const list = await listNexusModels();
+      setModels(list);
+      const remembered = readRememberedModel();
+      setSelectedModel((prev) => {
+        // Keep the current pick if it's still offered; otherwise fall back to
+        // last-used → env default → first listed.
+        const preferred = [prev, remembered, s.defaultModel].find(
+          (id) => id && list.some((m) => m.id === id)
+        );
+        return preferred || list[0]?.id || "";
+      });
+    } catch (err) {
+      setModelsError((err as Error).message);
+    }
+  }, []);
+
   // Fetch status + models on mount.
   useEffect(() => {
     let cancelled = false;
@@ -112,21 +137,7 @@ export function ChatPanel({ variant = "page", getPageContext, onRequestClose }: 
       .then(async (s) => {
         if (cancelled) return;
         setStatus(s);
-        if (!s.configured) return;
-        try {
-          const list = await listNexusModels();
-          if (cancelled) return;
-          setModels(list);
-          // Choose the initial model: last-used (if still available) →
-          // env default (if listed) → first listed.
-          const remembered = readRememberedModel();
-          const preferred = [remembered, s.defaultModel].find(
-            (id) => id && list.some((m) => m.id === id)
-          );
-          setSelectedModel(preferred || list[0]?.id || "");
-        } catch (err) {
-          if (!cancelled) setModelsError((err as Error).message);
-        }
+        if (s.configured) await loadModels(s);
       })
       .catch((err: Error) => {
         if (!cancelled) setStatusError(err.message);
@@ -134,7 +145,23 @@ export function ChatPanel({ variant = "page", getPageContext, onRequestClose }: 
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [loadModels]);
+
+  // Applies a status returned after the user sets/clears the key in-app, then
+  // (re)loads the model list so the picker reflects the new credential.
+  const applyStatus = useCallback(
+    async (s: NexusStatus) => {
+      setStatusError(null);
+      setStatus(s);
+      if (s.configured) {
+        await loadModels(s);
+      } else {
+        setModels([]);
+        setSelectedModel("");
+      }
+    },
+    [loadModels]
+  );
 
   // Persist last-used model so the next visit lands on the same choice.
   useEffect(() => {
@@ -337,10 +364,27 @@ export function ChatPanel({ variant = "page", getPageContext, onRequestClose }: 
         onNewChat={startNewChat}
         onOpenConversation={openHistoryConversation}
         onDeleteConversation={removeHistoryConversation}
+        onManageKey={() => setKeyEditorOpen((v) => !v)}
         onRequestClose={onRequestClose}
       />
 
       <div className="tw:relative tw:flex tw:flex-1 tw:flex-col tw:min-h-0">
+        {keyEditorOpen && (
+          <ApiKeyEditor
+            status={status}
+            onClose={() => setKeyEditorOpen(false)}
+            onSave={async (key) => {
+              const next = await setNexusApiKey(key);
+              await applyStatus(next);
+              setKeyEditorOpen(false);
+            }}
+            onClear={async () => {
+              const next = await clearNexusApiKey();
+              await applyStatus(next);
+              setKeyEditorOpen(false);
+            }}
+          />
+        )}
         {messages.length === 0 ? (
           <EmptyState
             configured={status.configured}
@@ -358,7 +402,7 @@ export function ChatPanel({ variant = "page", getPageContext, onRequestClose }: 
       </div>
 
       {!status.configured ? (
-        <NotConfigured />
+        <NotConfigured onConfigure={() => setKeyEditorOpen(true)} />
       ) : (
         <Composer
           draft={draft}
@@ -422,6 +466,7 @@ function Header({
   onNewChat,
   onOpenConversation,
   onDeleteConversation,
+  onManageKey,
   onRequestClose
 }: {
   status: NexusStatus;
@@ -434,6 +479,7 @@ function Header({
   onNewChat: () => void;
   onOpenConversation: (id: string) => void;
   onDeleteConversation: (id: string) => void;
+  onManageKey: () => void;
   onRequestClose?: () => void;
 }) {
   return (
@@ -476,6 +522,15 @@ function Header({
           onOpen={onOpenConversation}
           onDelete={onDeleteConversation}
         />
+        <Button
+          size="icon-xs"
+          variant="ghost"
+          onClick={onManageKey}
+          title={status.configured ? "Manage API key" : "Set API key"}
+          aria-label={status.configured ? "Manage API key" : "Set API key"}
+        >
+          <KeyRound />
+        </Button>
         {onRequestClose && (
           <Button
             size="icon-xs"
@@ -942,7 +997,7 @@ function Composer({
 
 /* ── CTAs ──────────────────────────────────────────────────────────── */
 
-function NotConfigured() {
+function NotConfigured({ onConfigure }: { onConfigure: () => void }) {
   return (
     <div className="tw:shrink-0 tw:border-t tw:border-border tw:bg-muted/40 tw:px-5 tw:py-5">
       <div className="tw:mx-auto tw:flex tw:max-w-xl tw:flex-col tw:items-start tw:gap-2">
@@ -951,14 +1006,158 @@ function NotConfigured() {
           Nexus chat is not configured on this DAppNode
         </div>
         <TypographyMuted className="tw:text-[12.5px]">
-          Set <code className="tw:rounded tw:bg-muted tw:px-1 tw:py-0.5 tw:font-mono">NEXUS_API_KEY</code>{" "}
-          on the dappmanager container and restart. The Nexus user portal is where you generate the
-          key.
+          Paste a Nexus API key to get started — generate one in the Nexus user portal. You can also
+          set <code className="tw:rounded tw:bg-muted tw:px-1 tw:py-0.5 tw:font-mono">NEXUS_API_KEY</code>{" "}
+          on the dappmanager container instead.
         </TypographyMuted>
-        <Button variant="outline" size="sm" onClick={() => window.open(nexusExternalUrl, "_blank")}>
-          Open Nexus
-          <ExternalLink />
+        <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+          <Button size="sm" onClick={onConfigure}>
+            <KeyRound />
+            Add API key
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => window.open(nexusExternalUrl, "_blank")}>
+            Open Nexus
+            <ExternalLink />
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── API-key editor ────────────────────────────────────────────────── */
+
+/**
+ * Inline overlay for setting, replacing or clearing the Nexus API key without
+ * leaving the chat. Validation happens server-side (the key is probed against
+ * the gateway before it's persisted), so a bad key surfaces as an error here.
+ */
+function ApiKeyEditor({
+  status,
+  onSave,
+  onClear,
+  onClose
+}: {
+  status: NexusStatus;
+  onSave: (key: string) => Promise<void>;
+  onClear: () => Promise<void>;
+  onClose: () => void;
+}) {
+  const [value, setValue] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const submit = async () => {
+    const key = value.trim();
+    if (!key || busy) return;
+    setBusy(true);
+    setError(null);
+    try {
+      await onSave(key);
+    } catch (err) {
+      setError((err as Error).message || "Failed to save the API key");
+      setBusy(false);
+    }
+  };
+
+  const clear = async () => {
+    if (busy) return;
+    setBusy(true);
+    setError(null);
+    try {
+      await onClear();
+    } catch (err) {
+      setError((err as Error).message || "Failed to clear the API key");
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="tw:absolute tw:inset-0 tw:z-10 tw:flex tw:items-start tw:justify-center tw:overflow-y-auto tw:bg-background/80 tw:backdrop-blur-sm tw:p-6">
+      {/* Card + spacing follow the project's Dialog primitive: no leading icon,
+          title/description stacked at the left edge, close button top-right, a
+          full-bleed muted footer bar. */}
+      <div className="tw:relative tw:w-full tw:max-w-md tw:overflow-hidden tw:rounded-xl tw:border tw:border-border tw:bg-card tw:shadow-lg">
+        <Button
+          size="icon-sm"
+          variant="ghost"
+          onClick={onClose}
+          aria-label="Close"
+          disabled={busy}
+          className="tw:absolute tw:top-2 tw:right-2"
+        >
+          <X />
         </Button>
+
+        <div className="tw:flex tw:flex-col tw:gap-4 tw:p-4">
+          <div className="tw:flex tw:flex-col tw:gap-1 tw:pr-8">
+            <div className="tw:text-base tw:font-medium tw:leading-none tw:text-foreground">
+              {status.configured ? "Update Nexus API key" : "Set Nexus API key"}
+            </div>
+            <TypographyMuted className="tw:text-[12.5px]">
+              The key is stored on this DAppNode and used to talk to Nexus. Generate one in the Nexus
+              user portal.
+            </TypographyMuted>
+          </div>
+
+          {status.keySource === "env" && (
+            <TypographyMuted className="tw:text-[12px]">
+              A key is currently provided via the{" "}
+              <code className="tw:rounded tw:bg-muted tw:px-1 tw:py-0.5 tw:font-mono">NEXUS_API_KEY</code>{" "}
+              env var. Saving a key here overrides it.
+            </TypographyMuted>
+          )}
+
+          {/*
+            Input surface mirrors the Composer's: the visible frame lives on the
+            wrapper (auto width, so it can't overflow the card) and the inner
+            field is borderless with no horizontal padding.
+          */}
+          <div className="tw:flex tw:items-center tw:rounded-lg tw:border tw:border-input tw:bg-transparent tw:px-3 tw:py-1.5 tw:transition-colors tw:focus-within:border-ring tw:focus-within:ring-3 tw:focus-within:ring-ring/50 tw:dark:bg-input/30">
+            <input
+              type="password"
+              value={value}
+              autoFocus
+              autoComplete="off"
+              placeholder="sk-…"
+              disabled={busy}
+              onChange={(e) => setValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  submit();
+                }
+              }}
+              className="tw:min-w-0 tw:flex-1 tw:appearance-none tw:border-0 tw:bg-transparent tw:py-1 tw:font-mono tw:text-[13px] tw:text-foreground tw:shadow-none tw:outline-none tw:ring-0 tw:placeholder:text-muted-foreground tw:focus:outline-none tw:focus:ring-0 tw:disabled:opacity-50"
+            />
+          </div>
+
+          {error && (
+            <Alert variant="destructive" className="tw:py-2 tw:text-[12.5px]">
+              <AlertTitle className="tw:text-[12.5px]">{error}</AlertTitle>
+            </Alert>
+          )}
+        </div>
+
+        <div className="tw:flex tw:items-center tw:justify-between tw:gap-2 tw:border-t tw:border-border tw:bg-muted/40 tw:px-4 tw:py-3">
+          <div>
+            {status.keySource === "db" && (
+              <Button variant="ghost" size="sm" onClick={clear} disabled={busy}>
+                <Trash2 />
+                Remove key
+              </Button>
+            )}
+          </div>
+          <div className="tw:flex tw:items-center tw:gap-2">
+            <Button variant="outline" size="sm" onClick={onClose} disabled={busy}>
+              Cancel
+            </Button>
+            <Button size="sm" onClick={submit} disabled={busy || !value.trim()}>
+              {busy && <Spinner className="tw:size-3.5" />}
+              {status.configured ? "Save" : "Save & connect"}
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );

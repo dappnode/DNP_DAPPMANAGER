@@ -30,8 +30,20 @@ function getGatewayUrl(): string {
   return raw.replace(/\/+$/, "");
 }
 
+/**
+ * The effective Nexus API key. A key set from the admin UI (persisted in
+ * dbMain) takes precedence over the `NEXUS_API_KEY` env var, so the user can
+ * configure it in-app without restarting the container.
+ */
 function getApiKey(): string {
-  return process.env.NEXUS_API_KEY || "";
+  return db.nexusApiKey.get() || process.env.NEXUS_API_KEY || "";
+}
+
+/** Where the effective key comes from — surfaced to the UI. */
+function getApiKeySource(): "db" | "env" | "none" {
+  if (db.nexusApiKey.get()) return "db";
+  if (process.env.NEXUS_API_KEY) return "env";
+  return "none";
 }
 
 function getDefaultModel(): string {
@@ -42,6 +54,8 @@ interface NexusStatus {
   configured: boolean;
   gatewayUrl: string;
   defaultModel: string;
+  /** Where the active key comes from: set in-app, from env, or unset. */
+  keySource: "db" | "env" | "none";
 }
 
 /* ──────────────────────────────────────────────────────────────────── *
@@ -217,6 +231,16 @@ async function buildSystemPrompt(pageContext?: unknown): Promise<string> {
     "Be concise and direct. Use markdown (lists, headings, fenced code blocks) when it helps. When referring to a specific installed package, use its exact `dnpName`. When citing docs, link the URL.",
     "",
     "**Docs URL rule:** When you cite a docs.dappnode.io URL to the user, NEVER include a trailing `.md`. The `.md` form (e.g. `…/wireguard.md`) is the raw-markdown variant used internally by the docs-fetch tool — humans visit the same URL without `.md` (e.g. `…/wireguard`). If a doc page's content links to another page using a `.md` URL, drop the `.md` before showing it to the user.",
+    "",
+    "**Local URL rule:** When giving the user a link to this DAppNode's UI or a package, use the `my.dappnode` host (e.g. `http://my.dappnode/...`). NEVER use `dappnode.local` — it is deprecated. If docs or other context show a `dappnode.local` URL, rewrite the host to `my.dappnode` before showing it.",
+    "",
+    "## Staking facts you MUST NOT get wrong",
+    "",
+    "On DAppNode, a staking setup with a **Web3Signer** package (e.g. `web3signer-<network>.dnp.dappnode.eth`) manages validator keys AND per-validator settings through its `brain` service. In that setup:",
+    "- **The fee recipient (rewards address) is configured in Web3Signer / the Staker UI, NOT in the consensus/validator client.** Web3Signer serves the fee recipient and validator registrations to the beacon node per-validator.",
+    "- The validator/consensus client's `FEE_RECIPIENT_ADDRESS` env var (often `0x0000000000000000000000000000000000000000`) is only a **fallback** that is overridden by Web3Signer. A `0x0` value there is **NORMAL and does NOT mean the setup is misconfigured** — do NOT report it as a problem or tell the user their rewards are being burned. The real, effective fee recipient is whatever Web3Signer holds (this is what shows up on-chain / on beaconcha.in).",
+    "- To read or change the fee recipient, point the user to Web3Signer's config / the Staker config page — not the consensus client's env vars.",
+    "- Likewise, MEV-Boost relay registration is handled through Web3Signer/Staker config. If beaconcha.in shows a correct fee recipient, the setup is working regardless of the client's fallback env value.",
     ""
   ];
 
@@ -252,12 +276,68 @@ function readStatus(): NexusStatus {
   return {
     configured: getApiKey() !== "",
     gatewayUrl: getGatewayUrl(),
-    defaultModel: getDefaultModel()
+    defaultModel: getDefaultModel(),
+    keySource: getApiKeySource()
   };
 }
 
 /** GET /nexus/status — surfaces config for the UI. */
 export const nexusStatus = wrapHandler(async (_req: Request, res: ExpressResponse) => {
+  res.status(200).json(readStatus());
+});
+
+/**
+ * Probes the Nexus gateway with a candidate key by listing models. Returns
+ * `null` on success, or a human-readable error string otherwise — so we never
+ * persist a key that can't actually talk to the gateway.
+ */
+async function validateApiKey(apiKey: string): Promise<string | null> {
+  let upstream: Awaited<ReturnType<typeof fetch>>;
+  try {
+    upstream = await fetch(`${getGatewayUrl()}/models`, {
+      headers: { accept: "application/json", authorization: `Bearer ${apiKey}` }
+    });
+  } catch (err) {
+    return err instanceof Error ? err.message : "Failed to reach the Nexus gateway";
+  }
+  if (upstream.status === 401 || upstream.status === 403) {
+    return "The Nexus gateway rejected this API key";
+  }
+  if (!upstream.ok) {
+    return `Nexus gateway error (${upstream.status})`;
+  }
+  return null;
+}
+
+/**
+ * POST /nexus/config — set the Nexus API key from the admin UI.
+ * Body: { apiKey: string }. The key is validated against the gateway before
+ * being persisted, so a bad key is rejected with 400 rather than stored.
+ */
+export const nexusSetApiKey = wrapHandler(async (req: Request, res: ExpressResponse) => {
+  const body = (req.body ?? {}) as { apiKey?: unknown };
+  const apiKey = typeof body.apiKey === "string" ? body.apiKey.trim() : "";
+  if (!apiKey) {
+    res.status(400).json({ error: { code: "invalid_request", message: "apiKey is required" } });
+    return;
+  }
+
+  const error = await validateApiKey(apiKey);
+  if (error) {
+    res.status(400).json({ error: { code: "invalid_api_key", message: error } });
+    return;
+  }
+
+  db.nexusApiKey.set(apiKey);
+  res.status(200).json(readStatus());
+});
+
+/**
+ * DELETE /nexus/config — clear the in-app Nexus API key. Falls back to the
+ * `NEXUS_API_KEY` env var afterwards if one is set.
+ */
+export const nexusClearApiKey = wrapHandler(async (_req: Request, res: ExpressResponse) => {
+  db.nexusApiKey.set("");
   res.status(200).json(readStatus());
 });
 

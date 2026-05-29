@@ -16,9 +16,12 @@ export interface NexusStatus {
   configured: boolean;
   gatewayUrl: string;
   defaultModel: string;
+  /** Where the active key comes from: set in-app, from env, or unset. */
+  keySource: "db" | "env" | "none";
 }
 
 const STATUS_URL = "/nexus/status";
+const CONFIG_URL = "/nexus/config";
 const MODELS_URL = "/nexus/models";
 const CHAT_URL = "/nexus/chat/completions";
 const CONFIRM_URL = "/nexus/chat/confirm";
@@ -52,6 +55,23 @@ async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
 
 export function getNexusStatus(): Promise<NexusStatus> {
   return fetchJson<NexusStatus>(STATUS_URL);
+}
+
+/**
+ * Saves a Nexus API key on this DAppNode. The backend validates the key
+ * against the gateway before persisting, so a bad key rejects with an error.
+ */
+export function setNexusApiKey(apiKey: string): Promise<NexusStatus> {
+  return fetchJson<NexusStatus>(CONFIG_URL, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ apiKey })
+  });
+}
+
+/** Clears the in-app Nexus API key (falls back to the env var if set). */
+export function clearNexusApiKey(): Promise<NexusStatus> {
+  return fetchJson<NexusStatus>(CONFIG_URL, { method: "DELETE" });
 }
 
 export async function listNexusModels(): Promise<NexusModel[]> {

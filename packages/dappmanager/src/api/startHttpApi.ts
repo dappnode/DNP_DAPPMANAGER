@@ -24,7 +24,9 @@ import {
   nexusChatHistoryGet,
   nexusChatHistoryList,
   nexusChatHistoryUpsert,
+  nexusClearApiKey,
   nexusListModels,
+  nexusSetApiKey,
   nexusStatus
 } from "./routes/nexus.js";
 import { handleMcpRequest } from "../mcp/server.js";
@@ -173,6 +175,8 @@ export function startHttpApi({
 
   // Nexus chat proxy (env-configured Nexus API key held server-side).
   app.get("/nexus/status", auth.onlyAdmin, nexusStatus);
+  app.post("/nexus/config", auth.onlyAdmin, nexusSetApiKey);
+  app.delete("/nexus/config", auth.onlyAdmin, nexusClearApiKey);
   app.get("/nexus/models", auth.onlyAdmin, nexusListModels);
   app.post("/nexus/chat/completions", auth.onlyAdmin, nexusChatCompletions);
   app.post("/nexus/chat/confirm", auth.onlyAdmin, nexusChatConfirm);
