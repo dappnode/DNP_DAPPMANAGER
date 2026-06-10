@@ -885,6 +885,9 @@ export interface Routes {
   /** Get credentials for a single Wireguard device */
   wireguardDeviceGet(device: string): Promise<WireguardDeviceCredentials>;
 
+  /** Get a remote or local config for a single Wireguard device */
+  wireguardDeviceConfigGet(options: { device: string; isLocal: boolean }): Promise<string>;
+
   /** Get URLs to a single Wireguard credentials */
   wireguardDevicesGet(): Promise<string[]>;
 }
@@ -1040,6 +1043,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   wireguardDeviceAdd: { log: true },
   wireguardDeviceRemove: { log: true },
   wireguardDeviceGet: {},
+  wireguardDeviceConfigGet: {},
   wireguardDevicesGet: {}
 };
 
