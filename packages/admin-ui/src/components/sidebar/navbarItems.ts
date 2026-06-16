@@ -14,7 +14,8 @@ import {
   MdDashboard,
   MdWifi,
   MdPeople,
-  MdStar
+  MdStar,
+  MdChatBubbleOutline
 } from "react-icons/md";
 import { FaRegBell } from "react-icons/fa";
 import { SiEthereum } from "react-icons/si";
@@ -31,6 +32,7 @@ import { relativePath as communityRelativePath } from "pages/community";
 import { relativePath as stakersRelativePath } from "pages/stakers";
 import { relativePath as notificationsRelativePath } from "pages/notifications";
 import { relativePath as premiumRelativePath } from "pages/premium";
+import { relativePath as nexusRelativePath } from "pages/nexus";
 
 export const fundedBy: { logo: string; text: string; link: string }[] = [
   {
@@ -128,6 +130,12 @@ export const sidenavItems: {
     name: "SUPPORT",
     href: supportRelativePath,
     icon: MdHelp,
+    show: true
+  },
+  {
+    name: "NEXUS",
+    href: nexusRelativePath,
+    icon: MdChatBubbleOutline,
     show: true
   },
   {

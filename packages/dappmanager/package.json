@@ -40,6 +40,7 @@
     "@dappnode/types": "workspace:^0.1.0",
     "@dappnode/upnpc": "workspace:^0.1.0",
     "@dappnode/utils": "workspace:^0.1.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "@types/async-retry": "^1.4.2",
     "@types/bcryptjs": "^2.4.2",
     "@types/compression": "^1.7.0",
@@ -76,7 +77,9 @@
     "prom-client": "^14.1.0",
     "semver": "^7.3.8",
     "socket.io": "^4.5.1",
-    "systeminformation": "^5.21.24"
+    "systeminformation": "^5.21.24",
+    "zod": "^3.25.0",
+    "zod-to-json-schema": "^3.25.1"
   },
   "devDependencies": {
     "@types/mocha": "^10",

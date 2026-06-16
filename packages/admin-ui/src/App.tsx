@@ -19,6 +19,7 @@ import { AppContextIface, Theme } from "types";
 import Smooth from "components/Smooth";
 import { PwaPermissionsAlert, PwaPermissionsModal } from "components/PwaPermissions";
 import { LocalProxyBanner } from "pages/wifi/components/localProxying/LocalProxyBanner";
+import { FloatingChatLauncher } from "pages/nexus/components/FloatingChatLauncher";
 // Grafana Faro for frontend monitoring and tracing
 import { FaroRoutes } from "@grafana/faro-react";
 import { useUiTelemetryConsent } from "hooks/useUiTelemetryConsent";
@@ -124,6 +125,7 @@ function MainApp({ username }: { username: string }) {
         <Smooth />
         <PwaPermissionsModal />
         <ToastContainer />
+        <FloatingChatLauncher />
       </div>
     </AppContext.Provider>
   );

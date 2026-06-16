@@ -1,0 +1,847 @@
+.nexus-page {
+  padding: var(--default-spacing);
+  max-width: 1000px;
+  margin: 0 auto;
+  height: calc(100vh - 2 * var(--default-spacing));
+  display: flex;
+  flex-direction: column;
+}
+
+// Loading / error placeholder
+.nexus-chat-loading {
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  gap: 0.75rem;
+}
+
+// Main chat card
+.nexus-chat-card {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  background: var(--color-light-background-sidebar-topbar, #fff);
+  overflow: hidden;
+}
+
+// Header
+.nexus-chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+  background: var(--color-light-background-sidebar-topbar, #fff);
+}
+
+.nexus-chat-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+.nexus-chat-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--dappnode-strong-main-color), var(--dappnode-darker-main-color));
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.nexus-chat-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nexus-chat-subtitle {
+  font-size: 0.8rem;
+  opacity: 0.6;
+}
+
+.nexus-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+
+  &.online {
+    background: var(--success-green-color);
+    box-shadow: 0 0 0 3px rgba(52, 168, 83, 0.2);
+  }
+
+  &.offline {
+    background: var(--dappnode-gray-main-color);
+  }
+}
+
+.nexus-chat-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.nexus-icon-button {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.04);
+    border-color: var(--dappnode-strong-main-color);
+  }
+
+  &::after {
+    display: none !important;
+  }
+}
+
+.nexus-history-dropdown {
+  .dropdown-toggle {
+    // Override Bootstrap dropdown-toggle caret and padding
+    padding: 0 !important;
+
+    &::after {
+      display: none !important;
+    }
+  }
+}
+
+.nexus-model-picker {
+  width: 220px;
+
+  select {
+    font-size: 0.85rem;
+  }
+}
+
+.nexus-history-menu {
+  min-width: 280px;
+  max-height: 380px;
+  overflow-y: auto;
+  padding: 0.5rem;
+  background: var(--color-light-background-sidebar-topbar, #fff);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.nexus-history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  font-weight: 600;
+  color: inherit;
+}
+
+.nexus-history-count {
+  font-size: 0.7rem;
+  font-weight: 500;
+  background: var(--border-color);
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+}
+
+.nexus-history-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  color: inherit;
+
+  &:hover,
+  &.active {
+    background: rgba(0, 177, 244, 0.08);
+  }
+
+  &.active .nexus-history-title {
+    color: var(--dappnode-darker-main-color);
+  }
+}
+
+.nexus-history-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.nexus-history-title {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: inherit;
+}
+
+.nexus-history-meta {
+  display: block;
+  font-size: 0.75rem;
+  opacity: 0.6;
+  color: inherit;
+}
+
+.nexus-history-delete {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: inherit;
+  opacity: 0.5;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    opacity: 1;
+    color: var(--danger-color);
+    background: rgba(188, 47, 57, 0.08);
+  }
+}
+
+// Chat body
+.nexus-chat-body {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  background: rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+}
+
+// Empty state
+.nexus-empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem;
+  gap: 1.75rem;
+  min-height: min-content;
+}
+
+.nexus-empty-hero {
+  text-align: center;
+
+  h5 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    opacity: 0.6;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+}
+
+.nexus-empty-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--dappnode-strong-main-color), var(--dappnode-darker-main-color));
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  margin: 0 auto 1.25rem;
+}
+
+.nexus-suggestions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 720px;
+}
+
+.nexus-suggestion {
+  text-align: left;
+  white-space: normal;
+  padding: 0.85rem 1rem;
+  font-size: 0.9rem;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover:not(:disabled) {
+    border-color: var(--dappnode-strong-main-color);
+    box-shadow: 0 2px 12px rgba(0, 177, 244, 0.1);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// Thread
+.nexus-thread {
+  flex: 1;
+  min-height: 0;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  overflow-y: auto;
+
+  // Ensure the last message has bottom padding so it doesn't touch the composer
+  &::after {
+    content: "";
+    display: block;
+    height: 0.5rem;
+    flex-shrink: 0;
+  }
+}
+
+.nexus-message {
+  display: flex;
+  gap: 0.75rem;
+  max-width: 100%;
+}
+
+.nexus-message-user {
+  justify-content: flex-end;
+}
+
+.nexus-message-assistant {
+  justify-content: flex-start;
+}
+
+.nexus-avatar-assistant {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--dappnode-strong-main-color), var(--dappnode-darker-main-color));
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+  margin-top: 0.25rem;
+}
+
+.nexus-bubble {
+  max-width: 85%;
+  padding: 0.85rem 1.1rem;
+  border-radius: 12px;
+  white-space: pre-wrap;
+  line-height: 1.55;
+  font-size: 0.95rem;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.nexus-bubble-user {
+  background: var(--dappnode-strong-main-color);
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.nexus-bubble-assistant {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-bottom-left-radius: 4px;
+
+  .nexus-markdown {
+    p:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.nexus-typing {
+  opacity: 0.5;
+  letter-spacing: 0.2rem;
+  animation: nexus-pulse 1.4s infinite;
+}
+
+@keyframes nexus-pulse {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+// Confirmation card
+.nexus-confirmation-card {
+  max-width: 90%;
+  align-self: flex-start;
+  margin-left: 44px;
+}
+
+.nexus-confirmation-inner {
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  background: #fffbeb;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.nexus-confirmation-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #92400e;
+}
+
+.nexus-mutating-badge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: rgba(245, 158, 11, 0.25);
+  color: #92400e;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+}
+
+.nexus-tool-args {
+  max-height: 180px;
+  overflow: auto;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  margin: 0.75rem 0;
+}
+
+.nexus-confirmation-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+// Composer
+.nexus-composer {
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--border-color);
+  background: var(--color-light-background-sidebar-topbar, #fff);
+  flex-shrink: 0;
+}
+
+.nexus-composer-error {
+  background: rgba(188, 47, 57, 0.08);
+  color: var(--danger-color);
+  padding: 0.6rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  margin-bottom: 0.75rem;
+}
+
+.nexus-composer-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-end;
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  padding: 0.5rem 0.5rem 0.5rem 1rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &:focus-within {
+    border-color: var(--dappnode-strong-main-color);
+    box-shadow: 0 0 0 3px rgba(0, 177, 244, 0.12);
+  }
+}
+
+.nexus-composer-input {
+  flex: 1;
+  resize: none;
+  border: none;
+  background: transparent;
+  padding: 0.35rem 0;
+  line-height: 1.5;
+  min-height: 28px;
+  max-height: 140px;
+  color: inherit;
+  font-size: 0.95rem;
+  width: 0;
+
+  &::placeholder {
+    opacity: 0.55;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: none;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.nexus-send-button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: var(--dappnode-strong-main-color);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s ease, transform 0.1s ease;
+
+  &:hover:not(:disabled) {
+    background: var(--dappnode-darker-main-color);
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.96);
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  &.nexus-stop-button {
+    background: var(--dappnode-gray-main-color);
+
+    &:hover {
+      background: #dc2626;
+    }
+  }
+}
+
+.nexus-composer-hint {
+  display: block;
+  text-align: center;
+  margin-top: 0.5rem;
+  opacity: 0.5;
+  font-size: 0.75rem;
+}
+
+// Not configured
+.nexus-not-configured {
+  padding: 1.25rem;
+  border-top: 1px solid var(--border-color);
+  background: var(--color-light-background-sidebar-topbar, #fff);
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.nexus-not-configured-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.nexus-not-configured-text {
+  flex: 1;
+
+  strong {
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  p {
+    opacity: 0.6;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+  }
+}
+
+.nexus-not-configured-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+// Key editor
+.nexus-key-editor-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: var(--z-index-confirm-dialog);
+}
+
+.nexus-key-editor-card {
+  width: 100%;
+  max-width: 480px;
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  background: var(--color-light-background-sidebar-topbar, #fff);
+  padding: 1.25rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.nexus-key-editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+
+  h5 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 600;
+  }
+}
+
+.nexus-key-editor-close {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  opacity: 0.5;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 6px;
+  transition: opacity 0.15s ease, background 0.15s ease;
+
+  &:hover:not(:disabled) {
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.06);
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+}
+
+.nexus-key-editor-text {
+  opacity: 0.7;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.nexus-key-editor-input-group {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.03);
+  padding: 0.35rem 0.35rem 0.35rem 0.75rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &:focus-within {
+    border-color: var(--dappnode-strong-main-color);
+    box-shadow: 0 0 0 3px rgba(0, 177, 244, 0.12);
+  }
+}
+
+.nexus-key-editor-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 0;
+
+  &:focus {
+    outline: none;
+    box-shadow: none;
+  }
+}
+
+.nexus-key-editor-toggle {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  opacity: 0.6;
+  cursor: pointer;
+  transition: opacity 0.15s ease, background 0.15s ease;
+
+  &:hover:not(:disabled) {
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.06);
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+}
+
+.nexus-key-editor-error {
+  background: rgba(188, 47, 57, 0.08);
+  color: var(--danger-color);
+  padding: 0.6rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  margin-top: 1rem;
+}
+
+.nexus-key-editor-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.25rem;
+}
+
+// Dark mode overrides
+#dark .nexus-chat-card,
+#dark .nexus-chat-header,
+#dark .nexus-composer,
+#dark .nexus-not-configured,
+#dark .nexus-key-editor-card {
+  background-color: var(--color-dark-card);
+  border-color: var(--color-dark-border);
+}
+
+#dark .nexus-chat-body {
+  background-color: var(--color-dark-background-main);
+}
+
+#dark .nexus-bubble-user {
+  background: var(--dappnode-darker-main-color);
+}
+
+#dark .nexus-bubble-assistant {
+  background: var(--color-dark-card);
+  color: var(--color-dark-maintext);
+}
+
+#dark .nexus-suggestion {
+  background: var(--color-dark-card);
+  border-color: var(--color-dark-border);
+  color: var(--color-dark-maintext);
+}
+
+#dark .nexus-composer-row {
+  background: var(--color-dark-background-main);
+  border-color: var(--color-dark-border);
+}
+
+#dark .nexus-composer-input {
+  background: transparent;
+  color: var(--color-dark-maintext);
+
+  &::placeholder {
+    color: var(--color-dark-secondarytext);
+  }
+}
+
+#dark .nexus-not-configured-icon,
+#dark .nexus-empty-icon,
+#dark .nexus-avatar-assistant,
+#dark .nexus-chat-avatar {
+  color: white;
+}
+
+#dark .nexus-confirmation-inner {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+#dark .nexus-confirmation-title,
+#dark .nexus-mutating-badge {
+  color: #fbbf24;
+}
+
+#dark .nexus-tool-args {
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--color-dark-maintext);
+}
+
+#dark .nexus-key-editor-overlay {
+  background: rgba(0, 0, 0, 0.65);
+}
+
+#dark .nexus-key-editor-card {
+  background: var(--color-dark-card);
+  border-color: var(--color-dark-border);
+}
+
+#dark .nexus-key-editor-close:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+#dark .nexus-key-editor-input-group {
+  background: var(--color-dark-background-main);
+  border-color: var(--color-dark-border);
+}
+
+#dark .nexus-key-editor-input {
+  background: transparent;
+  color: var(--color-dark-maintext);
+}
+
+#dark .nexus-key-editor-toggle:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+#dark .nexus-history-menu {
+  background: var(--color-dark-card);
+  border-color: var(--color-dark-border);
+}
+
+#dark .nexus-history-item:hover,
+#dark .nexus-history-item.active {
+  background: rgba(0, 177, 244, 0.15);
+}
+
+#dark .nexus-history-delete:hover {
+  background: rgba(239, 68, 68, 0.15);
+}
