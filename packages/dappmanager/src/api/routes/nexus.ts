@@ -19,7 +19,7 @@ import { startDocsWarmup } from "../../mcp/docs.js";
  */
 
 const DEFAULT_GATEWAY_URL = "https://nexus-api.dappnode.com/v1";
-const DEFAULT_MODEL = "openai/gpt-4o-mini";
+const DEFAULT_MODEL = "nexus/auto";
 const LLMS_TXT_URL = "https://docs.dappnode.io/llms.txt";
 const LLMS_TXT_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 const LLMS_TXT_MAX_BYTES = 60_000; // safety cap; all listed gateway models have ≥128K context
