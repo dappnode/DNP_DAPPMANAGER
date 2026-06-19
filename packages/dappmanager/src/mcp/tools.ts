@@ -170,14 +170,14 @@ const getSystemInfoTool: DappnodeTool = {
       system:
         system.status === "fulfilled"
           ? {
-              name: system.value.name,
-              dappnodeWebName: system.value.dappnodeWebName,
-              internalIp: system.value.internalIp,
-              publicIp: system.value.publicIp,
-              staticIp: system.value.staticIp,
-              domain: system.value.domain,
-              versionData: system.value.versionData
-            }
+            name: system.value.name,
+            dappnodeWebName: system.value.dappnodeWebName,
+            internalIp: system.value.internalIp,
+            publicIp: system.value.publicIp,
+            staticIp: system.value.staticIp,
+            domain: system.value.domain,
+            versionData: system.value.versionData
+          }
           : { error: String(system.reason) }
     };
   }
@@ -714,10 +714,10 @@ const searchRegistryTool: DappnodeTool = {
     const needle = query?.trim().toLowerCase();
     const filtered = needle
       ? entries.filter((e) => {
-          const name = e.name?.toLowerCase() ?? "";
-          const description = e.status === "ok" ? e.description?.toLowerCase() ?? "" : "";
-          return name.includes(needle) || description.includes(needle);
-        })
+        const name = e.name?.toLowerCase() ?? "";
+        const description = e.status === "ok" ? e.description?.toLowerCase() ?? "" : "";
+        return name.includes(needle) || description.includes(needle);
+      })
       : entries;
     return filtered.slice(0, limit).map((e) => ({
       name: e.name,

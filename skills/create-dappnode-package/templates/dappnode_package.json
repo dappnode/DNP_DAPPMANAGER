@@ -1,10 +1,14 @@
 {
-  "name": "my-package.dnp.dappnode.eth",
-  "version": "0.1.0",
-  "description": "What this package does.",
-  "type": "service",
-  "author": "You <you@example.com>",
-  "license": "GPL-3.0",
-  "categories": ["Blockchain"],
-  "links": { "homepage": "https://github.com/you/my-package" }
+    "name": "my-package.dnp.dappnode.eth",
+    "version": "0.1.0",
+    "description": "What this package does.",
+    "type": "service",
+    "author": "You <you@example.com>",
+    "license": "GPL-3.0",
+    "categories": [
+        "Blockchain"
+    ],
+    "links": {
+        "homepage": "https://github.com/you/my-package"
+    }
 }

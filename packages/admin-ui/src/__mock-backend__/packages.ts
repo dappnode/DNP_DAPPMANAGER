@@ -163,10 +163,10 @@ export const packages: Pick<
       containers: d.containers.map((container) =>
         !serviceNames || serviceNames?.includes(container.serviceName)
           ? {
-              ...container,
-              running: !container.running,
-              state: container.running ? "exited" : "running"
-            }
+            ...container,
+            running: !container.running,
+            state: container.running ? "exited" : "running"
+          }
           : container
       )
     }));

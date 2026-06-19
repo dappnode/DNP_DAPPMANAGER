@@ -12,18 +12,18 @@ import { yamlParse } from "@dappnode/utils";
  * The package is flagged as a dev package and shown under the "My dev packages" tab.
  */
 export async function packageInstallDev({
-  manifest,
-  compose,
-  imageTarPath,
-  setupWizard
-}: Parameters<Routes["packageInstallDev"]>[0]): Promise<void> {
-  const composeObj = yamlParse<Compose>(compose);
-  const setupWizardObj = setupWizard ? yamlParse<SetupWizard>(setupWizard) : undefined;
-
-  await pkgInstallDev({
     manifest,
-    compose: composeObj,
+    compose,
     imageTarPath,
-    setupWizard: setupWizardObj
-  });
+    setupWizard
+}: Parameters<Routes["packageInstallDev"]>[0]): Promise<void> {
+    const composeObj = yamlParse<Compose>(compose);
+    const setupWizardObj = setupWizard ? yamlParse<SetupWizard>(setupWizard) : undefined;
+
+    await pkgInstallDev({
+        manifest,
+        compose: composeObj,
+        imageTarPath,
+        setupWizard: setupWizardObj
+    });
 }
