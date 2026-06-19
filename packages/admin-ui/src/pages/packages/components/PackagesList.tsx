@@ -18,11 +18,17 @@ import { renderResponse } from "components/SwrRender";
 import { coreDnpName } from "params";
 import "./packages.scss";
 
-export const PackagesList = ({ coreDnps }: { coreDnps: boolean }) => {
+export const PackagesList = ({ coreDnps, devDnps = false }: { coreDnps: boolean; devDnps?: boolean }) => {
   const dnpsRequest = useApi.packagesGet();
 
   return renderResponse(dnpsRequest, ["Loading installed DAppNode Packages"], (dnps) => {
-    const filteredDnps = dnps.filter((dnp) => Boolean(coreDnps) === Boolean(dnp.isCore) && dnp.dnpName !== coreDnpName);
+    const filteredDnps = dnps.filter((dnp) => {
+      if (dnp.dnpName === coreDnpName) return false;
+      // Dev packages have their own "My dev packages" tab
+      if (devDnps) return Boolean(dnp.isDev);
+      if (dnp.isDev) return false;
+      return Boolean(coreDnps) === Boolean(dnp.isCore);
+    });
     if (!filteredDnps.length) return <NoPackagesYet />;
 
     return (

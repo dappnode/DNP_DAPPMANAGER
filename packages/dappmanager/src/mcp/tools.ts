@@ -640,6 +640,54 @@ const validatePackageTool: DappnodeTool = {
   }
 };
 
+const installDevPackageTool: DappnodeTool = {
+  name: "dappnode_install_dev_package",
+  displayName: "Install dev package",
+  description:
+    "Install a package you are DEVELOPING into this DAppNode WITHOUT IPFS, so you can test it end-to-end. It is tagged as a dev package and listed under the 'My dev packages' tab (separate from registry packages). Provide the raw dappnode_package.json (manifest) and docker-compose.yml contents, plus `imageTarPath`: an absolute path on the DAppNode host to a `docker save` tarball of the package image. The image inside the tarball MUST be tagged exactly `<service>.<dnpName>:<version>` — build it first with `docker compose build`, then `docker save <image> -o <imageTarPath>`. Always run dappnode_validate_package first. This mutates state and starts containers — confirm with the user before calling. To re-install an updated build, run it again with the same name.",
+  mutating: true,
+  schema: {
+    manifest: z
+      .union([z.string(), z.record(z.any())])
+      .describe("Contents of dappnode_package.json — either the raw JSON string or the already-parsed object."),
+    compose: z.string().min(1).describe("Raw contents of docker-compose.yml (YAML)."),
+    imageTarPath: z
+      .string()
+      .min(1)
+      .describe(
+        "Absolute path on the DAppNode host to the `docker save` image tarball. The image must be tagged `<service>.<dnpName>:<version>`."
+      ),
+    setupWizard: z
+      .union([z.string(), z.record(z.any())])
+      .optional()
+      .describe("Optional contents of setup-wizard.yml / setup-wizard.json (YAML or JSON).")
+  },
+  async execute({
+    manifest,
+    compose,
+    imageTarPath,
+    setupWizard
+  }: {
+    manifest: string | Record<string, unknown>;
+    compose: string;
+    imageTarPath: string;
+    setupWizard?: string | Record<string, unknown>;
+  }) {
+    const manifestObj = (typeof manifest === "string" ? JSON.parse(manifest) : manifest) as Manifest;
+    const setupWizardStr =
+      setupWizard === undefined
+        ? undefined
+        : typeof setupWizard === "string"
+          ? setupWizard
+          : JSON.stringify(setupWizard);
+
+    logs.info(`MCP: dappnode_install_dev_package(${manifestObj.name})`);
+    const { packageInstallDev } = await import("../calls/packageInstallDev.js");
+    await packageInstallDev({ manifest: manifestObj, compose, imageTarPath, setupWizard: setupWizardStr });
+    return { ok: true, dnpName: manifestObj.name, version: manifestObj.version };
+  }
+};
+
 /* ────────────── Registry / install tools ────────────── */
 
 const searchRegistryTool: DappnodeTool = {
@@ -770,6 +818,7 @@ export const dappnodeTools: Record<string, DappnodeTool> = {
   [setPackageEnvironmentTool.name]: setPackageEnvironmentTool,
   [setPackagePortMappingsTool.name]: setPackagePortMappingsTool,
   [validatePackageTool.name]: validatePackageTool,
+  [installDevPackageTool.name]: installDevPackageTool,
   [searchRegistryTool.name]: searchRegistryTool,
   [fetchInstallPreviewTool.name]: fetchInstallPreviewTool,
   [installPackageTool.name]: installPackageTool

@@ -42,7 +42,7 @@ import {
   InstalledPackageData
 } from "./calls.js";
 import { PackageEnvs } from "./compose.js";
-import { PackageBackup } from "./manifest.js";
+import { PackageBackup, Manifest } from "./manifest.js";
 import {
   CustomEndpoint,
   GatusEndpoint,
@@ -537,6 +537,23 @@ export interface Routes {
   }) => Promise<void>;
 
   /**
+   * Installs a DAppNode Package locally for development, without IPFS.
+   * The package image must already be available to the Docker daemon as a
+   * `docker save` tarball at `imageTarPath` (a path readable by the dappmanager).
+   * The package is tagged as a dev package and shown under the "My dev packages" tab.
+   * @param manifest Package manifest (dappnode_package.json content)
+   * @param compose Package docker-compose.yml content (as a YAML string)
+   * @param imageTarPath Absolute host path to the `docker save` image tarball
+   * @param setupWizard Optional setup-wizard.yml content (as a YAML string)
+   */
+  packageInstallDev: (kwargs: {
+    manifest: Manifest;
+    compose: string;
+    imageTarPath: string;
+    setupWizard?: string;
+  }) => Promise<void>;
+
+  /**
    * Get package detail information
    */
   packageGet: (kwargs: { dnpName: string }) => Promise<InstalledPackageDetailData>;
@@ -980,6 +997,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   optimismConfigGet: {},
   optimismConfigSet: { log: true },
   packageInstall: { log: true },
+  packageInstallDev: { log: true },
   packageGet: {},
   packagesGet: {},
   packageGettingStartedToggle: {},

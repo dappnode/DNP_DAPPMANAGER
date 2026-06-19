@@ -17,6 +17,7 @@ type NavRoute = {
 
 const routesForNavbar: NavRoute[] = [
   { name: "My packages", subPath: subPaths.my, link: "my" },
+  { name: "My dev packages", subPath: subPaths.dev, link: "dev" },
   { name: "System packages", subPath: subPaths.system, link: "system" }
 ];
 
@@ -28,6 +29,16 @@ export const PackagesNavigator: React.FC = () => {
       element: (
         <Routes>
           <Route index element={<PackagesList coreDnps={false} />} />
+          <Route path=":id/*" element={<PackageById />} />
+        </Routes>
+      )
+    },
+    {
+      name: "My dev packages",
+      subPath: subPaths.dev,
+      element: (
+        <Routes>
+          <Route index element={<PackagesList coreDnps={false} devDnps={true} />} />
           <Route path=":id/*" element={<PackageById />} />
         </Routes>
       )
