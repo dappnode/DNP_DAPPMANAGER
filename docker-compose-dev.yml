@@ -30,6 +30,7 @@ services:
       - IPFS_HOST=
       - DISABLE_UPNP=
       - NEXUS_API_KEY=
+      - MCP_API_KEY=
     networks:
       dncore_network:
         aliases:

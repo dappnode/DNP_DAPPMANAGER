@@ -26,6 +26,7 @@ services:
       - SKIP_COMPOSE_VALIDATION=
       - TEST=
       - NEXUS_API_KEY=
+      - MCP_API_KEY=
     networks:
       dncore_network:
         aliases:

@@ -30,6 +30,7 @@ import { AdminPasswordDb } from "./adminPasswordDb.js";
 
 export interface AuthPasswordSessionParams {
   ADMIN_RECOVERY_FILE: string;
+  MCP_API_KEY?: string;
 }
 
 const recoveryTokenLength = 20;
@@ -38,11 +39,13 @@ export class AuthPasswordSession {
   sessions: SessionsManager;
   adminPasswordDb: AdminPasswordDb;
   recoveryDb: PlainTextFileDb;
+  private params: AuthPasswordSessionParams;
 
   constructor(sessions: SessionsManager, adminPasswordDb: AdminPasswordDb, params: AuthPasswordSessionParams) {
     this.sessions = sessions;
     this.adminPasswordDb = adminPasswordDb;
     this.recoveryDb = new PlainTextFileDb(params.ADMIN_RECOVERY_FILE);
+    this.params = params;
   }
 
   private assertPassword(username: string, password: string): void {
@@ -60,6 +63,24 @@ export class AuthPasswordSession {
    * - Some user registered invalid session >> NotLoggedInError
    * - Some user registered no cookie in req >> NotLoggedInNoCookieError
    */
+  private isMcpApiKeyValid(req: Request): boolean {
+    const configuredKey = this.params.MCP_API_KEY || process.env.MCP_API_KEY;
+    if (!configuredKey) return false;
+
+    const authHeader = req.headers.authorization || "";
+    const match = authHeader.match(/^bearer\s+(.+)$/i);
+    if (!match) return false;
+
+    const providedKey = match[1];
+    // Constant-time compare to avoid timing leaks.
+    if (providedKey.length !== configuredKey.length) return false;
+    let result = 0;
+    for (let i = 0; i < configuredKey.length; i++) {
+      result |= configuredKey.charCodeAt(i) ^ providedKey.charCodeAt(i);
+    }
+    return result === 0;
+  }
+
   private assertOnlyAdmin(req: Request): SessionData {
     if (!this.adminPasswordDb.hasSomePassword()) throw new NotRegisteredError();
 
@@ -187,9 +208,22 @@ export class AuthPasswordSession {
   });
 
   /**
-   * Middleware to protect routes only for admin sessions
+   * Middleware to protect routes only for admin sessions.
+   *
+   * In addition to the normal admin cookie session, routes that need to be
+   * reachable by non-browser clients (MCP clients, other DAppNode packages)
+   * accept a bearer token via the `Authorization` header:
+   *
+   *   Authorization: Bearer <MCP_API_KEY>
+   *
+   * `MCP_API_KEY` is set on the dappmanager container environment. When it is
+   * unset, bearer-token auth is disabled and only cookie sessions work.
    */
   onlyAdmin = wrapHandler((req, _, next) => {
+    if (this.isMcpApiKeyValid(req)) {
+      next();
+      return;
+    }
     this.assertOnlyAdmin(req);
     next();
   });

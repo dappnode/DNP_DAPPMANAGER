@@ -186,8 +186,9 @@ export function startHttpApi({
   app.delete("/nexus/chat/history/:id", auth.onlyAdmin, nexusChatHistoryDelete);
 
   // MCP server for this DAppNode — same tools the embedded chat uses, also
-  // reachable by external MCP clients (Claude Desktop, Cursor, etc.) once
-  // they authenticate as admin.
+  // reachable by external MCP clients (Claude Desktop, Cursor, etc.) and by
+  // other DAppNode packages. Authentication: admin session cookie OR
+  // `Authorization: Bearer <MCP_API_KEY>` (configured in the dappmanager env).
   app.post("/mcp", auth.onlyAdmin, wrapHandler(handleMcpRequest));
   app.get("/mcp", auth.onlyAdmin, wrapHandler(handleMcpRequest));
   app.delete("/mcp", auth.onlyAdmin, wrapHandler(handleMcpRequest));

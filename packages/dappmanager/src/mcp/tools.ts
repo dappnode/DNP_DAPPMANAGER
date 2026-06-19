@@ -9,10 +9,11 @@ import {
   logContainer
 } from "@dappnode/dockerapi";
 import { Network, PortProtocol } from "@dappnode/types";
-import type { PackageContainer, PortMapping, StakerConfigSet, UserSettingsAllDnps } from "@dappnode/types";
+import type { Compose, Manifest, PackageContainer, PortMapping, SetupWizard, StakerConfigSet, UserSettingsAllDnps } from "@dappnode/types";
+import { validateManifestSchema, validateDappnodeCompose, validateSetupWizardSchema } from "@dappnode/schemas";
+import { yamlParse } from "@dappnode/utils";
 import { logs } from "@dappnode/logger";
 import { packageRestart } from "../calls/packageRestart.js";
-import { packageInstall } from "../calls/packageInstall.js";
 import { packageSetEnvironment } from "../calls/packageSetEnvironment.js";
 import { packageSetPortMappings } from "../calls/packageSetPortMappings.js";
 import { statsCpuGet } from "../calls/statsCpuGet.js";
@@ -22,10 +23,15 @@ import { systemInfoGet } from "../calls/systemInfoGet.js";
 import { diagnose } from "../calls/diagnose.js";
 import { autoUpdateDataGet } from "../calls/autoUpdateDataGet.js";
 import { notificationsGetAll } from "../calls/notifications.js";
-import { stakerConfigGet, stakerConfigSet } from "../calls/stakerConfig.js";
-import { fetchDnpRequest } from "../calls/fetchDnpRequest.js";
-import { fetchRegistry } from "../calls/fetchRegistry.js";
 import { searchDocs, fetchDocPage } from "./docs.js";
+
+// NOTE: packageInstall, fetchDnpRequest, fetchRegistry and stakerConfig are
+// imported lazily (dynamic import inside the tool's execute()) because they
+// statically import the dappmanager `../index.js` singletons. A static import
+// here would create the load-time cycle
+// index.ts → startHttpApi → routes/nexus → mcp/tools → calls → index.ts,
+// which makes index.ts run its top-level `startHttpApi()` before nexus.ts
+// finishes evaluating (TDZ: "Cannot access 'nexusStatus' before initialization").
 
 /**
  * Shared tool registry consumed by both the MCP server (for external clients
@@ -67,6 +73,10 @@ function compactContainer(c: PackageContainer): Record<string, unknown> {
 
 function truncate(s: string, max: number): string {
   return s.length > max ? s.slice(0, max) + "\n…(truncated)" : s;
+}
+
+function errMessage(err: unknown): string {
+  return err instanceof Error ? err.message : String(err);
 }
 
 /* ────────────── Tools ────────────── */
@@ -270,6 +280,7 @@ const updatePackageTool: DappnodeTool = {
   },
   async execute({ dnpName, version }: { dnpName: string; version?: string }) {
     logs.info(`MCP: dappnode_update_package(${dnpName}, ${version ?? "latest"})`);
+    const { packageInstall } = await import("../calls/packageInstall.js");
     await packageInstall({
       name: dnpName,
       version,
@@ -415,6 +426,7 @@ const getStakerConfigTool: DappnodeTool = {
       .describe("Staker network: 'mainnet', 'gnosis', 'lukso', 'hoodi', 'holesky', 'sepolia', 'prater', 'starknet', 'starknet-sepolia'.")
   },
   async execute({ network }: { network: Network }) {
+    const { stakerConfigGet } = await import("../calls/stakerConfig.js");
     return await stakerConfigGet({ network });
   }
 };
@@ -476,6 +488,7 @@ const setStakerConfigTool: DappnodeTool = {
       web3signerDnpName,
       relays
     };
+    const { stakerConfigSet } = await import("../calls/stakerConfig.js");
     await stakerConfigSet({ stakerConfig });
     return { ok: true, network, applied: stakerConfig };
   }
@@ -547,6 +560,86 @@ const setPackagePortMappingsTool: DappnodeTool = {
   }
 };
 
+/* ────────────── Package development tools ────────────── */
+
+const validatePackageTool: DappnodeTool = {
+  name: "dappnode_validate_package",
+  displayName: "Validate package files",
+  description:
+    "Validate a DAppNode package you are DEVELOPING, fast and offline, WITHOUT building an IPFS hash. Pass the raw contents of dappnode_package.json (manifest) and docker-compose.yml, plus optionally setup-wizard.yml. Runs the exact manifest + DAppNode-compose + setup-wizard schema checks the dappmanager applies at install time, and returns the list of problems to fix. Call this on every iteration while authoring a package. NOTE: it does NOT run `docker compose config` (the Docker-level structural check) — run that yourself locally, together with `docker compose build/up` and reading container logs, to verify the package actually runs.",
+  schema: {
+    manifest: z
+      .union([z.string(), z.record(z.any())])
+      .describe("Contents of dappnode_package.json — either the raw JSON string or the already-parsed object."),
+    compose: z.string().min(1).describe("Raw contents of docker-compose.yml (YAML)."),
+    setupWizard: z
+      .union([z.string(), z.record(z.any())])
+      .optional()
+      .describe("Optional contents of setup-wizard.yml / setup-wizard.json (YAML or JSON).")
+  },
+  async execute({
+    manifest,
+    compose,
+    setupWizard
+  }: {
+    manifest: string | Record<string, unknown>;
+    compose: string;
+    setupWizard?: string | Record<string, unknown>;
+  }) {
+    const errors: string[] = [];
+
+    let manifestObj: Manifest | undefined;
+    try {
+      manifestObj = (typeof manifest === "string" ? JSON.parse(manifest) : manifest) as Manifest;
+    } catch (err) {
+      return { ok: false, errors: [`dappnode_package.json is not valid JSON: ${errMessage(err)}`] };
+    }
+
+    try {
+      validateManifestSchema(manifestObj);
+    } catch (err) {
+      errors.push(errMessage(err));
+    }
+
+    let composeObj: Compose | undefined;
+    try {
+      composeObj = yamlParse<Compose>(compose);
+    } catch (err) {
+      errors.push(`docker-compose.yml is not valid YAML: ${errMessage(err)}`);
+    }
+
+    if (composeObj && manifestObj) {
+      try {
+        validateDappnodeCompose(composeObj, manifestObj);
+      } catch (err) {
+        errors.push(errMessage(err));
+      }
+    }
+
+    if (setupWizard !== undefined) {
+      let setupWizardObj: SetupWizard | undefined;
+      try {
+        setupWizardObj = (typeof setupWizard === "string" ? yamlParse(setupWizard) : setupWizard) as SetupWizard;
+      } catch (err) {
+        errors.push(`setup-wizard is not valid YAML/JSON: ${errMessage(err)}`);
+      }
+      if (setupWizardObj) {
+        try {
+          validateSetupWizardSchema(setupWizardObj);
+        } catch (err) {
+          errors.push(errMessage(err));
+        }
+      }
+    }
+
+    return {
+      ok: errors.length === 0,
+      errors,
+      checked: { manifest: true, compose: Boolean(composeObj), setupWizard: setupWizard !== undefined }
+    };
+  }
+};
+
 /* ────────────── Registry / install tools ────────────── */
 
 const searchRegistryTool: DappnodeTool = {
@@ -568,6 +661,7 @@ const searchRegistryTool: DappnodeTool = {
       .describe("Max entries to return. Default 25, max 100.")
   },
   async execute({ query, limit = 25 }: { query?: string; limit?: number }) {
+    const { fetchRegistry } = await import("../calls/fetchRegistry.js");
     const entries = await fetchRegistry();
     const needle = query?.trim().toLowerCase();
     const filtered = needle
@@ -602,6 +696,7 @@ const fetchInstallPreviewTool: DappnodeTool = {
       .describe("Optional target version (semver or IPFS hash). Defaults to latest.")
   },
   async execute({ name, version }: { name: string; version?: string }) {
+    const { fetchDnpRequest } = await import("../calls/fetchDnpRequest.js");
     return await fetchDnpRequest({ id: name, version });
   }
 };
@@ -643,6 +738,7 @@ const installPackageTool: DappnodeTool = {
     options?: { BYPASS_RESOLVER?: boolean; BYPASS_CORE_RESTRICTION?: boolean };
   }) {
     logs.info(`MCP: dappnode_install_package(${name}, ${version ?? "latest"})`);
+    const { packageInstall } = await import("../calls/packageInstall.js");
     await packageInstall({
       name,
       version,
@@ -673,6 +769,7 @@ export const dappnodeTools: Record<string, DappnodeTool> = {
   [setStakerConfigTool.name]: setStakerConfigTool,
   [setPackageEnvironmentTool.name]: setPackageEnvironmentTool,
   [setPackagePortMappingsTool.name]: setPackagePortMappingsTool,
+  [validatePackageTool.name]: validatePackageTool,
   [searchRegistryTool.name]: searchRegistryTool,
   [fetchInstallPreviewTool.name]: fetchInstallPreviewTool,
   [installPackageTool.name]: installPackageTool
