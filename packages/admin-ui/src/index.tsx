@@ -9,13 +9,12 @@ import { cleanObj } from "utils/objects";
 
 // Init css
 import "react-toastify/dist/ReactToastify.css";
-// Boostrap loaders
-import "bootstrap/dist/css/bootstrap.min.css";
+// Bootstrap — scoped under .legacy-bootstrap so it only affects legacy /legacy/* routes
+import "./styles/bootstrap-scoped.scss";
 // Custom styles
-import "./dappnode_styles.scss";
-import "./dappnode_colors.scss";
-import "./light_dark.scss";
-import "./layout.scss";
+
+// Tailwind CSS v4 — isolated, prefixed, no preflight
+import "./styles/tailwind.css";
 // PWA
 import { PwaInstallProvider } from "pages/system/components/App/PwaInstallContext";
 // Grafana Faro for frontend monitoring and tracing (initialized paused until consent)

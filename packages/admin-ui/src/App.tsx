@@ -1,24 +1,30 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Route, useLocation, useNavigate } from "react-router-dom";
+import { Route, useLocation, Navigate } from "react-router-dom";
 import { startApi, apiAuth, LoginStatus } from "api";
 // Components
-import { ToastContainer } from "react-toastify";
-import NotificationsMain from "./components/NotificationsMain";
 import ErrorBoundary from "./components/ErrorBoundary";
 import Loading from "components/Loading";
-import Welcome from "components/welcome/Welcome";
-import SideBar from "components/sidebar/SideBar";
-import { TopBar } from "components/topbar/TopBar";
-// Pages
+// Theme
+import { ThemeProvider, useTheme } from "components/ThemeProvider";
+// Legacy pages
 import { pages } from "./pages";
-import { Login } from "./start-pages/Login";
-import { Register } from "./start-pages/Register";
-import { NoConnection } from "start-pages/NoConnection";
+// New pages
+// import { NewHomePage } from "./pages-new/home/HomePage";
+
+// Old start pages (keep until deleted)
+// import { Login } from "./start-pages/Login";
+// import { Register } from "./start-pages/Register";
+// import { NoConnection } from "start-pages/NoConnection";
+import { LoginPage } from "./pages-new/home/LoginPage";
+import { RegisterPage } from "./pages-new/home/RegisterPage";
+import { NoConnectionPage } from "./pages-new/home/NoConnectionPage";
+import { AiLayout } from "./pages-new/ai/AiLayout";
+import { HomeLayout } from "./pages-new/home/HomeLayout";
+import { StakingLayout } from "./pages-new/staking/StakingLayout";
+// Layouts
+import { LegacyStakingLayout } from "./layouts/LegacyStakingLayout";
 // Types
-import { AppContextIface, Theme } from "types";
-import Smooth from "components/Smooth";
-import { PwaPermissionsAlert, PwaPermissionsModal } from "components/PwaPermissions";
-import { LocalProxyBanner } from "pages/wifi/components/localProxying/LocalProxyBanner";
+import { AppContextIface } from "types";
 // Grafana Faro for frontend monitoring and tracing
 import { FaroRoutes } from "@grafana/faro-react";
 import { useUiTelemetryConsent } from "hooks/useUiTelemetryConsent";
@@ -27,28 +33,6 @@ export const AppContext = React.createContext<AppContextIface>({
   theme: "light",
   toggleTheme: () => {}
 });
-
-const useLocalStorage = <T extends string>(
-  key: string,
-  initialValue: T
-): [T, React.Dispatch<React.SetStateAction<T>>] => {
-  const [storedValue, setStoredValue] = useState<T>(() => {
-    try {
-      const item = window.localStorage.getItem(key);
-      // Assert that either the item or initialValue is of type T
-      return (item as T) || initialValue;
-    } catch (error) {
-      console.error(error);
-      return initialValue;
-    }
-  });
-
-  useEffect(() => {
-    window.localStorage.setItem(key, storedValue);
-  }, [key, storedValue]);
-
-  return [storedValue, setStoredValue];
-};
 
 function MainApp({ username }: { username: string }) {
   // App is the parent container of any other component.
@@ -59,7 +43,11 @@ function MainApp({ username }: { username: string }) {
   useUiTelemetryConsent();
 
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
-  const [theme, setTheme] = useLocalStorage<Theme>("theme", "light");
+  const { theme, setTheme } = useTheme();
+
+  // Resolve "system" to actual light/dark for legacy code that expects a binary value
+  const resolvedTheme =
+    theme === "system" ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : theme;
 
   useEffect(() => {
     const handleResize = () => setScreenWidth(window.innerWidth);
@@ -73,35 +61,38 @@ function MainApp({ username }: { username: string }) {
     window.scrollTo(0, 0);
   }, [screenLocation.pathname]);
 
+  // Legacy AppContext — derives from the ThemeProvider
   const appContext: AppContextIface = {
-    theme,
-    toggleTheme: () => setTheme((curr: Theme) => (curr === "light" ? "dark" : "light"))
+    theme: resolvedTheme,
+    toggleTheme: () => setTheme(resolvedTheme === "light" ? "dark" : "light")
   };
 
+  // Keep <body> class in sync for legacy CSS that targets body.dark / body.light
   useEffect(() => {
-    const html = document.documentElement;
     const body = document.body;
-
-    html.classList.remove("light", "dark");
     body.classList.remove("light", "dark");
-
-    html.classList.add(theme);
-    body.classList.add(theme);
-  }, [theme]);
+    body.classList.add(resolvedTheme);
+  }, [resolvedTheme]);
 
   return (
     <AppContext.Provider value={appContext}>
-      <div className="body" id={theme}>
-        <SideBar screenWidth={screenWidth} />
-        <TopBar username={username} appContext={appContext} />
-        <div id="main">
-          <ErrorBoundary>
-            <LocalProxyBanner />
-            <NotificationsMain />
-          </ErrorBoundary>
-          <PwaPermissionsAlert />
-          <FaroRoutes>
-            {/** Provide the app context only to the dashboard (where the modules switch is handled) */}
+      <div className="body" id={resolvedTheme}>
+        <FaroRoutes>
+          {/* New UI routes — Tailwind + shadcn, no legacy chrome */}
+          <Route
+            path="/ai/*"
+            element={
+              <ErrorBoundary>
+                <AiLayout />
+              </ErrorBoundary>
+            }
+          />
+
+          {/* Legacy routes — Bootstrap + SCSS, with sidebar/topbar/legacy chrome */}
+          <Route
+            path="/legacy"
+            element={<LegacyStakingLayout screenWidth={screenWidth} username={username} appContext={appContext} />}
+          >
             {Object.values(pages).map(({ RootComponent, rootPath }) => (
               <Route
                 key={rootPath}
@@ -113,36 +104,44 @@ function MainApp({ username }: { username: string }) {
                 }
               />
             ))}
-            {/* Redirection for routes with hashes */}
-            {/* 404 routes redirect to dashboard or default page */}
-            <Route path="*" element={<DefaultRedirect />} />
-          </FaroRoutes>
-        </div>
+            {/* Default: redirect /legacy to /legacy/dashboard */}
+            <Route index element={<Navigate to="dashboard" replace />} />
+          </Route>
 
-        {/* Place here non-page components */}
-        <Welcome />
-        <Smooth />
-        <PwaPermissionsModal />
-        <ToastContainer />
+          {/* Staking section — new Tailwind + shadcn pages */}
+          <Route
+            path="/staking/*"
+            element={
+              <ErrorBoundary>
+                <StakingLayout />
+              </ErrorBoundary>
+            }
+          />
+
+          {/* Home section — catch-all for / and /info, /settings etc. */}
+          <Route
+            path="/*"
+            element={
+              <ErrorBoundary>
+                <HomeLayout />
+              </ErrorBoundary>
+            }
+          />
+        </FaroRoutes>
       </div>
     </AppContext.Provider>
   );
 }
 
-function DefaultRedirect() {
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  useEffect(() => {
-    if (location.pathname === "/") {
-      navigate("/dashboard", { replace: true });
-    }
-  }, [location, navigate]);
-
-  return null;
+export default function App() {
+  return (
+    <ThemeProvider defaultTheme="system" storageKey="dappnode-ui-theme">
+      <AppInner />
+    </ThemeProvider>
+  );
 }
 
-export default function App() {
+function AppInner() {
   const [loginStatus, setLoginStatus] = useState<LoginStatus>();
   // Handles the login, register and connecting logic. Nothing else will render
   // Until the app has been logged in
@@ -188,12 +187,16 @@ export default function App() {
     case "logged-in":
       return <MainApp username={loginStatus.username} />;
     case "not-logged-in":
-      return <Login refetchStatus={onFetchLoginStatus} />;
+      // return <Login refetchStatus={onFetchLoginStatus} />;
+      return <LoginPage refetchStatus={onFetchLoginStatus} />;
     case "not-registered":
-      return <Register refetchStatus={onFetchLoginStatus} />;
+      // return <Register refetchStatus={onFetchLoginStatus} />;
+      return <RegisterPage refetchStatus={onFetchLoginStatus} />;
     case "error":
-      return <NoConnection error={loginStatus.error} />;
+      // return <NoConnection error={loginStatus.error} />;
+      return <NoConnectionPage error={loginStatus.error} />;
     default:
-      return <NoConnection />;
+      // return <NoConnection />;
+      return <NoConnectionPage />;
   }
 }

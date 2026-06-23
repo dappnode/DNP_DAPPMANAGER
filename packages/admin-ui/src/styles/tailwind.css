@@ -1,0 +1,364 @@
+@layer theme, base, components, utilities;
+
+/* Tailwind theme with prefix */
+@import "tailwindcss/theme.css" layer(theme) prefix(tw);
+
+/* Keep preflight disabled for now so Bootstrap/legacy styles are not reset */
+
+/* Animation utilities for prefixed Tailwind setups */
+@import "tw-animate-css/prefix";
+
+/* Tailwind utilities only, still prefixed */
+@import "tailwindcss/utilities.css" layer(utilities) prefix(tw) source(none);
+
+/* Scan app files for tw: classes */
+@source "../**/*.tsx";
+
+/* Custom utilities (available as tw:no-scrollbar etc.) */
+@utility no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ *  ⚠️  MIGRATION NOTE — TEMPORARY CODE
+ *  Scoped base reset for new Tailwind pages
+ *
+ *  Since Tailwind preflight is disabled (to keep Bootstrap working on
+ *  legacy routes), we manually apply the critical resets ONLY inside
+ *  elements that opt-in with the `.tw-base` class.
+ *
+ *  This gives new pages proper box-sizing, font-family, line-height,
+ *  and removes the fixed `height:100%` constraint from the legacy
+ *  layout.scss that breaks `min-h-svh` on the sidebar.
+ *
+ *  This entire `.tw-base` block (including the scoped reset rules
+ *  below) can be DELETED once the Bootstrap → Tailwind migration is
+ *  complete. At that point:
+ *    1. Remove Bootstrap and its scoped import (bootstrap-scoped.scss).
+ *    2. Enable Tailwind preflight by adding:
+ *         @import "tailwindcss/preflight.css" layer(base);
+ *       after the theme import at the top of this file.
+ *    3. Delete every `.tw-base` rule in the @layer base {} block.
+ *    4. Remove the `.tw-base` wrapper class from layouts and
+ *       components (NewPageLayout, AiLayout, sidebar SheetContent…).
+ *  Preflight will then apply these same resets globally, making the
+ *  scoped approach unnecessary.
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ */
+@layer base {
+  .tw-base {
+    /* Apply the same resets Tailwind preflight would, scoped */
+    box-sizing: border-box;
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+      Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+    tab-size: 4;
+  }
+
+  /*
+   * Page-level layout overrides — only for the top-level .tw-base wrapper
+   * used by layouts (AiLayout, NewPageLayout), NOT for portal elements.
+   * The `:not([data-slot])` selector excludes Radix portal content which
+   * always carries a data-slot attribute.
+   */
+  .tw-base:not([data-slot]) {
+    height: auto !important;
+    min-height: 100svh;
+  }
+
+  /*
+   * Scoped preflight — applies to everything inside .tw-base.
+   *
+   * The mobile sidebar (rendered via a React portal on <body>) also
+   * gets these resets because the sidebar component adds the .tw-base
+   * class to its SheetContent wrapper.
+   */
+  .tw-base *,
+  .tw-base *::before,
+  .tw-base *::after {
+    box-sizing: border-box;
+    border-width: 0;
+    border-style: solid;
+    border-color: var(--border);
+  }
+
+  /* Reset common elements */
+  .tw-base h1,
+  .tw-base h2,
+  .tw-base h3,
+  .tw-base h4,
+  .tw-base h5,
+  .tw-base h6,
+  .tw-base p {
+    margin: 0;
+    font-weight: inherit;
+    font-size: inherit;
+  }
+
+  .tw-base ul,
+  .tw-base ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .tw-base a {
+    color: inherit;
+    text-decoration: inherit;
+  }
+
+  .tw-base button,
+  .tw-base input,
+  .tw-base optgroup,
+  .tw-base select,
+  .tw-base textarea {
+    font-family: inherit;
+    font-feature-settings: inherit;
+    font-variation-settings: inherit;
+    font-size: 100%;
+    font-weight: inherit;
+    line-height: inherit;
+    letter-spacing: inherit;
+    color: var(--foreground);
+    margin: 0;
+    padding: 0;
+  }
+
+  .tw-base button,
+  .tw-base [role="button"] {
+    cursor: pointer;
+  }
+
+  .tw-base img,
+  .tw-base svg,
+  .tw-base video {
+    display: block;
+    max-width: 100%;
+  }
+
+  .tw-base img,
+  .tw-base video {
+    height: auto;
+  }
+
+  /* Scrollbar-less containers (used by sidebar) */
+  .tw-base .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .tw-base .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /*
+   * Sonner toaster reset — Sonner renders a <section> into <body>,
+   * outside .tw-base.  Give it the same critical resets.
+   */
+  [data-sonner-toaster],
+  [data-sonner-toaster] *,
+  [data-sonner-toaster] *::before,
+  [data-sonner-toaster] *::after {
+    box-sizing: border-box;
+    border-width: 0;
+    border-style: solid;
+    border-color: var(--border);
+  }
+
+  [data-sonner-toaster] {
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+      Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* shadcn tokens + Dappnode design tokens */
+@theme inline {
+  /* ── Semantic color aliases (shadcn) ──────────────────────────── */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-caution: var(--caution);
+  --color-caution-foreground: var(--caution-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* ── Dappnode brand palette ───────────────────────────────────── */
+  --color-dn-blue: var(--dn-blue);
+  --color-dn-cyan: var(--dn-cyan);
+  --color-dn-orange: var(--dn-orange);
+  --color-dn-pink: var(--dn-pink);
+  --color-dn-purple: var(--dn-purple);
+
+  /* ── Sidebar tokens ───────────────────────────────────────────── */
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* ── Radius ────────────────────────────────────────────────────── */
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 2);
+
+  /* ── Spacing primitives ───────────────────────────────────────── */
+  --spacing-page-x: var(--page-padding-x);
+  --spacing-page-y: var(--page-padding-y);
+  --spacing-section: var(--section-gap);
+  --spacing-card: var(--card-gap);
+  --spacing-header-gap: var(--header-gap);
+  --spacing-step: var(--step-gap);
+  --spacing-topbar-h: var(--topbar-height);
+  --spacing-content-max: var(--content-max-w);
+}
+
+/*
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ *  Dappnode branded palette
+ *
+ *  Blue   #00B1F4  → oklch(0.72 0.15 230)
+ *  Cyan   #06D4E7  → oklch(0.80 0.13 200)
+ *  Orange #FC9E22  → oklch(0.78 0.17 70)
+ *  Pink   #E60AF6  → oklch(0.58 0.30 320)
+ *  Purple #5231C6  → oklch(0.40 0.24 290)
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ */
+
+:root {
+  /* ── Brand primitives (constant across light/dark) ────────────── */
+  --dn-blue: oklch(0.72 0.15 230);
+  --dn-cyan: oklch(0.8 0.13 200);
+  --dn-orange: oklch(0.78 0.17 70);
+  --dn-pink: oklch(0.58 0.3 320);
+  --dn-purple: oklch(0.4 0.24 290);
+
+  /* ── Layout primitives ────────────────────────────────────────── */
+  --page-padding-x: 1.5rem;
+  --page-padding-y: 2rem;
+  --section-gap: 2rem;
+  --card-gap: 1rem;
+  --header-gap: 0.5rem;
+  --step-gap: 1.5rem;
+  --topbar-height: 3rem;
+  --content-max-w: 64rem;
+  --radius: 0.625rem;
+
+  /* ── Semantic tokens (light) ──────────────────────────────────── */
+  --background: oklch(0.98 0.005 220);
+  --foreground: oklch(0.15 0.01 240);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.15 0.01 240);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.15 0.01 240);
+  --primary: var(--dn-blue);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.95 0.02 220);
+  --secondary-foreground: oklch(0.2 0.02 240);
+  --muted: oklch(0.95 0.01 220);
+  --muted-foreground: oklch(0.5 0.02 240);
+  --accent: var(--dn-cyan);
+  --accent-foreground: oklch(0.99 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  --success: oklch(0.6 0.19 145);
+  --success-foreground: oklch(0.985 0 0);
+  --caution: oklch(0.75 0.18 65);
+  --caution-foreground: oklch(0.25 0.05 65);
+  --border: oklch(0.91 0.01 220);
+  --input: oklch(0.91 0.01 220);
+  --ring: var(--dn-blue);
+  --chart-1: var(--dn-blue);
+  --chart-2: var(--dn-cyan);
+  --chart-3: var(--dn-orange);
+  --chart-4: var(--dn-pink);
+  --chart-5: var(--dn-purple);
+
+  /* ── Sidebar (light) ──────────────────────────────────────────── */
+  --sidebar: oklch(0.98 0.005 220);
+  --sidebar-foreground: oklch(0.15 0.01 240);
+  --sidebar-primary: var(--dn-blue);
+  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --sidebar-accent: oklch(0.93 0.02 220);
+  --sidebar-accent-foreground: oklch(0.15 0.01 240);
+  --sidebar-border: oklch(0.91 0.01 220);
+  --sidebar-ring: var(--dn-blue);
+}
+
+.dark {
+  --background: oklch(0.14 0.01 240);
+  --foreground: oklch(0.96 0.005 220);
+  --card: oklch(0.19 0.015 240);
+  --card-foreground: oklch(0.96 0.005 220);
+  --popover: oklch(0.19 0.015 240);
+  --popover-foreground: oklch(0.96 0.005 220);
+  --primary: var(--dn-blue);
+  --primary-foreground: oklch(0.12 0.02 240);
+  --secondary: oklch(0.24 0.02 240);
+  --secondary-foreground: oklch(0.96 0.005 220);
+  --muted: oklch(0.24 0.015 240);
+  --muted-foreground: oklch(0.65 0.02 220);
+  --accent: var(--dn-cyan);
+  --accent-foreground: oklch(0.99 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.985 0 0);
+  --success: oklch(0.65 0.2 145);
+  --success-foreground: oklch(0.985 0 0);
+  --caution: oklch(0.8 0.16 65);
+  --caution-foreground: oklch(0.15 0.05 65);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: var(--dn-blue);
+  --chart-1: var(--dn-blue);
+  --chart-2: var(--dn-cyan);
+  --chart-3: var(--dn-orange);
+  --chart-4: var(--dn-pink);
+  --chart-5: var(--dn-purple);
+
+  /* ── Sidebar (dark) ───────────────────────────────────────────── */
+  --sidebar: oklch(0.16 0.015 240);
+  --sidebar-foreground: oklch(0.96 0.005 220);
+  --sidebar-primary: var(--dn-blue);
+  --sidebar-primary-foreground: oklch(0.12 0.02 240);
+  --sidebar-accent: oklch(0.22 0.02 240);
+  --sidebar-accent-foreground: oklch(0.96 0.005 220);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: var(--dn-blue);
+}

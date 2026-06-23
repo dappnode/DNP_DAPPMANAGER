@@ -65,7 +65,7 @@ function Modal({
 
   return (
     <div
-      className="confirm-dialog-root"
+      className="confirm-dialog-root legacy-bootstrap"
       ref={modalEl}
       onClick={(e) => {
         if (modalEl.current === e.target) onClose();

@@ -1,0 +1,121 @@
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { ClickableCard, CardHeader, CardTitle, CardDescription, CardContent } from "components/primitives/card";
+import { UserRoundKey, Sparkles, Check, ArrowRight } from "lucide-react";
+import dappnodeLogo from "img/dappnode-logo-only.png";
+import { LEGACY_BASE_PATH } from "utils/path";
+
+export function HomePage() {
+  const navigate = useNavigate();
+
+  return (
+    <div className="tw:h-full tw:flex tw:flex-1 tw:flex-col tw:items-center tw:justify-center tw:px-page-x tw:py-page-y tw:gap-section">
+      {/* Hero section */}
+      <header className="tw:text-center tw:max-w-2xl tw:space-y-5">
+        {/* Dappnode logo mark */}
+        <div className="tw:mx-auto tw:mb-4 tw:flex tw:items-center tw:justify-center tw:size-20 tw:rounded-2xl tw:ring-1 tw:bg-card tw:ring-foreground/10">
+          <img className="tw:size-10" src={dappnodeLogo} alt="Dappnode Logo" />
+        </div>
+
+        <h1 className="tw:text-5xl tw:sm:text-6xl tw:font-extrabold tw:tracking-tight tw:text-foreground">
+          Welcome to{" "}
+          <span className="tw:bg-gradient-to-r tw:from-dn-blue tw:via-dn-pink tw:to-dn-orange tw:bg-clip-text tw:text-transparent">
+            Dappnode
+          </span>
+        </h1>
+
+        <p className="tw:text-lg tw:sm:text-xl tw:text-muted-foreground tw:max-w-lg tw:mx-auto tw:leading-relaxed">
+          Your gateway to decentralised infrastructure.
+        </p>
+      </header>
+
+      {/* ── Navigation cards ───────────────────────────────────── */}
+      <div className="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-card tw:w-full tw:max-w-content-max">
+        {/* Staking Card */}
+        <ClickableCard className="tw:group tw:bg-card/80 tw:backdrop-blur-sm" onClick={() => navigate("/staking")}>
+          <CardHeader>
+            <div className="tw:flex tw:items-center tw:gap-4 tw:mb-2">
+              <div className="tw:flex tw:items-center tw:justify-center tw:size-12 tw:rounded-xl tw:bg-accent/10 tw:text-accent tw:ring-1 tw:ring-accent/20 tw:transition-colors tw:group-hover:bg-accent/20">
+                <UserRoundKey className="tw:size-6" />
+              </div>
+              <CardTitle className="tw:text-2xl tw:font-bold">Staking</CardTitle>
+            </div>
+            <CardDescription className="tw:text-base tw:leading-relaxed">
+              Run nodes, validators and manage your staking setup among several networks.
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="tw:flex-1">
+            <ul className="tw:space-y-3">
+              <FeatureItem>Set-up and run nodes &amp; configuration</FeatureItem>
+              <FeatureItem>Package management</FeatureItem>
+              <FeatureItem>Network &amp; device settings</FeatureItem>
+            </ul>
+          </CardContent>
+          <CardContent className="tw:flex-1">
+            <div className="tw:w-full tw:mt-5 tw:py-2 tw:flex tw:justify-center tw:items-center tw:bg-secondary tw:rounded-2xl tw:font-semibold tw:group-hover:bg-secondary/80 tw:group-hover:text-primary">
+              View Staking
+              <ArrowRight className="tw:ml-1 tw:size-4 tw:transition-transform tw:group-hover:translate-x-0.5" />
+            </div>
+          </CardContent>
+        </ClickableCard>
+
+        {/* AI Card */}
+        <ClickableCard className="tw:group tw:bg-card/80 tw:backdrop-blur-sm" onClick={() => navigate("/ai")}>
+          <CardHeader>
+            <div className="tw:flex tw:items-center tw:gap-4 tw:mb-2">
+              <div className="tw:flex tw:items-center tw:justify-center tw:size-12 tw:rounded-xl tw:bg-primary/10 tw:text-primary tw:ring-1 tw:ring-primary/20 tw:transition-colors tw:group-hover:bg-primary/20">
+                <Sparkles className="tw:size-6" />
+              </div>
+              <CardTitle className="tw:text-2xl tw:font-bold">AI</CardTitle>
+            </div>
+            <CardDescription className="tw:text-base tw:leading-relaxed">
+              Explore AI powered features to maximize your daily productivity with Dappnode.
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="tw:flex-1">
+            <ul className="tw:space-y-3">
+              <FeatureItem>Run models privately: local and cloud</FeatureItem>
+              <FeatureItem>Run and manage AI agents</FeatureItem>
+              <FeatureItem>Discover powerful AI tools</FeatureItem>
+            </ul>
+          </CardContent>
+          <CardContent className="tw:flex-1">
+            <div className="tw:w-full tw:mt-5 tw:py-2 tw:flex tw:justify-center tw:items-center tw:bg-secondary tw:rounded-2xl tw:font-semibold tw:group-hover:bg-secondary/80 tw:group-hover:text-primary">
+              View AI
+              <ArrowRight className="tw:ml-1 tw:size-4 tw:transition-transform tw:group-hover:translate-x-0.5" />
+            </div>
+          </CardContent>
+        </ClickableCard>
+      </div>
+
+      {/* ── Legacy UI link ──────────────────────────────────────── */}
+      <p className="tw:text-sm tw:text-muted-foreground">
+        Looking for the previous interface?{" "}
+        <button
+          onClick={() => navigate(LEGACY_BASE_PATH)}
+          className="tw:underline tw:underline-offset-3 tw:text-primary tw:hover:text-primary/80 tw:cursor-pointer tw:bg-transparent"
+        >
+          Open Legacy UI
+        </button>
+      </p>
+
+      {/* ── Footer ───────────────────────────────────────────────── */}
+      <footer className="tw:py-6 tw:text-center tw:text-xs tw:text-muted-foreground/60">
+        Powered by Dappnode — decentralise everything
+      </footer>
+    </div>
+  );
+}
+
+function FeatureItem({ children }: { children: React.ReactNode }) {
+  return (
+    <li className="tw:flex tw:items-center tw:gap-3 tw:text-sm tw:text-muted-foreground">
+      <span className="tw:flex tw:items-center tw:justify-center tw:size-5 tw:rounded-full tw:bg-accent/10 tw:text-accent tw:shrink-0">
+        <Check className="tw:size-3" strokeWidth={3} />
+      </span>
+      {children}
+    </li>
+  );
+}

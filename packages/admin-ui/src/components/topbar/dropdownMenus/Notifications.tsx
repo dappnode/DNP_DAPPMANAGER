@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 // Icons
 import { FaRegBell } from "react-icons/fa";
 import { useApi } from "api";
+import { relativePath as notificationsRelativePath } from "pages/notifications/data";
+import { withLegacyBase } from "utils/path";
 
 export default function Notifications() {
   const unseenNotificationsReq = useApi.notificationsGetUnseenCount();
@@ -27,7 +29,7 @@ export default function Notifications() {
   }, [unseenNotificationsReq.data]);
 
   return (
-    <div onClick={() => navigate("/notifications/inbox")} className="tn-dropdown tn-dropdown-toggle">
+    <div onClick={() => navigate(withLegacyBase(notificationsRelativePath))} className="tn-dropdown tn-dropdown-toggle">
       <FaRegBell size={"1.4em"} />
       {newNotifications && <div className={`icon-bubble success`} />}
     </div>

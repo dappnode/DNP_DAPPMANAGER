@@ -19,6 +19,7 @@ import Title from "components/Title";
 import { prettyDnpName } from "utils/format";
 import { AlertPackageUpdateAvailable } from "../components/AlertPackageUpdateAvailable";
 import { MdKeyboardArrowLeft } from "react-icons/md";
+import { withLegacyBase } from "@/utils/path";
 import "../components/packages.scss";
 
 export const PackageById: React.FC = () => {
@@ -109,10 +110,12 @@ export const PackageById: React.FC = () => {
       available: true
     }
   ].filter((route) => route.available);
-
   return (
     <div>
-      <Link to={isCore ? `/${basePath}/${systemSubPath}` : `/${basePath}/${mySubPath}`} className="pkgs-back-btn">
+      <Link
+        to={withLegacyBase(isCore ? `/${basePath}/${systemSubPath}` : `/${basePath}/${mySubPath}`)}
+        className="pkgs-back-btn"
+      >
         <MdKeyboardArrowLeft />
         <span>{(isCore ? `${systemSubPath}` : `${mySubPath}`).toUpperCase()} PACKAGES</span>
       </Link>

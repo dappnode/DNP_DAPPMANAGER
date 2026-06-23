@@ -3,10 +3,11 @@ import React from "react";
 import { Routes, Route, NavLink, useMatch } from "react-router-dom";
 import { SectionNavigator } from "components/SectionNavigator";
 import { PackagesList } from "../components/PackagesList";
-import { subPaths, title } from "../data";
+import { basePath, subPaths, title } from "../data";
 import { PackageById } from "../pages/ById";
 import { RouteType } from "types";
 import Title from "components/Title";
+import { withLegacyBase } from "utils/path";
 import "./packages.scss";
 
 type NavRoute = {
@@ -45,7 +46,7 @@ export const PackagesNavigator: React.FC = () => {
   ];
 
   // Hide navbar when in a package detail view
-  const scopePath: string = "/packages/:scope";
+  const scopePath: string = `${withLegacyBase(basePath)}/:scope`;
   const match = useMatch({ path: scopePath, end: true });
   const isBaseSubpath = !!match && routesForNavbar.some((r) => r.link === (match.params?.scope ?? ""));
 

@@ -1,0 +1,1 @@
+export { VpnTab } from "./VpnTab";

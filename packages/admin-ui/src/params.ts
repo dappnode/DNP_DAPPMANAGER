@@ -1,4 +1,5 @@
 import { urlJoin } from "utils/url";
+import { withLegacyBase } from "utils/path";
 
 // JSON RPC API
 export const apiUrl = "/";
@@ -74,11 +75,11 @@ export const dappnodeForumUrl = "https://forum.dappnode.io";
 export const topicBaseUrl = `https://forum.dappnode.io/new-topic`;
 export const discordInviteUrl = "https://discord.gg/dappnode";
 // zkEvm
-export const packageInfoPath = `/packages/my/${zkevmDnpName}/info`;
+export const packageInfoPath = withLegacyBase(`packages/my/${zkevmDnpName}/info`);
 export const zkevmUiUrl = "http://ui.zkevm-tokens-withdrawal.dappnode/";
 
 export const sdkPublishAppUrl = "https://dappnode.github.io/sdk-publish/";
-export const sdkGuideUrl = "https://github.com/dappnode/DAppNodeSDK";
+export const sdkRepoUrl = "https://github.com/dappnode/DAppNodeSDK";
 export const githubNewIssueDappnodeUrl = "https://github.com/dappnode/DAppNode/issues/new";
 
 export const surveyUrl = "https://goo.gl/forms/DSy1J1OlQGpdyhD22";
@@ -93,6 +94,8 @@ const docsBaseUrl = "https://docs.dappnode.io";
 
 export const docsUrl = {
   main: docsBaseUrl,
+  userDocumentation: `${docsBaseUrl}/docs/user/getting-started/choose-your-path`,
+  devsDocumentation: `${docsBaseUrl}/docs/dev`,
   recoverPasswordGuide: `${docsBaseUrl}/docs/user/getting-started/register#troubleshooting`,
   connectToRouter: `${docsBaseUrl}/docs/user/getting-started/connect-dappnode-to-the-router`,
   connectWifi: `${docsBaseUrl}/docs/user/access-your-dappnode/wifi`,
@@ -114,7 +117,10 @@ export const docsUrl = {
   premiumBackupNode: `${docsBaseUrl}/docs/user/dappnode-premium/premium-services#backup-node-for-validators`,
   premiumBackupValidatorsLimit: `${docsBaseUrl}/docs/user/dappnode-premium/premium-services#validators-limit`,
   starknetDocs: `${docsBaseUrl}/docs/user/staking/starknet/solo`,
-  uiTelemetry: `${docsBaseUrl}/docs/user/ui-telemetry`
+  uiTelemetry: `${docsBaseUrl}/docs/user/ui-telemetry`,
+  publishPkgGuide: `${docsBaseUrl}/docs/dev/package-publishing/publish-packages-clients`,
+  ownershipPkgGuide: `${docsBaseUrl}/docs/dev/package-publishing/package-ownership`,
+  sdkGuideUrl: `${docsBaseUrl}/docs/dev/sdk/overview`
 };
 
 export const forumUrl = {
@@ -134,6 +140,7 @@ export const troubleShootMountpointsGuideUrl = "https://docs.dappnode.io/develop
 export const dappnodeUserGuideUrl = "https://docs.dappnode.io/user/faq/general";
 export const explorerGitcoinUrl =
   "https://explorer.gitcoin.co/#/round/1/0xdf22a2c8f6ba9376ff17ee13e6154b784ee92094/0xdf22a2c8f6ba9376ff17ee13e6154b784ee92094-17";
+export const givethDappnodeDonationsUrl = "https://giveth.io/project/dappnode";
 export const dappnodeGithub = "https://github.com/dappnode/DAppNode";
 export const dappnodeDiscourse = "https://forum.dappnode.io/";
 export const dappnodeDiscord = "https://discord.gg/dappnode";

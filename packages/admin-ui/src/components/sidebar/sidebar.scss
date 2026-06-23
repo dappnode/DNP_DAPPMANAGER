@@ -32,7 +32,7 @@
 /* Remember specificity order rules to override bootstrap */
 .sidenav-item {
   border-left: 5px solid transparent;
-  color: black;
+  color: black !important;
   text-decoration: none;
   transition: all 0.5s;
   /* Try to standarize this size */

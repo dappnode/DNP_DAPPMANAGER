@@ -1,55 +1,369 @@
 ---
 applyTo: "packages/admin-ui/src/**/*.ts,packages/admin-ui/src/**/*.tsx,packages/admin-ui/src/**/*.js,packages/admin-ui/src/**/*.scss"
 ---
+
 # Copilot Instructions for admin-ui
 
 ## Overview
+
 - The `admin-ui` module is the React-based frontend for Dappnode Package Manager.
 - All code should be written using TypeScript and React best practices.
+- The project is migrating from Bootstrap/SCSS (legacy) to Tailwind CSS v4 + shadcn/ui (new pages).
+- **Legacy pages** live in `src/pages/` — they must never be modified.
+- **New pages** live in `src/pages-new/` — all new development happens here.
 
 ## Directory Structure Guidelines
-- **Entry Points:**  
-  - Main app entry: `src/App.tsx`  
-  - React root: `src/index.tsx`
-- **Pages:**  
-  - Add new UI views under `src/pages/`. Use PascalCase for file names (e.g., `UserManagement.tsx`).
-  - For wizard or onboarding flows, use `src/start-pages/`.
-- **Components:**  
-  - Reusable components go in `src/components/`. Use PascalCase for component files.
-- **Hooks:**  
-  - Custom React hooks should be placed in `src/hooks/` and named with the `use` prefix (e.g., `useUser.ts`).
-- **API layer:**  
-  - API calls and logic reside in `src/api/` and `src/services/`.
-  - Always use functions from these directories when making backend requests.
-- **Utils:**  
-  - Utility helpers should go in `src/utils/`.
-- **State Management:**  
-  - Use `src/store.ts` for Redux or main store logic, and `src/rootReducer.ts` for reducers.
-- **Types:**  
-  - Shared/global types should go in `src/types.ts`.
-- **Mock Backend:**  
-  - For tests and development, use `src/__mock-backend__/`.
-- **Tests:**  
-  - Place all tests in `src/__tests__/`.
+
+### Entry Points
+
+- Main app entry: `src/App.tsx`
+- React root: `src/index.tsx`
+
+### Pages
+
+- **New pages**: Create under `src/pages-new/`, organised by context folder:
+  - `src/pages-new/home/` — Home / landing pages
+  - `src/pages-new/ai/` — AI section pages
+  - Add new context folders as needed (e.g. `src/pages-new/staking/`)
+- **Legacy pages** (`src/pages/`): **Do not modify**. They use Bootstrap/SCSS and are served under `/staking`.
+- For wizard or onboarding flows, use `src/start-pages/`.
+
+### Layouts
+
+The project uses a two-tier layout system:
+
+#### Shared base layout: `SectionLayout` (`src/layouts/SectionLayout.tsx`)
+
+All new sections use `SectionLayout` as their base. It provides:
+- `.tw-base` scoped reset
+- Collapsible sidebar with configurable nav items
+- Sticky topbar with breadcrumbs and theme toggle
+- `DecorativeBackground` gradient orbs
+- Sonner `<Toaster />`
+- A "Back to Home" sidebar link (auto-hidden when `basePath="/"`)
+
+`SectionLayout` is configured via props:
+
+| Prop           | Type        | Description                                                |
+| -------------- | ----------- | ---------------------------------------------------------- |
+| `sectionLabel` | `string`    | Shown in sidebar subtitle and breadcrumb root (e.g. "AI"). |
+| `basePath`     | `string`    | Route prefix for breadcrumb links (e.g. `"/ai"`, `"/"`).   |
+| `navItems`     | `NavItem[]` | `{ label, icon, path }` entries rendered in the sidebar.   |
+| `children`     | `ReactNode` | Typically a `<Routes>` block with the section's pages.     |
+
+Import from the barrel: `import { SectionLayout, NavItem } from "layouts";`
+
+#### Section-specific layouts
+
+Each route section has a thin layout wrapper that passes configuration to `SectionLayout`:
+
+- **`HomeLayout`** (`src/pages-new/home/HomeLayout.tsx`) — `basePath="/"`, tabs: Home, System Info, Settings.
+- **`AiLayout`** (`src/pages-new/ai/AiLayout.tsx`) — `basePath="/ai"`, tabs: Packages, Store, Nexus.
+- **`LegacyStakingLayout`** (`src/layouts/LegacyStakingLayout.tsx`) — Bootstrap-based, does **not** use `SectionLayout`.
+
+#### `DecorativeBackground` (`src/layouts/DecorativeBackground.tsx`)
+
+Purely presentational gradient-orb layer used by `SectionLayout` and `NewPageLayout`. Import from `layouts/DecorativeBackground`.
+
+#### `NewPageLayout` (`src/pages-new/layouts/NewPageLayout.tsx`)
+
+Standalone page wrapper for pages outside any section (Login, Register, NoConnection). Provides `.tw-base`, `min-h-screen`, `bg-background`, and optional decorative background. **Not** used for pages inside a section — those inherit everything from `SectionLayout`.
+
+#### Adding a new section
+
+1. Create a folder under `src/pages-new/[section]/`.
+2. Create `[Section]Layout.tsx`:
+   ```tsx
+   import { SectionLayout, NavItem } from "layouts";
+   
+   const navItems: NavItem[] = [
+     { label: "Tab One", icon: SomeIcon, path: "/section/tab-one" },
+   ];
+   
+   export function SectionNameLayout() {
+     return (
+       <SectionLayout sectionLabel="Section" basePath="/section" navItems={navItems}>
+         <Routes>
+           <Route index element={<TabOnePage />} />
+         </Routes>
+       </SectionLayout>
+     );
+   }
+   ```
+3. Add a `<Route path="/section/*" element={<SectionNameLayout />} />` in `App.tsx`.
+
+### Components
+
+- **Primitives** (shadcn components): `src/components/primitives/` (button, card, sidebar, sheet, tooltip, etc.)
+- **Reusable app components**: `src/components/`. Use PascalCase for component files.
+
+### Hooks
+
+- Custom React hooks: `src/hooks/` with `use` prefix (e.g., `useUser.ts`).
+- shadcn-specific hooks: `src/hooks/components/` (e.g., `use-mobile.ts`).
+
+### Other Directories
+
+- **API layer**: `src/api/` and `src/services/` — always use these for backend requests.
+- **Utils**: `src/utils/`
+- **Lib**: `src/lib/` — contains `utils.ts` with the `cn()` helper (clsx + tailwind-merge).
+- **State Management**: `src/store.ts` for Redux, `src/rootReducer.ts` for reducers.
+- **Types**: `src/types.ts` for shared/global types.
+- **Mock Backend**: `src/__mock-backend__/`
+- **Tests**: `src/__tests__/`
+
+## Import Conventions
+
+This project uses `baseUrl: "src"` in `tsconfig.json` with `vite-tsconfig-paths` for Vite resolution.
+
+**Always use bare imports** (relative to `src/`):
 
 ## Styling
-- Use SCSS for styling.  
-  - Common styles: `src/dappnode_styles.scss`, `src/dappnode_colors.scss`, `src/layout.scss`, `src/light_dark.scss`.
-  - Prefer CSS modules or SCSS imports over inline styles.
+
+### New Pages (Tailwind CSS v4 + shadcn)
+
+- All Tailwind classes use the `tw:` prefix (e.g., `tw:flex`, `tw:bg-primary`).
+- Design tokens are defined in `src/styles/tailwind.css`.
+- The `.tw-base` class provides a scoped CSS reset (box-sizing, font-family, etc.) since Tailwind preflight is disabled to avoid breaking legacy Bootstrap styles.
+- Pages inside a section (Home, AI, etc.) get `.tw-base` automatically from `SectionLayout` — no extra wrapper needed.
+- Standalone pages (Login, Register, NoConnection) must use `<NewPageLayout>` from `pages-new/layouts`, which provides `.tw-base` + optional decorative background.
+
+### Legacy Pages (Bootstrap/SCSS)
+
+- Common styles: `src/dappnode_styles.scss`, `src/dappnode_colors.scss`, `src/layout.scss`, `src/light_dark.scss`.
+- Bootstrap is scoped under `.legacy-bootstrap` via `src/styles/bootstrap-scoped.scss`.
+- Do not use Tailwind classes in legacy pages.
+
+## Design Tokens and Layout Consistency
+
+All design tokens are defined in `src/styles/tailwind.css`. **Always reuse existing tokens** when building layouts or composing pages.
+
+### Layout Spacing Tokens
+
+These tokens are available as Tailwind spacing utilities:
+
+| Token                  | CSS Variable       | Default  | Usage                                 |
+| ---------------------- | ------------------ | -------- | ------------------------------------- |
+| `tw:px-page-x`         | `--page-padding-x` | `1.5rem` | Horizontal page padding               |
+| `tw:py-page-y`         | `--page-padding-y` | `2rem`   | Vertical page padding                 |
+| `tw:gap-section`       | `--section-gap`    | `2rem`   | Gap between major page sections       |
+| `tw:gap-card`          | `--card-gap`       | `1rem`   | Gap between cards / list items        |
+| `tw:mt-header-gap`     | `--header-gap`     | `0.5rem` | Space between heading and description |
+| `tw:h-topbar-h`        | `--topbar-height`  | `3rem`   | Height of top bars / app bars         |
+| `tw:max-w-content-max` | `--content-max-w`  | `64rem`  | Max width for main content areas      |
+
+### Brand Colors
+
+Available as `tw:bg-dn-blue`, `tw:text-dn-cyan`, etc.:
+
+- Blue `#00B1F4`, Cyan `#06D4E7`, Orange `#FC9E22`, Pink `#E60AF6`, Purple `#5231C6`
+
+### Semantic Colors (shadcn)
+
+`primary`, `secondary`, `muted`, `accent`, `destructive`, `card`, `popover`, `sidebar-*`, etc. — all defined in `tailwind.css` with light/dark variants.
+
+### Rules
+
+- Always reuse existing tokens. Do not hardcode spacing values that already have a token.
+- If a new token is needed, add it to `tailwind.css` following the existing pattern (CSS variable in `:root` + `--spacing-*` mapping in `@theme inline`).
+- Components may still use specific margins/paddings as exceptions when the token doesn't apply.
+
+## shadcn Component Installation
+
+### Installing a New Component
+
+1. Navigate to `packages/admin-ui`.
+2. Run:
+   ```bash
+   yarn dlx shadcn@latest add [COMPONENT_NAME]
+   ```
+   Components will be placed in `src/components/primitives/` (configured via `components.json`).
+
+### Required Post-Install Fixes
+
+After importing any shadcn component, apply these fixes before the code will compile:
+
+1. **Replace `@/` imports with bare imports.** shadcn generates `@/` prefixed imports which fail in the Docker build. Change them to bare imports:
+
+   ```ts
+   // Generated by shadcn:
+   import { cn } from "@/lib/utils";
+   // Fix to:
+   import { cn } from "lib/utils";
+   ```
+
+```ts
+// ✅ Correct
+import { Button } from "components/primitives/button";
+import { cn } from "lib/utils";
+import { useIsMobile } from "hooks/components/use-mobile";
+
+// ❌ Wrong — @/ prefix fails in Docker builds
+import { Button } from "@/components/primitives/button";
+```
+
+Apply this to all `@/` prefixed imports in the generated file (`lib/utils`, `components/primitives/*`, `hooks/components/*`).
+
+2. **Add `import * as React from "react"`.** Some generated components (e.g., `skeleton.tsx`) may be missing the React import. Add it at the top if the file uses JSX or `React.*` APIs.
+
+3. **Fix `Slot.Root` ref type mismatches.** Components that use Radix UI's `Slot.Root` with `asChild` pattern (like `sidebar.tsx`) produce TypeScript errors due to ref type incompatibility with React 18. Fix by casting:
+
+   ```ts
+   // Generated:
+   const Comp = asChild ? Slot.Root : "button";
+   // Fix to:
+   const Comp = (asChild ? Slot.Root : "button") as React.ElementType;
+   ```
+
+4. **Verify the `"use client"` directive.** Some components include `"use client"` at the top. This is harmless in a non-RSC environment (this project uses `rsc: false` in `components.json`) and can be left in place.
+
+## Page Creation Rules
+
+When creating a new page inside an existing section:
+
+1. **Place it inside `src/pages-new/[section]/`** in the appropriate context folder.
+2. **Use the page layout primitives** from `components/primitives/page` for consistent structure.
+3. **Add a `<Route>`** in the section's layout file (e.g. `AiLayout.tsx` or `HomeLayout.tsx`).
+4. **Add a nav item** to the section's `navItems` array if it should appear in the sidebar.
+5. **Never modify legacy pages** in `src/pages/`.
+
+Pages inside a section do **not** need a `<NewPageLayout>` or `.tw-base` wrapper — `SectionLayout` provides both automatically.
+
+For standalone pages outside any section (Login, Register, NoConnection), wrap with `<NewPageLayout>` from `pages-new/layouts`.
+
+### Page Layout Primitives
+
+The project provides layout primitives in `src/components/primitives/page.tsx` that **must** be used for all page-level structure:
+
+| Component         | Purpose                                                   |
+| ----------------- | --------------------------------------------------------- |
+| `PageContainer`   | Outermost wrapper — applies `px-page-x`, `py-page-y`, `gap-section`, flexbox column layout. Replaces the repeated `<div className="tw:flex tw:flex-col tw:gap-section tw:px-page-x tw:py-page-y">` pattern. |
+| `PageHeader`      | Semantic `<header>` with optional `title` and `description` shorthand props. Also accepts `children` for composed content. |
+| `PageTitle`       | Wraps `TypographyH3` (`<h3>`, 2xl, semibold, tracking-tight) for consistent page headings. |
+| `PageDescription` | Wraps `TypographyMuted` with `mt-header-gap` spacing and `max-w-2xl`. |
+
+**Do not** duplicate the container/header pattern with raw HTML + utility classes — always use these primitives.
+
+### Standard Page Structure
+
+```tsx
+import { PageContainer, PageHeader } from "components/primitives/page";
+
+export function MyPage() {
+  return (
+    <PageContainer>
+      <PageHeader title="My Page" description="A short description of this page." />
+      {/* Page content */}
+    </PageContainer>
+  );
+}
+```
+
+### Composed Header (custom content)
+
+```tsx
+import { PageContainer, PageHeader, PageTitle, PageDescription } from "components/primitives/page";
+
+export function MyPage() {
+  return (
+    <PageContainer>
+      <PageHeader>
+        <PageTitle>My Page</PageTitle>
+        <PageDescription>Description with <strong>rich content</strong>.</PageDescription>
+        <Button>Custom action</Button>
+      </PageHeader>
+      {/* Page content */}
+    </PageContainer>
+  );
+}
+```
+
+### PageContainer with custom gap
+
+The detail page uses `<PageContainer className="tw:gap-6">` to override the default `gap-section` when tighter spacing is needed (e.g., for tab layouts).
 
 ## API Integration
-- Use api instance from `src/api/index.ts` for making api calls.
-- Use `useApi` instance from `src/api/index.ts` for making api calls with SWR.
+
+- Use `api` instance from `src/api/index.ts` for imperative calls (mutations, actions).
+- Use `useApi` hook from `src/api/index.ts` for data fetching with SWR (auto-revalidation).
+- Use `apiRoutes` from `src/api/index.ts` for URL helpers (e.g., `apiRoutes.containerLogsUrl`, `apiRoutes.fileDownloadUrl`, `apiRoutes.downloadUrl`, `apiRoutes.uploadFile`).
+- For toasts in new pages, use **Sonner** (`import { toast } from "sonner"`), not the legacy `withToast`/`withToastNoThrow`.
+- For destructive confirmation dialogs, use the `AlertDialog` primitive, not the legacy `confirm()` helper.
+
+### Toast Pattern for Async Operations
+
+When showing a loading toast during an async operation, **always capture the toast ID** returned by `toast.loading()` and pass it to the subsequent `toast.success()` or `toast.error()` via `{ id: toastId }`. This replaces the loading toast instead of stacking a new one on top (which leaves the loading spinner visible forever).
+
+```tsx
+// ✅ Correct — loading toast is replaced by success/error
+async function handleAction() {
+  const toastId = toast.loading("Performing action...");
+  try {
+    await api.someCall();
+    toast.success("Action completed", { id: toastId });
+  } catch (e) {
+    toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`, { id: toastId });
+  }
+}
+
+// ❌ Wrong — loading toast stays visible after success/error appears
+async function handleAction() {
+  try {
+    toast.loading("Performing action...");
+    await api.someCall();
+    toast.success("Action completed");
+  } catch (e) {
+    toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`);
+  }
+}
+```
+
+**Key rules:**
+- Declare `const toastId = toast.loading(...)` **before** the `try` block (or at the top of it) so it's in scope for the `catch` block.
+- Pass `{ id: toastId }` to every `toast.success()` and `toast.error()` that should dismiss the loading toast.
+- For functions with multiple sequential async steps (each with their own loading state), use separate toast IDs for each step.
+
+## Sidebar & Routing
+
+Each section (`/`, `/ai/*`, etc.) has its own thin layout that passes nav items and routes to the shared `SectionLayout`. To add a new page to an existing section:
+
+1. Create the page component under `src/pages-new/[section]/[context]/`.
+2. Add a `<Route>` entry in the section's layout file (e.g. `AiLayout.tsx`, `HomeLayout.tsx`) inside the `<Routes>` block.
+3. To make it appear in the sidebar, add an entry to the section's `navItems` array.
+4. The `isActive` check uses exact match + `startsWith` prefix matching — sub-routes are automatically highlighted.
+
+### Package Detail Page Pattern
+
+For pages with sub-tabs (like package detail), use this pattern:
+
+- The parent route uses a wildcard: `<Route path="packages/:id/*" element={<PackageDetailPage />} />`
+- Inside the detail page, use the `NavigationMenu` component (from `components/primitives/navigation-menu`) with `NavigationMenuLink asChild` wrapping React Router `NavLink` elements for the tab bar.
+- Each tab is a nested `<Route>` rendered inside the detail component.
+- Include a `<Navigate>` fallback to redirect to the default tab.
 
 ## UI/UX Guidelines
-- Use shared components from `src/components/` whenever possible.
+
+- Use shared components from `src/components/` and `src/components/primitives/` whenever possible.
 - Ensure accessibility: use semantic HTML, proper ARIA attributes, and keyboard navigation.
-- When adding new pages, update navigation menus as required (in `src/components/Sidebar.tsx` or similar).
+- Use `lucide-react` for icons (the project's configured icon library).
+- Use `prettyDnpName()` from `utils/format` to display human-readable package names.
+- Use `parseContainerState()` from `pages/packages/components/StateBadge/utils` for container status display (returns `{variant, state, title}`).
+- For navigation between new and legacy pages, use `withLegacyBase(path)` from `utils/path` which prepends the legacy route base (`/staking`).
+
+## Typography Primitives
+
+The project provides typography components in `src/components/primitives/typography.tsx`:
+
+- `TypographyH1` through `TypographyH4` — heading elements with consistent styling.
+- `TypographyMuted` — muted paragraph text for descriptions.
+- `TypographyInlineCode` — inline code snippets.
+
+**For page-level titles and descriptions**, prefer the page layout primitives (`PageTitle`, `PageDescription`) from `components/primitives/page` — they wrap `TypographyH3` and `TypographyMuted` respectively, adding consistent spacing tokens. Use the typography primitives directly for content-level headings within cards, sections, or prose.
 
 ## Coding Conventions
+
 - Use explicit TypeScript types; avoid `any`.
 - Use hooks for all state and effect logic.
 - Keep components focused and reusable.
 - Prefer functional components.
 - Avoid placing business logic in UI components—delegate to hooks, services, or utilities.
-

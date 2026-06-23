@@ -22,6 +22,8 @@ import { fetchDnpDirectory } from "services/dnpDirectory/actions";
 import { confirmPromise } from "components/ConfirmDialog";
 import { stakehouseLsdUrl } from "params";
 import { InstallerAIBanner } from "../aiDappstore/InstallerAiBanner";
+import { relativePath as stakersRelativePath } from "pages/stakers/data";
+import { withLegacyBase } from "utils/path";
 
 export const InstallerDnp: React.FC = () => {
   const navigate = useNavigate();
@@ -58,8 +60,8 @@ export const InstallerDnp: React.FC = () => {
     // - Mainnet: http://my.dappnode/stakers/mainnet
     // - Gnosis: http://my.dappnode/stakers/gnosis
     // - Stakehouse: http://my.dappnode/stakers/stakehouse
-    if (id === "ethereum.dnp.dappnode.eth") navigate("/stakers/ethereum");
-    else if (id === "gnosis.dnp.dappnode.eth") navigate("/stakers/gnosis");
+    if (id === "ethereum.dnp.dappnode.eth") navigate(withLegacyBase(stakersRelativePath));
+    else if (id === "gnosis.dnp.dappnode.eth") navigate(withLegacyBase("stakers/gnosis"));
     else if (id === "stakehouse.dnp.dappnode.eth") {
       // open a dialog that says it will open an external link, are you sure?
       confirmPromise({
