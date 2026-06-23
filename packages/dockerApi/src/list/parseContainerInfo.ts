@@ -46,6 +46,7 @@ export function parseContainerInfo(container: ContainerInfo): PackageContainer {
     version: labels.version || (container.Image || "").split(":")[1] || "0.0.0",
     isDnp,
     isCore,
+    isDev: labels.isDev,
 
     // Docker data
     created: container.Created,

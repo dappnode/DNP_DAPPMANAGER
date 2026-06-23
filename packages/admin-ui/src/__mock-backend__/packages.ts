@@ -18,6 +18,7 @@ export const packages: Pick<
   | "packageGet"
   | "packageGettingStartedToggle"
   | "packageInstall"
+  | "packageInstallDev"
   | "packageLog"
   | "packageRemove"
   | "packageRestart"
@@ -67,6 +68,36 @@ export const packages: Pick<
   },
 
   packageLog: async ({ containerName }) => `INFO: ${containerName} logs`,
+
+  packageInstallDev: async ({ manifest, imageFileId: _imageFileId }) => {
+    await pause(pkgRestartMs);
+    const name = manifest.name;
+    packagesState.set(name, {
+      ...sampleDnp,
+      dnpName: name,
+      version: manifest.version || "0.1.0",
+      avatarUrl: "",
+      origin: "dev",
+      gettingStarted: `Custom package **${name}** installed locally`,
+      gettingStartedShow: true,
+      containers: [
+        {
+          ...sampleContainer,
+          containerName: `DAppNodePackage-${name}`,
+          containerId: `00000000000${name}`,
+          serviceName: name,
+          instanceName: "",
+          created: 1500000000,
+          image: `${name}:${manifest.version}`,
+          isDev: true,
+          state: "running",
+          running: true,
+          ports: [],
+          volumes: []
+        }
+      ]
+    });
+  },
 
   packageRemove: async ({ dnpName }) => {
     await pause(pkgRestartMs);

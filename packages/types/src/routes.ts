@@ -42,7 +42,7 @@ import {
   InstalledPackageData
 } from "./calls.js";
 import { PackageEnvs } from "./compose.js";
-import { PackageBackup } from "./manifest.js";
+import { PackageBackup, Manifest } from "./manifest.js";
 import {
   CustomEndpoint,
   GatusEndpoint,
@@ -537,6 +537,46 @@ export interface Routes {
   }) => Promise<void>;
 
   /**
+   * Installs a DAppNode Package locally for development, without IPFS.
+   * The package image must already have been uploaded as a `docker save` tarball
+   * via the `/upload` endpoint, which returns a `fileId`. That `imageFileId` is
+   * resolved here to the host file path and loaded into Docker.
+   * The package is tagged as a custom package and shown under the "My custom packages" tab.
+   * @param manifest Package manifest (dappnode_package.json content)
+   * @param compose Package docker-compose.yml content (as a YAML string)
+   * @param imageFileId File ID returned by `/upload` for the `docker save` tarball
+   * @param setupWizard Optional setup-wizard.yml content (as a YAML string)
+   */
+  packageInstallDev: (kwargs: {
+    manifest: Manifest;
+    compose: string;
+    imageFileId: string;
+    setupWizard?: string;
+  }) => Promise<void>;
+
+  /**
+   * Get the current MCP API bearer key, if one has been generated, plus the
+   * external MCP mutating-tools setting.
+   */
+  mcpApiKeyGet: () => Promise<{ apiKey: string | null; mutatingToolsEnabled: boolean }>;
+
+  /**
+   * Generate a new MCP API bearer key. Invalidates any previously generated key.
+   */
+  mcpApiKeyGenerate: () => Promise<{ apiKey: string }>;
+
+  /**
+   * Remove the in-app MCP API bearer key. Bearer auth is disabled until the
+   * admin generates a new key.
+   */
+  mcpApiKeyRemove: () => Promise<{ ok: true }>;
+
+  /**
+   * Enable or disable mutating tools for external MCP clients.
+   */
+  mcpMutatingToolsSet: (kwargs: { enabled: boolean }) => Promise<{ enabled: boolean }>;
+
+  /**
    * Get package detail information
    */
   packageGet: (kwargs: { dnpName: string }) => Promise<InstalledPackageDetailData>;
@@ -980,6 +1020,11 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   optimismConfigGet: {},
   optimismConfigSet: { log: true },
   packageInstall: { log: true },
+  packageInstallDev: { log: true },
+  mcpApiKeyGet: {},
+  mcpApiKeyGenerate: { log: true },
+  mcpApiKeyRemove: { log: true },
+  mcpMutatingToolsSet: { log: true },
   packageGet: {},
   packagesGet: {},
   packageGettingStartedToggle: {},

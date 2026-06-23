@@ -77,9 +77,7 @@ export function ChatPanel({ variant = "page" }: ChatPanelProps) {
       setModels(list);
       const remembered = readRememberedModel();
       setSelectedModel((prev) => {
-        const preferred = [prev, remembered, s.defaultModel].find(
-          (id) => id && list.some((m) => m.id === id)
-        );
+        const preferred = [prev, remembered, s.defaultModel].find((id) => id && list.some((m) => m.id === id));
         return preferred || list[0]?.id || "";
       });
     } catch (err) {
@@ -212,10 +210,7 @@ export function ChatPanel({ variant = "page" }: ChatPanelProps) {
 
   const cancel = () => abortRef.current?.abort();
 
-  const respondToConfirmation = async (
-    confirmation: PendingConfirmation,
-    decision: "approve" | "deny"
-  ) => {
+  const respondToConfirmation = async (confirmation: PendingConfirmation, decision: "approve" | "deny") => {
     setPendingConfirm(null);
     try {
       await submitChatConfirmation(confirmation.id, decision);
@@ -433,17 +428,18 @@ function ChatHeader({
           </div>
         ) : null}
 
-        <button
-          type="button"
-          className="nexus-icon-button"
-          onClick={onNewChat}
-          title="New chat"
-        >
+        <button type="button" className="nexus-icon-button" onClick={onNewChat} title="New chat">
           <FiPlus />
         </button>
 
         <Dropdown align="end" className="nexus-history-dropdown">
-          <Dropdown.Toggle as="button" type="button" className="nexus-icon-button" id="nexus-history-toggle" title="Past conversations">
+          <Dropdown.Toggle
+            as="button"
+            type="button"
+            className="nexus-icon-button"
+            id="nexus-history-toggle"
+            title="Past conversations"
+          >
             <MdHistory />
           </Dropdown.Toggle>
           <Dropdown.Menu className="nexus-history-menu">
@@ -490,7 +486,6 @@ function ChatHeader({
         >
           <FiKey />
         </button>
-
       </div>
     </div>
   );
@@ -542,12 +537,7 @@ function EmptyState({
       {configured && (
         <div className="nexus-suggestions">
           {SUGGESTIONS.map((prompt) => (
-            <button
-              key={prompt}
-              disabled={disabled}
-              onClick={() => onPick(prompt)}
-              className="nexus-suggestion"
-            >
+            <button key={prompt} disabled={disabled} onClick={() => onPick(prompt)} className="nexus-suggestion">
               {prompt}
             </button>
           ))}
@@ -602,11 +592,7 @@ function Thread({
         return msg.role === "user" ? (
           <UserBubble key={idx} text={msg.content} />
         ) : (
-          <AssistantBubble
-            key={idx}
-            text={msg.content}
-            isRunning={isRunning && isLast && !pendingConfirm}
-          />
+          <AssistantBubble key={idx} text={msg.content} isRunning={isRunning && isLast && !pendingConfirm} />
         );
       })}
       {pendingConfirm && (
@@ -764,10 +750,7 @@ function NotConfigured({ onConfigure }: { onConfigure: () => void }) {
       </div>
       <div className="nexus-not-configured-text">
         <strong>Nexus chat is not configured</strong>
-        <p>
-          Paste a Nexus API key to get started — generate one in the Nexus user portal. You can also set{" "}
-          <code>NEXUS_API_KEY</code> on the dappmanager container instead.
-        </p>
+        <p>Paste a Nexus API key to get started — generate one in the Nexus user portal.</p>
         <div className="nexus-not-configured-actions">
           <Button variant="dappnode" onClick={onConfigure}>
             Add API key
@@ -842,12 +825,6 @@ function ApiKeyEditor({
           .
         </p>
 
-        {status.keySource === "env" && (
-          <p className="nexus-key-editor-text">
-            A key is currently provided via the <code>NEXUS_API_KEY</code> env var. Saving a key here overrides it.
-          </p>
-        )}
-
         <div className="nexus-key-editor-input-group">
           <input
             type={show ? "text" : "password"}
@@ -877,7 +854,7 @@ function ApiKeyEditor({
 
         <div className="nexus-key-editor-actions">
           <div>
-            {(status.keySource === "db" || status.keySource === "env") && (
+            {status.keySource === "db" && (
               <Button variant="outline-danger" onClick={clear} disabled={busy}>
                 Remove key
               </Button>

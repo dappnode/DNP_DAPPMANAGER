@@ -1,5 +1,6 @@
 import { Request } from "express";
 import { PlainTextFileDb } from "@dappnode/utils";
+import * as db from "@dappnode/db";
 import { getRandomAlphanumericToken } from "./token.js";
 import { wrapHandler } from "../utils.js";
 import { SessionData, SessionsManager } from "../sessions/index.js";
@@ -30,22 +31,52 @@ import { AdminPasswordDb } from "./adminPasswordDb.js";
 
 export interface AuthPasswordSessionParams {
   ADMIN_RECOVERY_FILE: string;
-  MCP_API_KEY?: string;
 }
 
 const recoveryTokenLength = 20;
+const maxAuthHeaderLength = 8192;
+
+function isAsciiWhitespace(char: string): boolean {
+  const code = char.charCodeAt(0);
+  return code === 9 || code === 10 || code === 11 || code === 12 || code === 13 || code === 32;
+}
+
+function containsAsciiWhitespace(value: string): boolean {
+  for (let i = 0; i < value.length; i++) {
+    if (isAsciiWhitespace(value[i])) return true;
+  }
+  return false;
+}
+
+export function parseMcpBearerToken(authHeader: string | undefined): string | null {
+  if (!authHeader || authHeader.length > maxAuthHeaderLength) return null;
+
+  const schemeEnd = authHeader.indexOf(" ");
+  const tabSchemeEnd = authHeader.indexOf("\t");
+  const firstSeparator =
+    schemeEnd === -1 ? tabSchemeEnd : tabSchemeEnd === -1 ? schemeEnd : Math.min(schemeEnd, tabSchemeEnd);
+  if (firstSeparator <= 0) return null;
+
+  if (authHeader.slice(0, firstSeparator).toLowerCase() !== "bearer") return null;
+
+  let tokenStart = firstSeparator;
+  while (tokenStart < authHeader.length && isAsciiWhitespace(authHeader[tokenStart])) tokenStart++;
+  if (tokenStart === authHeader.length) return null;
+
+  const token = authHeader.slice(tokenStart);
+  if (containsAsciiWhitespace(token)) return null;
+  return token;
+}
 
 export class AuthPasswordSession {
   sessions: SessionsManager;
   adminPasswordDb: AdminPasswordDb;
   recoveryDb: PlainTextFileDb;
-  private params: AuthPasswordSessionParams;
 
   constructor(sessions: SessionsManager, adminPasswordDb: AdminPasswordDb, params: AuthPasswordSessionParams) {
     this.sessions = sessions;
     this.adminPasswordDb = adminPasswordDb;
     this.recoveryDb = new PlainTextFileDb(params.ADMIN_RECOVERY_FILE);
-    this.params = params;
   }
 
   private assertPassword(username: string, password: string): void {
@@ -64,14 +95,12 @@ export class AuthPasswordSession {
    * - Some user registered no cookie in req >> NotLoggedInNoCookieError
    */
   private isMcpApiKeyValid(req: Request): boolean {
-    const configuredKey = this.params.MCP_API_KEY || process.env.MCP_API_KEY;
+    const configuredKey = db.mcpApiKey.get();
     if (!configuredKey) return false;
 
-    const authHeader = req.headers.authorization || "";
-    const match = authHeader.match(/^bearer\s+(.+)$/i);
-    if (!match) return false;
+    const providedKey = parseMcpBearerToken(req.headers.authorization);
+    if (!providedKey) return false;
 
-    const providedKey = match[1];
     // Constant-time compare to avoid timing leaks.
     if (providedKey.length !== configuredKey.length) return false;
     let result = 0;
@@ -208,18 +237,21 @@ export class AuthPasswordSession {
   });
 
   /**
-   * Middleware to protect routes only for admin sessions.
-   *
-   * In addition to the normal admin cookie session, routes that need to be
-   * reachable by non-browser clients (MCP clients, other DAppNode packages)
-   * accept a bearer token via the `Authorization` header:
-   *
-   *   Authorization: Bearer <MCP_API_KEY>
-   *
-   * `MCP_API_KEY` is set on the dappmanager container environment. When it is
-   * unset, bearer-token auth is disabled and only cookie sessions work.
+   * Middleware to protect routes only for admin browser sessions.
    */
   onlyAdmin = wrapHandler((req, _, next) => {
+    this.assertOnlyAdmin(req);
+    next();
+  });
+
+  /**
+   * Middleware for routes that intentionally accept either an admin session
+   * cookie or the scoped MCP bearer key.
+   *
+   * Keep this opt-in: the MCP key is for MCP-compatible agent endpoints, not a
+   * replacement for the full admin session across every HTTP/RPC route.
+   */
+  onlyAdminOrMcpApiKey = wrapHandler((req, _, next) => {
     if (this.isMcpApiKeyValid(req)) {
       next();
       return;

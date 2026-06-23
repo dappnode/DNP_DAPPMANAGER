@@ -30,7 +30,9 @@ import {
   nexusStatus
 } from "./routes/nexus.js";
 import { handleMcpRequest } from "../mcp/server.js";
+import { MCP_UPLOAD_CHUNK_BASE64_CHARS } from "../mcp/upload.js";
 import { params as dappnodeParams } from "@dappnode/params";
+import { ensureTempTransferDir, MAX_UPLOAD_FILE_SIZE_BYTES } from "../uploads/tempTransfer.js";
 
 export interface HttpApiParams extends ClientSideCookiesParams, AuthPasswordSessionParams {
   AUTH_IP_ALLOW_LOCAL_IP: boolean;
@@ -104,12 +106,15 @@ export function startHttpApi({
   // Intercept decentralized website requests first
   // TODO: research how to use auth in the proxy
   app.use(ethForwardMiddleware);
-  // default options. ALL CORS + limit fileSize and file count
-  app.use(fileUpload({ limits: { fileSize: 500 * 1024 * 1024, files: 10 } }));
   // CORS config follows https://stackoverflow.com/questions/50614397/value-of-the-access-control-allow-origin-header-in-the-response-must-not-be-th
   app.use(cors({ credentials: true, origin: params.HTTP_CORS_WHITELIST }));
   app.use(compression());
-  app.use(bodyParser.json());
+  const defaultJsonParser = bodyParser.json();
+  const mcpJsonParser = bodyParser.json({ limit: MCP_UPLOAD_CHUNK_BASE64_CHARS + 256 * 1024 });
+  app.use((req, res, next) => {
+    const jsonParser = req.path === "/mcp" ? mcpJsonParser : defaultJsonParser;
+    jsonParser(req, res, next);
+  });
   app.use(bodyParser.text());
   app.use(bodyParser.urlencoded({ extended: true }));
   // Serve locally-downloaded package avatars (non-core from REPO_DIR, core from DNCORE_DIR)
@@ -126,6 +131,19 @@ export function startHttpApi({
 
   // Auth
   const auth = new AuthPasswordSession(sessions, adminPasswordDb, params);
+
+  const ensureTempTransferDirMiddleware: RequestHandler = (_req, _res, next) => {
+    ensureTempTransferDir();
+    next();
+  };
+
+  // Route-local upload parser. It intentionally runs after auth so rejected
+  // requests cannot stream large temporary files to disk first.
+  const uploadFileMiddleware = fileUpload({
+    limits: { fileSize: MAX_UPLOAD_FILE_SIZE_BYTES, files: 10 },
+    useTempFiles: true,
+    tempFileDir: dappnodeParams.TEMP_TRANSFER_DIR
+  });
 
   // sessionHandler will mutate socket.handshake attaching .session object
   // Then, onlyAdmin will reject if socket.handshake.session.isAdmin !== true
@@ -171,9 +189,9 @@ export function startHttpApi({
   app.get("/file-download/:containerName", auth.onlyAdmin, routes.fileDownload);
   app.get("/download/:fileId", auth.onlyAdmin, routes.download);
   app.get("/user-action-logs", auth.onlyAdmin, routes.downloadUserActionLogs);
-  app.post("/upload", auth.onlyAdmin, routes.upload);
+  app.post("/upload", auth.onlyAdmin, ensureTempTransferDirMiddleware, uploadFileMiddleware, routes.upload);
 
-  // Nexus chat proxy (env-configured Nexus API key held server-side).
+  // Nexus chat proxy (Nexus API key held server-side).
   app.get("/nexus/status", auth.onlyAdmin, nexusStatus);
   app.post("/nexus/config", auth.onlyAdmin, nexusSetApiKey);
   app.delete("/nexus/config", auth.onlyAdmin, nexusClearApiKey);
@@ -185,13 +203,14 @@ export function startHttpApi({
   app.put("/nexus/chat/history/:id", auth.onlyAdmin, nexusChatHistoryUpsert);
   app.delete("/nexus/chat/history/:id", auth.onlyAdmin, nexusChatHistoryDelete);
 
-  // MCP server for this DAppNode — same tools the embedded chat uses, also
-  // reachable by external MCP clients (Claude Desktop, Cursor, etc.) and by
-  // other DAppNode packages. Authentication: admin session cookie OR
-  // `Authorization: Bearer <MCP_API_KEY>` (configured in the dappmanager env).
-  app.post("/mcp", auth.onlyAdmin, wrapHandler(handleMcpRequest));
-  app.get("/mcp", auth.onlyAdmin, wrapHandler(handleMcpRequest));
-  app.delete("/mcp", auth.onlyAdmin, wrapHandler(handleMcpRequest));
+  // Stateless MCP server for this DAppNode — same tools the embedded chat
+  // uses, also reachable by external MCP clients (Claude Desktop, Cursor, etc.)
+  // and by other DAppNode packages. Authentication: admin session cookie OR
+  // `Authorization: Bearer <generated MCP API key>` from the admin UI at
+  // System > Advanced > MCP API key.
+  // A fresh transport is created per request so a stale client session can
+  // never hold the MCP endpoint lock.
+  app.post("/mcp", auth.onlyAdminOrMcpApiKey, wrapHandler(handleMcpRequest));
 
   // Open endpoints (no auth)
   app.get("/global-envs/:name?", routes.globalEnvs);

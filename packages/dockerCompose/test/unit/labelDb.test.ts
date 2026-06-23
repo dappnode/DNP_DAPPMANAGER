@@ -124,4 +124,14 @@ describe("Parse and validate manifest labels to be used in the compose", () => {
     // Expect labelValues to be equal to expectedLabels
     expect(labelValues).to.deep.equal(expectedLabels);
   });
+
+  it("should parse isDev only when the label is present", () => {
+    const labelsRaw: ContainerLabelsRaw = {
+      "dappnode.dnp.isDev": "true"
+    };
+
+    const labelValues = readContainerLabels(labelsRaw);
+
+    expect(labelValues).to.include({ isDev: true });
+  });
 });

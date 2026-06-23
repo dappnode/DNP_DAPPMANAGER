@@ -9,13 +9,22 @@ import {
   logContainer
 } from "@dappnode/dockerapi";
 import { Network, PortProtocol } from "@dappnode/types";
-import type { Compose, Manifest, PackageContainer, PortMapping, SetupWizard, StakerConfigSet, UserSettingsAllDnps } from "@dappnode/types";
+import type {
+  Compose,
+  Manifest,
+  PackageContainer,
+  PortMapping,
+  SetupWizard,
+  StakerConfigSet,
+  UserSettingsAllDnps
+} from "@dappnode/types";
 import { validateManifestSchema, validateDappnodeCompose, validateSetupWizardSchema } from "@dappnode/schemas";
 import { yamlParse } from "@dappnode/utils";
 import { logs } from "@dappnode/logger";
 import { packageRestart } from "../calls/packageRestart.js";
 import { packageSetEnvironment } from "../calls/packageSetEnvironment.js";
 import { packageSetPortMappings } from "../calls/packageSetPortMappings.js";
+import { MAX_UPLOAD_FILE_SIZE_BYTES, UPLOAD_TTL_MS } from "../uploads/tempTransfer.js";
 import { statsCpuGet } from "../calls/statsCpuGet.js";
 import { statsMemoryGet } from "../calls/statsMemoryGet.js";
 import { statsDiskGet } from "../calls/statsDiskGet.js";
@@ -24,6 +33,14 @@ import { diagnose } from "../calls/diagnose.js";
 import { autoUpdateDataGet } from "../calls/autoUpdateDataGet.js";
 import { notificationsGetAll } from "../calls/notifications.js";
 import { searchDocs, fetchDocPage } from "./docs.js";
+import {
+  abortMcpDevImageUpload,
+  appendMcpDevImageUploadChunk,
+  beginMcpDevImageUpload,
+  finishMcpDevImageUpload,
+  MCP_UPLOAD_CHUNK_BASE64_CHARS,
+  MCP_UPLOAD_CHUNK_BYTES
+} from "./upload.js";
 
 // NOTE: packageInstall, fetchDnpRequest, fetchRegistry and stakerConfig are
 // imported lazily (dynamic import inside the tool's execute()) because they
@@ -56,6 +73,19 @@ export interface DappnodeTool {
   schema: Record<string, z.ZodType<any>>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   execute: (input: any) => Promise<unknown>;
+}
+
+/** Standard MCP tool annotations derived from a tool's mutating flag. */
+export function toolAnnotations(tool: DappnodeTool): {
+  title: string;
+  readOnlyHint: boolean;
+  destructiveHint: boolean;
+} {
+  return {
+    title: tool.displayName,
+    readOnlyHint: !tool.mutating,
+    destructiveHint: Boolean(tool.mutating)
+  };
 }
 
 /* ────────────── Helpers ────────────── */
@@ -107,10 +137,7 @@ const getPackageDetailsTool: DappnodeTool = {
   description:
     "Get full details for a specific package by its dnpName: containers, ports, volumes, env summary, dependencies.",
   schema: {
-    dnpName: z
-      .string()
-      .min(1)
-      .describe("The package dnpName, e.g. 'mev-boost-hoodi.dnp.dappnode.eth'")
+    dnpName: z.string().min(1).describe("The package dnpName, e.g. 'mev-boost-hoodi.dnp.dappnode.eth'")
   },
   async execute({ dnpName }: { dnpName: string }) {
     const pkg = await listPackage({ dnpName });
@@ -122,8 +149,7 @@ const getPackageDetailsTool: DappnodeTool = {
 const getPackageLogsTool: DappnodeTool = {
   name: "dappnode_get_package_logs",
   displayName: "Read package logs",
-  description:
-    "Fetch the tail of container logs for a package. Returns one log block per container in the package.",
+  description: "Fetch the tail of container logs for a package. Returns one log block per container in the package.",
   schema: {
     dnpName: z.string().min(1).describe("The package dnpName"),
     tail: z
@@ -153,8 +179,7 @@ const getPackageLogsTool: DappnodeTool = {
 const getSystemInfoTool: DappnodeTool = {
   name: "dappnode_get_system_info",
   displayName: "Get system info",
-  description:
-    "Get system-level info for this DAppNode: CPU usage, memory, disk usage, hostname, IPs, version data.",
+  description: "Get system-level info for this DAppNode: CPU usage, memory, disk usage, hostname, IPs, version data.",
   schema: {},
   async execute() {
     const [cpu, memory, disk, system] = await Promise.allSettled([
@@ -273,10 +298,7 @@ const updatePackageTool: DappnodeTool = {
   mutating: true,
   schema: {
     dnpName: z.string().min(1).describe("The package dnpName to update"),
-    version: z
-      .string()
-      .optional()
-      .describe("Optional target version (semver or IPFS hash). Defaults to latest.")
+    version: z.string().optional().describe("Optional target version (semver or IPFS hash). Defaults to latest.")
   },
   async execute({ dnpName, version }: { dnpName: string; version?: string }) {
     logs.info(`MCP: dappnode_update_package(${dnpName}, ${version ?? "latest"})`);
@@ -343,10 +365,7 @@ const getDiskUsageTool: DappnodeTool = {
     "Disk usage grouped by docker volume (and by owning package). Answers questions like 'what's eating my disk'. Returns sizes in bytes.",
   schema: {},
   async execute() {
-    const [ownership, systemData] = await Promise.all([
-      getVolumesOwnershipData(),
-      getVolumeSystemData()
-    ]);
+    const [ownership, systemData] = await Promise.all([getVolumesOwnershipData(), getVolumeSystemData()]);
     // Aggregate volume sizes by owner dnpName for the model's convenience.
     const byOwner: Record<string, { totalBytes: number; volumes: { name: string; size?: number | string }[] }> = {};
     for (const o of ownership) {
@@ -378,13 +397,7 @@ const searchDocsTool: DappnodeTool = {
       .describe(
         "Free-text keywords. Use specific terms — e.g. 'mev-boost configuration', 'wireguard setup', 'tailscale access', 'smooth subscription'."
       ),
-    limit: z
-      .number()
-      .int()
-      .min(1)
-      .max(10)
-      .optional()
-      .describe("Max number of results. Default 5.")
+    limit: z.number().int().min(1).max(10).optional().describe("Max number of results. Default 5.")
   },
   async execute({ query, limit }: { query: string; limit?: number }) {
     return await searchDocs(query, limit ?? 5);
@@ -423,7 +436,9 @@ const getStakerConfigTool: DappnodeTool = {
   schema: {
     network: z
       .nativeEnum(Network)
-      .describe("Staker network: 'mainnet', 'gnosis', 'lukso', 'hoodi', 'holesky', 'sepolia', 'prater', 'starknet', 'starknet-sepolia'.")
+      .describe(
+        "Staker network: 'mainnet', 'gnosis', 'lukso', 'hoodi', 'holesky', 'sepolia', 'prater', 'starknet', 'starknet-sepolia'."
+      )
   },
   async execute({ network }: { network: Network }) {
     const { stakerConfigGet } = await import("../calls/stakerConfig.js");
@@ -443,26 +458,13 @@ const setStakerConfigTool: DappnodeTool = {
       .string()
       .nullable()
       .optional()
-      .describe("Execution client dnpName, or null to unset. Omit to leave unchanged is NOT supported — pass null explicitly."),
-    consensusDnpName: z
-      .string()
-      .nullable()
-      .optional()
-      .describe("Consensus client dnpName, or null to unset."),
-    mevBoostDnpName: z
-      .string()
-      .nullable()
-      .optional()
-      .describe("MEV-boost dnpName, or null to unset."),
-    web3signerDnpName: z
-      .string()
-      .nullable()
-      .optional()
-      .describe("Web3signer dnpName, or null to unset."),
-    relays: z
-      .array(z.string())
-      .optional()
-      .describe("List of MEV-boost relay URLs. Defaults to empty.")
+      .describe(
+        "Execution client dnpName, or null to unset. Omit to leave unchanged is NOT supported — pass null explicitly."
+      ),
+    consensusDnpName: z.string().nullable().optional().describe("Consensus client dnpName, or null to unset."),
+    mevBoostDnpName: z.string().nullable().optional().describe("MEV-boost dnpName, or null to unset."),
+    web3signerDnpName: z.string().nullable().optional().describe("Web3signer dnpName, or null to unset."),
+    relays: z.array(z.string()).optional().describe("List of MEV-boost relay URLs. Defaults to empty.")
   },
   async execute({
     network,
@@ -640,6 +642,161 @@ const validatePackageTool: DappnodeTool = {
   }
 };
 
+const getDevUploadInfoTool: DappnodeTool = {
+  name: "dappnode_get_dev_upload_info",
+  displayName: "Get custom package upload info",
+  description:
+    "Return the supported ways to stage a `docker save` image tarball before calling `dappnode_install_dev_package`. MCP clients should prefer the chunked MCP upload tools when they cannot reach this DAppNode's `/upload` endpoint directly.",
+  schema: {},
+  async execute() {
+    return {
+      mcpChunkedUpload: {
+        tools: [
+          "dappnode_begin_dev_image_upload",
+          "dappnode_append_dev_image_upload_chunk",
+          "dappnode_finish_dev_image_upload",
+          "dappnode_abort_dev_image_upload"
+        ],
+        maxFileSizeBytes: MAX_UPLOAD_FILE_SIZE_BYTES,
+        maxChunkBytes: MCP_UPLOAD_CHUNK_BYTES,
+        maxChunkBase64Chars: MCP_UPLOAD_CHUNK_BASE64_CHARS,
+        ttlMs: UPLOAD_TTL_MS,
+        finishResponse: "JSON object with imageFileId, sizeBytes, sha256, and expiresInMs",
+        note: "Use this path when the MCP client can call POST /mcp but cannot make a separate authenticated multipart request to /upload. Chunks must be standard padded base64 and appended in order using the returned uploadId and byte offset. Finish returns imageFileId."
+      },
+      httpUpload: {
+        uploadPath: "/upload",
+        formFieldName: "file",
+        method: "POST",
+        maxFileSizeBytes: MAX_UPLOAD_FILE_SIZE_BYTES,
+        maxFiles: 10,
+        auth: "Admin browser session cookie only. The generated MCP API key is scoped to POST /mcp and is not accepted by /upload.",
+        responseType: "plain text fileId"
+      },
+      note: "After staging the image by either method, pass the returned fileId/imageFileId to dappnode_install_dev_package. Uploaded files expire after 15 minutes. External MCP exposes mutating tools such as uploads and dappnode_install_dev_package only when the admin enables mutating MCP tools in System > Advanced; embedded Nexus chat uses its own confirmation flow."
+    };
+  }
+};
+
+const beginDevImageUploadTool: DappnodeTool = {
+  name: "dappnode_begin_dev_image_upload",
+  displayName: "Begin custom image upload",
+  description:
+    "Start an MCP-native chunked upload for a `docker save` image tarball. Use this when the MCP client can call POST /mcp but cannot access the DAppNode `/upload` endpoint directly. Pass the total byte size, and optionally a sha256 hex digest. Then call dappnode_append_dev_image_upload_chunk repeatedly with standard padded base64 chunks, and finally dappnode_finish_dev_image_upload to receive imageFileId. This writes a temporary file and requires explicit user approval.",
+  mutating: true,
+  schema: {
+    sizeBytes: z
+      .number()
+      .int()
+      .min(1)
+      .max(MAX_UPLOAD_FILE_SIZE_BYTES)
+      .describe("Total byte size of the docker save tarball."),
+    sha256: z.string().length(64).optional().describe("Optional expected SHA-256 hex digest of the complete tarball."),
+    fileName: z.string().max(255).optional().describe("Optional local filename for operator-facing context.")
+  },
+  async execute({ sizeBytes, sha256, fileName }: { sizeBytes: number; sha256?: string; fileName?: string }) {
+    logs.info(`MCP: dappnode_begin_dev_image_upload(${fileName ?? "image.tar"}, ${sizeBytes} bytes)`);
+    return await beginMcpDevImageUpload({ sizeBytes, sha256, fileName });
+  }
+};
+
+const appendDevImageUploadChunkTool: DappnodeTool = {
+  name: "dappnode_append_dev_image_upload_chunk",
+  displayName: "Append custom image upload chunk",
+  description:
+    "Append one standard padded base64 chunk to an MCP-native dev image upload. Chunks must be sent in order. The `offset` is the number of raw bytes already accepted, returned by the previous append call. Each raw decoded chunk must be at most 1 MiB. This writes temporary file data and requires explicit user approval.",
+  mutating: true,
+  schema: {
+    uploadId: z.string().min(1).describe("uploadId returned by dappnode_begin_dev_image_upload."),
+    offset: z.number().int().min(0).describe("Raw byte offset for this chunk. Must equal receivedBytes so far."),
+    chunkBase64: z
+      .string()
+      .min(1)
+      .max(MCP_UPLOAD_CHUNK_BASE64_CHARS)
+      .describe("Standard padded base64 for the next raw chunk, max decoded size 1 MiB.")
+  },
+  async execute({ uploadId, offset, chunkBase64 }: { uploadId: string; offset: number; chunkBase64: string }) {
+    return await appendMcpDevImageUploadChunk({ uploadId, offset, chunkBase64 });
+  }
+};
+
+const finishDevImageUploadTool: DappnodeTool = {
+  name: "dappnode_finish_dev_image_upload",
+  displayName: "Finish custom image upload",
+  description:
+    "Finish an MCP-native dev image upload after every chunk has been appended. Verifies the declared size and optional sha256 digest, registers the staged tarball in DAppManager's temporary file-transfer store, and returns `imageFileId` for dappnode_install_dev_package. This requires explicit user approval.",
+  mutating: true,
+  schema: {
+    uploadId: z.string().min(1).describe("uploadId returned by dappnode_begin_dev_image_upload.")
+  },
+  async execute({ uploadId }: { uploadId: string }) {
+    logs.info(`MCP: dappnode_finish_dev_image_upload(${uploadId})`);
+    return await finishMcpDevImageUpload(uploadId);
+  }
+};
+
+const abortDevImageUploadTool: DappnodeTool = {
+  name: "dappnode_abort_dev_image_upload",
+  displayName: "Abort custom image upload",
+  description:
+    "Abort an in-progress MCP-native dev image upload and delete its temporary partial file. Use this if the upload fails or the user cancels.",
+  mutating: true,
+  schema: {
+    uploadId: z.string().min(1).describe("uploadId returned by dappnode_begin_dev_image_upload.")
+  },
+  async execute({ uploadId }: { uploadId: string }) {
+    return await abortMcpDevImageUpload(uploadId);
+  }
+};
+
+const installDevPackageTool: DappnodeTool = {
+  name: "dappnode_install_dev_package",
+  displayName: "Install custom package",
+  description:
+    "Install a package you are DEVELOPING into this DAppNode WITHOUT IPFS, so you can test it end-to-end. It is listed under the 'My custom packages' tab (separate from registry packages). Provide the raw dappnode_package.json (manifest) and docker-compose.yml contents, plus `imageFileId`: the fileId returned by `/upload` or the imageFileId returned by dappnode_finish_dev_image_upload. The image inside the tarball MUST be tagged exactly `<service>.<dnpName>:<version>` — build it first with `docker compose build`, then `docker save <image> -o <tar>`, stage the tarball, and pass the returned imageFileId here. Always run dappnode_validate_package first. This mutates state and starts containers — confirm with the user before calling. To re-install an updated build, run it again with the same name.",
+  mutating: true,
+  schema: {
+    manifest: z
+      .union([z.string(), z.record(z.any())])
+      .describe("Contents of dappnode_package.json — either the raw JSON string or the already-parsed object."),
+    compose: z.string().min(1).describe("Raw contents of docker-compose.yml (YAML)."),
+    imageFileId: z
+      .string()
+      .min(1)
+      .describe(
+        "File ID for the staged `docker save` image tarball. Use the `/upload` endpoint with an admin session cookie, or use the MCP chunked upload tools and pass the imageFileId returned by dappnode_finish_dev_image_upload."
+      ),
+    setupWizard: z
+      .union([z.string(), z.record(z.any())])
+      .optional()
+      .describe("Optional contents of setup-wizard.yml / setup-wizard.json (YAML or JSON).")
+  },
+  async execute({
+    manifest,
+    compose,
+    imageFileId,
+    setupWizard
+  }: {
+    manifest: string | Record<string, unknown>;
+    compose: string;
+    imageFileId: string;
+    setupWizard?: string | Record<string, unknown>;
+  }) {
+    const manifestObj = (typeof manifest === "string" ? JSON.parse(manifest) : manifest) as Manifest;
+    const setupWizardStr =
+      setupWizard === undefined
+        ? undefined
+        : typeof setupWizard === "string"
+          ? setupWizard
+          : JSON.stringify(setupWizard);
+
+    logs.info(`MCP: dappnode_install_dev_package(${manifestObj.name})`);
+    const { packageInstallDev } = await import("../calls/packageInstallDev.js");
+    await packageInstallDev({ manifest: manifestObj, compose, imageFileId, setupWizard: setupWizardStr });
+    return { ok: true, dnpName: manifestObj.name, version: manifestObj.version };
+  }
+};
+
 /* ────────────── Registry / install tools ────────────── */
 
 const searchRegistryTool: DappnodeTool = {
@@ -648,17 +805,8 @@ const searchRegistryTool: DappnodeTool = {
   description:
     "Browse the DAppNode public package registry. Returns packages with their name, description, categories and install status. NOTE: this scans the chain — slower than the other read tools, so call sparingly (e.g. once when the user asks 'what's available' or 'what can I install for X'). Optional `query` filters by case-insensitive substring on name and description.",
   schema: {
-    query: z
-      .string()
-      .optional()
-      .describe("Optional case-insensitive substring filter on name/description."),
-    limit: z
-      .number()
-      .int()
-      .min(1)
-      .max(100)
-      .optional()
-      .describe("Max entries to return. Default 25, max 100.")
+    query: z.string().optional().describe("Optional case-insensitive substring filter on name/description."),
+    limit: z.number().int().min(1).max(100).optional().describe("Max entries to return. Default 25, max 100.")
   },
   async execute({ query, limit = 25 }: { query?: string; limit?: number }) {
     const { fetchRegistry } = await import("../calls/fetchRegistry.js");
@@ -667,7 +815,7 @@ const searchRegistryTool: DappnodeTool = {
     const filtered = needle
       ? entries.filter((e) => {
           const name = e.name?.toLowerCase() ?? "";
-          const description = e.status === "ok" ? e.description?.toLowerCase() ?? "" : "";
+          const description = e.status === "ok" ? (e.description?.toLowerCase() ?? "") : "";
           return name.includes(needle) || description.includes(needle);
         })
       : entries;
@@ -690,10 +838,7 @@ const fetchInstallPreviewTool: DappnodeTool = {
     "Fetch the install preview of a package: special permissions it needs, its dependency tree, signature status, compatibility checks and the setup-wizard fields the user would fill in. ALWAYS call this BEFORE dappnode_install_package so you can present the permissions and required setup to the user.",
   schema: {
     name: z.string().min(1).describe("Package dnpName, e.g. 'bitcoin.dnp.dappnode.eth'"),
-    version: z
-      .string()
-      .optional()
-      .describe("Optional target version (semver or IPFS hash). Defaults to latest.")
+    version: z.string().optional().describe("Optional target version (semver or IPFS hash). Defaults to latest.")
   },
   async execute({ name, version }: { name: string; version?: string }) {
     const { fetchDnpRequest } = await import("../calls/fetchDnpRequest.js");
@@ -709,15 +854,13 @@ const installPackageTool: DappnodeTool = {
   mutating: true,
   schema: {
     name: z.string().min(1).describe("Package dnpName to install"),
-    version: z
-      .string()
-      .optional()
-      .describe("Optional target version (semver or IPFS hash). Defaults to latest."),
+    version: z.string().optional().describe("Optional target version (semver or IPFS hash). Defaults to latest."),
     userSettings: z
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .record(z.any())
       .optional()
-      .describe("Per-package settings (env vars, port mappings, named-volume mountpoints, …). Structure matches the setup wizard returned by dappnode_fetch_install_preview."),
+      .describe(
+        "Per-package settings (env vars, port mappings, named-volume mountpoints, …). Structure matches the setup wizard returned by dappnode_fetch_install_preview."
+      ),
     options: z
       .object({
         BYPASS_RESOLVER: z.boolean().optional(),
@@ -770,6 +913,12 @@ export const dappnodeTools: Record<string, DappnodeTool> = {
   [setPackageEnvironmentTool.name]: setPackageEnvironmentTool,
   [setPackagePortMappingsTool.name]: setPackagePortMappingsTool,
   [validatePackageTool.name]: validatePackageTool,
+  [getDevUploadInfoTool.name]: getDevUploadInfoTool,
+  [beginDevImageUploadTool.name]: beginDevImageUploadTool,
+  [appendDevImageUploadChunkTool.name]: appendDevImageUploadChunkTool,
+  [finishDevImageUploadTool.name]: finishDevImageUploadTool,
+  [abortDevImageUploadTool.name]: abortDevImageUploadTool,
+  [installDevPackageTool.name]: installDevPackageTool,
   [searchRegistryTool.name]: searchRegistryTool,
   [fetchInstallPreviewTool.name]: fetchInstallPreviewTool,
   [installPackageTool.name]: installPackageTool

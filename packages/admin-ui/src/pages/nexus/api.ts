@@ -16,8 +16,8 @@ export interface NexusStatus {
   configured: boolean;
   gatewayUrl: string;
   defaultModel: string;
-  /** Where the active key comes from: set in-app, from env, or unset. */
-  keySource: "db" | "env" | "none";
+  /** Where the active key comes from: set in-app or unset. */
+  keySource: "db" | "none";
 }
 
 const STATUS_URL = "/nexus/status";
@@ -69,7 +69,7 @@ export function setNexusApiKey(apiKey: string): Promise<NexusStatus> {
   });
 }
 
-/** Clears the in-app Nexus API key (falls back to the env var if set). */
+/** Clears the in-app Nexus API key. */
 export function clearNexusApiKey(): Promise<NexusStatus> {
   return fetchJson<NexusStatus>(CONFIG_URL, { method: "DELETE" });
 }
@@ -117,11 +117,7 @@ export function loadConversation(id: string): Promise<StoredConversation> {
   return fetchJson<StoredConversation>(`${HISTORY_URL}/${encodeURIComponent(id)}`);
 }
 
-export function saveConversation(
-  id: string,
-  messages: ChatMessage[],
-  title?: string
-): Promise<StoredConversation> {
+export function saveConversation(id: string, messages: ChatMessage[], title?: string): Promise<StoredConversation> {
   return fetchJson<StoredConversation>(`${HISTORY_URL}/${encodeURIComponent(id)}`, {
     method: "PUT",
     headers: { "content-type": "application/json" },
@@ -205,7 +201,7 @@ async function* readSSE(stream: ReadableStream<Uint8Array>): AsyncGenerator<stri
     for (;;) {
       const { done, value } = await reader.read();
       if (done) break;
-      buffer += decoder.decode(value, { stream: true }).replace(/\r\n/g, "\n");
+      buffer += decoder.decode(value, { stream: true }).split("\r\n").join("\n");
       let sep: number;
       while ((sep = buffer.indexOf("\n\n")) !== -1) {
         const event = buffer.slice(0, sep);

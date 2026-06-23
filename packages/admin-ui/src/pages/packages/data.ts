@@ -6,8 +6,10 @@ export const title = "Packages";
 
 export const mySubPath = "my";
 export const systemSubPath = "system";
+export const devSubPath = "dev";
 
 export const subPaths = {
   my: `${mySubPath}/*`,
-  system: `${systemSubPath}/*`
+  system: `${systemSubPath}/*`,
+  dev: `${devSubPath}/*`
 };
