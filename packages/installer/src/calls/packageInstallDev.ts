@@ -1,5 +1,3 @@
-import fs from "fs";
-import path from "path";
 import { getInstallerPackagesData } from "../installer/getInstallerPackageData.js";
 import createVolumeDevicePaths from "../installer/createVolumeDevicePaths.js";
 import {
@@ -19,7 +17,6 @@ import { getDockerImageManifest, loadImage } from "@dappnode/dockerapi";
 import { ComposeEditor, setDappnodeComposeDefaults, writeMetadataToLabels } from "@dappnode/dockercompose";
 import { computeGlobalEnvsFromDb } from "@dappnode/db";
 import { params } from "@dappnode/params";
-import { getAvatarPath } from "@dappnode/utils";
 import { validateDappnodeCompose, validateManifestSchema, validateSetupWizardSchema } from "@dappnode/schemas";
 import {
   Compose,
@@ -29,12 +26,6 @@ import {
   ReleaseSignatureStatusCode,
   SetupWizard
 } from "@dappnode/types";
-
-/**
- * Default avatar for custom packages. Stored under the non-core avatars directory
- * as a fallback so the UI can serve a real icon instead of the generic placeholder.
- */
-const DEFAULT_DEV_AVATAR_FILENAME = "dev-default-avatar.png";
 
 const CORE_DNP_NAMES = new Set([
   params.dappmanagerDnpName,
@@ -127,10 +118,6 @@ export async function packageInstallDev({
 
       log(id, "Loading dev image...");
       await loadImage(imageTarPath, (event) => log(id, event.status || ""));
-
-      // Persist a default avatar for the custom package so the UI has an icon.
-      // Future: accept an uploaded avatar file and persist it instead.
-      await persistDevAvatar(dnpName);
 
       await createVolumeDevicePaths(packagesData);
       await writeAndValidateFiles(packagesData, log);
@@ -225,36 +212,5 @@ async function verifyDevImageTar({
   const missingTags = Array.from(expectedTags).filter((tag) => !foundTags.has(tag));
   if (missingTags.length > 0) {
     throw Error(`Docker image archive is missing expected tag(s): ${missingTags.join(", ")}`);
-  }
-}
-
-/**
- * Copies the default dev-package avatar into the non-core avatars directory
- * under `<dnpName>.png`, so `resolveAvatarUrl()` can serve it at `/avatars/`.
- *
- * This is a temporary default; the upload/install flow can later accept an
- * explicit `avatarFileId` and copy that file here instead.
- */
-async function persistDevAvatar(dnpName: string): Promise<void> {
-  try {
-    const avatarPath = getAvatarPath(dnpName, false);
-    const avatarDir = path.dirname(avatarPath);
-    if (!fs.existsSync(avatarDir)) {
-      fs.mkdirSync(avatarDir, { recursive: true });
-    }
-
-    // Avoid overwriting an existing avatar in case the user later uploads one.
-    if (fs.existsSync(avatarPath)) return;
-
-    const defaultAvatarPath = path.join(__dirname, "..", "..", "assets", DEFAULT_DEV_AVATAR_FILENAME);
-    if (!fs.existsSync(defaultAvatarPath)) {
-      logs.warn(`Default dev avatar not found at ${defaultAvatarPath}, skipping`);
-      return;
-    }
-
-    await fs.promises.copyFile(defaultAvatarPath, avatarPath);
-  } catch (e) {
-    // Avatar persistence must never block installation.
-    logs.warn(`Failed to persist dev avatar for ${dnpName}: ${e.message}`);
   }
 }

@@ -63,7 +63,7 @@ export default function SideBar({ screenWidth }: { screenWidth: number }) {
       )}
 
       <div className="funded-by">
-        <div className={theme === "light" ? "funded-by-text-light" : "funded-by-text-dark"}>DEV MODE</div>
+        <div className={theme === "light" ? "funded-by-text-light" : "funded-by-text-dark"}>SUPPORTED BY</div>
         <div className="funded-by-logos">
           {fundedBy.map((item, i) => (
             <a key={i} href={item.link}>

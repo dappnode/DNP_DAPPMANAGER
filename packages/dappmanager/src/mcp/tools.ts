@@ -450,36 +450,35 @@ const setStakerConfigTool: DappnodeTool = {
   name: "dappnode_set_staker_config",
   displayName: "Change staker config",
   description:
-    "Change the staker setup on a network: pick (or clear) the execution/consensus/mev-boost/web3signer clients, and update the mev-boost relay list. Each *DnpName field is optional and defaults to 'unset that slot' (null). This touches multiple packages — ask the user to confirm before calling.",
+    "Change the staker setup on a network: pick (or clear) the execution/consensus/mev-boost/web3signer clients, and update the mev-boost relay list. Call dappnode_get_staker_config first and pass the full intended configuration; use null only when you explicitly want to unset a slot. This touches multiple packages — ask the user to confirm before calling.",
   mutating: true,
   schema: {
     network: z.nativeEnum(Network).describe("Staker network to configure."),
     executionDnpName: z
       .string()
       .nullable()
-      .optional()
       .describe(
-        "Execution client dnpName, or null to unset. Omit to leave unchanged is NOT supported — pass null explicitly."
+        "Execution client dnpName, or null to unset. Required to avoid accidental partial staker changes."
       ),
-    consensusDnpName: z.string().nullable().optional().describe("Consensus client dnpName, or null to unset."),
-    mevBoostDnpName: z.string().nullable().optional().describe("MEV-boost dnpName, or null to unset."),
-    web3signerDnpName: z.string().nullable().optional().describe("Web3signer dnpName, or null to unset."),
-    relays: z.array(z.string()).optional().describe("List of MEV-boost relay URLs. Defaults to empty.")
+    consensusDnpName: z.string().nullable().describe("Consensus client dnpName, or null to unset."),
+    mevBoostDnpName: z.string().nullable().describe("MEV-boost dnpName, or null to unset."),
+    web3signerDnpName: z.string().nullable().describe("Web3signer dnpName, or null to unset."),
+    relays: z.array(z.string()).describe("Full list of MEV-boost relay URLs; pass [] only to clear the list.")
   },
   async execute({
     network,
-    executionDnpName = null,
-    consensusDnpName = null,
-    mevBoostDnpName = null,
-    web3signerDnpName = null,
-    relays = []
+    executionDnpName,
+    consensusDnpName,
+    mevBoostDnpName,
+    web3signerDnpName,
+    relays
   }: {
     network: Network;
-    executionDnpName?: string | null;
-    consensusDnpName?: string | null;
-    mevBoostDnpName?: string | null;
-    web3signerDnpName?: string | null;
-    relays?: string[];
+    executionDnpName: string | null;
+    consensusDnpName: string | null;
+    mevBoostDnpName: string | null;
+    web3signerDnpName: string | null;
+    relays: string[];
   }) {
     logs.info(`MCP: dappnode_set_staker_config(${network})`);
     const stakerConfig: StakerConfigSet = {
