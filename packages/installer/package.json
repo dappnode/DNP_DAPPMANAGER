@@ -12,10 +12,6 @@
     },
     "./package.json": "./package.json"
   },
-  "files": [
-    "dist",
-    "src/assets"
-  ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "TEST=true mocha --config ./.mocharc.yaml --recursive ./test/unit",
