@@ -6,6 +6,7 @@ export * from "./ethicalMetrics.js";
 export * from "./ipfsClient.js";
 export * from "./mirrorProvider.js";
 export * from "./fileTransferPath.js";
+export * from "./mcp.js";
 export * from "./network.js";
 export * from "./nexus.js";
 export * from "./notification.js";

@@ -1,5 +1,6 @@
 import { Request } from "express";
 import { PlainTextFileDb } from "@dappnode/utils";
+import * as db from "@dappnode/db";
 import { getRandomAlphanumericToken } from "./token.js";
 import { wrapHandler } from "../utils.js";
 import { SessionData, SessionsManager } from "../sessions/index.js";
@@ -64,7 +65,7 @@ export class AuthPasswordSession {
    * - Some user registered no cookie in req >> NotLoggedInNoCookieError
    */
   private isMcpApiKeyValid(req: Request): boolean {
-    const configuredKey = this.params.MCP_API_KEY || process.env.MCP_API_KEY;
+    const configuredKey = db.mcpApiKey.get() || this.params.MCP_API_KEY || process.env.MCP_API_KEY;
     if (!configuredKey) return false;
 
     const authHeader = req.headers.authorization || "";
@@ -216,8 +217,10 @@ export class AuthPasswordSession {
    *
    *   Authorization: Bearer <MCP_API_KEY>
    *
-   * `MCP_API_KEY` is set on the dappmanager container environment. When it is
-   * unset, bearer-token auth is disabled and only cookie sessions work.
+   * `MCP_API_KEY` may be set on the dappmanager container environment, or
+   * generated from the admin UI and stored in the main DB. The in-app key
+   * takes precedence. When no key is set anywhere, bearer-token auth is
+   * disabled and only cookie sessions work.
    */
   onlyAdmin = wrapHandler((req, _, next) => {
     if (this.isMcpApiKeyValid(req)) {

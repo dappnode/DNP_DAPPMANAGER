@@ -538,20 +538,37 @@ export interface Routes {
 
   /**
    * Installs a DAppNode Package locally for development, without IPFS.
-   * The package image must already be available to the Docker daemon as a
-   * `docker save` tarball at `imageTarPath` (a path readable by the dappmanager).
+   * The package image must already have been uploaded as a `docker save` tarball
+   * via the `/upload` endpoint, which returns a `fileId`. That `imageFileId` is
+   * resolved here to the host file path and loaded into Docker.
    * The package is tagged as a dev package and shown under the "My dev packages" tab.
    * @param manifest Package manifest (dappnode_package.json content)
    * @param compose Package docker-compose.yml content (as a YAML string)
-   * @param imageTarPath Absolute host path to the `docker save` image tarball
+   * @param imageFileId File ID returned by `/upload` for the `docker save` tarball
    * @param setupWizard Optional setup-wizard.yml content (as a YAML string)
    */
   packageInstallDev: (kwargs: {
     manifest: Manifest;
     compose: string;
-    imageTarPath: string;
+    imageFileId: string;
     setupWizard?: string;
   }) => Promise<void>;
+
+  /**
+   * Get the current MCP API bearer key, if one has been generated.
+   */
+  mcpApiKeyGet: () => Promise<{ apiKey: string | null }>;
+
+  /**
+   * Generate a new MCP API bearer key. Invalidates any previously generated key.
+   */
+  mcpApiKeyGenerate: () => Promise<{ apiKey: string }>;
+
+  /**
+   * Remove the in-app MCP API bearer key. Bearer auth falls back to the
+   * `MCP_API_KEY` env var if one is configured; otherwise it is disabled.
+   */
+  mcpApiKeyRemove: () => Promise<{ ok: true }>;
 
   /**
    * Get package detail information
@@ -998,6 +1015,9 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   optimismConfigSet: { log: true },
   packageInstall: { log: true },
   packageInstallDev: { log: true },
+  mcpApiKeyGet: {},
+  mcpApiKeyGenerate: { log: true },
+  mcpApiKeyRemove: { log: true },
   packageGet: {},
   packagesGet: {},
   packageGettingStartedToggle: {},

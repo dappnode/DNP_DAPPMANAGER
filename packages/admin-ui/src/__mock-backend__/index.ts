@@ -519,7 +519,10 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   }),
   disableHostScriptsGet: async () => false,
   uiTelemetryConsentGet: async () => true,
-  uiTelemetryConsentSet: async () => {}
+  uiTelemetryConsentSet: async () => {},
+  mcpApiKeyGet: async () => ({ apiKey: null }),
+  mcpApiKeyGenerate: async () => ({ apiKey: "mock-mcp-api-key" }),
+  mcpApiKeyRemove: async () => ({ ok: true })
 };
 
 export const calls: Routes = {

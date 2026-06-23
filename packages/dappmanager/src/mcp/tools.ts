@@ -58,6 +58,15 @@ export interface DappnodeTool {
   execute: (input: any) => Promise<unknown>;
 }
 
+/** Standard MCP tool annotations derived from a tool's mutating flag. */
+export function toolAnnotations(tool: DappnodeTool): { title: string; readOnlyHint: boolean; destructiveHint: boolean } {
+  return {
+    title: tool.displayName,
+    readOnlyHint: !tool.mutating,
+    destructiveHint: Boolean(tool.mutating)
+  };
+}
+
 /* ────────────── Helpers ────────────── */
 
 function compactContainer(c: PackageContainer): Record<string, unknown> {
@@ -640,22 +649,42 @@ const validatePackageTool: DappnodeTool = {
   }
 };
 
+const getDevUploadInfoTool: DappnodeTool = {
+  name: "dappnode_get_dev_upload_info",
+  displayName: "Get dev package upload info",
+  description:
+    "Return the upload endpoint details needed to send a `docker save` image tarball to this DAppNode before calling `dappnode_install_dev_package`. The image MUST be uploaded out-of-band via plain HTTP multipart POST (do NOT send binary bytes through MCP). Use this first if you are unsure of the URL, form field name, auth method, or size limit.",
+  schema: {},
+  async execute() {
+    return {
+      uploadPath: "/upload",
+      formFieldName: "file",
+      method: "POST",
+      maxFileSizeBytes: 500 * 1024 * 1024,
+      maxFiles: 10,
+      auth: "Same origin and credentials as /mcp: admin session cookie or Authorization: Bearer <MCP_API_KEY>",
+      responseType: "plain text fileId",
+      note: "POST to the same origin you use for /mcp (e.g. http://<your-dappnode>/upload). After uploading, pass the returned fileId as `imageFileId` to dappnode_install_dev_package. Uploaded files expire after 15 minutes."
+    };
+  }
+};
+
 const installDevPackageTool: DappnodeTool = {
   name: "dappnode_install_dev_package",
   displayName: "Install dev package",
   description:
-    "Install a package you are DEVELOPING into this DAppNode WITHOUT IPFS, so you can test it end-to-end. It is tagged as a dev package and listed under the 'My dev packages' tab (separate from registry packages). Provide the raw dappnode_package.json (manifest) and docker-compose.yml contents, plus `imageTarPath`: an absolute path on the DAppNode host to a `docker save` tarball of the package image. The image inside the tarball MUST be tagged exactly `<service>.<dnpName>:<version>` — build it first with `docker compose build`, then `docker save <image> -o <imageTarPath>`. Always run dappnode_validate_package first. This mutates state and starts containers — confirm with the user before calling. To re-install an updated build, run it again with the same name.",
+    "Install a package you are DEVELOPING into this DAppNode WITHOUT IPFS, so you can test it end-to-end. It is tagged as a dev package and listed under the 'My dev packages' tab (separate from registry packages). Provide the raw dappnode_package.json (manifest) and docker-compose.yml contents, plus `imageFileId`: the fileId returned by uploading a `docker save` tarball to this DAppNode's `/upload` endpoint. The image inside the tarball MUST be tagged exactly `<service>.<dnpName>:<version>` — build it first with `docker compose build`, then `docker save <image> -o <tar>`, upload the tar to `/upload`, and pass the returned fileId here. Always run dappnode_validate_package first. This mutates state and starts containers — confirm with the user before calling. To re-install an updated build, run it again with the same name.",
   mutating: true,
   schema: {
     manifest: z
       .union([z.string(), z.record(z.any())])
       .describe("Contents of dappnode_package.json — either the raw JSON string or the already-parsed object."),
     compose: z.string().min(1).describe("Raw contents of docker-compose.yml (YAML)."),
-    imageTarPath: z
+    imageFileId: z
       .string()
       .min(1)
       .describe(
-        "Absolute path on the DAppNode host to the `docker save` image tarball. The image must be tagged `<service>.<dnpName>:<version>`."
+        "File ID returned by the `/upload` endpoint for the `docker save` image tarball. Upload the tar out-of-band (multipart/form-data, field name 'file') and pass the returned fileId here."
       ),
     setupWizard: z
       .union([z.string(), z.record(z.any())])
@@ -665,12 +694,12 @@ const installDevPackageTool: DappnodeTool = {
   async execute({
     manifest,
     compose,
-    imageTarPath,
+    imageFileId,
     setupWizard
   }: {
     manifest: string | Record<string, unknown>;
     compose: string;
-    imageTarPath: string;
+    imageFileId: string;
     setupWizard?: string | Record<string, unknown>;
   }) {
     const manifestObj = (typeof manifest === "string" ? JSON.parse(manifest) : manifest) as Manifest;
@@ -683,7 +712,7 @@ const installDevPackageTool: DappnodeTool = {
 
     logs.info(`MCP: dappnode_install_dev_package(${manifestObj.name})`);
     const { packageInstallDev } = await import("../calls/packageInstallDev.js");
-    await packageInstallDev({ manifest: manifestObj, compose, imageTarPath, setupWizard: setupWizardStr });
+    await packageInstallDev({ manifest: manifestObj, compose, imageFileId, setupWizard: setupWizardStr });
     return { ok: true, dnpName: manifestObj.name, version: manifestObj.version };
   }
 };
@@ -761,11 +790,7 @@ const installPackageTool: DappnodeTool = {
       .string()
       .optional()
       .describe("Optional target version (semver or IPFS hash). Defaults to latest."),
-    userSettings: z
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .record(z.any())
-      .optional()
-      .describe("Per-package settings (env vars, port mappings, named-volume mountpoints, …). Structure matches the setup wizard returned by dappnode_fetch_install_preview."),
+    userSettings: z.record(z.any()).optional().describe("Per-package settings (env vars, port mappings, named-volume mountpoints, …). Structure matches the setup wizard returned by dappnode_fetch_install_preview."),
     options: z
       .object({
         BYPASS_RESOLVER: z.boolean().optional(),
@@ -818,6 +843,7 @@ export const dappnodeTools: Record<string, DappnodeTool> = {
   [setPackageEnvironmentTool.name]: setPackageEnvironmentTool,
   [setPackagePortMappingsTool.name]: setPackagePortMappingsTool,
   [validatePackageTool.name]: validatePackageTool,
+  [getDevUploadInfoTool.name]: getDevUploadInfoTool,
   [installDevPackageTool.name]: installDevPackageTool,
   [searchRegistryTool.name]: searchRegistryTool,
   [fetchInstallPreviewTool.name]: fetchInstallPreviewTool,

@@ -9,6 +9,12 @@ description: >-
   compose rules, and how to validate + debug the package using Docker and the
   DAppNode MCP server. NOT for managing already-installed packages on a
   running node — use the MCP package tools directly for that.
+license: GPL-3.0
+compatibility: Requires Docker, a reachable DAppNode with MCP enabled, and an MCP API key or admin session for /mcp and /upload.
+allowed-tools: Read Write Edit Bash dappnode_validate_package dappnode_get_dev_upload_info dappnode_install_dev_package dappnode_get_package_details dappnode_get_package_logs dappnode_start_package dappnode_stop_package dappnode_restart_package dappnode_search_docs dappnode_fetch_doc
+metadata:
+  author: dappnode
+  version: "1.0.0"
 ---
 
 # Create a DAppNode package
@@ -24,16 +30,36 @@ produce an IPFS hash at the very end, when you publish a release.
 1. **Never build an IPFS hash during development.** Do NOT run
    `dappnodesdk build` / `publish` in the dev loop — it is slow and uploads to
    IPFS. Use `docker compose` locally instead.
-2. **The agent debugs the package itself.** Build it, start it, read its logs,
-   exec into it, curl its endpoints. Iterate until it actually runs. Don't hand
-   a broken package to the user.
-3. **You MUST use the DAppNode MCP** to validate the package and (optionally) to
-   test it on a real node. The key dev-time tool is `dappnode_validate_package`,
-   which runs the exact manifest + compose + setup-wizard checks the dappmanager
-   applies at install time — fast and offline, no IPFS.
-4. **Keep it minimal.** A working package is `dappnode_package.json` +
-   `docker-compose.yml` + a `Dockerfile` (or a public `image:`). Add a
-   setup-wizard, backup, notifications, etc. only when needed.
+2. **Run the whole flow yourself.** You scaffold, build, validate, upload,
+   install and test. Do not hand command lists to the user and stop. If Docker
+   is not running, try to start it; if you cannot, ask the user to start it
+   **once** and then continue autonomously.
+3. **Use the DAppNode MCP as the source of truth.** Call
+   `dappnode_validate_package` on every iteration, and use
+   `dappnode_install_dev_package` to test on a real node. These run the exact
+   checks the dappmanager applies at install time.
+4. **Iterate until it actually works.** Read container logs, `curl` endpoints,
+   exec into containers, and fix errors. Do not declare success before the
+   service responds correctly.
+5. **Keep it minimal.** A working package is `dappnode_package.json` +
+   `docker-compose.yml` + a `Dockerfile` (or a public `image:`). Add extras only
+   when needed.
+
+## DAppNode MCP connection
+
+The DAppNode MCP server is usually exposed at `http://my.dappnode/mcp`, but
+use the exact origin (scheme + host + port) of the MCP connection you are
+configured to use. The same admin authentication works for both `/mcp` and
+`/upload` (session cookie or `Authorization: Bearer <MCP_API_KEY>`).
+
+All `dappnode_*` tools below are served by that MCP. Before calling any of
+them, make sure you are connected to the DAppNode MCP; if you are not,
+connect first. For uploads, POST the tarball to `<mcp-origin>/upload`, not a
+guessed `my.dappnode` address that may not resolve from your machine.
+
+If no bearer token exists yet, generate one in the DAppNode admin UI under
+**System > Advanced > MCP API key**. That UI can also revoke or rotate the
+token at any time.
 
 ## Package anatomy
 
@@ -204,7 +230,7 @@ Filename matching is by regex — use these exact names to be safe:
 
 | File | Purpose |
 |------|---------|
-| `avatar.png` | Package icon (PNG, ≤100KB). Required for a real published release; not needed for the local `docker compose` dev loop. |
+| `avatar.png` | Package icon (PNG, ≤100KB). Required for a real published release; not needed for the local `docker compose` dev loop. For dev installs, a default icon is used automatically, but you may include one if you want a custom icon. |
 | `setup-wizard.yml` | Install-time form (section 4). |
 | `getting-started.md` | Shown once after install. |
 | `disclaimer.md` | Must-accept disclaimer text. |
@@ -212,8 +238,9 @@ Filename matching is by regex — use these exact names to be safe:
 | `prometheus-targets.json` | Prometheus scrape targets. |
 | `notifications.yaml` | Notification/alert definitions. |
 
-All are optional except `avatar.png` (only required at publish time). Match the
-filename regex exactly or the file is silently ignored.
+All are optional. `avatar.png` is required only for a real published release;
+for dev installs a default icon is applied automatically. Match the filename
+regex exactly or the file is silently ignored.
 
 ## SDK commands & options (reference)
 
@@ -248,86 +275,145 @@ developing a variant locally, merge the base + variant compose yourself (or just
 work on one concrete compose) and validate the merged result with
 `dappnode_validate_package` — still no IPFS needed.
 
-## The fast dev loop (no IPFS)
+## End-to-end dev workflow (no IPFS)
 
-Run everything from the package directory. You (the agent) drive Docker and read
-the output — don't ask the user to do it.
+Do not stop after local testing and ask the user to continue. Run the whole
+sequence below in one continuous pass, reading output and fixing errors at each
+step.
 
-1. **Scaffold** the files above — copy from [templates/](templates/) and edit
-   (or run `dappnodesdk init` to generate them, then stop — do NOT build/publish).
-2. **Validate structure** with Docker's own parser:
-   ```bash
-   docker compose config
-   ```
-3. **Validate DAppNode rules** via the MCP tool `dappnode_validate_package`,
-   passing the raw contents of `dappnode_package.json`, `docker-compose.yml` and
-   (if present) `setup-wizard.yml`. Fix every reported error. This is the
-   IPFS-free equivalent of the install-time checks.
-4. **Build the image** locally:
-   ```bash
-   docker compose build
-   ```
-5. **Run it** and watch it:
-   ```bash
-   docker compose up -d
-   docker compose logs -f --tail=200
-   ```
-6. **Debug yourself**: read the logs, `docker compose ps` for state/health,
-   `docker compose exec <service> sh` to poke inside, `curl` exposed ports. If a
-   container restarts/exits, read the logs, fix the Dockerfile/compose/env, and
-   go back to step 2.
-7. **Repeat** until the service is healthy and does what it should.
-8. **Clean up** when done:
-   ```bash
-   docker compose down -v
-   ```
+### 1. Scaffold the package
 
-## Install & test on your DAppNode (no IPFS)
+Create a directory and copy the templates. Edit `dappnode_package.json`,
+`docker-compose.yml`, and `Dockerfile` (or use a public `image:`) to match the
+service you are packaging.
 
-When the package runs cleanly in the local loop above, install it straight into
-the DAppNode — still **without IPFS** — to test it inside the real DAppNode
-environment (networks, global envs, DNS, the UI). It lands under the
-**"My dev packages"** tab in the Packages page, kept separate from packages
-installed from the registry.
+### 2. Validate locally with Docker
 
-Use the MCP tool **`dappnode_install_dev_package`**. The only extra requirement
-vs. the local loop is delivering the already-built image:
+From the package directory:
 
-1. **Build** the image with the exact DAppNode tag (the compose `image:` field
-   already is `<service>.<dnpName>:<version>` — see the compose rules):
-   ```bash
-   docker compose build
-   ```
-2. **Save** it to a tarball at a path the dappmanager can read on the host:
-   ```bash
-   docker save <service>.<dnpName>:<version> -o /path/on/host/<dnpName>.tar
-   ```
-   For a multi-service package, `docker save` every service image into the tar.
-3. **Install** via the MCP tool, passing the raw `dappnode_package.json` and
-   `docker-compose.yml` contents plus `imageTarPath` (and optionally
-   `setup-wizard.yml`):
-   - `dappnode_install_dev_package({ manifest, compose, imageTarPath, setupWizard? })`
-   - It validates the files, `docker load`s the image, tags the package as a dev
-     package, and starts it — no IPFS, no APM, no signing.
-4. **Verify on the node** with the read-only MCP tools
-   (`dappnode_get_package_details`, `dappnode_get_package_logs`, …) and in the
-   UI under Packages → **My dev packages**.
-5. **Iterate**: rebuild, re-save, and call `dappnode_install_dev_package` again
-   with the same name to replace it. Remove it like any package when done.
+```bash
+docker compose config
+docker compose build
+docker compose up -d
+docker compose logs -f --tail=200
+```
 
-Image tag MUST match `<service>.<dnpName>:<version>` exactly — DAppNode forces
-that image tag in the compose, so a mismatched `docker save` tag will fail to
-start. Always run `dappnode_validate_package` first.
+If Docker is not running, try to start it. If you cannot start it automatically,
+ask the user to start it **once** and then continue autonomously — do not hand
+back a list of commands and stop.
+
+Read the logs. If the container exits or restarts, fix the code/compose/env and
+repeat this step. Confirm the service actually responds (`curl`, browser, health
+endpoint) before moving on.
+
+**Image tag check:** before saving the tarball, verify the built image is tagged
+exactly `<service>.<dnpName>:<version>` (single-service packages may omit the
+`<service>.` prefix). DAppNode requires this tag. If `docker images` shows a
+different tag, rebuild or re-tag with `docker tag <current> <required>`.
+
+### 3. Validate against DAppNode rules
+
+Call `dappnode_validate_package` with the raw contents of
+`dappnode_package.json`, `docker-compose.yml` and (if present)
+`setup-wizard.yml`. Fix every error it reports, then re-run local validation.
+
+### 4. Build and save the DAppNode image
+
+```bash
+docker compose build
+docker save <service>.<dnpName>:<version> -o <dnpName>.tar
+```
+
+The image tag MUST be exactly `<service>.<dnpName>:<version>` (for a single
+service you may omit the `<service>.` prefix). DAppNode forces this tag. If
+your image is tagged differently, re-tag it before saving:
+
+```bash
+docker tag <current-tag> <service>.<dnpName>:<version>
+```
+
+### 5. Upload the image
+
+Get upload details from `dappnode_get_dev_upload_info()` if needed. Then
+POST the tarball to `<mcp-origin>/upload`, where `<mcp-origin>` is the exact
+scheme + host + port of the MCP server you are using. Use the same bearer
+token or session cookie that reaches `/mcp`:
+
+```bash
+curl -X POST <mcp-origin>/upload \
+  -H "Authorization: Bearer $MCP_API_KEY" \
+  -F "file=@<dnpName>.tar"
+# → <imageFileId>
+```
+
+The response body is a plain-text file ID, not JSON. Save it exactly as
+returned.
+
+Do not hardcode `http://my.dappnode` if it does not resolve from your
+environment. If the upload fails because the DAppNode is not reachable, ask
+for a reachable address **once**, update the origin, and continue. Do not keep
+prompting after every step.
+
+Uploaded files expire after 15 minutes. If you wait longer than that, re-upload
+before calling `dappnode_install_dev_package`.
+
+### 6. Install on the DAppNode
+
+Call:
+
+```text
+dappnode_install_dev_package({
+  manifest: <raw dappnode_package.json>,
+  compose: <raw docker-compose.yml>,
+  imageFileId: <fileId from upload>,
+  setupWizard?: <raw setup-wizard.yml>
+})
+```
+
+This validates, `docker load`s the image, flags the package as dev, and starts
+it — no IPFS, no APM, no signing. Dev packages get a default icon so they show
+up with an avatar in the UI; in the future you will be able to upload a custom
+`avatar.png` and pass its fileId. This mutates state; confirm with the user
+before calling if you have not already.
+
+### 7. Verify on the real node
+
+Use the MCP read tools:
+
+- `dappnode_get_package_details(<dnpName>)` — inspect state, ports, volumes.
+- `dappnode_get_package_logs(<dnpName>)` — read logs.
+- `curl` the package's DAppNode URL (`http://<service>.<dnpName-without-.eth>`).
+
+Fix any issues locally, rebuild, re-upload and call
+`dappnode_install_dev_package` again with the same name to replace it. If the
+install fails with "No uploaded file found for imageFileId", the tarball has
+expired (15-minute TTL) — re-upload and retry immediately.
+
+### 8. Clean up
+
+When finished:
+
+```bash
+docker compose down -v
+```
+
+Remove the dev package from the DAppNode like any other package.
 
 ## MCP tools to use
 
 Dev-time (offline, no IPFS):
 - `dappnode_validate_package` — validate manifest + compose + setup-wizard.
   Call it on every iteration.
+- `dappnode_get_dev_upload_info` — return the `/upload` endpoint details
+  (path, form field, size limit, auth) so you can send the `docker save`
+  tarball out of band. Combine the returned path with the exact origin of the
+  MCP server you are using, not a guessed `my.dappnode` address. Call this if
+  you are unsure how to upload.
 - `dappnode_install_dev_package` — install a locally-built package into the
   DAppNode without IPFS, for real end-to-end testing. Appears under the
-  "My dev packages" tab. Needs a `docker save` image tarball (see the section
-  above). This mutates state — confirm with the user before calling.
+  "My dev packages" tab. Takes an `imageFileId` returned by `/upload`, not the
+  raw tarball bytes. This mutates state — confirm with the user before calling.
+  Uploaded tarballs expire after 15 minutes, so install promptly after upload.
 
 Optional, to test the finished package on a real DAppNode after you've installed
 it there:

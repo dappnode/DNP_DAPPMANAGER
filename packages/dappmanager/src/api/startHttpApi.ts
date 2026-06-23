@@ -105,7 +105,16 @@ export function startHttpApi({
   // TODO: research how to use auth in the proxy
   app.use(ethForwardMiddleware);
   // default options. ALL CORS + limit fileSize and file count
-  app.use(fileUpload({ limits: { fileSize: 500 * 1024 * 1024, files: 10 } }));
+  // useTempFiles is required so the MCP dev-package tarball is streamed to
+  // disk instead of buffered in memory; large docker-save images can exceed
+  // Node's heap otherwise.
+  app.use(
+    fileUpload({
+      limits: { fileSize: 500 * 1024 * 1024, files: 10 },
+      useTempFiles: true,
+      tempFileDir: dappnodeParams.TEMP_TRANSFER_DIR
+    })
+  );
   // CORS config follows https://stackoverflow.com/questions/50614397/value-of-the-access-control-allow-origin-header-in-the-response-must-not-be-th
   app.use(cors({ credentials: true, origin: params.HTTP_CORS_WHITELIST }));
   app.use(compression());
@@ -185,13 +194,14 @@ export function startHttpApi({
   app.put("/nexus/chat/history/:id", auth.onlyAdmin, nexusChatHistoryUpsert);
   app.delete("/nexus/chat/history/:id", auth.onlyAdmin, nexusChatHistoryDelete);
 
-  // MCP server for this DAppNode — same tools the embedded chat uses, also
-  // reachable by external MCP clients (Claude Desktop, Cursor, etc.) and by
-  // other DAppNode packages. Authentication: admin session cookie OR
-  // `Authorization: Bearer <MCP_API_KEY>` (configured in the dappmanager env).
+  // Stateless MCP server for this DAppNode — same tools the embedded chat
+  // uses, also reachable by external MCP clients (Claude Desktop, Cursor, etc.)
+  // and by other DAppNode packages. Authentication: admin session cookie OR
+  // `Authorization: Bearer <MCP_API_KEY>` (configured in the dappmanager env
+  // or generated from the admin UI at System > Advanced > MCP API key).
+  // A fresh transport is created per request so a stale client session can
+  // never hold the MCP endpoint lock.
   app.post("/mcp", auth.onlyAdmin, wrapHandler(handleMcpRequest));
-  app.get("/mcp", auth.onlyAdmin, wrapHandler(handleMcpRequest));
-  app.delete("/mcp", auth.onlyAdmin, wrapHandler(handleMcpRequest));
 
   // Open endpoints (no auth)
   app.get("/global-envs/:name?", routes.globalEnvs);

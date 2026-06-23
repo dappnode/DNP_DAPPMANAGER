@@ -11,6 +11,6 @@
     "lib": ["ESNext", "DOM"]
   },
 
-  "include": ["src/**/*", "src/**/*.json"],
+  "include": ["src/**/*", "src/**/*.json", "src/**/*.png"],
   "exclude": ["node_modules", "test/**/*", "dist"]
 }

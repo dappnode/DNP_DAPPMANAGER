@@ -69,7 +69,7 @@ export const packages: Pick<
 
   packageLog: async ({ containerName }) => `INFO: ${containerName} logs`,
 
-  packageInstallDev: async ({ manifest }) => {
+  packageInstallDev: async ({ manifest, imageFileId: _imageFileId }) => {
     await pause(pkgRestartMs);
     const name = manifest.name;
     packagesState.set(name, {
