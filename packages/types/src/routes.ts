@@ -541,7 +541,7 @@ export interface Routes {
    * The package image must already have been uploaded as a `docker save` tarball
    * via the `/upload` endpoint, which returns a `fileId`. That `imageFileId` is
    * resolved here to the host file path and loaded into Docker.
-   * The package is tagged as a dev package and shown under the "My dev packages" tab.
+   * The package is tagged as a custom package and shown under the "My custom packages" tab.
    * @param manifest Package manifest (dappnode_package.json content)
    * @param compose Package docker-compose.yml content (as a YAML string)
    * @param imageFileId File ID returned by `/upload` for the `docker save` tarball

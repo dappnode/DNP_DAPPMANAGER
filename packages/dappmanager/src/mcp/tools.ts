@@ -644,7 +644,7 @@ const validatePackageTool: DappnodeTool = {
 
 const getDevUploadInfoTool: DappnodeTool = {
   name: "dappnode_get_dev_upload_info",
-  displayName: "Get dev package upload info",
+  displayName: "Get custom package upload info",
   description:
     "Return the supported ways to stage a `docker save` image tarball before calling `dappnode_install_dev_package`. MCP clients should prefer the chunked MCP upload tools when they cannot reach this DAppNode's `/upload` endpoint directly.",
   schema: {},
@@ -680,7 +680,7 @@ const getDevUploadInfoTool: DappnodeTool = {
 
 const beginDevImageUploadTool: DappnodeTool = {
   name: "dappnode_begin_dev_image_upload",
-  displayName: "Begin dev image upload",
+  displayName: "Begin custom image upload",
   description:
     "Start an MCP-native chunked upload for a `docker save` image tarball. Use this when the MCP client can call POST /mcp but cannot access the DAppNode `/upload` endpoint directly. Pass the total byte size, and optionally a sha256 hex digest. Then call dappnode_append_dev_image_upload_chunk repeatedly with standard padded base64 chunks, and finally dappnode_finish_dev_image_upload to receive imageFileId. This writes a temporary file and requires explicit user approval.",
   mutating: true,
@@ -702,7 +702,7 @@ const beginDevImageUploadTool: DappnodeTool = {
 
 const appendDevImageUploadChunkTool: DappnodeTool = {
   name: "dappnode_append_dev_image_upload_chunk",
-  displayName: "Append dev image upload chunk",
+  displayName: "Append custom image upload chunk",
   description:
     "Append one standard padded base64 chunk to an MCP-native dev image upload. Chunks must be sent in order. The `offset` is the number of raw bytes already accepted, returned by the previous append call. Each raw decoded chunk must be at most 1 MiB. This writes temporary file data and requires explicit user approval.",
   mutating: true,
@@ -722,7 +722,7 @@ const appendDevImageUploadChunkTool: DappnodeTool = {
 
 const finishDevImageUploadTool: DappnodeTool = {
   name: "dappnode_finish_dev_image_upload",
-  displayName: "Finish dev image upload",
+  displayName: "Finish custom image upload",
   description:
     "Finish an MCP-native dev image upload after every chunk has been appended. Verifies the declared size and optional sha256 digest, registers the staged tarball in DAppManager's temporary file-transfer store, and returns `imageFileId` for dappnode_install_dev_package. This requires explicit user approval.",
   mutating: true,
@@ -737,7 +737,7 @@ const finishDevImageUploadTool: DappnodeTool = {
 
 const abortDevImageUploadTool: DappnodeTool = {
   name: "dappnode_abort_dev_image_upload",
-  displayName: "Abort dev image upload",
+  displayName: "Abort custom image upload",
   description:
     "Abort an in-progress MCP-native dev image upload and delete its temporary partial file. Use this if the upload fails or the user cancels.",
   mutating: true,
@@ -751,9 +751,9 @@ const abortDevImageUploadTool: DappnodeTool = {
 
 const installDevPackageTool: DappnodeTool = {
   name: "dappnode_install_dev_package",
-  displayName: "Install dev package",
+  displayName: "Install custom package",
   description:
-    "Install a package you are DEVELOPING into this DAppNode WITHOUT IPFS, so you can test it end-to-end. It is tagged as a dev package and listed under the 'My dev packages' tab (separate from registry packages). Provide the raw dappnode_package.json (manifest) and docker-compose.yml contents, plus `imageFileId`: the fileId returned by `/upload` or the imageFileId returned by dappnode_finish_dev_image_upload. The image inside the tarball MUST be tagged exactly `<service>.<dnpName>:<version>` — build it first with `docker compose build`, then `docker save <image> -o <tar>`, stage the tarball, and pass the returned imageFileId here. Always run dappnode_validate_package first. This mutates state and starts containers — confirm with the user before calling. To re-install an updated build, run it again with the same name.",
+    "Install a package you are DEVELOPING into this DAppNode WITHOUT IPFS, so you can test it end-to-end. It is listed under the 'My custom packages' tab (separate from registry packages). Provide the raw dappnode_package.json (manifest) and docker-compose.yml contents, plus `imageFileId`: the fileId returned by `/upload` or the imageFileId returned by dappnode_finish_dev_image_upload. The image inside the tarball MUST be tagged exactly `<service>.<dnpName>:<version>` — build it first with `docker compose build`, then `docker save <image> -o <tar>`, stage the tarball, and pass the returned imageFileId here. Always run dappnode_validate_package first. This mutates state and starts containers — confirm with the user before calling. To re-install an updated build, run it again with the same name.",
   mutating: true,
   schema: {
     manifest: z

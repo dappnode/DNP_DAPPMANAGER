@@ -31,7 +31,7 @@ import {
 } from "@dappnode/types";
 
 /**
- * Default avatar for dev packages. Stored under the non-core avatars directory
+ * Default avatar for custom packages. Stored under the non-core avatars directory
  * as a fallback so the UI can serve a real icon instead of the generic placeholder.
  */
 const DEFAULT_DEV_AVATAR_FILENAME = "dev-default-avatar.png";
@@ -62,7 +62,7 @@ function isCorePackageIdentity(manifest: Manifest): boolean {
  * for `docker compose up`.
  *
  * The package is tagged with the `dappnode.dnp.isDev` container label so the UI
- * can list it under the "My dev packages" tab and keep it separate from packages
+ * can list it under the "My custom packages" tab and keep it separate from packages
  * installed from the registry.
  */
 export async function packageInstallDev({
@@ -87,13 +87,13 @@ export async function packageInstallDev({
     if (setupWizard) validateSetupWizardSchema(setupWizard);
 
     if (isCorePackageIdentity(manifest)) {
-      throw Error("Dev packages cannot use core package names or type=dncore");
+      throw Error("Custom packages cannot use core package names or type=dncore");
     }
     await checkInstallRequirements({ manifest });
 
     if (packageIsInstalling(dnpName)) throw Error(`${dnpName} is installing`);
 
-    // Apply DAppNode compose defaults and tag the package as a dev package
+    // Apply DAppNode compose defaults and tag the package as a custom package
     const devCompose = buildDevCompose(compose, manifest);
 
     const release: PackageRelease = {
@@ -128,7 +128,7 @@ export async function packageInstallDev({
       log(id, "Loading dev image...");
       await loadImage(imageTarPath, (event) => log(id, event.status || ""));
 
-      // Persist a default avatar for the dev package so the UI has an icon.
+      // Persist a default avatar for the custom package so the UI has an icon.
       // Future: accept an uploaded avatar file and persist it instead.
       await persistDevAvatar(dnpName);
 
@@ -150,7 +150,7 @@ export async function packageInstallDev({
       throw e;
     }
   } catch (e) {
-    logs.error(`Error installing dev package ${dnpName}`, e);
+    logs.error(`Error installing custom package ${dnpName}`, e);
     logUiClear({ id });
     throw e;
   }
@@ -158,7 +158,7 @@ export async function packageInstallDev({
 
 /**
  * Applies the DAppNode compose defaults and writes the package metadata to the
- * container labels, flagging the package as a dev package (`isDev: true`).
+ * container labels, flagging the package as a custom package (`isDev: true`).
  * Mirrors `DappnodeInstaller.addCustomDefaultsAndLabels` but for local dev installs.
  */
 function buildDevCompose(compose: Compose, manifest: Manifest): Compose {

@@ -397,8 +397,8 @@ dappnode_install_dev_package({
 })
 ```
 
-This validates, `docker load`s the image, flags the package as dev, and starts
-it — no IPFS, no APM, no signing. Dev packages get a default icon so they show
+This validates, `docker load`s the image, flags the package as custom, and starts
+it — no IPFS, no APM, no signing. Custom packages get a default icon so they show
 up with an avatar in the UI; in the future you will be able to upload a custom
 `avatar.png` and pass its fileId. This mutates state; confirm with the user
 before calling if you have not already.
@@ -424,7 +424,7 @@ When finished:
 docker compose down -v
 ```
 
-Remove the dev package from the DAppNode like any other package.
+Remove the custom package from the DAppNode like any other package.
 
 ## MCP tools to use
 
@@ -442,7 +442,7 @@ Dev-time (offline, no IPFS):
   MCP-native upload and delete its partial temp file.
 - `dappnode_install_dev_package` — install a locally-built package into the
   DAppNode without IPFS, for real end-to-end testing. Appears under the
-  "My dev packages" tab. Takes an `imageFileId` returned by the upload step,
+  "My custom packages" tab. Takes an `imageFileId` returned by the upload step,
   not the raw tarball bytes. This mutates state — confirm with the user before calling.
   Uploaded tarballs expire after 15 minutes, so install promptly after upload.
 

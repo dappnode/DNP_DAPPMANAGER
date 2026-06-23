@@ -48,7 +48,7 @@ export function McpApiKey() {
       await new Promise<void>((resolve) =>
         confirm({
           title: "Enable mutating MCP tools",
-          text: "External MCP clients that can authenticate to this DAppNode will be able to run tools that change package state, including start, stop, restart, and dev package install actions.",
+          text: "External MCP clients that can authenticate to this DAppNode will be able to run tools that change package state, including start, stop, restart, and custom package install actions.",
           label: "Enable",
           onClick: resolve
         })

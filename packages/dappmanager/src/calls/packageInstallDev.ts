@@ -11,24 +11,24 @@ import * as db from "@dappnode/db";
  * which returns a `fileId` stored in `db.fileTransferPath`. We resolve that
  * `imageFileId` to the host path and pass the path down to the installer.
  *
- * The package is flagged as a dev package and shown under the "My dev packages" tab.
+ * The package is flagged as a custom package and shown under the "My custom packages" tab.
  */
 export async function packageInstallDev({
-    manifest,
-    compose,
-    imageFileId,
-    setupWizard
+  manifest,
+  compose,
+  imageFileId,
+  setupWizard
 }: Parameters<Routes["packageInstallDev"]>[0]): Promise<void> {
-    const imageTarPath = db.fileTransferPath.get(imageFileId);
-    if (!imageTarPath) throw Error(`No uploaded file found for imageFileId ${imageFileId}`);
+  const imageTarPath = db.fileTransferPath.get(imageFileId);
+  if (!imageTarPath) throw Error(`No uploaded file found for imageFileId ${imageFileId}`);
 
-    const composeObj = yamlParse<Compose>(compose);
-    const setupWizardObj = setupWizard ? yamlParse<SetupWizard>(setupWizard) : undefined;
+  const composeObj = yamlParse<Compose>(compose);
+  const setupWizardObj = setupWizard ? yamlParse<SetupWizard>(setupWizard) : undefined;
 
-    await pkgInstallDev({
-        manifest,
-        compose: composeObj,
-        imageTarPath,
-        setupWizard: setupWizardObj
-    });
+  await pkgInstallDev({
+    manifest,
+    compose: composeObj,
+    imageTarPath,
+    setupWizard: setupWizardObj
+  });
 }

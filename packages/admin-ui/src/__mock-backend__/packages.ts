@@ -78,7 +78,7 @@ export const packages: Pick<
       version: manifest.version || "0.1.0",
       avatarUrl: "",
       origin: "dev",
-      gettingStarted: `Dev package **${name}** installed locally`,
+      gettingStarted: `Custom package **${name}** installed locally`,
       gettingStartedShow: true,
       containers: [
         {
@@ -163,10 +163,10 @@ export const packages: Pick<
       containers: d.containers.map((container) =>
         !serviceNames || serviceNames?.includes(container.serviceName)
           ? {
-            ...container,
-            running: !container.running,
-            state: container.running ? "exited" : "running"
-          }
+              ...container,
+              running: !container.running,
+              state: container.running ? "exited" : "running"
+            }
           : container
       )
     }));

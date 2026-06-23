@@ -134,6 +134,7 @@ export function readContainerLabels(labelsRaw: ContainerLabelsRaw): Partial<{
   defaultVolumes: string[];
 }> {
   const labelValues = parseContainerLabels(labelsRaw);
+  const isDev = labelValues["dappnode.dnp.isDev"];
   return {
     dnpName: labelValues["dappnode.dnp.dnpName"],
     version: labelValues["dappnode.dnp.version"],
@@ -145,7 +146,7 @@ export function readContainerLabels(labelsRaw: ContainerLabelsRaw): Partial<{
     chain: labelValues["dappnode.dnp.chain"],
     categories: labelValues["dappnode.dnp.categories"],
     isCore: labelValues["dappnode.dnp.isCore"],
-    isDev: labelValues["dappnode.dnp.isDev"],
+    ...(isDev === undefined ? {} : { isDev }),
     isMain: labelValues["dappnode.dnp.isMain"],
     dockerTimeout: labelValues["dappnode.dnp.dockerTimeout"],
     defaultEnvironment: labelValues["dappnode.dnp.default.environment"],
