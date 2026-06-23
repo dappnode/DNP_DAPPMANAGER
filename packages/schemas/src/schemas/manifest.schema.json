@@ -481,6 +481,25 @@
         }
       }
     },
+    "upnpDisable": {
+      "oneOf": [
+        {
+          "type": "boolean",
+          "description": "Disable UPnP port mapping for all ports in this package",
+          "examples": [true, false]
+        },
+        {
+          "type": "array",
+          "description": "List of specific ports to disable UPnP port mapping for",
+          "items": {
+            "type": "number",
+            "description": "Port number to disable UPnP mapping for",
+            "examples": [8545, 30303, 9000]
+          }
+        }
+      ],
+      "description": "Disable UPnP port mapping for this package. Can be set to true to disable for all ports, or an array of port numbers to disable for specific ports only."
+    },
     "author": {
       "type": "string",
       "description": "Main author of this DAppNode Package. Must follow the structure `${name} <${email}> (${githubUserLink})`.",
