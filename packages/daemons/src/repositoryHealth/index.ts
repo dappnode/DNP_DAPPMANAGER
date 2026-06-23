@@ -48,7 +48,7 @@ async function checkIpfsHealth(): Promise<void> {
         category: Category.system,
         priority: Priority.high,
         status: Status.resolved,
-        isBanner: false,
+        isBanner: true,
         isRemote: false,
         correlationId
       });
@@ -121,7 +121,7 @@ Syncing and access to Ethereum chain data should now resume normally.`,
         category: Category.system,
         priority: Priority.high,
         status: Status.resolved,
-        isBanner: false,
+        isBanner: true,
         isRemote: false,
         correlationId
       });
