@@ -6,10 +6,12 @@ import Button from "components/Button";
 import { InputForm } from "components/InputForm";
 import { confirm } from "components/ConfirmDialog";
 import { withToastNoThrow } from "components/toast/Toast";
+import Switch from "components/Switch";
 
 export function McpApiKey() {
   const { data, mutate } = useApi.mcpApiKeyGet();
   const apiKey = data?.apiKey || "";
+  const mutatingToolsEnabled = data?.mutatingToolsEnabled ?? false;
 
   useEffect(() => {
     const clipboard = new ClipboardJS(".copy-mcp-key");
@@ -28,7 +30,7 @@ export function McpApiKey() {
     await new Promise<void>((resolve) =>
       confirm({
         title: "Remove MCP API key",
-        text: "External MCP clients will no longer be able to authenticate. You can generate a new key at any time.",
+        text: "External MCP clients using this key will no longer be able to authenticate. You can generate a new key at any time.",
         label: "Remove",
         onClick: resolve
       })
@@ -41,12 +43,30 @@ export function McpApiKey() {
     mutate();
   }
 
+  async function setMutatingToolsEnabled(enabled: boolean) {
+    if (enabled) {
+      await new Promise<void>((resolve) =>
+        confirm({
+          title: "Enable mutating MCP tools",
+          text: "External MCP clients that can authenticate to this DAppNode will be able to run tools that change package state, including start, stop, restart, and dev package install actions.",
+          label: "Enable",
+          onClick: resolve
+        })
+      );
+    }
+
+    await withToastNoThrow(() => api.mcpMutatingToolsSet({ enabled }), {
+      message: enabled ? "Enabling mutating MCP tools..." : "Disabling mutating MCP tools...",
+      onSuccess: enabled ? "Mutating MCP tools enabled" : "Mutating MCP tools disabled"
+    });
+    mutate();
+  }
+
   return (
     <Card spacing>
       <p>
-        External MCP clients (Claude Desktop, Cursor, etc.) connect to{" "}
-        <code>https://my.dappnode/mcp</code> with an <code>Authorization: Bearer</code>{" "}
-        token. Keep the token secret.
+        External MCP clients (Claude Desktop, Cursor, etc.) connect to <code>https://my.dappnode/mcp</code> with an{" "}
+        <code>Authorization: Bearer</code> token. Keep the token secret.
       </p>
 
       {apiKey ? (
@@ -85,6 +105,19 @@ export function McpApiKey() {
           </Button>
         </>
       )}
+
+      <hr />
+
+      <div className="d-flex justify-content-between align-items-start gap-3">
+        <div>
+          <strong>Allow mutating MCP tools</strong>
+          <p className="mb-0">
+            External MCP clients can run package-changing tools when this is enabled. Read-only tools remain available
+            either way.
+          </p>
+        </div>
+        <Switch id="mcp-mutating-tools-enabled" checked={mutatingToolsEnabled} onToggle={setMutatingToolsEnabled} />
+      </div>
     </Card>
   );
 }

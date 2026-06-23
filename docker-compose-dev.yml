@@ -29,8 +29,6 @@ services:
       - ETH_MAINNET_RPC_URL_REMOTE=
       - IPFS_HOST=
       - DISABLE_UPNP=
-      - NEXUS_API_KEY=
-      - MCP_API_KEY=
     networks:
       dncore_network:
         aliases:

@@ -555,9 +555,10 @@ export interface Routes {
   }) => Promise<void>;
 
   /**
-   * Get the current MCP API bearer key, if one has been generated.
+   * Get the current MCP API bearer key, if one has been generated, plus the
+   * external MCP mutating-tools setting.
    */
-  mcpApiKeyGet: () => Promise<{ apiKey: string | null }>;
+  mcpApiKeyGet: () => Promise<{ apiKey: string | null; mutatingToolsEnabled: boolean }>;
 
   /**
    * Generate a new MCP API bearer key. Invalidates any previously generated key.
@@ -565,10 +566,15 @@ export interface Routes {
   mcpApiKeyGenerate: () => Promise<{ apiKey: string }>;
 
   /**
-   * Remove the in-app MCP API bearer key. Bearer auth falls back to the
-   * `MCP_API_KEY` env var if one is configured; otherwise it is disabled.
+   * Remove the in-app MCP API bearer key. Bearer auth is disabled until the
+   * admin generates a new key.
    */
   mcpApiKeyRemove: () => Promise<{ ok: true }>;
+
+  /**
+   * Enable or disable mutating tools for external MCP clients.
+   */
+  mcpMutatingToolsSet: (kwargs: { enabled: boolean }) => Promise<{ enabled: boolean }>;
 
   /**
    * Get package detail information
@@ -1018,6 +1024,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   mcpApiKeyGet: {},
   mcpApiKeyGenerate: { log: true },
   mcpApiKeyRemove: { log: true },
+  mcpMutatingToolsSet: { log: true },
   packageGet: {},
   packagesGet: {},
   packageGettingStartedToggle: {},

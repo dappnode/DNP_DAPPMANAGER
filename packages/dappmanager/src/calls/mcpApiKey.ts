@@ -7,9 +7,12 @@ const tokenLength = 64;
  * Return the current in-app MCP API bearer key, or null if none has been
  * generated.
  */
-export async function mcpApiKeyGet(): Promise<{ apiKey: string | null }> {
-    const apiKey = db.mcpApiKey.get();
-    return { apiKey: apiKey || null };
+export async function mcpApiKeyGet(): Promise<{ apiKey: string | null; mutatingToolsEnabled: boolean }> {
+  const apiKey = db.mcpApiKey.get();
+  return {
+    apiKey: apiKey || null,
+    mutatingToolsEnabled: db.mcpMutatingToolsEnabled.get()
+  };
 }
 
 /**
@@ -17,16 +20,24 @@ export async function mcpApiKeyGet(): Promise<{ apiKey: string | null }> {
  * return it to the caller. Any previous key is invalidated.
  */
 export async function mcpApiKeyGenerate(): Promise<{ apiKey: string }> {
-    const apiKey = getRandomAlphanumericToken(tokenLength);
-    db.mcpApiKey.set(apiKey);
-    return { apiKey };
+  const apiKey = getRandomAlphanumericToken(tokenLength);
+  db.mcpApiKey.set(apiKey);
+  return { apiKey };
 }
 
 /**
- * Remove the in-app MCP API bearer key. Bearer auth then falls back to the
- * `MCP_API_KEY` env var if configured; otherwise it is disabled.
+ * Remove the in-app MCP API bearer key. Bearer auth is disabled until the
+ * admin generates a new key.
  */
 export async function mcpApiKeyRemove(): Promise<{ ok: true }> {
-    db.mcpApiKey.set("");
-    return { ok: true };
+  db.mcpApiKey.set("");
+  return { ok: true };
+}
+
+/**
+ * Enable or disable mutating tools for external MCP clients.
+ */
+export async function mcpMutatingToolsSet({ enabled }: { enabled: boolean }): Promise<{ enabled: boolean }> {
+  db.mcpMutatingToolsEnabled.set(enabled);
+  return { enabled };
 }

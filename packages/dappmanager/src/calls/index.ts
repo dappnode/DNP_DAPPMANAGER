@@ -63,7 +63,7 @@ export { packageGet } from "./packageGet.js";
 export { packagesGet } from "./packagesGet.js";
 export { packageInstall } from "./packageInstall.js";
 export { packageInstallDev } from "./packageInstallDev.js";
-export { mcpApiKeyGet, mcpApiKeyGenerate, mcpApiKeyRemove } from "./mcpApiKey.js";
+export { mcpApiKeyGet, mcpApiKeyGenerate, mcpApiKeyRemove, mcpMutatingToolsSet } from "./mcpApiKey.js";
 export { packageLog } from "./packageLog.js";
 export { packageRemove } from "./packageRemove.js";
 export { packageRestart } from "./packageRestart.js";

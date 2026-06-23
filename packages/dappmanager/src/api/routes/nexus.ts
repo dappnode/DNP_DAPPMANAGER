@@ -13,9 +13,8 @@ import { startDocsWarmup } from "../../mcp/docs.js";
  * Nexus chat proxy — talks to a Nexus gateway with a Nexus API key held
  * server-side, so the secret never reaches the browser.
  *
- * The DAppNode admin configures a single Nexus API key via env
- * (`NEXUS_API_KEY`). When Nexus gains an anonymous-signup endpoint, the
- * env-key path is replaced with auto-provisioning.
+ * The DAppNode admin configures a single Nexus API key from the admin UI.
+ * The key is stored in dbMain and never reaches the browser.
  */
 
 const DEFAULT_GATEWAY_URL = "https://nexus-api.dappnode.com/v1";
@@ -31,18 +30,16 @@ function getGatewayUrl(): string {
 }
 
 /**
- * The effective Nexus API key. A key set from the admin UI (persisted in
- * dbMain) takes precedence over the `NEXUS_API_KEY` env var, so the user can
- * configure it in-app without restarting the container.
+ * The effective Nexus API key. Stored in dbMain so the user can configure it
+ * in-app without restarting the container.
  */
 function getApiKey(): string {
-  return db.nexusApiKey.get() || process.env.NEXUS_API_KEY || "";
+  return db.nexusApiKey.get();
 }
 
 /** Where the effective key comes from — surfaced to the UI. */
-function getApiKeySource(): "db" | "env" | "none" {
+function getApiKeySource(): "db" | "none" {
   if (db.nexusApiKey.get()) return "db";
-  if (process.env.NEXUS_API_KEY) return "env";
   return "none";
 }
 
@@ -54,8 +51,8 @@ interface NexusStatus {
   configured: boolean;
   gatewayUrl: string;
   defaultModel: string;
-  /** Where the active key comes from: set in-app, from env, or unset. */
-  keySource: "db" | "env" | "none";
+  /** Where the active key comes from: set in-app or unset. */
+  keySource: "db" | "none";
 }
 
 /* ──────────────────────────────────────────────────────────────────── *
@@ -72,10 +69,7 @@ let llmsInflight: Promise<string> | null = null;
  * detail for the docs-fetch tool.
  */
 function stripMdFromDocsUrls(body: string): string {
-  return body.replace(
-    /(https:\/\/docs\.dappnode\.io\/[^\s)]+?)\.md(?=[\s)])/g,
-    "$1"
-  );
+  return body.replace(/(https:\/\/docs\.dappnode\.io\/[^\s)]+?)\.md(?=[\s)])/g, "$1");
 }
 
 /** Fetches docs.dappnode.io/llms.txt with a 24h in-memory cache. */
@@ -93,9 +87,7 @@ async function fetchLlmsContext(): Promise<string> {
       const raw = await r.text();
       const stripped = stripMdFromDocsUrls(raw);
       const trimmed =
-        stripped.length > LLMS_TXT_MAX_BYTES
-          ? stripped.slice(0, LLMS_TXT_MAX_BYTES) + "\n\n…(truncated)…"
-          : stripped;
+        stripped.length > LLMS_TXT_MAX_BYTES ? stripped.slice(0, LLMS_TXT_MAX_BYTES) + "\n\n…(truncated)…" : stripped;
       llmsCache = { fetchedAt: now, content: trimmed };
       return trimmed;
     } catch (err) {
@@ -186,13 +178,10 @@ function describePageContext(raw: unknown): string | null {
   const title = typeof ctx.title === "string" ? ctx.title.trim() : "";
 
   const fullPath = path + search + hash;
-  const lines: string[] = [
-    "================ USER'S CURRENT PAGE (admin UI) ================",
-    `- Path: ${fullPath}`
-  ];
+  const lines: string[] = ["================ USER'S CURRENT PAGE (admin UI) ================", `- Path: ${fullPath}`];
   if (title) lines.push(`- Title: ${title}`);
   lines.push(
-    "When the user asks vague things like \"what is this\" or \"how do I use this page\", assume they mean the page above. Otherwise treat it as ambient context — don't volunteer it unless relevant.",
+    'When the user asks vague things like "what is this" or "how do I use this page", assume they mean the page above. Otherwise treat it as ambient context — don\'t volunteer it unless relevant.',
     "================ END USER'S CURRENT PAGE ================",
     ""
   );
@@ -206,10 +195,7 @@ async function buildSystemPrompt(pageContext?: unknown): Promise<string> {
   // time the model decides to call dappnode_search_docs, pages are cached.
   startDocsWarmup();
 
-  const [docsIndex, packageList] = await Promise.all([
-    fetchLlmsContext(),
-    describeInstalledPackages()
-  ]);
+  const [docsIndex, packageList] = await Promise.all([fetchLlmsContext(), describeInstalledPackages()]);
 
   const today = new Date().toISOString().slice(0, 10);
   const parts: string[] = [
@@ -226,7 +212,7 @@ async function buildSystemPrompt(pageContext?: unknown): Promise<string> {
     "3. If a snippet isn't enough, call `dappnode_fetch_doc(url)` to read the full page.",
     "4. Only AFTER consulting the docs do you answer. If the docs don't cover it, say so explicitly.",
     "",
-    "For questions about THIS Dappnode's runtime state (\"is X running\", \"what's eating my disk\"), use the runtime tools (`dappnode_list_packages`, `dappnode_get_package_logs`, `dappnode_diagnose`, etc.) instead of guessing from the package snapshot below.",
+    'For questions about THIS Dappnode\'s runtime state ("is X running", "what\'s eating my disk"), use the runtime tools (`dappnode_list_packages`, `dappnode_get_package_logs`, `dappnode_diagnose`, etc.) instead of guessing from the package snapshot below.',
     "",
     "Be concise and direct. Use markdown (lists, headings, fenced code blocks) when it helps. When referring to a specific installed package, use its exact `dnpName`. When citing docs, link the URL.",
     "",
@@ -249,7 +235,9 @@ async function buildSystemPrompt(pageContext?: unknown): Promise<string> {
 
   if (docsIndex) {
     parts.push("================ DAPPNODE DOCS — INDEX ONLY (from docs.dappnode.io/llms.txt) ================");
-    parts.push("This is the catalogue of available pages, NOT the docs themselves. To read a page's contents, call `dappnode_search_docs` or `dappnode_fetch_doc`.");
+    parts.push(
+      "This is the catalogue of available pages, NOT the docs themselves. To read a page's contents, call `dappnode_search_docs` or `dappnode_fetch_doc`."
+    );
     parts.push("");
     parts.push(docsIndex);
     parts.push("================ END DAPPNODE DOCS INDEX ================");
@@ -333,8 +321,7 @@ export const nexusSetApiKey = wrapHandler(async (req: Request, res: ExpressRespo
 });
 
 /**
- * DELETE /nexus/config — clear the in-app Nexus API key. Falls back to the
- * `NEXUS_API_KEY` env var afterwards if one is set.
+ * DELETE /nexus/config — clear the in-app Nexus API key.
  */
 export const nexusClearApiKey = wrapHandler(async (_req: Request, res: ExpressResponse) => {
   db.nexusApiKey.set("");
@@ -441,9 +428,7 @@ export const nexusChatHistoryUpsert = wrapHandler(async (req: Request, res: Expr
   // Prune oldest entries beyond MAX_HISTORY_ENTRIES.
   const all = Object.values(db.nexusChatHistory.getAll());
   if (all.length > MAX_HISTORY_ENTRIES) {
-    const toPrune = [...all]
-      .sort((a, b) => b.updatedAt - a.updatedAt)
-      .slice(MAX_HISTORY_ENTRIES);
+    const toPrune = [...all].sort((a, b) => b.updatedAt - a.updatedAt).slice(MAX_HISTORY_ENTRIES);
     for (const c of toPrune) db.nexusChatHistory.remove(c.id);
   }
 
@@ -489,7 +474,7 @@ export const nexusChatConfirm = wrapHandler(async (req: Request, res: ExpressRes
 export const nexusListModels = wrapHandler(async (_req: Request, res: ExpressResponse) => {
   if (!getApiKey()) {
     res.status(503).json({
-      error: { code: "nexus_not_configured", message: "NEXUS_API_KEY is not set on this DAppNode" }
+      error: { code: "nexus_not_configured", message: "Nexus API key is not configured on this DAppNode" }
     });
     return;
   }
@@ -554,7 +539,7 @@ export async function nexusChatCompletions(req: Request, res: ExpressResponse): 
 
   if (!status.configured) {
     res.status(503).json({
-      error: { code: "nexus_not_configured", message: "NEXUS_API_KEY is not set on this DAppNode" },
+      error: { code: "nexus_not_configured", message: "Nexus API key is not configured on this DAppNode" },
       status
     });
     return;
@@ -791,11 +776,7 @@ async function runChatToolLoop(
           });
           if (decision === "deny") {
             const reasonText = reason ? ` — ${reason}` : "";
-            writeSyntheticContent(
-              res,
-              `\n\n_Skipped **${displayName}**${reasonText}_\n\n`,
-              responseModelId
-            );
+            writeSyntheticContent(res, `\n\n_Skipped **${displayName}**${reasonText}_\n\n`, responseModelId);
             messages.push({
               role: "tool",
               tool_call_id: tc.id,
@@ -810,9 +791,7 @@ async function runChatToolLoop(
         const result = await dispatchTool(toolName, args);
         const payload = JSON.stringify(result.ok ? result.output : { error: result.error });
         const content =
-          payload.length > MAX_TOOL_RESULT_BYTES
-            ? payload.slice(0, MAX_TOOL_RESULT_BYTES) + "…(truncated)"
-            : payload;
+          payload.length > MAX_TOOL_RESULT_BYTES ? payload.slice(0, MAX_TOOL_RESULT_BYTES) + "…(truncated)" : payload;
 
         messages.push({
           role: "tool",

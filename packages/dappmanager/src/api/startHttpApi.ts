@@ -1,3 +1,4 @@
+import fs from "fs";
 import http from "http";
 import express, { RequestHandler } from "express";
 import bodyParser from "body-parser";
@@ -104,17 +105,6 @@ export function startHttpApi({
   // Intercept decentralized website requests first
   // TODO: research how to use auth in the proxy
   app.use(ethForwardMiddleware);
-  // default options. ALL CORS + limit fileSize and file count
-  // useTempFiles is required so the MCP dev-package tarball is streamed to
-  // disk instead of buffered in memory; large docker-save images can exceed
-  // Node's heap otherwise.
-  app.use(
-    fileUpload({
-      limits: { fileSize: 500 * 1024 * 1024, files: 10 },
-      useTempFiles: true,
-      tempFileDir: dappnodeParams.TEMP_TRANSFER_DIR
-    })
-  );
   // CORS config follows https://stackoverflow.com/questions/50614397/value-of-the-access-control-allow-origin-header-in-the-response-must-not-be-th
   app.use(cors({ credentials: true, origin: params.HTTP_CORS_WHITELIST }));
   app.use(compression());
@@ -135,6 +125,19 @@ export function startHttpApi({
 
   // Auth
   const auth = new AuthPasswordSession(sessions, adminPasswordDb, params);
+
+  const ensureTempTransferDir: RequestHandler = (_req, _res, next) => {
+    fs.mkdirSync(dappnodeParams.TEMP_TRANSFER_DIR, { recursive: true });
+    next();
+  };
+
+  // Route-local upload parser. It intentionally runs after auth so rejected
+  // requests cannot stream large temporary files to disk first.
+  const uploadFileMiddleware = fileUpload({
+    limits: { fileSize: 500 * 1024 * 1024, files: 10 },
+    useTempFiles: true,
+    tempFileDir: dappnodeParams.TEMP_TRANSFER_DIR
+  });
 
   // sessionHandler will mutate socket.handshake attaching .session object
   // Then, onlyAdmin will reject if socket.handshake.session.isAdmin !== true
@@ -180,9 +183,9 @@ export function startHttpApi({
   app.get("/file-download/:containerName", auth.onlyAdmin, routes.fileDownload);
   app.get("/download/:fileId", auth.onlyAdmin, routes.download);
   app.get("/user-action-logs", auth.onlyAdmin, routes.downloadUserActionLogs);
-  app.post("/upload", auth.onlyAdmin, routes.upload);
+  app.post("/upload", auth.onlyAdminOrMcpApiKey, ensureTempTransferDir, uploadFileMiddleware, routes.upload);
 
-  // Nexus chat proxy (env-configured Nexus API key held server-side).
+  // Nexus chat proxy (Nexus API key held server-side).
   app.get("/nexus/status", auth.onlyAdmin, nexusStatus);
   app.post("/nexus/config", auth.onlyAdmin, nexusSetApiKey);
   app.delete("/nexus/config", auth.onlyAdmin, nexusClearApiKey);
@@ -197,11 +200,11 @@ export function startHttpApi({
   // Stateless MCP server for this DAppNode — same tools the embedded chat
   // uses, also reachable by external MCP clients (Claude Desktop, Cursor, etc.)
   // and by other DAppNode packages. Authentication: admin session cookie OR
-  // `Authorization: Bearer <MCP_API_KEY>` (configured in the dappmanager env
-  // or generated from the admin UI at System > Advanced > MCP API key).
+  // `Authorization: Bearer <generated MCP API key>` from the admin UI at
+  // System > Advanced > MCP API key.
   // A fresh transport is created per request so a stale client session can
   // never hold the MCP endpoint lock.
-  app.post("/mcp", auth.onlyAdmin, wrapHandler(handleMcpRequest));
+  app.post("/mcp", auth.onlyAdminOrMcpApiKey, wrapHandler(handleMcpRequest));
 
   // Open endpoints (no auth)
   app.get("/global-envs/:name?", routes.globalEnvs);

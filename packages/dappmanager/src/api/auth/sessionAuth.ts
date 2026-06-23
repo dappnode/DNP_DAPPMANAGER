@@ -31,7 +31,6 @@ import { AdminPasswordDb } from "./adminPasswordDb.js";
 
 export interface AuthPasswordSessionParams {
   ADMIN_RECOVERY_FILE: string;
-  MCP_API_KEY?: string;
 }
 
 const recoveryTokenLength = 20;
@@ -40,13 +39,11 @@ export class AuthPasswordSession {
   sessions: SessionsManager;
   adminPasswordDb: AdminPasswordDb;
   recoveryDb: PlainTextFileDb;
-  private params: AuthPasswordSessionParams;
 
   constructor(sessions: SessionsManager, adminPasswordDb: AdminPasswordDb, params: AuthPasswordSessionParams) {
     this.sessions = sessions;
     this.adminPasswordDb = adminPasswordDb;
     this.recoveryDb = new PlainTextFileDb(params.ADMIN_RECOVERY_FILE);
-    this.params = params;
   }
 
   private assertPassword(username: string, password: string): void {
@@ -65,7 +62,7 @@ export class AuthPasswordSession {
    * - Some user registered no cookie in req >> NotLoggedInNoCookieError
    */
   private isMcpApiKeyValid(req: Request): boolean {
-    const configuredKey = db.mcpApiKey.get() || this.params.MCP_API_KEY || process.env.MCP_API_KEY;
+    const configuredKey = db.mcpApiKey.get();
     if (!configuredKey) return false;
 
     const authHeader = req.headers.authorization || "";
@@ -209,20 +206,21 @@ export class AuthPasswordSession {
   });
 
   /**
-   * Middleware to protect routes only for admin sessions.
-   *
-   * In addition to the normal admin cookie session, routes that need to be
-   * reachable by non-browser clients (MCP clients, other DAppNode packages)
-   * accept a bearer token via the `Authorization` header:
-   *
-   *   Authorization: Bearer <MCP_API_KEY>
-   *
-   * `MCP_API_KEY` may be set on the dappmanager container environment, or
-   * generated from the admin UI and stored in the main DB. The in-app key
-   * takes precedence. When no key is set anywhere, bearer-token auth is
-   * disabled and only cookie sessions work.
+   * Middleware to protect routes only for admin browser sessions.
    */
   onlyAdmin = wrapHandler((req, _, next) => {
+    this.assertOnlyAdmin(req);
+    next();
+  });
+
+  /**
+   * Middleware for routes that intentionally accept either an admin session
+   * cookie or the scoped MCP bearer key.
+   *
+   * Keep this opt-in: the MCP key is for MCP-compatible agent endpoints, not a
+   * replacement for the full admin session across every HTTP/RPC route.
+   */
+  onlyAdminOrMcpApiKey = wrapHandler((req, _, next) => {
     if (this.isMcpApiKeyValid(req)) {
       next();
       return;

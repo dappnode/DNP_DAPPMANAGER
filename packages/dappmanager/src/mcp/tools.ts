@@ -9,7 +9,15 @@ import {
   logContainer
 } from "@dappnode/dockerapi";
 import { Network, PortProtocol } from "@dappnode/types";
-import type { Compose, Manifest, PackageContainer, PortMapping, SetupWizard, StakerConfigSet, UserSettingsAllDnps } from "@dappnode/types";
+import type {
+  Compose,
+  Manifest,
+  PackageContainer,
+  PortMapping,
+  SetupWizard,
+  StakerConfigSet,
+  UserSettingsAllDnps
+} from "@dappnode/types";
 import { validateManifestSchema, validateDappnodeCompose, validateSetupWizardSchema } from "@dappnode/schemas";
 import { yamlParse } from "@dappnode/utils";
 import { logs } from "@dappnode/logger";
@@ -59,7 +67,11 @@ export interface DappnodeTool {
 }
 
 /** Standard MCP tool annotations derived from a tool's mutating flag. */
-export function toolAnnotations(tool: DappnodeTool): { title: string; readOnlyHint: boolean; destructiveHint: boolean } {
+export function toolAnnotations(tool: DappnodeTool): {
+  title: string;
+  readOnlyHint: boolean;
+  destructiveHint: boolean;
+} {
   return {
     title: tool.displayName,
     readOnlyHint: !tool.mutating,
@@ -116,10 +128,7 @@ const getPackageDetailsTool: DappnodeTool = {
   description:
     "Get full details for a specific package by its dnpName: containers, ports, volumes, env summary, dependencies.",
   schema: {
-    dnpName: z
-      .string()
-      .min(1)
-      .describe("The package dnpName, e.g. 'mev-boost-hoodi.dnp.dappnode.eth'")
+    dnpName: z.string().min(1).describe("The package dnpName, e.g. 'mev-boost-hoodi.dnp.dappnode.eth'")
   },
   async execute({ dnpName }: { dnpName: string }) {
     const pkg = await listPackage({ dnpName });
@@ -131,8 +140,7 @@ const getPackageDetailsTool: DappnodeTool = {
 const getPackageLogsTool: DappnodeTool = {
   name: "dappnode_get_package_logs",
   displayName: "Read package logs",
-  description:
-    "Fetch the tail of container logs for a package. Returns one log block per container in the package.",
+  description: "Fetch the tail of container logs for a package. Returns one log block per container in the package.",
   schema: {
     dnpName: z.string().min(1).describe("The package dnpName"),
     tail: z
@@ -162,8 +170,7 @@ const getPackageLogsTool: DappnodeTool = {
 const getSystemInfoTool: DappnodeTool = {
   name: "dappnode_get_system_info",
   displayName: "Get system info",
-  description:
-    "Get system-level info for this DAppNode: CPU usage, memory, disk usage, hostname, IPs, version data.",
+  description: "Get system-level info for this DAppNode: CPU usage, memory, disk usage, hostname, IPs, version data.",
   schema: {},
   async execute() {
     const [cpu, memory, disk, system] = await Promise.allSettled([
@@ -179,14 +186,14 @@ const getSystemInfoTool: DappnodeTool = {
       system:
         system.status === "fulfilled"
           ? {
-            name: system.value.name,
-            dappnodeWebName: system.value.dappnodeWebName,
-            internalIp: system.value.internalIp,
-            publicIp: system.value.publicIp,
-            staticIp: system.value.staticIp,
-            domain: system.value.domain,
-            versionData: system.value.versionData
-          }
+              name: system.value.name,
+              dappnodeWebName: system.value.dappnodeWebName,
+              internalIp: system.value.internalIp,
+              publicIp: system.value.publicIp,
+              staticIp: system.value.staticIp,
+              domain: system.value.domain,
+              versionData: system.value.versionData
+            }
           : { error: String(system.reason) }
     };
   }
@@ -282,10 +289,7 @@ const updatePackageTool: DappnodeTool = {
   mutating: true,
   schema: {
     dnpName: z.string().min(1).describe("The package dnpName to update"),
-    version: z
-      .string()
-      .optional()
-      .describe("Optional target version (semver or IPFS hash). Defaults to latest.")
+    version: z.string().optional().describe("Optional target version (semver or IPFS hash). Defaults to latest.")
   },
   async execute({ dnpName, version }: { dnpName: string; version?: string }) {
     logs.info(`MCP: dappnode_update_package(${dnpName}, ${version ?? "latest"})`);
@@ -352,10 +356,7 @@ const getDiskUsageTool: DappnodeTool = {
     "Disk usage grouped by docker volume (and by owning package). Answers questions like 'what's eating my disk'. Returns sizes in bytes.",
   schema: {},
   async execute() {
-    const [ownership, systemData] = await Promise.all([
-      getVolumesOwnershipData(),
-      getVolumeSystemData()
-    ]);
+    const [ownership, systemData] = await Promise.all([getVolumesOwnershipData(), getVolumeSystemData()]);
     // Aggregate volume sizes by owner dnpName for the model's convenience.
     const byOwner: Record<string, { totalBytes: number; volumes: { name: string; size?: number | string }[] }> = {};
     for (const o of ownership) {
@@ -387,13 +388,7 @@ const searchDocsTool: DappnodeTool = {
       .describe(
         "Free-text keywords. Use specific terms — e.g. 'mev-boost configuration', 'wireguard setup', 'tailscale access', 'smooth subscription'."
       ),
-    limit: z
-      .number()
-      .int()
-      .min(1)
-      .max(10)
-      .optional()
-      .describe("Max number of results. Default 5.")
+    limit: z.number().int().min(1).max(10).optional().describe("Max number of results. Default 5.")
   },
   async execute({ query, limit }: { query: string; limit?: number }) {
     return await searchDocs(query, limit ?? 5);
@@ -432,7 +427,9 @@ const getStakerConfigTool: DappnodeTool = {
   schema: {
     network: z
       .nativeEnum(Network)
-      .describe("Staker network: 'mainnet', 'gnosis', 'lukso', 'hoodi', 'holesky', 'sepolia', 'prater', 'starknet', 'starknet-sepolia'.")
+      .describe(
+        "Staker network: 'mainnet', 'gnosis', 'lukso', 'hoodi', 'holesky', 'sepolia', 'prater', 'starknet', 'starknet-sepolia'."
+      )
   },
   async execute({ network }: { network: Network }) {
     const { stakerConfigGet } = await import("../calls/stakerConfig.js");
@@ -452,26 +449,13 @@ const setStakerConfigTool: DappnodeTool = {
       .string()
       .nullable()
       .optional()
-      .describe("Execution client dnpName, or null to unset. Omit to leave unchanged is NOT supported — pass null explicitly."),
-    consensusDnpName: z
-      .string()
-      .nullable()
-      .optional()
-      .describe("Consensus client dnpName, or null to unset."),
-    mevBoostDnpName: z
-      .string()
-      .nullable()
-      .optional()
-      .describe("MEV-boost dnpName, or null to unset."),
-    web3signerDnpName: z
-      .string()
-      .nullable()
-      .optional()
-      .describe("Web3signer dnpName, or null to unset."),
-    relays: z
-      .array(z.string())
-      .optional()
-      .describe("List of MEV-boost relay URLs. Defaults to empty.")
+      .describe(
+        "Execution client dnpName, or null to unset. Omit to leave unchanged is NOT supported — pass null explicitly."
+      ),
+    consensusDnpName: z.string().nullable().optional().describe("Consensus client dnpName, or null to unset."),
+    mevBoostDnpName: z.string().nullable().optional().describe("MEV-boost dnpName, or null to unset."),
+    web3signerDnpName: z.string().nullable().optional().describe("Web3signer dnpName, or null to unset."),
+    relays: z.array(z.string()).optional().describe("List of MEV-boost relay URLs. Defaults to empty.")
   },
   async execute({
     network,
@@ -662,9 +646,9 @@ const getDevUploadInfoTool: DappnodeTool = {
       method: "POST",
       maxFileSizeBytes: 500 * 1024 * 1024,
       maxFiles: 10,
-      auth: "Same origin and credentials as /mcp: admin session cookie or Authorization: Bearer <MCP_API_KEY>",
+      auth: "Same origin and credentials as /mcp: admin session cookie or Authorization: Bearer <generated MCP API key>",
       responseType: "plain text fileId",
-      note: "POST to the same origin you use for /mcp (e.g. http://<your-dappnode>/upload). After uploading, pass the returned fileId as `imageFileId` to dappnode_install_dev_package. Uploaded files expire after 15 minutes."
+      note: "POST to the same origin you use for /mcp (e.g. http://<your-dappnode>/upload). After uploading, pass the returned fileId as `imageFileId` to dappnode_install_dev_package. Uploaded files expire after 15 minutes. External MCP exposes mutating tools such as dappnode_install_dev_package only when the admin enables mutating MCP tools in System > Advanced; embedded Nexus chat uses its own confirmation flow."
     };
   }
 };
@@ -725,17 +709,8 @@ const searchRegistryTool: DappnodeTool = {
   description:
     "Browse the DAppNode public package registry. Returns packages with their name, description, categories and install status. NOTE: this scans the chain — slower than the other read tools, so call sparingly (e.g. once when the user asks 'what's available' or 'what can I install for X'). Optional `query` filters by case-insensitive substring on name and description.",
   schema: {
-    query: z
-      .string()
-      .optional()
-      .describe("Optional case-insensitive substring filter on name/description."),
-    limit: z
-      .number()
-      .int()
-      .min(1)
-      .max(100)
-      .optional()
-      .describe("Max entries to return. Default 25, max 100.")
+    query: z.string().optional().describe("Optional case-insensitive substring filter on name/description."),
+    limit: z.number().int().min(1).max(100).optional().describe("Max entries to return. Default 25, max 100.")
   },
   async execute({ query, limit = 25 }: { query?: string; limit?: number }) {
     const { fetchRegistry } = await import("../calls/fetchRegistry.js");
@@ -743,10 +718,10 @@ const searchRegistryTool: DappnodeTool = {
     const needle = query?.trim().toLowerCase();
     const filtered = needle
       ? entries.filter((e) => {
-        const name = e.name?.toLowerCase() ?? "";
-        const description = e.status === "ok" ? e.description?.toLowerCase() ?? "" : "";
-        return name.includes(needle) || description.includes(needle);
-      })
+          const name = e.name?.toLowerCase() ?? "";
+          const description = e.status === "ok" ? (e.description?.toLowerCase() ?? "") : "";
+          return name.includes(needle) || description.includes(needle);
+        })
       : entries;
     return filtered.slice(0, limit).map((e) => ({
       name: e.name,
@@ -767,10 +742,7 @@ const fetchInstallPreviewTool: DappnodeTool = {
     "Fetch the install preview of a package: special permissions it needs, its dependency tree, signature status, compatibility checks and the setup-wizard fields the user would fill in. ALWAYS call this BEFORE dappnode_install_package so you can present the permissions and required setup to the user.",
   schema: {
     name: z.string().min(1).describe("Package dnpName, e.g. 'bitcoin.dnp.dappnode.eth'"),
-    version: z
-      .string()
-      .optional()
-      .describe("Optional target version (semver or IPFS hash). Defaults to latest.")
+    version: z.string().optional().describe("Optional target version (semver or IPFS hash). Defaults to latest.")
   },
   async execute({ name, version }: { name: string; version?: string }) {
     const { fetchDnpRequest } = await import("../calls/fetchDnpRequest.js");
@@ -786,11 +758,13 @@ const installPackageTool: DappnodeTool = {
   mutating: true,
   schema: {
     name: z.string().min(1).describe("Package dnpName to install"),
-    version: z
-      .string()
+    version: z.string().optional().describe("Optional target version (semver or IPFS hash). Defaults to latest."),
+    userSettings: z
+      .record(z.any())
       .optional()
-      .describe("Optional target version (semver or IPFS hash). Defaults to latest."),
-    userSettings: z.record(z.any()).optional().describe("Per-package settings (env vars, port mappings, named-volume mountpoints, …). Structure matches the setup wizard returned by dappnode_fetch_install_preview."),
+      .describe(
+        "Per-package settings (env vars, port mappings, named-volume mountpoints, …). Structure matches the setup wizard returned by dappnode_fetch_install_preview."
+      ),
     options: z
       .object({
         BYPASS_RESOLVER: z.boolean().optional(),
