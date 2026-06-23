@@ -74,6 +74,8 @@ export default function Warnings({
         </div>
       ) : null}
 
+      <br />
+
       <div className="button-group">
         <Button onClick={goBack}>Back</Button>
         <Button variant="dappnode" onClick={goNext}>
