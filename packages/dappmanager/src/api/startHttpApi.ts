@@ -1,4 +1,3 @@
-import fs from "fs";
 import http from "http";
 import express, { RequestHandler } from "express";
 import bodyParser from "body-parser";
@@ -31,7 +30,9 @@ import {
   nexusStatus
 } from "./routes/nexus.js";
 import { handleMcpRequest } from "../mcp/server.js";
+import { MCP_UPLOAD_CHUNK_BASE64_CHARS } from "../mcp/upload.js";
 import { params as dappnodeParams } from "@dappnode/params";
+import { ensureTempTransferDir, MAX_UPLOAD_FILE_SIZE_BYTES } from "../uploads/tempTransfer.js";
 
 export interface HttpApiParams extends ClientSideCookiesParams, AuthPasswordSessionParams {
   AUTH_IP_ALLOW_LOCAL_IP: boolean;
@@ -108,7 +109,12 @@ export function startHttpApi({
   // CORS config follows https://stackoverflow.com/questions/50614397/value-of-the-access-control-allow-origin-header-in-the-response-must-not-be-th
   app.use(cors({ credentials: true, origin: params.HTTP_CORS_WHITELIST }));
   app.use(compression());
-  app.use(bodyParser.json());
+  const defaultJsonParser = bodyParser.json();
+  const mcpJsonParser = bodyParser.json({ limit: MCP_UPLOAD_CHUNK_BASE64_CHARS + 256 * 1024 });
+  app.use((req, res, next) => {
+    const jsonParser = req.path === "/mcp" ? mcpJsonParser : defaultJsonParser;
+    jsonParser(req, res, next);
+  });
   app.use(bodyParser.text());
   app.use(bodyParser.urlencoded({ extended: true }));
   // Serve locally-downloaded package avatars (non-core from REPO_DIR, core from DNCORE_DIR)
@@ -126,15 +132,15 @@ export function startHttpApi({
   // Auth
   const auth = new AuthPasswordSession(sessions, adminPasswordDb, params);
 
-  const ensureTempTransferDir: RequestHandler = (_req, _res, next) => {
-    fs.mkdirSync(dappnodeParams.TEMP_TRANSFER_DIR, { recursive: true });
+  const ensureTempTransferDirMiddleware: RequestHandler = (_req, _res, next) => {
+    ensureTempTransferDir();
     next();
   };
 
   // Route-local upload parser. It intentionally runs after auth so rejected
   // requests cannot stream large temporary files to disk first.
   const uploadFileMiddleware = fileUpload({
-    limits: { fileSize: 500 * 1024 * 1024, files: 10 },
+    limits: { fileSize: MAX_UPLOAD_FILE_SIZE_BYTES, files: 10 },
     useTempFiles: true,
     tempFileDir: dappnodeParams.TEMP_TRANSFER_DIR
   });
@@ -183,7 +189,7 @@ export function startHttpApi({
   app.get("/file-download/:containerName", auth.onlyAdmin, routes.fileDownload);
   app.get("/download/:fileId", auth.onlyAdmin, routes.download);
   app.get("/user-action-logs", auth.onlyAdmin, routes.downloadUserActionLogs);
-  app.post("/upload", auth.onlyAdminOrMcpApiKey, ensureTempTransferDir, uploadFileMiddleware, routes.upload);
+  app.post("/upload", auth.onlyAdmin, ensureTempTransferDirMiddleware, uploadFileMiddleware, routes.upload);
 
   // Nexus chat proxy (Nexus API key held server-side).
   app.get("/nexus/status", auth.onlyAdmin, nexusStatus);

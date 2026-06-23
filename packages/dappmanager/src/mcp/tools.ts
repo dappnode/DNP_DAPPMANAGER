@@ -24,6 +24,7 @@ import { logs } from "@dappnode/logger";
 import { packageRestart } from "../calls/packageRestart.js";
 import { packageSetEnvironment } from "../calls/packageSetEnvironment.js";
 import { packageSetPortMappings } from "../calls/packageSetPortMappings.js";
+import { MAX_UPLOAD_FILE_SIZE_BYTES, UPLOAD_TTL_MS } from "../uploads/tempTransfer.js";
 import { statsCpuGet } from "../calls/statsCpuGet.js";
 import { statsMemoryGet } from "../calls/statsMemoryGet.js";
 import { statsDiskGet } from "../calls/statsDiskGet.js";
@@ -32,6 +33,14 @@ import { diagnose } from "../calls/diagnose.js";
 import { autoUpdateDataGet } from "../calls/autoUpdateDataGet.js";
 import { notificationsGetAll } from "../calls/notifications.js";
 import { searchDocs, fetchDocPage } from "./docs.js";
+import {
+  abortMcpDevImageUpload,
+  appendMcpDevImageUploadChunk,
+  beginMcpDevImageUpload,
+  finishMcpDevImageUpload,
+  MCP_UPLOAD_CHUNK_BASE64_CHARS,
+  MCP_UPLOAD_CHUNK_BYTES
+} from "./upload.js";
 
 // NOTE: packageInstall, fetchDnpRequest, fetchRegistry and stakerConfig are
 // imported lazily (dynamic import inside the tool's execute()) because they
@@ -637,19 +646,106 @@ const getDevUploadInfoTool: DappnodeTool = {
   name: "dappnode_get_dev_upload_info",
   displayName: "Get dev package upload info",
   description:
-    "Return the upload endpoint details needed to send a `docker save` image tarball to this DAppNode before calling `dappnode_install_dev_package`. The image MUST be uploaded out-of-band via plain HTTP multipart POST (do NOT send binary bytes through MCP). Use this first if you are unsure of the URL, form field name, auth method, or size limit.",
+    "Return the supported ways to stage a `docker save` image tarball before calling `dappnode_install_dev_package`. MCP clients should prefer the chunked MCP upload tools when they cannot reach this DAppNode's `/upload` endpoint directly.",
   schema: {},
   async execute() {
     return {
-      uploadPath: "/upload",
-      formFieldName: "file",
-      method: "POST",
-      maxFileSizeBytes: 500 * 1024 * 1024,
-      maxFiles: 10,
-      auth: "Same origin and credentials as /mcp: admin session cookie or Authorization: Bearer <generated MCP API key>",
-      responseType: "plain text fileId",
-      note: "POST to the same origin you use for /mcp (e.g. http://<your-dappnode>/upload). After uploading, pass the returned fileId as `imageFileId` to dappnode_install_dev_package. Uploaded files expire after 15 minutes. External MCP exposes mutating tools such as dappnode_install_dev_package only when the admin enables mutating MCP tools in System > Advanced; embedded Nexus chat uses its own confirmation flow."
+      mcpChunkedUpload: {
+        tools: [
+          "dappnode_begin_dev_image_upload",
+          "dappnode_append_dev_image_upload_chunk",
+          "dappnode_finish_dev_image_upload",
+          "dappnode_abort_dev_image_upload"
+        ],
+        maxFileSizeBytes: MAX_UPLOAD_FILE_SIZE_BYTES,
+        maxChunkBytes: MCP_UPLOAD_CHUNK_BYTES,
+        maxChunkBase64Chars: MCP_UPLOAD_CHUNK_BASE64_CHARS,
+        ttlMs: UPLOAD_TTL_MS,
+        finishResponse: "JSON object with imageFileId, sizeBytes, sha256, and expiresInMs",
+        note: "Use this path when the MCP client can call POST /mcp but cannot make a separate authenticated multipart request to /upload. Chunks must be standard padded base64 and appended in order using the returned uploadId and byte offset. Finish returns imageFileId."
+      },
+      httpUpload: {
+        uploadPath: "/upload",
+        formFieldName: "file",
+        method: "POST",
+        maxFileSizeBytes: MAX_UPLOAD_FILE_SIZE_BYTES,
+        maxFiles: 10,
+        auth: "Admin browser session cookie only. The generated MCP API key is scoped to POST /mcp and is not accepted by /upload.",
+        responseType: "plain text fileId"
+      },
+      note: "After staging the image by either method, pass the returned fileId/imageFileId to dappnode_install_dev_package. Uploaded files expire after 15 minutes. External MCP exposes mutating tools such as uploads and dappnode_install_dev_package only when the admin enables mutating MCP tools in System > Advanced; embedded Nexus chat uses its own confirmation flow."
     };
+  }
+};
+
+const beginDevImageUploadTool: DappnodeTool = {
+  name: "dappnode_begin_dev_image_upload",
+  displayName: "Begin dev image upload",
+  description:
+    "Start an MCP-native chunked upload for a `docker save` image tarball. Use this when the MCP client can call POST /mcp but cannot access the DAppNode `/upload` endpoint directly. Pass the total byte size, and optionally a sha256 hex digest. Then call dappnode_append_dev_image_upload_chunk repeatedly with standard padded base64 chunks, and finally dappnode_finish_dev_image_upload to receive imageFileId. This writes a temporary file and requires explicit user approval.",
+  mutating: true,
+  schema: {
+    sizeBytes: z
+      .number()
+      .int()
+      .min(1)
+      .max(MAX_UPLOAD_FILE_SIZE_BYTES)
+      .describe("Total byte size of the docker save tarball."),
+    sha256: z.string().length(64).optional().describe("Optional expected SHA-256 hex digest of the complete tarball."),
+    fileName: z.string().max(255).optional().describe("Optional local filename for operator-facing context.")
+  },
+  async execute({ sizeBytes, sha256, fileName }: { sizeBytes: number; sha256?: string; fileName?: string }) {
+    logs.info(`MCP: dappnode_begin_dev_image_upload(${fileName ?? "image.tar"}, ${sizeBytes} bytes)`);
+    return await beginMcpDevImageUpload({ sizeBytes, sha256, fileName });
+  }
+};
+
+const appendDevImageUploadChunkTool: DappnodeTool = {
+  name: "dappnode_append_dev_image_upload_chunk",
+  displayName: "Append dev image upload chunk",
+  description:
+    "Append one standard padded base64 chunk to an MCP-native dev image upload. Chunks must be sent in order. The `offset` is the number of raw bytes already accepted, returned by the previous append call. Each raw decoded chunk must be at most 1 MiB. This writes temporary file data and requires explicit user approval.",
+  mutating: true,
+  schema: {
+    uploadId: z.string().min(1).describe("uploadId returned by dappnode_begin_dev_image_upload."),
+    offset: z.number().int().min(0).describe("Raw byte offset for this chunk. Must equal receivedBytes so far."),
+    chunkBase64: z
+      .string()
+      .min(1)
+      .max(MCP_UPLOAD_CHUNK_BASE64_CHARS)
+      .describe("Standard padded base64 for the next raw chunk, max decoded size 1 MiB.")
+  },
+  async execute({ uploadId, offset, chunkBase64 }: { uploadId: string; offset: number; chunkBase64: string }) {
+    return await appendMcpDevImageUploadChunk({ uploadId, offset, chunkBase64 });
+  }
+};
+
+const finishDevImageUploadTool: DappnodeTool = {
+  name: "dappnode_finish_dev_image_upload",
+  displayName: "Finish dev image upload",
+  description:
+    "Finish an MCP-native dev image upload after every chunk has been appended. Verifies the declared size and optional sha256 digest, registers the staged tarball in DAppManager's temporary file-transfer store, and returns `imageFileId` for dappnode_install_dev_package. This requires explicit user approval.",
+  mutating: true,
+  schema: {
+    uploadId: z.string().min(1).describe("uploadId returned by dappnode_begin_dev_image_upload.")
+  },
+  async execute({ uploadId }: { uploadId: string }) {
+    logs.info(`MCP: dappnode_finish_dev_image_upload(${uploadId})`);
+    return await finishMcpDevImageUpload(uploadId);
+  }
+};
+
+const abortDevImageUploadTool: DappnodeTool = {
+  name: "dappnode_abort_dev_image_upload",
+  displayName: "Abort dev image upload",
+  description:
+    "Abort an in-progress MCP-native dev image upload and delete its temporary partial file. Use this if the upload fails or the user cancels.",
+  mutating: true,
+  schema: {
+    uploadId: z.string().min(1).describe("uploadId returned by dappnode_begin_dev_image_upload.")
+  },
+  async execute({ uploadId }: { uploadId: string }) {
+    return await abortMcpDevImageUpload(uploadId);
   }
 };
 
@@ -657,7 +753,7 @@ const installDevPackageTool: DappnodeTool = {
   name: "dappnode_install_dev_package",
   displayName: "Install dev package",
   description:
-    "Install a package you are DEVELOPING into this DAppNode WITHOUT IPFS, so you can test it end-to-end. It is tagged as a dev package and listed under the 'My dev packages' tab (separate from registry packages). Provide the raw dappnode_package.json (manifest) and docker-compose.yml contents, plus `imageFileId`: the fileId returned by uploading a `docker save` tarball to this DAppNode's `/upload` endpoint. The image inside the tarball MUST be tagged exactly `<service>.<dnpName>:<version>` — build it first with `docker compose build`, then `docker save <image> -o <tar>`, upload the tar to `/upload`, and pass the returned fileId here. Always run dappnode_validate_package first. This mutates state and starts containers — confirm with the user before calling. To re-install an updated build, run it again with the same name.",
+    "Install a package you are DEVELOPING into this DAppNode WITHOUT IPFS, so you can test it end-to-end. It is tagged as a dev package and listed under the 'My dev packages' tab (separate from registry packages). Provide the raw dappnode_package.json (manifest) and docker-compose.yml contents, plus `imageFileId`: the fileId returned by `/upload` or the imageFileId returned by dappnode_finish_dev_image_upload. The image inside the tarball MUST be tagged exactly `<service>.<dnpName>:<version>` — build it first with `docker compose build`, then `docker save <image> -o <tar>`, stage the tarball, and pass the returned imageFileId here. Always run dappnode_validate_package first. This mutates state and starts containers — confirm with the user before calling. To re-install an updated build, run it again with the same name.",
   mutating: true,
   schema: {
     manifest: z
@@ -668,7 +764,7 @@ const installDevPackageTool: DappnodeTool = {
       .string()
       .min(1)
       .describe(
-        "File ID returned by the `/upload` endpoint for the `docker save` image tarball. Upload the tar out-of-band (multipart/form-data, field name 'file') and pass the returned fileId here."
+        "File ID for the staged `docker save` image tarball. Use the `/upload` endpoint with an admin session cookie, or use the MCP chunked upload tools and pass the imageFileId returned by dappnode_finish_dev_image_upload."
       ),
     setupWizard: z
       .union([z.string(), z.record(z.any())])
@@ -818,6 +914,10 @@ export const dappnodeTools: Record<string, DappnodeTool> = {
   [setPackagePortMappingsTool.name]: setPackagePortMappingsTool,
   [validatePackageTool.name]: validatePackageTool,
   [getDevUploadInfoTool.name]: getDevUploadInfoTool,
+  [beginDevImageUploadTool.name]: beginDevImageUploadTool,
+  [appendDevImageUploadChunkTool.name]: appendDevImageUploadChunkTool,
+  [finishDevImageUploadTool.name]: finishDevImageUploadTool,
+  [abortDevImageUploadTool.name]: abortDevImageUploadTool,
   [installDevPackageTool.name]: installDevPackageTool,
   [searchRegistryTool.name]: searchRegistryTool,
   [fetchInstallPreviewTool.name]: fetchInstallPreviewTool,

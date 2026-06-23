@@ -1,4 +1,5 @@
 import { logs } from "@dappnode/logger";
+import { canonicalDocUrl, collapseWhitespace, rawMarkdownUrl } from "@dappnode/nexus";
 
 /**
  * In-process cache of the official DAppNode docs (docs.dappnode.io).
@@ -40,25 +41,6 @@ const docsIndex: Map<string, DocEntry> = new Map();
 let indexFetchedAt = 0;
 let indexInflight: Promise<void> | null = null;
 let warmupPromise: Promise<void> | null = null;
-
-/**
- * Strips Docusaurus's raw-markdown `.md` extension (and any trailing slash)
- * so what we hand back to the model matches what the user sees in their
- * browser. The `.md` is an implementation detail of the docs.dappnode.io
- * routing — humans never type it.
- *
- *   https://docs.dappnode.io/docs/dao.md     → https://docs.dappnode.io/docs/dao
- *   https://docs.dappnode.io/docs/dao.md/    → https://docs.dappnode.io/docs/dao
- *   https://docs.dappnode.io/docs/dao        → https://docs.dappnode.io/docs/dao  (idempotent)
- */
-export function canonicalDocUrl(url: string): string {
-  return url.replace(/\.md\/?$/i, "").replace(/\/+$/, "");
-}
-
-/** Inverse: appends `.md` so we hit the raw-markdown variant when fetching. */
-function rawMarkdownUrl(canonical: string): string {
-  return canonical.endsWith(".md") ? canonical : canonical + ".md";
-}
 
 async function fetchWithTimeout(url: string, timeoutMs: number): Promise<Response> {
   const ac = new AbortController();
@@ -139,7 +121,7 @@ async function ensurePage(entry: DocEntry): Promise<void> {
     const r = await fetchWithTimeout(fetchUrl, PAGE_FETCH_TIMEOUT_MS);
     if (!r.ok) throw new Error(`status ${r.status}`);
     let body = await r.text();
-    if (body.length > MAX_PAGE_BYTES) body = body.slice(0, MAX_PAGE_BYTES) + "\n…(truncated)";
+    if (body.length > MAX_PAGE_BYTES) body = body.slice(0, MAX_PAGE_BYTES) + "\n...(truncated)";
     entry.content = body;
     entry.fetchedAt = now;
   } catch (err) {
@@ -213,8 +195,8 @@ function makeSnippet(content: string, position: number, term: string): string {
     const prevSpace = content.lastIndexOf(" ", end);
     if (prevSpace !== -1 && end - prevSpace < 30) end = prevSpace;
   }
-  const slice = content.slice(start, end).replace(/\s+/g, " ").trim();
-  return (start > 0 ? "…" : "") + slice + (end < content.length ? "…" : "");
+  const slice = collapseWhitespace(content.slice(start, end));
+  return (start > 0 ? "..." : "") + slice + (end < content.length ? "..." : "");
 }
 
 export async function searchDocs(query: string, limit = 5): Promise<DocSearchHit[]> {

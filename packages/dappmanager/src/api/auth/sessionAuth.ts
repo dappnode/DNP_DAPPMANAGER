@@ -34,6 +34,39 @@ export interface AuthPasswordSessionParams {
 }
 
 const recoveryTokenLength = 20;
+const maxAuthHeaderLength = 8192;
+
+function isAsciiWhitespace(char: string): boolean {
+  const code = char.charCodeAt(0);
+  return code === 9 || code === 10 || code === 11 || code === 12 || code === 13 || code === 32;
+}
+
+function containsAsciiWhitespace(value: string): boolean {
+  for (let i = 0; i < value.length; i++) {
+    if (isAsciiWhitespace(value[i])) return true;
+  }
+  return false;
+}
+
+export function parseMcpBearerToken(authHeader: string | undefined): string | null {
+  if (!authHeader || authHeader.length > maxAuthHeaderLength) return null;
+
+  const schemeEnd = authHeader.indexOf(" ");
+  const tabSchemeEnd = authHeader.indexOf("\t");
+  const firstSeparator =
+    schemeEnd === -1 ? tabSchemeEnd : tabSchemeEnd === -1 ? schemeEnd : Math.min(schemeEnd, tabSchemeEnd);
+  if (firstSeparator <= 0) return null;
+
+  if (authHeader.slice(0, firstSeparator).toLowerCase() !== "bearer") return null;
+
+  let tokenStart = firstSeparator;
+  while (tokenStart < authHeader.length && isAsciiWhitespace(authHeader[tokenStart])) tokenStart++;
+  if (tokenStart === authHeader.length) return null;
+
+  const token = authHeader.slice(tokenStart);
+  if (containsAsciiWhitespace(token)) return null;
+  return token;
+}
 
 export class AuthPasswordSession {
   sessions: SessionsManager;
@@ -65,11 +98,9 @@ export class AuthPasswordSession {
     const configuredKey = db.mcpApiKey.get();
     if (!configuredKey) return false;
 
-    const authHeader = req.headers.authorization || "";
-    const match = authHeader.match(/^bearer\s+(.+)$/i);
-    if (!match) return false;
+    const providedKey = parseMcpBearerToken(req.headers.authorization);
+    if (!providedKey) return false;
 
-    const providedKey = match[1];
     // Constant-time compare to avoid timing leaks.
     if (providedKey.length !== configuredKey.length) return false;
     let result = 0;

@@ -10,8 +10,8 @@ description: >-
   DAppNode MCP server. NOT for managing already-installed packages on a
   running node — use the MCP package tools directly for that.
 license: GPL-3.0
-compatibility: Requires Docker, a reachable DAppNode with MCP enabled, and an MCP API key or admin session for /mcp and /upload.
-allowed-tools: Read Write Edit Bash dappnode_validate_package dappnode_get_dev_upload_info dappnode_install_dev_package dappnode_get_package_details dappnode_get_package_logs dappnode_start_package dappnode_stop_package dappnode_restart_package dappnode_search_docs dappnode_fetch_doc
+compatibility: Requires Docker and a reachable DAppNode with MCP enabled. MCP-only upload works with an MCP API key or admin session for /mcp; direct /upload still requires an admin session cookie.
+allowed-tools: Read Write Edit Bash dappnode_validate_package dappnode_get_dev_upload_info dappnode_begin_dev_image_upload dappnode_append_dev_image_upload_chunk dappnode_finish_dev_image_upload dappnode_abort_dev_image_upload dappnode_install_dev_package dappnode_get_package_details dappnode_get_package_logs dappnode_start_package dappnode_stop_package dappnode_restart_package dappnode_search_docs dappnode_fetch_doc
 metadata:
   author: dappnode
   version: "1.0.0"
@@ -49,13 +49,21 @@ produce an IPFS hash at the very end, when you publish a release.
 
 The DAppNode MCP server is usually exposed at `http://my.dappnode/mcp`, but
 use the exact origin (scheme + host + port) of the MCP connection you are
-configured to use. The same admin authentication works for both `/mcp` and
-`/upload` (session cookie or `Authorization: Bearer <MCP_API_KEY>`).
+configured to use. `Authorization: Bearer <MCP_API_KEY>` is scoped to `/mcp`
+only. `/upload` requires a normal admin session cookie, so MCP-key clients
+should upload dev image tarballs through the chunked MCP upload tools.
 
 All `dappnode_*` tools below are served by that MCP. Before calling any of
 them, make sure you are connected to the DAppNode MCP; if you are not,
-connect first. For uploads, POST the tarball to `<mcp-origin>/upload`, not a
-guessed `my.dappnode` address that may not resolve from your machine.
+connect first. For uploads, prefer:
+
+1. `dappnode_begin_dev_image_upload`
+2. `dappnode_append_dev_image_upload_chunk` repeatedly
+3. `dappnode_finish_dev_image_upload`
+
+This keeps the whole flow inside `POST /mcp` and works for agents that cannot
+make a separate authenticated request to the node. Direct `/upload` remains
+available only when you have an admin session cookie.
 
 If no bearer token exists yet, generate one in the DAppNode admin UI under
 **System > Advanced > MCP API key**. That UI can also revoke or rotate the
@@ -97,6 +105,7 @@ Required fields: `name`, `version`, `description`, `type`, `license`.
 ```
 
 Notes:
+
 - `version` is strict semver `x.y.z` (no `v` prefix). First APM-publishable
   versions are `0.0.1`, `0.1.0` or `1.0.0`.
 - `type`: `service` (normal package), `library` (no ENVs, can't depend on
@@ -118,7 +127,7 @@ Notes:
 - `mainService` — for multi-service packages, which service the root
   `<name>.dappnode` domain maps to.
 - `dependencies` / `optionalDependencies` — map of `<dnpName>: <semver | range |
-  latest | /ipfs/Hash>`. During dev you can point a dep at an IPFS hash.
+latest | /ipfs/Hash>`. During dev you can point a dep at an IPFS hash.
 - `requirements` — `minimumDappnodeVersion`, `minimumDockerVersion` (both strict
   `x.y.z`), `notInstalledPackages` (conflicts).
 - `globalEnvs` — ask the DAPPMANAGER to inject global envs (e.g.
@@ -126,7 +135,7 @@ Notes:
 - `backup` — array of `{ name, path, service? }`; `path` must be ABSOLUTE (no
   `~`). Adds a backup/restore view in the UI. Back up only small config/keys.
 - `exposable` — array of `{ name, port, serviceName?, description?,
-  exposeByDefault? }` HTTPS services the user can expose over the public
+exposeByDefault? }` HTTPS services the user can expose over the public
   internet via the HTTPS portal.
 - `warnings` (`onInstall`/`onUpdate`/`onReset`/`onRemove`…), `updateAlerts`
   (per `from`/`to` semver jump), `disclaimer` (must-accept popup),
@@ -207,6 +216,7 @@ customize it.
 Start from [templates/setup-wizard.yml](templates/setup-wizard.yml). Defines the
 fields the user fills in at install time. Hard requirements (from the actual
 schema):
+
 - Top level: `version: "2"` (string, must be exactly `"2"`) and `fields: []`.
 - Each field requires `id`, `title`, `description`. Optional: `secret` (mask
   input), `pattern` + `patternErrorMessage`, `enum`, `required`, `if`
@@ -220,23 +230,23 @@ schema):
     for a named volume.
   - `{ type: allNamedVolumesMountpoint }` — same, for all volumes at once.
   - `{ type: fileUpload, path, service? }` — upload a file to an absolute path.
-Validate with `dappnode_validate_package`. The env/port/volume a field targets
-MUST actually exist in the compose.
+    Validate with `dappnode_validate_package`. The env/port/volume a field targets
+    MUST actually exist in the compose.
 
 ## 5. Optional release files
 
 These extra files are picked up by name when the package is built/installed.
 Filename matching is by regex — use these exact names to be safe:
 
-| File | Purpose |
-|------|---------|
-| `avatar.png` | Package icon (PNG, ≤100KB). Required for a real published release; not needed for the local `docker compose` dev loop. For dev installs, a default icon is used automatically, but you may include one if you want a custom icon. |
-| `setup-wizard.yml` | Install-time form (section 4). |
-| `getting-started.md` | Shown once after install. |
-| `disclaimer.md` | Must-accept disclaimer text. |
-| `grafana-dashboard.json` | Grafana dashboard(s) shipped to the DMS. Multiple allowed (`*grafana-dashboard.json`). |
-| `prometheus-targets.json` | Prometheus scrape targets. |
-| `notifications.yaml` | Notification/alert definitions. |
+| File                      | Purpose                                                                                                                                                                                                                           |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `avatar.png`              | Package icon (PNG, ≤100KB). Required for a real published release; not needed for the local `docker compose` dev loop. For dev installs, a default icon is used automatically, but you may include one if you want a custom icon. |
+| `setup-wizard.yml`        | Install-time form (section 4).                                                                                                                                                                                                    |
+| `getting-started.md`      | Shown once after install.                                                                                                                                                                                                         |
+| `disclaimer.md`           | Must-accept disclaimer text.                                                                                                                                                                                                      |
+| `grafana-dashboard.json`  | Grafana dashboard(s) shipped to the DMS. Multiple allowed (`*grafana-dashboard.json`).                                                                                                                                            |
+| `prometheus-targets.json` | Prometheus scrape targets.                                                                                                                                                                                                        |
+| `notifications.yaml`      | Notification/alert definitions.                                                                                                                                                                                                   |
 
 All are optional. `avatar.png` is required only for a real published release;
 for dev installs a default icon is applied automatically. Match the filename
@@ -253,6 +263,7 @@ creates a multi-variant template (see below). Default files: `dappnode_package.j
 
 `dappnodesdk build` — **builds the IPFS hash; do NOT use in the dev loop.** Useful
 flags when you DO publish a test build:
+
 - `-p, --provider <ipfs>` (default `dappnode`; e.g. `infura`, `localhost:5002`).
 - `--upload-to <ipfs|swarm>` (default `ipfs`).
 - `-t, --timeout <60min>` build timeout.
@@ -334,20 +345,36 @@ docker tag <current-tag> <service>.<dnpName>:<version>
 
 ### 5. Upload the image
 
-Get upload details from `dappnode_get_dev_upload_info()` if needed. Then
-POST the tarball to `<mcp-origin>/upload`, where `<mcp-origin>` is the exact
-scheme + host + port of the MCP server you are using. Use the same bearer
-token or session cookie that reaches `/mcp`:
+Get upload details from `dappnode_get_dev_upload_info()` if needed. Prefer the
+MCP-native chunked upload flow, especially when authenticating with
+`Authorization: Bearer <MCP_API_KEY>`:
+
+1. Compute the tarball byte size and, if possible, SHA-256 digest.
+2. Call `dappnode_begin_dev_image_upload({ sizeBytes, sha256?, fileName? })`.
+3. Read the tarball locally in chunks no larger than the returned
+   `maxChunkBytes`.
+4. For each chunk, standard-base64 encode the raw bytes and call
+   `dappnode_append_dev_image_upload_chunk({ uploadId, offset, chunkBase64 })`.
+   `offset` is the number of raw bytes already accepted.
+5. Call `dappnode_finish_dev_image_upload({ uploadId })`.
+
+`dappnode_finish_dev_image_upload` returns `imageFileId`. Use that value in
+`dappnode_install_dev_package`.
+
+If you have an admin session cookie and direct network access to the node, you
+may instead POST the tarball to `<mcp-origin>/upload`, where `<mcp-origin>` is
+the exact scheme + host + port of the MCP server you are using. The generated
+MCP bearer token is not accepted by `/upload`:
 
 ```bash
 curl -X POST <mcp-origin>/upload \
-  -H "Authorization: Bearer $MCP_API_KEY" \
+  -H "Cookie: <admin-session-cookie>" \
   -F "file=@<dnpName>.tar"
 # → <imageFileId>
 ```
 
-The response body is a plain-text file ID, not JSON. Save it exactly as
-returned.
+The direct `/upload` response body is a plain-text file ID, not JSON. Use it
+exactly as returned.
 
 Do not hardcode `http://my.dappnode` if it does not resolve from your
 environment. If the upload fails because the DAppNode is not reachable, ask
@@ -402,21 +429,26 @@ Remove the dev package from the DAppNode like any other package.
 ## MCP tools to use
 
 Dev-time (offline, no IPFS):
+
 - `dappnode_validate_package` — validate manifest + compose + setup-wizard.
   Call it on every iteration.
-- `dappnode_get_dev_upload_info` — return the `/upload` endpoint details
-  (path, form field, size limit, auth) so you can send the `docker save`
-  tarball out of band. Combine the returned path with the exact origin of the
-  MCP server you are using, not a guessed `my.dappnode` address. Call this if
-  you are unsure how to upload.
+- `dappnode_get_dev_upload_info` — return the MCP chunked-upload limits and
+  the optional `/upload` endpoint details. Call this if you are unsure how to
+  upload.
+- `dappnode_begin_dev_image_upload` / `dappnode_append_dev_image_upload_chunk`
+  / `dappnode_finish_dev_image_upload` — upload a `docker save` tarball through
+  MCP only, returning the `imageFileId` needed by `dappnode_install_dev_package`.
+- `dappnode_abort_dev_image_upload` — cancel a failed or no-longer-needed
+  MCP-native upload and delete its partial temp file.
 - `dappnode_install_dev_package` — install a locally-built package into the
   DAppNode without IPFS, for real end-to-end testing. Appears under the
-  "My dev packages" tab. Takes an `imageFileId` returned by `/upload`, not the
-  raw tarball bytes. This mutates state — confirm with the user before calling.
+  "My dev packages" tab. Takes an `imageFileId` returned by the upload step,
+  not the raw tarball bytes. This mutates state — confirm with the user before calling.
   Uploaded tarballs expire after 15 minutes, so install promptly after upload.
 
 Optional, to test the finished package on a real DAppNode after you've installed
 it there:
+
 - `dappnode_get_package_details` — inspect containers, ports, volumes.
 - `dappnode_get_package_logs` — read logs of an installed package.
 - `dappnode_start_package` / `dappnode_stop_package` / `dappnode_restart_package`.
@@ -446,6 +478,7 @@ end-to-end testing.
 ## Common mistakes (AI agents make these a lot)
 
 Process / approach:
+
 - **Building an IPFS hash to "test"** (`dappnodesdk build`/`publish`) during the
   dev loop. It's slow and uploads to IPFS. Use `docker compose` — see rule 1.
 - **Declaring success without running it.** Always `docker compose up -d`, read
@@ -457,6 +490,7 @@ Process / approach:
   are the source of truth; docs can lag.
 
 Manifest:
+
 - **`version` with a `v` prefix or non-`x.y.z`** (e.g. `v1.0.0`, `1.0`,
   `1.0.0-rc1`). Must be strict semver `x.y.z`. Same for `minimumDappnodeVersion`.
 - **Mixing `upstream` with `upstreamRepo`/`upstreamVersion`/`upstreamArg`** —
@@ -468,6 +502,7 @@ Manifest:
   → schema rejects unknown fields.
 
 Compose:
+
 - **Image tag mismatch** — `image:` must be EXACTLY
   `<service>.<dnpName>:<manifestVersion>` (single service may omit the service
   prefix: `<dnpName>:<version>`). A wrong tag, wrong version, or a public image
@@ -486,17 +521,20 @@ Compose:
   exotic keys (e.g. `deploy`, arbitrary `cap_add`) are rejected.
 
 Networking / runtime:
+
 - **Using `localhost`/`127.0.0.1` to reach other packages** — use the internal
   DNS `<service>.<name>.dappnode` (e.g. `http://geth.dappnode:8545`).
 - **Hardcoding host ports** — prefer container-only `ports: ["8080"]` and let the
   user/setup-wizard pick the host port.
 
 Setup-wizard:
+
 - **`version` not the string `\"2\"`**, or a `target` pointing at an env/port/volume
   that doesn't exist in the compose.
 - **`containerPort` as a number** — it must be a string (`\"8080\"`).
 
 Release files:
+
 - **Wrong filename** — files are matched by regex; e.g. a dashboard must end in
   `grafana-dashboard.json`, targets must match `*prometheus-targets.json`. A
   misnamed file is silently ignored.

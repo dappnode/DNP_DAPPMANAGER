@@ -32,21 +32,30 @@ function buildServer(): McpServer {
   });
 
   for (const tool of dappnodeToolList.filter(shouldExposeToolToMcp)) {
-    server.tool(tool.name, tool.description, tool.schema, toolAnnotations(tool), async (input: unknown) => {
-      try {
-        const output = await tool.execute(input || {});
-        return {
-          content: [{ type: "text", text: JSON.stringify(output, null, 2) }]
-        };
-      } catch (err) {
-        const message = err instanceof Error ? err.message : String(err);
-        logs.warn(`MCP tool ${tool.name} failed: ${message}`);
-        return {
-          isError: true,
-          content: [{ type: "text", text: `Error: ${message}` }]
-        };
+    server.registerTool(
+      tool.name,
+      {
+        title: tool.displayName,
+        description: tool.description,
+        inputSchema: tool.schema,
+        annotations: toolAnnotations(tool)
+      },
+      async (input: unknown) => {
+        try {
+          const output = await tool.execute(input || {});
+          return {
+            content: [{ type: "text", text: JSON.stringify(output, null, 2) }]
+          };
+        } catch (err) {
+          const message = err instanceof Error ? err.message : String(err);
+          logs.warn(`MCP tool ${tool.name} failed: ${message}`);
+          return {
+            isError: true,
+            content: [{ type: "text", text: `Error: ${message}` }]
+          };
+        }
       }
-    });
+    );
   }
 
   return server;
