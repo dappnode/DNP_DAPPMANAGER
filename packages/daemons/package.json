@@ -18,6 +18,7 @@
     "dev": "tsc -w"
   },
   "dependencies": {
+    "@dappnode/cache": "workspace:^0.1.0",
     "@dappnode/db": "workspace:^0.1.0",
     "@dappnode/dockerapi": "workspace:^0.1.0",
     "@dappnode/dockercompose": "workspace:^0.1.0",

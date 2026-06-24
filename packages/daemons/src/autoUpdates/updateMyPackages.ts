@@ -4,6 +4,7 @@ import { listPackages } from "@dappnode/dockerapi";
 import { eventBus } from "@dappnode/eventbus";
 import { DappnodeInstaller, packageInstall } from "@dappnode/installer";
 import { logs } from "@dappnode/logger";
+import { contractAddressCache } from "@dappnode/cache";
 import { sendUpdatePackageNotificationMaybe } from "./sendUpdateNotification.js";
 import { computeSemverUpdateType } from "@dappnode/utils";
 import { flagErrorUpdate } from "./flagErrorUpdate.js";
@@ -11,7 +12,7 @@ import { isUpdateDelayCompleted } from "./isUpdateDelayCompleted.js";
 import { flagCompletedUpdate } from "./flagCompletedUpdate.js";
 import { isDnpUpdateEnabled } from "./isDnpUpdateEnabled.js";
 
-const contractAddressMap = new Map<string, string>();
+// Keep existing Map for contentUri as it's more transient data
 const contentUriMap = new Map<string, string>();
 
 /**
@@ -31,7 +32,7 @@ export async function checkNewPackagesVersion(dappnodeInstaller: DappnodeInstall
       if (!dnpName || !valid(currentVersion) || params.corePackagesNotAutoupdatable.includes(dnpName)) continue;
 
       await updateContractAddress(dappnodeInstaller, dnpName);
-      const contractAddress = contractAddressMap.get(dnpName);
+      const contractAddress = contractAddressCache.get(dnpName);
       if (!contractAddress) {
         logs.warn(`No contract address found for ${dnpName}, skipping version check`);
         continue;
@@ -90,15 +91,15 @@ async function pinAndUnpinContentNotThrow(
 }
 
 /**
- * updateContractAddress
+ * updateContractAddress - now uses LRU cache with TTL
  */
 async function updateContractAddress(dappnodeInstaller: DappnodeInstaller, dnpName: string): Promise<void> {
   // MUST exist an APM repo with the package dnpName
-  if (!contractAddressMap.get(dnpName)) {
+  if (!contractAddressCache.has(dnpName)) {
     const repoContract = await dappnodeInstaller.getRepoContract(dnpName);
     if (typeof repoContract.target === "string") {
       logs.info(`Caching contract info for ${dnpName}`);
-      contractAddressMap.set(dnpName, repoContract.target);
+      contractAddressCache.set(dnpName, repoContract.target);
     }
   }
 }
