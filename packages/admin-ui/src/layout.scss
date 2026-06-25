@@ -12,6 +12,20 @@
 
   --border-size: 0.08rem;
   --default-spacing: 1.25rem;
+  --nexus-floating-bubble-size: 3.5rem;
+  --nexus-floating-offset: 1.5rem;
+  --nexus-floating-clearance: 1rem;
+  --nexus-floating-safe-area: calc(
+    var(--nexus-floating-bubble-size) + var(--nexus-floating-offset) + var(--nexus-floating-clearance)
+  );
+  --nexus-floating-panel-bottom: calc(
+    var(--nexus-floating-bubble-size) + var(--nexus-floating-offset) + var(--nexus-floating-clearance)
+  );
+  @media (max-width: 40rem) {
+    --nexus-floating-bubble-size: 3rem;
+    --nexus-floating-offset: 0.75rem;
+    --nexus-floating-clearance: 0.75rem;
+  }
   // time
   --transition-time: 0.25s;
 }
@@ -23,6 +37,8 @@
   --z-index-confirm-dialog: 5000;
   --z-index-welcome-dialog: 4000;
   --z-index-sidebar: 2000;
+  --z-index-chat: 1050;
+  --z-index-chat-backdrop: 1040;
   --z-index-topbar: 1000;
 }
 
@@ -164,9 +180,14 @@ body,
 #main {
   margin-left: var(--sidenav-width);
   padding: var(--container-padding);
+  padding-bottom: calc(var(--container-padding) + var(--nexus-floating-safe-area));
 
   @media (max-width: 55rem) {
     padding-top: var(--topbar-height) !important;
+  }
+
+  @media (min-width: 55rem) {
+    padding-right: calc(var(--container-padding) + var(--nexus-floating-safe-area));
   }
 }
 
