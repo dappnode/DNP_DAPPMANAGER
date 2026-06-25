@@ -9,20 +9,34 @@ COPY .git dappnode_package.json docker/getGitData.js ./
 RUN apk add --no-cache git
 RUN node getGitData /usr/src/app/.git-data.json
 
+# Extract only package.json files to preserve dependency layer cache
+FROM ${BASE_IMAGE} AS manifests
+WORKDIR /app
+COPY packages packages
+RUN find packages -mindepth 2 ! -name "package.json" -delete 2>/dev/null; \
+    find packages -empty -delete 2>/dev/null; true
+
 # Build stage
 FROM ${BASE_IMAGE} AS build-src
 ENV VITE_APP_API_URL /
 WORKDIR /app
 
-# Copy and build packages
-COPY package.json yarn.lock .yarnrc.yml tsconfig.json ./
-COPY packages packages
+# Copy dependency manifests only (changes less often, preserves layer cache)
+COPY package.json yarn.lock .yarnrc.yml ./
+COPY --from=manifests /app/packages ./packages
 
 # Install necessary packages required by vite
 RUN apk add --no-cache python3 py3-pip build-base
 # Install corepack to be able to use modern yarn berry
 RUN corepack enable
+
+# Since we copied dependency manifests only, if there are changes in source code,
+# that don't change dependencies, we can reuse the cached layer with installed dependencies.
 RUN yarn install --immutable
+
+# Copy source code and build 
+COPY tsconfig.json ./
+COPY packages packages
 # Build and install production dependencies
 RUN yarn build && \
   yarn workspaces focus --all --production
