@@ -109,14 +109,16 @@ export function startHttpApi({
   // CORS config follows https://stackoverflow.com/questions/50614397/value-of-the-access-control-allow-origin-header-in-the-response-must-not-be-th
   app.use(cors({ credentials: true, origin: params.HTTP_CORS_WHITELIST }));
   app.use(compression());
-  const defaultJsonParser = bodyParser.json();
+  const skipMcpBodyParser = (handler: RequestHandler): RequestHandler => {
+    return (req, res, next) => {
+      if (req.path === "/mcp" || req.path === "/mcp/") return next();
+      return handler(req, res, next);
+    };
+  };
   const mcpJsonParser = bodyParser.json({ limit: MCP_UPLOAD_CHUNK_BASE64_CHARS + 256 * 1024 });
-  app.use((req, res, next) => {
-    const jsonParser = req.path === "/mcp" ? mcpJsonParser : defaultJsonParser;
-    jsonParser(req, res, next);
-  });
-  app.use(bodyParser.text());
-  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(skipMcpBodyParser(bodyParser.json()));
+  app.use(skipMcpBodyParser(bodyParser.text()));
+  app.use(skipMcpBodyParser(bodyParser.urlencoded({ extended: true })));
   // Serve locally-downloaded package avatars (non-core from REPO_DIR, core from DNCORE_DIR)
   app.use("/avatars", express.static(path.resolve(dappnodeParams.avatarStaticDir), { maxAge: "1d" }));
   app.use("/avatars", express.static(path.resolve(dappnodeParams.coreAvatarStaticDir), { maxAge: "1d" }));
@@ -141,6 +143,8 @@ export function startHttpApi({
   // requests cannot stream large temporary files to disk first.
   const uploadFileMiddleware = fileUpload({
     limits: { fileSize: MAX_UPLOAD_FILE_SIZE_BYTES, files: 10 },
+    abortOnLimit: true,
+    responseOnLimit: `Uploaded file exceeds maximum size of ${MAX_UPLOAD_FILE_SIZE_BYTES} bytes`,
     useTempFiles: true,
     tempFileDir: dappnodeParams.TEMP_TRANSFER_DIR
   });
@@ -210,7 +214,7 @@ export function startHttpApi({
   // System > Advanced > MCP API key.
   // A fresh transport is created per request so a stale client session can
   // never hold the MCP endpoint lock.
-  app.post("/mcp", auth.onlyAdminOrMcpApiKey, wrapHandler(handleMcpRequest));
+  app.post("/mcp", auth.onlyAdminOrMcpApiKey, mcpJsonParser, wrapHandler(handleMcpRequest));
 
   // Open endpoints (no auth)
   app.get("/global-envs/:name?", routes.globalEnvs);
