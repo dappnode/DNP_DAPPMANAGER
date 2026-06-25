@@ -1,5 +1,5 @@
 import path from "path";
-import { mapValues, pick, omitBy, isObject } from "lodash-es";
+import { mapValues, omitBy, isObject } from "lodash-es";
 import {
   parsePortMappings,
   stringifyPortMappings,
@@ -238,7 +238,14 @@ export function applyUserSettings(
 
     const nextLabels = {
       ...(service.labels || {}),
-      ...writeDefaultsToLabels(pick(service, ["environment", "ports", "volumes"]))
+      // Compute default labels from post-applied values so they match the
+      // compose content written to disk. This keeps the daemon idempotent:
+      // re-computing labels from the same on-disk values yields no diff.
+      ...writeDefaultsToLabels({
+        environment: nextEnvironment,
+        ports: nextPorts,
+        volumes: nextServiceVolumes
+      })
     };
 
     return {
