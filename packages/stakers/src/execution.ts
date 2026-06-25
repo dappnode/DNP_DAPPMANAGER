@@ -16,7 +16,7 @@ import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller } from "@dappnode/installer";
 import * as db from "@dappnode/db";
 import { params } from "@dappnode/params";
-import { listPackage } from "@dappnode/dockerapi";
+import { listPackage, listPackageNoThrow } from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
 import { gt } from "semver";
 
@@ -104,9 +104,9 @@ export class Execution extends StakerComponent {
   async persistSelectedExecutionIfInstalled(network: Network): Promise<void> {
     const currentExecutionDnpName = this.DbHandlers[network].get();
     if (currentExecutionDnpName) {
-      const isInstalled = await this.isPackageInstalled(currentExecutionDnpName);
+      const pkg = await listPackageNoThrow({ dnpName: currentExecutionDnpName });
 
-      if (!isInstalled) {
+      if (!pkg) {
         // update status in db
         this.DbHandlers[network].set(undefined);
         return;
@@ -114,7 +114,7 @@ export class Execution extends StakerComponent {
 
       const userSettings = await this.getUserSettings(network, currentExecutionDnpName);
 
-      await this.setStakerPkgConfig({ dnpName: currentExecutionDnpName, isInstalled, userSettings });
+      await this.setStakerPkgConfig({ dnpName: currentExecutionDnpName, pkg, userSettings });
 
       await this.DbHandlers[network].set(currentExecutionDnpName);
     }
