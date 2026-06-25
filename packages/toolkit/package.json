@@ -29,6 +29,7 @@
   "dependencies": {
     "@dappnode/types": "workspace:^0.1.0",
     "@ipld/car": "^5.4.0",
+    "@ipld/dag-pb": "^4.1.2",
     "esm": "^3.2.25",
     "ethers": "^6.15.0",
     "graphql": "^16.6.0",
