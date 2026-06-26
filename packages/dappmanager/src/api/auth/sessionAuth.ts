@@ -14,6 +14,7 @@ import {
   WrongCredentialsError
 } from "./errors.js";
 import { AdminPasswordDb } from "./adminPasswordDb.js";
+import { verifyMcpApiKey } from "./mcpApiKeyHash.js";
 
 // Password & sessions auth
 // ========================
@@ -95,19 +96,13 @@ export class AuthPasswordSession {
    * - Some user registered no cookie in req >> NotLoggedInNoCookieError
    */
   private isMcpApiKeyValid(req: Request): boolean {
-    const configuredKey = db.mcpApiKey.get();
-    if (!configuredKey) return false;
+    const configuredValue = db.mcpApiKey.get();
+    if (!configuredValue) return false;
 
     const providedKey = parseMcpBearerToken(req.headers.authorization);
     if (!providedKey) return false;
 
-    // Constant-time compare to avoid timing leaks.
-    if (providedKey.length !== configuredKey.length) return false;
-    let result = 0;
-    for (let i = 0; i < configuredKey.length; i++) {
-      result |= configuredKey.charCodeAt(i) ^ providedKey.charCodeAt(i);
-    }
-    return result === 0;
+    return verifyMcpApiKey(providedKey, configuredValue);
   }
 
   private assertOnlyAdmin(req: Request): SessionData {

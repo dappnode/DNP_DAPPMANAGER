@@ -555,10 +555,10 @@ export interface Routes {
   }) => Promise<void>;
 
   /**
-   * Get the current MCP API bearer key, if one has been generated, plus the
-   * external MCP mutating-tools setting.
+   * Get whether an MCP API bearer key has been generated, plus the external
+   * MCP mutating-tools setting. The raw key is only returned when generated.
    */
-  mcpApiKeyGet: () => Promise<{ apiKey: string | null; mutatingToolsEnabled: boolean }>;
+  mcpApiKeyGet: () => Promise<{ hasApiKey: boolean; mutatingToolsEnabled: boolean }>;
 
   /**
    * Generate a new MCP API bearer key. Invalidates any previously generated key.

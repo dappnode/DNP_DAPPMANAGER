@@ -1,16 +1,17 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import ClipboardJS from "clipboard";
 import { api, useApi } from "api";
 import Card from "components/Card";
 import Button from "components/Button";
 import { InputForm } from "components/InputForm";
 import { confirm } from "components/ConfirmDialog";
-import { withToastNoThrow } from "components/toast/Toast";
+import { withToast, withToastNoThrow } from "components/toast/Toast";
 import Switch from "components/Switch";
 
 export function McpApiKey() {
   const { data, mutate } = useApi.mcpApiKeyGet();
-  const apiKey = data?.apiKey || "";
+  const [generatedApiKey, setGeneratedApiKey] = useState("");
+  const hasApiKey = data?.hasApiKey || Boolean(generatedApiKey);
   const mutatingToolsEnabled = data?.mutatingToolsEnabled ?? false;
 
   useEffect(() => {
@@ -19,11 +20,16 @@ export function McpApiKey() {
   }, []);
 
   async function generateKey() {
-    await withToastNoThrow(() => api.mcpApiKeyGenerate(), {
-      message: "Generating MCP API key...",
-      onSuccess: "MCP API key generated"
-    });
-    mutate();
+    try {
+      const { apiKey } = await withToast(() => api.mcpApiKeyGenerate(), {
+        message: "Generating MCP API key...",
+        onSuccess: "MCP API key generated"
+      });
+      setGeneratedApiKey(apiKey);
+      mutate();
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   async function removeKey() {
@@ -36,11 +42,16 @@ export function McpApiKey() {
       })
     );
 
-    await withToastNoThrow(() => api.mcpApiKeyRemove(), {
-      message: "Removing MCP API key...",
-      onSuccess: "MCP API key removed"
-    });
-    mutate();
+    try {
+      await withToast(() => api.mcpApiKeyRemove(), {
+        message: "Removing MCP API key...",
+        onSuccess: "MCP API key removed"
+      });
+      setGeneratedApiKey("");
+      mutate();
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   async function setMutatingToolsEnabled(enabled: boolean) {
@@ -69,7 +80,7 @@ export function McpApiKey() {
         <code>Authorization: Bearer</code> token. Keep the token secret.
       </p>
 
-      {apiKey ? (
+      {generatedApiKey ? (
         <>
           <InputForm
             fields={[
@@ -77,18 +88,30 @@ export function McpApiKey() {
                 labelId: "mcp-api-key",
                 label: "MCP API key",
                 name: "mcp-api-key",
-                value: apiKey,
+                value: generatedApiKey,
                 lock: true,
                 onValueChange: () => {}
               }
             ]}
           >
-            <Button className="copy-mcp-key" data-clipboard-text={apiKey}>
+            <Button className="copy-mcp-key" data-clipboard-text={generatedApiKey}>
               Copy
             </Button>
           </InputForm>
 
           <div className="d-flex gap-2 mt-3">
+            <Button variant="dappnode" onClick={generateKey}>
+              Generate new key
+            </Button>
+            <Button variant="outline-danger" onClick={removeKey}>
+              Remove key
+            </Button>
+          </div>
+        </>
+      ) : hasApiKey ? (
+        <>
+          <p>An MCP API key is configured. Generate a new key if you need to copy it again.</p>
+          <div className="d-flex gap-2">
             <Button variant="dappnode" onClick={generateKey}>
               Generate new key
             </Button>

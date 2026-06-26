@@ -3,13 +3,14 @@ import http from "http";
 import { expect } from "chai";
 import * as db from "@dappnode/db";
 import { AuthPasswordSession, parseMcpBearerToken } from "../../../src/api/auth/sessionAuth.js";
+import { hashMcpApiKey } from "../../../src/api/auth/mcpApiKeyHash.js";
 import type { AdminPasswordDb } from "../../../src/api/auth/adminPasswordDb.js";
 import type { SessionsManager } from "../../../src/api/sessions/index.js";
 
 describe("api / auth / MCP bearer scope", () => {
   beforeEach(() => {
     db.clearMainDb();
-    db.mcpApiKey.set("mcp-secret");
+    db.mcpApiKey.set(hashMcpApiKey("mcp-secret"));
   });
 
   afterEach(() => {
@@ -34,6 +35,20 @@ describe("api / auth / MCP bearer scope", () => {
       expect(await status(`${baseUrl}/rpc`, "POST", headers)).to.equal(403);
       expect(await status(`${baseUrl}/ping`, "GET", headers)).to.equal(403);
       expect(await status(`${baseUrl}/nexus/status`, "GET", headers)).to.equal(403);
+    } finally {
+      await new Promise<void>((resolve, reject) => {
+        server.close((err) => (err ? reject(err) : resolve()));
+      });
+    }
+  });
+
+  it("rejects un-hashed stored MCP keys without rewriting them", async () => {
+    db.mcpApiKey.set("mcp-secret");
+
+    const { server, baseUrl } = await startScopedAuthServer();
+    try {
+      expect(await status(`${baseUrl}/mcp`, "POST", { authorization: "Bearer mcp-secret" })).to.equal(403);
+      expect(db.mcpApiKey.get()).to.equal("mcp-secret");
     } finally {
       await new Promise<void>((resolve, reject) => {
         server.close((err) => (err ? reject(err) : resolve()));
