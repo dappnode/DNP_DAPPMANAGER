@@ -1022,7 +1022,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   packageInstall: { log: true },
   packageInstallDev: { log: true },
   mcpApiKeyGet: {},
-  mcpApiKeyGenerate: { log: true },
+  mcpApiKeyGenerate: {},
   mcpApiKeyRemove: { log: true },
   mcpMutatingToolsSet: { log: true },
   packageGet: {},
