@@ -8,7 +8,7 @@ describe("calls / mcpApiKey", () => {
     db.clearMainDb();
   });
 
-  it("stores generated MCP API keys as a digest and returns the raw key only once", async () => {
+  it("stores generated MCP API keys as a hash and returns the raw key only once", async () => {
     const { apiKey } = await mcpApiKeyGenerate();
     const storedValue = db.mcpApiKey.get();
 

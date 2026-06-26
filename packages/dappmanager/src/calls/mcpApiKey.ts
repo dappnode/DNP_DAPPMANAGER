@@ -6,7 +6,7 @@ const tokenLength = 64;
 
 /**
  * Return whether an in-app MCP API bearer key exists. The raw key is only
- * returned at generation time because the DB stores a one-way digest.
+ * returned at generation time because the DB stores a one-way hash.
  */
 export async function mcpApiKeyGet(): Promise<{ hasApiKey: boolean; mutatingToolsEnabled: boolean }> {
   const storedApiKey = db.mcpApiKey.get();
@@ -18,7 +18,7 @@ export async function mcpApiKeyGet(): Promise<{ hasApiKey: boolean; mutatingTool
 }
 
 /**
- * Generate a new random MCP API bearer key, store its digest in the main DB and
+ * Generate a new random MCP API bearer key, store its hash in the main DB and
  * return it to the caller. Any previous key is invalidated.
  */
 export async function mcpApiKeyGenerate(): Promise<{ apiKey: string }> {
