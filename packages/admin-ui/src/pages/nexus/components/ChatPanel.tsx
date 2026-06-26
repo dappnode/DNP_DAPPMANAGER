@@ -1,10 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import Button from "components/Button";
 import Select from "components/Select";
 import NexusMarkdown from "./NexusMarkdown";
 import Dropdown from "react-bootstrap/Dropdown";
 import { MdChatBubbleOutline, MdHistory } from "react-icons/md";
-import { FiTrash2, FiPlus, FiKey, FiSend, FiSquare, FiEye, FiEyeOff } from "react-icons/fi";
+import { FiTrash2, FiPlus, FiKey, FiSend, FiSquare, FiEye, FiEyeOff, FiMaximize2, FiMinimize2 } from "react-icons/fi";
 import { nexusExternalUrl } from "../data";
 import "./nexus.scss";
 import {
@@ -46,9 +46,55 @@ export type ChatPanelVariant = "page" | "floating";
 
 export interface ChatPanelProps {
   variant?: ChatPanelVariant;
+  onOpenFullScreen?: () => void;
+  onOpenFloating?: () => void;
 }
 
-export function ChatPanel({ variant = "page" }: ChatPanelProps) {
+interface NexusChatContextValue {
+  initialize: () => Promise<void>;
+  status: NexusStatus | null;
+  statusError: string | null;
+  models: NexusModel[];
+  modelsError: string | null;
+  selectedModel: string;
+  setSelectedModel: React.Dispatch<React.SetStateAction<string>>;
+  messages: ChatMessage[];
+  isRunning: boolean;
+  draft: string;
+  setDraft: React.Dispatch<React.SetStateAction<string>>;
+  streamError: string | null;
+  pendingConfirm: PendingConfirmation | null;
+  conversationId: string | null;
+  historyList: ChatHistorySummary[];
+  showKeyEditor: boolean;
+  setShowKeyEditor: React.Dispatch<React.SetStateAction<boolean>>;
+  send: (text: string) => Promise<void>;
+  cancel: () => void;
+  respondToConfirmation: (confirmation: PendingConfirmation, decision: "approve" | "deny") => Promise<void>;
+  startNewChat: () => void;
+  openHistoryConversation: (id: string) => Promise<void>;
+  removeHistoryConversation: (id: string) => Promise<void>;
+  applyStatus: (s: NexusStatus) => Promise<void>;
+  isFloatingOpen: boolean;
+  hasFloatingOpened: boolean;
+  openFloatingChat: () => void;
+  closeFloatingChat: () => void;
+}
+
+const NexusChatContext = createContext<NexusChatContextValue | null>(null);
+
+export function NexusChatProvider({ children }: { children: React.ReactNode }) {
+  const value = useNexusChatState();
+  return <NexusChatContext.Provider value={value}>{children}</NexusChatContext.Provider>;
+}
+
+export function useNexusChat() {
+  const context = useContext(NexusChatContext);
+  if (!context) throw new Error("useNexusChat must be used within NexusChatProvider");
+  return context;
+}
+
+function useNexusChatState(): NexusChatContextValue {
   const [status, setStatus] = useState<NexusStatus | null>(null);
   const [statusError, setStatusError] = useState<string | null>(null);
   const [models, setModels] = useState<NexusModel[]>([]);
@@ -62,9 +108,13 @@ export function ChatPanel({ variant = "page" }: ChatPanelProps) {
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [historyList, setHistoryList] = useState<ChatHistorySummary[]>([]);
   const [showKeyEditor, setShowKeyEditor] = useState(false);
+  const [isFloatingOpen, setIsFloatingOpen] = useState(false);
+  const [hasFloatingOpened, setHasFloatingOpened] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
   const messagesRef = useRef<ChatMessage[]>([]);
   const lastSavedRef = useRef<string>("");
+  const initializedRef = useRef(false);
+  const initializingRef = useRef(false);
 
   useEffect(() => {
     messagesRef.current = messages;
@@ -85,21 +135,32 @@ export function ChatPanel({ variant = "page" }: ChatPanelProps) {
     }
   }, []);
 
-  useEffect(() => {
-    let cancelled = false;
-    getNexusStatus()
-      .then(async (s) => {
-        if (cancelled) return;
-        setStatus(s);
-        if (s.configured) await loadModels(s);
-      })
-      .catch((err: Error) => {
-        if (!cancelled) setStatusError(err.message);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [loadModels]);
+  const refreshHistory = useCallback(async () => {
+    try {
+      const list = await listChatHistory();
+      setHistoryList(list);
+    } catch {
+      /* non-fatal */
+    }
+  }, []);
+
+  const initialize = useCallback(async () => {
+    if (initializedRef.current || initializingRef.current) return;
+
+    initializingRef.current = true;
+    setStatusError(null);
+    try {
+      const s = await getNexusStatus();
+      setStatus(s);
+      if (s.configured) await loadModels(s);
+      await refreshHistory();
+      initializedRef.current = true;
+    } catch (err) {
+      setStatusError((err as Error).message);
+    } finally {
+      initializingRef.current = false;
+    }
+  }, [loadModels, refreshHistory]);
 
   const applyStatus = useCallback(
     async (s: NexusStatus) => {
@@ -118,19 +179,6 @@ export function ChatPanel({ variant = "page" }: ChatPanelProps) {
   useEffect(() => {
     if (selectedModel) writeRememberedModel(selectedModel);
   }, [selectedModel]);
-
-  const refreshHistory = useCallback(async () => {
-    try {
-      const list = await listChatHistory();
-      setHistoryList(list);
-    } catch {
-      /* non-fatal */
-    }
-  }, []);
-
-  useEffect(() => {
-    refreshHistory();
-  }, [refreshHistory]);
 
   useEffect(() => {
     if (isRunning || !conversationId || messages.length < 2) return;
@@ -260,6 +308,81 @@ export function ChatPanel({ variant = "page" }: ChatPanelProps) {
     }
   };
 
+  const openFloatingChat = useCallback(() => {
+    setHasFloatingOpened(true);
+    setIsFloatingOpen(true);
+  }, []);
+
+  const closeFloatingChat = useCallback(() => setIsFloatingOpen(false), []);
+
+  useEffect(() => {
+    return () => abortRef.current?.abort();
+  }, []);
+
+  return {
+    initialize,
+    status,
+    statusError,
+    models,
+    modelsError,
+    selectedModel,
+    setSelectedModel,
+    messages,
+    isRunning,
+    draft,
+    setDraft,
+    streamError,
+    pendingConfirm,
+    conversationId,
+    historyList,
+    showKeyEditor,
+    setShowKeyEditor,
+    send,
+    cancel,
+    respondToConfirmation,
+    startNewChat,
+    openHistoryConversation,
+    removeHistoryConversation,
+    applyStatus,
+    isFloatingOpen,
+    hasFloatingOpened,
+    openFloatingChat,
+    closeFloatingChat
+  };
+}
+
+export function ChatPanel({ variant = "page", onOpenFullScreen, onOpenFloating }: ChatPanelProps) {
+  const {
+    initialize,
+    status,
+    statusError,
+    models,
+    modelsError,
+    selectedModel,
+    setSelectedModel,
+    messages,
+    isRunning,
+    draft,
+    setDraft,
+    streamError,
+    pendingConfirm,
+    conversationId,
+    historyList,
+    showKeyEditor,
+    setShowKeyEditor,
+    send,
+    cancel,
+    respondToConfirmation,
+    startNewChat,
+    openHistoryConversation,
+    removeHistoryConversation,
+    applyStatus
+  } = useNexusChat();
+
+  useEffect(() => {
+    initialize();
+  }, [initialize]);
+
   if (!status && !statusError) {
     return (
       <div className="nexus-chat-loading">
@@ -280,7 +403,7 @@ export function ChatPanel({ variant = "page" }: ChatPanelProps) {
 
   if (!status) return null;
 
-  return (
+  const chatCard = (
     <div className={`nexus-chat-card nexus-chat-card-${variant}`}>
       <ChatHeader
         status={status}
@@ -294,6 +417,8 @@ export function ChatPanel({ variant = "page" }: ChatPanelProps) {
         onOpenConversation={openHistoryConversation}
         onDeleteConversation={removeHistoryConversation}
         onManageKey={() => setShowKeyEditor(true)}
+        onOpenFullScreen={onOpenFullScreen}
+        onOpenFloating={onOpenFloating}
       />
 
       {showKeyEditor && (
@@ -345,6 +470,21 @@ export function ChatPanel({ variant = "page" }: ChatPanelProps) {
       )}
     </div>
   );
+
+  if (variant !== "page") return chatCard;
+
+  return (
+    <div className="nexus-chat-shell nexus-chat-shell-page">
+      <HistorySidebar
+        historyList={historyList}
+        activeConversationId={conversationId}
+        onNewChat={startNewChat}
+        onOpenConversation={openHistoryConversation}
+        onDeleteConversation={removeHistoryConversation}
+      />
+      {chatCard}
+    </div>
+  );
 }
 
 function readRememberedModel(): string {
@@ -376,7 +516,9 @@ function ChatHeader({
   onNewChat,
   onOpenConversation,
   onDeleteConversation,
-  onManageKey
+  onManageKey,
+  onOpenFullScreen,
+  onOpenFloating
 }: {
   status: NexusStatus;
   models: NexusModel[];
@@ -389,6 +531,8 @@ function ChatHeader({
   onOpenConversation: (id: string) => void;
   onDeleteConversation: (id: string) => void;
   onManageKey: () => void;
+  onOpenFullScreen?: () => void;
+  onOpenFloating?: () => void;
 }) {
   const modelIds = useMemo(() => {
     return [...models].sort(sortModelCompare).map((m) => m.id);
@@ -428,6 +572,30 @@ function ChatHeader({
           </div>
         ) : null}
 
+        {onOpenFullScreen && (
+          <button
+            type="button"
+            className="nexus-icon-button"
+            onClick={onOpenFullScreen}
+            title="Open full screen"
+            aria-label="Open full screen"
+          >
+            <FiMaximize2 />
+          </button>
+        )}
+
+        {onOpenFloating && (
+          <button
+            type="button"
+            className="nexus-icon-button"
+            onClick={onOpenFloating}
+            title="Open as bubble"
+            aria-label="Open as bubble"
+          >
+            <FiMinimize2 />
+          </button>
+        )}
+
         <button type="button" className="nexus-icon-button" onClick={onNewChat} title="New chat">
           <FiPlus />
         </button>
@@ -448,32 +616,14 @@ function ChatHeader({
               <span className="nexus-history-count">{historyList.length}</span>
             </Dropdown.Header>
             {historyList.length === 0 ? (
-              <Dropdown.ItemText className="text-muted">No saved chats yet.</Dropdown.ItemText>
+              <Dropdown.ItemText className="nexus-history-empty">No saved chats yet.</Dropdown.ItemText>
             ) : (
-              historyList.map((h) => (
-                <Dropdown.Item
-                  key={h.id}
-                  as="div"
-                  className={`nexus-history-item ${h.id === activeConversationId ? "active" : ""}`}
-                >
-                  <div className="nexus-history-main" onClick={() => onOpenConversation(h.id)}>
-                    <span className="nexus-history-title">{h.title}</span>
-                    <small className="nexus-history-meta">
-                      {formatRelative(h.updatedAt)} · {h.messageCount} msg
-                    </small>
-                  </div>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDeleteConversation(h.id);
-                    }}
-                    className="nexus-history-delete"
-                    title="Delete conversation"
-                  >
-                    <FiTrash2 />
-                  </button>
-                </Dropdown.Item>
-              ))
+              <HistoryItems
+                historyList={historyList}
+                activeConversationId={activeConversationId}
+                onOpenConversation={onOpenConversation}
+                onDeleteConversation={onDeleteConversation}
+              />
             )}
           </Dropdown.Menu>
         </Dropdown>
@@ -488,6 +638,103 @@ function ChatHeader({
         </button>
       </div>
     </div>
+  );
+}
+
+function HistorySidebar({
+  historyList,
+  activeConversationId,
+  onNewChat,
+  onOpenConversation,
+  onDeleteConversation
+}: {
+  historyList: ChatHistorySummary[];
+  activeConversationId: string | null;
+  onNewChat: () => void;
+  onOpenConversation: (id: string) => void;
+  onDeleteConversation: (id: string) => void;
+}) {
+  return (
+    <aside className="nexus-history-sidebar" aria-label="Past conversations">
+      <div className="nexus-history-sidebar-header">
+        <div>
+          <div className="nexus-history-sidebar-title">
+            <MdHistory />
+            <span>Past conversations</span>
+          </div>
+          <div className="nexus-history-sidebar-subtitle">
+            {historyList.length} saved chat{historyList.length === 1 ? "" : "s"}
+          </div>
+        </div>
+        <button type="button" className="nexus-icon-button" onClick={onNewChat} title="New chat" aria-label="New chat">
+          <FiPlus />
+        </button>
+      </div>
+
+      <div className="nexus-history-sidebar-list">
+        {historyList.length === 0 ? (
+          <div className="nexus-history-empty">No saved chats yet.</div>
+        ) : (
+          <HistoryItems
+            historyList={historyList}
+            activeConversationId={activeConversationId}
+            onOpenConversation={onOpenConversation}
+            onDeleteConversation={onDeleteConversation}
+          />
+        )}
+      </div>
+    </aside>
+  );
+}
+
+function HistoryItems({
+  historyList,
+  activeConversationId,
+  onOpenConversation,
+  onDeleteConversation
+}: {
+  historyList: ChatHistorySummary[];
+  activeConversationId: string | null;
+  onOpenConversation: (id: string) => void;
+  onDeleteConversation: (id: string) => void;
+}) {
+  return (
+    <>
+      {historyList.map((h) => (
+        <div
+          key={h.id}
+          role="button"
+          tabIndex={0}
+          className={`nexus-history-item ${h.id === activeConversationId ? "active" : ""}`}
+          onClick={() => onOpenConversation(h.id)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              onOpenConversation(h.id);
+            }
+          }}
+        >
+          <div className="nexus-history-main">
+            <span className="nexus-history-title">{h.title}</span>
+            <small className="nexus-history-meta">
+              {formatRelative(h.updatedAt)} · {h.messageCount} msg
+            </small>
+          </div>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDeleteConversation(h.id);
+            }}
+            className="nexus-history-delete"
+            title="Delete conversation"
+            aria-label={`Delete ${h.title}`}
+          >
+            <FiTrash2 />
+          </button>
+        </div>
+      ))}
+    </>
   );
 }
 

@@ -20,6 +20,7 @@ import Smooth from "components/Smooth";
 import { PwaPermissionsAlert, PwaPermissionsModal } from "components/PwaPermissions";
 import { LocalProxyBanner } from "pages/wifi/components/localProxying/LocalProxyBanner";
 import { FloatingChatLauncher } from "pages/nexus/components/FloatingChatLauncher";
+import { NexusChatProvider } from "pages/nexus/components/ChatPanel";
 // Grafana Faro for frontend monitoring and tracing
 import { FaroRoutes } from "@grafana/faro-react";
 import { useUiTelemetryConsent } from "hooks/useUiTelemetryConsent";
@@ -92,41 +93,43 @@ function MainApp({ username }: { username: string }) {
 
   return (
     <AppContext.Provider value={appContext}>
-      <div className="body" id={theme}>
-        <SideBar screenWidth={screenWidth} />
-        <TopBar username={username} appContext={appContext} />
-        <div id="main">
-          <ErrorBoundary>
-            <LocalProxyBanner />
-            <NotificationsMain />
-          </ErrorBoundary>
-          <PwaPermissionsAlert />
-          <FaroRoutes>
-            {/** Provide the app context only to the dashboard (where the modules switch is handled) */}
-            {Object.values(pages).map(({ RootComponent, rootPath }) => (
-              <Route
-                key={rootPath}
-                path={rootPath}
-                element={
-                  <ErrorBoundary>
-                    <RootComponent />
-                  </ErrorBoundary>
-                }
-              />
-            ))}
-            {/* Redirection for routes with hashes */}
-            {/* 404 routes redirect to dashboard or default page */}
-            <Route path="*" element={<DefaultRedirect />} />
-          </FaroRoutes>
-        </div>
+      <NexusChatProvider>
+        <div className="body" id={theme}>
+          <SideBar screenWidth={screenWidth} />
+          <TopBar username={username} appContext={appContext} />
+          <div id="main">
+            <ErrorBoundary>
+              <LocalProxyBanner />
+              <NotificationsMain />
+            </ErrorBoundary>
+            <PwaPermissionsAlert />
+            <FaroRoutes>
+              {/** Provide the app context only to the dashboard (where the modules switch is handled) */}
+              {Object.values(pages).map(({ RootComponent, rootPath }) => (
+                <Route
+                  key={rootPath}
+                  path={rootPath}
+                  element={
+                    <ErrorBoundary>
+                      <RootComponent />
+                    </ErrorBoundary>
+                  }
+                />
+              ))}
+              {/* Redirection for routes with hashes */}
+              {/* 404 routes redirect to dashboard or default page */}
+              <Route path="*" element={<DefaultRedirect />} />
+            </FaroRoutes>
+          </div>
 
-        {/* Place here non-page components */}
-        <Welcome />
-        <Smooth />
-        <PwaPermissionsModal />
-        <ToastContainer />
-        <FloatingChatLauncher />
-      </div>
+          {/* Place here non-page components */}
+          <Welcome />
+          <Smooth />
+          <PwaPermissionsModal />
+          <ToastContainer />
+          <FloatingChatLauncher />
+        </div>
+      </NexusChatProvider>
     </AppContext.Provider>
   );
 }

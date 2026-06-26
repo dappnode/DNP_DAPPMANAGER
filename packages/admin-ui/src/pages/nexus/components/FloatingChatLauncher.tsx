@@ -1,57 +1,60 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import React, { useCallback, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { MdChatBubbleOutline } from "react-icons/md";
-import { ChatPanel } from "./ChatPanel";
+import { ChatPanel, useNexusChat } from "./ChatPanel";
 import "./floatingChat.scss";
 
 const HIDE_ON_PATH_PREFIXES = ["/nexus"];
 
 export function FloatingChatLauncher() {
   const location = useLocation();
-  const [isOpen, setIsOpen] = useState(false);
-  const [hasEverOpened, setHasEverOpened] = useState(false);
+  const navigate = useNavigate();
+  const { isFloatingOpen, hasFloatingOpened, openFloatingChat, closeFloatingChat } = useNexusChat();
 
   const hideEntirely = HIDE_ON_PATH_PREFIXES.some((prefix) => location.pathname.startsWith(prefix));
 
-  const open = useCallback(() => {
-    setIsOpen(true);
-    setHasEverOpened(true);
-  }, []);
-  const close = useCallback(() => setIsOpen(false), []);
+  const openFullScreen = useCallback(() => {
+    closeFloatingChat();
+    navigate("/nexus", {
+      state: {
+        nexusReturnTo: `${location.pathname}${location.search}${location.hash}`
+      }
+    });
+  }, [closeFloatingChat, location.hash, location.pathname, location.search, navigate]);
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isFloatingOpen) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") close();
+      if (e.key === "Escape") closeFloatingChat();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [isOpen, close]);
+  }, [isFloatingOpen, closeFloatingChat]);
 
   if (hideEntirely) return null;
 
   return (
     <>
-      {isOpen && <div className="nexus-floating-backdrop" onClick={close} aria-hidden="true" />}
+      {isFloatingOpen && <div className="nexus-floating-backdrop" onClick={closeFloatingChat} aria-hidden="true" />}
 
       <button
         type="button"
-        onClick={isOpen ? close : open}
-        aria-label={isOpen ? "Close Nexus chat" : "Open Nexus chat"}
-        aria-expanded={isOpen}
+        onClick={isFloatingOpen ? closeFloatingChat : openFloatingChat}
+        aria-label={isFloatingOpen ? "Close Nexus chat" : "Open Nexus chat"}
+        aria-expanded={isFloatingOpen}
         className="nexus-floating-bubble"
       >
         <MdChatBubbleOutline />
       </button>
 
-      {hasEverOpened && (
+      {hasFloatingOpened && (
         <div
           role="dialog"
           aria-modal="false"
           aria-label="Nexus chat"
-          className={`nexus-floating-panel ${isOpen ? "open" : "closed"}`}
+          className={`nexus-floating-panel ${isFloatingOpen ? "open" : "closed"}`}
         >
-          <ChatPanel variant="floating" />
+          <ChatPanel variant="floating" onOpenFullScreen={openFullScreen} />
         </div>
       )}
     </>

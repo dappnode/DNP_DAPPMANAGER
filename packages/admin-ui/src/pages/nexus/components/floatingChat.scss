@@ -7,7 +7,7 @@
 
 .nexus-floating-bubble {
   position: fixed;
-  bottom: var(--nexus-floating-offset);
+  bottom: calc(var(--nexus-floating-offset) + env(safe-area-inset-bottom));
   right: var(--nexus-floating-offset);
   z-index: var(--z-index-chat);
   width: var(--nexus-floating-bubble-size);
@@ -22,7 +22,9 @@
   justify-content: center;
   cursor: pointer;
   box-shadow: 0 4px 16px rgba(0, 177, 244, 0.35);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
 
   &:hover {
     transform: translateY(-2px);
@@ -42,7 +44,7 @@
 
   // Mobile: nearly fullscreen with a bottom gap for the bubble
   inset: var(--nexus-floating-offset);
-  bottom: var(--nexus-floating-panel-bottom);
+  bottom: calc(var(--nexus-floating-panel-bottom) + env(safe-area-inset-bottom));
 
   &.open {
     opacity: 1;
@@ -73,15 +75,39 @@
 @media (min-width: 640px) {
   .nexus-floating-panel {
     inset: auto;
-    bottom: var(--nexus-floating-panel-bottom);
+    bottom: calc(var(--nexus-floating-panel-bottom) + env(safe-area-inset-bottom));
     right: var(--nexus-floating-offset);
     width: 520px;
-    height: #{'min(760px, calc(100vh - var(--nexus-floating-panel-bottom) - var(--nexus-floating-offset)))'};
+    height: #{"min(760px, calc(100vh - var(--nexus-floating-panel-bottom) - var(--nexus-floating-offset)))"};
+    height: #{"min(760px, calc(100dvh - var(--nexus-floating-panel-bottom) - var(--nexus-floating-offset) - env(safe-area-inset-bottom)))"};
   }
 }
 
 @media (min-width: 1200px) {
   .nexus-floating-panel {
     width: 600px;
+  }
+}
+
+@media (max-width: 40rem) {
+  .nexus-floating-panel {
+    top: calc(var(--nexus-floating-offset) + env(safe-area-inset-top));
+    right: var(--nexus-floating-offset);
+    bottom: calc(var(--nexus-floating-panel-bottom) + env(safe-area-inset-bottom));
+    left: calc(var(--sidenav-collapsed-width) + var(--nexus-floating-offset));
+    border-radius: 12px;
+  }
+}
+
+@media (max-width: 24rem) {
+  .nexus-floating-panel {
+    top: calc(0.5rem + env(safe-area-inset-top));
+    right: 0.5rem;
+    bottom: calc(var(--nexus-floating-panel-bottom) + env(safe-area-inset-bottom));
+    left: calc(var(--sidenav-collapsed-width) + 0.5rem);
+  }
+
+  .nexus-floating-bubble {
+    right: 0.5rem;
   }
 }
