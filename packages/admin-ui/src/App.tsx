@@ -74,6 +74,8 @@ function MainApp({ username }: { username: string }) {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [screenLocation.pathname]);
+  const isNexusPage =
+    screenLocation.pathname === "/nexus" || screenLocation.pathname.startsWith("/nexus/");
 
   const appContext: AppContextIface = {
     theme,
@@ -97,7 +99,7 @@ function MainApp({ username }: { username: string }) {
         <div className="body" id={theme}>
           <SideBar screenWidth={screenWidth} />
           <TopBar username={username} appContext={appContext} />
-          <div id="main">
+          <div id="main" className={isNexusPage ? "main-no-floating-chat-clearance" : undefined}>
             <ErrorBoundary>
               <LocalProxyBanner />
               <NotificationsMain />

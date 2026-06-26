@@ -1,10 +1,10 @@
 .nexus-page {
   padding: var(--default-spacing);
-  max-width: 1480px;
+  max-width: 1760px;
   margin: 0 auto;
   width: 100%;
-  height: calc(100vh - 2 * var(--default-spacing));
-  height: calc(100dvh - 2 * var(--default-spacing));
+  height: calc(100vh - 2 * var(--container-padding));
+  height: calc(100dvh - 2 * var(--container-padding));
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -895,8 +895,8 @@
   .nexus-page {
     padding: 0;
     max-width: none;
-    height: calc(100vh - var(--topbar-height) - var(--container-padding) - var(--nexus-floating-safe-area));
-    height: calc(100dvh - var(--topbar-height) - var(--container-padding) - var(--nexus-floating-safe-area));
+    height: calc(100vh - var(--topbar-height) - var(--container-padding));
+    height: calc(100dvh - var(--topbar-height) - var(--container-padding));
   }
 
   .nexus-history-sidebar {
