@@ -1,5 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import Button from "components/Button";
+import { confirm } from "components/ConfirmDialog";
 import Select from "components/Select";
 import NexusMarkdown from "./NexusMarkdown";
 import Dropdown from "react-bootstrap/Dropdown";
@@ -13,6 +14,7 @@ import {
   ChatMessage,
   NexusModel,
   NexusStatus,
+  clearChatHistory,
   clearNexusApiKey,
   deleteConversation,
   getNexusStatus,
@@ -74,6 +76,7 @@ interface NexusChatContextValue {
   startNewChat: () => void;
   openHistoryConversation: (id: string) => Promise<void>;
   removeHistoryConversation: (id: string) => Promise<void>;
+  clearHistory: () => Promise<void>;
   applyStatus: (s: NexusStatus) => Promise<void>;
   isFloatingOpen: boolean;
   hasFloatingOpened: boolean;
@@ -308,6 +311,21 @@ function useNexusChatState(): NexusChatContextValue {
     }
   };
 
+  const clearHistory = async () => {
+    if (isRunning) abortRef.current?.abort();
+    try {
+      await clearChatHistory();
+      setHistoryList([]);
+      setMessages([]);
+      setConversationId(null);
+      setStreamError(null);
+      setPendingConfirm(null);
+      lastSavedRef.current = "";
+    } catch (err) {
+      setStreamError((err as Error).message);
+    }
+  };
+
   const openFloatingChat = useCallback(() => {
     setHasFloatingOpened(true);
     setIsFloatingOpen(true);
@@ -343,6 +361,7 @@ function useNexusChatState(): NexusChatContextValue {
     startNewChat,
     openHistoryConversation,
     removeHistoryConversation,
+    clearHistory,
     applyStatus,
     isFloatingOpen,
     hasFloatingOpened,
@@ -376,6 +395,7 @@ export function ChatPanel({ variant = "page", onOpenFullScreen, onOpenFloating }
     startNewChat,
     openHistoryConversation,
     removeHistoryConversation,
+    clearHistory,
     applyStatus
   } = useNexusChat();
 
@@ -403,6 +423,19 @@ export function ChatPanel({ variant = "page", onOpenFullScreen, onOpenFloating }
 
   if (!status) return null;
 
+  const confirmClearHistory = () => {
+    if (historyList.length === 0) return;
+    confirm({
+      title: "Clear chat history?",
+      text: "This will delete all saved Nexus conversations from this DAppNode.",
+      label: "Clear history",
+      variant: "danger",
+      onClick: () => {
+        void clearHistory();
+      }
+    });
+  };
+
   const chatCard = (
     <div className={`nexus-chat-card nexus-chat-card-${variant}`}>
       <ChatHeader
@@ -416,6 +449,7 @@ export function ChatPanel({ variant = "page", onOpenFullScreen, onOpenFloating }
         onNewChat={startNewChat}
         onOpenConversation={openHistoryConversation}
         onDeleteConversation={removeHistoryConversation}
+        onClearHistory={confirmClearHistory}
         onManageKey={() => setShowKeyEditor(true)}
         onOpenFullScreen={onOpenFullScreen}
         onOpenFloating={onOpenFloating}
@@ -481,6 +515,7 @@ export function ChatPanel({ variant = "page", onOpenFullScreen, onOpenFloating }
         onNewChat={startNewChat}
         onOpenConversation={openHistoryConversation}
         onDeleteConversation={removeHistoryConversation}
+        onClearHistory={confirmClearHistory}
       />
       {chatCard}
     </div>
@@ -516,6 +551,7 @@ function ChatHeader({
   onNewChat,
   onOpenConversation,
   onDeleteConversation,
+  onClearHistory,
   onManageKey,
   onOpenFullScreen,
   onOpenFloating
@@ -530,6 +566,7 @@ function ChatHeader({
   onNewChat: () => void;
   onOpenConversation: (id: string) => void;
   onDeleteConversation: (id: string) => void;
+  onClearHistory: () => void;
   onManageKey: () => void;
   onOpenFullScreen?: () => void;
   onOpenFloating?: () => void;
@@ -613,7 +650,19 @@ function ChatHeader({
           <Dropdown.Menu className="nexus-history-menu">
             <Dropdown.Header className="nexus-history-header">
               Past conversations
-              <span className="nexus-history-count">{historyList.length}</span>
+              <span className="nexus-history-header-actions">
+                <span className="nexus-history-count">{historyList.length}</span>
+                <button
+                  type="button"
+                  className="nexus-history-clear"
+                  onClick={onClearHistory}
+                  disabled={historyList.length === 0}
+                  title="Clear chat history"
+                  aria-label="Clear chat history"
+                >
+                  <FiTrash2 />
+                </button>
+              </span>
             </Dropdown.Header>
             {historyList.length === 0 ? (
               <Dropdown.ItemText className="nexus-history-empty">No saved chats yet.</Dropdown.ItemText>
@@ -646,13 +695,15 @@ function HistorySidebar({
   activeConversationId,
   onNewChat,
   onOpenConversation,
-  onDeleteConversation
+  onDeleteConversation,
+  onClearHistory
 }: {
   historyList: ChatHistorySummary[];
   activeConversationId: string | null;
   onNewChat: () => void;
   onOpenConversation: (id: string) => void;
   onDeleteConversation: (id: string) => void;
+  onClearHistory: () => void;
 }) {
   return (
     <aside className="nexus-history-sidebar" aria-label="Past conversations">
@@ -666,9 +717,27 @@ function HistorySidebar({
             {historyList.length} saved chat{historyList.length === 1 ? "" : "s"}
           </div>
         </div>
-        <button type="button" className="nexus-icon-button" onClick={onNewChat} title="New chat" aria-label="New chat">
-          <FiPlus />
-        </button>
+        <div className="nexus-history-sidebar-actions">
+          <button
+            type="button"
+            className="nexus-icon-button"
+            onClick={onClearHistory}
+            disabled={historyList.length === 0}
+            title="Clear chat history"
+            aria-label="Clear chat history"
+          >
+            <FiTrash2 />
+          </button>
+          <button
+            type="button"
+            className="nexus-icon-button"
+            onClick={onNewChat}
+            title="New chat"
+            aria-label="New chat"
+          >
+            <FiPlus />
+          </button>
+        </div>
       </div>
 
       <div className="nexus-history-sidebar-list">

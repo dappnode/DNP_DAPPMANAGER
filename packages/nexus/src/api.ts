@@ -193,6 +193,12 @@ export class NexusApi {
     this.deps.historyStore.remove(id);
   }
 
+  clearHistory(): void {
+    for (const id of Object.keys(this.deps.historyStore.getAll())) {
+      this.deps.historyStore.remove(id);
+    }
+  }
+
   resolveConfirmation(body: unknown): { ok: boolean } {
     const parsedBody =
       body && typeof body === "object" ? (body as { id?: unknown; decision?: unknown; reason?: unknown }) : {};

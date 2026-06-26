@@ -1,13 +1,19 @@
 import fs from "fs";
 import path from "path";
-import { dbFactory } from "../../src/dbFactory.js";
+import { dbCache, dbFactory, dbNexus } from "../../src/dbFactory.js";
 import { expect } from "chai";
 
 const testDir = "./test_files/";
 
 describe("db", () => {
+  afterEach(() => {
+    dbCache.clearDb();
+    dbNexus.clearDb();
+  });
+
   it("Should read modify and write db", () => {
     const dbPath = path.join(testDir, "test-db.json");
+    fs.rmSync(dbPath, { force: true });
     const { staticKey, indexedByKey } = dbFactory(dbPath);
 
     const STATIC_VALUE_KEY = "static-value";

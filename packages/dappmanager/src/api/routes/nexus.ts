@@ -103,6 +103,12 @@ export const nexusChatHistoryDelete = wrapHandler(async (req: Request, res: Expr
   }
 });
 
+/** DELETE /nexus/chat/history - remove all conversations. */
+export const nexusChatHistoryClear = wrapHandler(async (_req: Request, res: ExpressResponse) => {
+  nexus.clearHistory();
+  res.status(204).end();
+});
+
 /** POST /nexus/chat/confirm - resolve a pending mutating-tool confirmation. */
 export const nexusChatConfirm = wrapHandler(async (req: Request, res: ExpressResponse) => {
   try {

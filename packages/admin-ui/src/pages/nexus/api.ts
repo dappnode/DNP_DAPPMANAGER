@@ -135,6 +135,16 @@ export async function deleteConversation(id: string): Promise<void> {
   }
 }
 
+export async function clearChatHistory(): Promise<void> {
+  const res = await fetch(HISTORY_URL, {
+    method: "DELETE",
+    credentials: "include"
+  });
+  if (!res.ok && res.status !== 204) {
+    throw new Error(`Failed to clear chat history: ${res.status}`);
+  }
+}
+
 /* ------------------------------------------------------------------ *
  * Chat completion (SSE)
  * ------------------------------------------------------------------ */

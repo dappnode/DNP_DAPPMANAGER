@@ -42,6 +42,7 @@ export const params = {
   // lowdb requires an absolute path
   DB_MAIN_PATH: path.resolve(DNCORE_DIR, "maindb.json"),
   DB_CACHE_PATH: path.resolve(DNCORE_DIR, "dappmanagerdb.json"),
+  DB_NEXUS_PATH: path.resolve(DNCORE_DIR, "nexusdb.json"),
 
   // File with sole purpose of handling admin password hash. Must be deletable
   ADMIN_RECOVERY_FILE: path.join(DNCORE_DIR, "admin-recovery-token.txt"),

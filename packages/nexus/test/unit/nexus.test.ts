@@ -57,7 +57,7 @@ describe("nexus / api", () => {
     expect(models.map((model) => model.id)).to.deep.equal(["chat", "legacy-chat"]);
   });
 
-  it("upserts, lists, deletes, and prunes chat history", () => {
+  it("upserts, lists, deletes, clears, and prunes chat history", () => {
     let now = 1000;
     const { service, state } = makeService({ now: () => now++ });
 
@@ -76,6 +76,10 @@ describe("nexus / api", () => {
 
     expect(Object.keys(state.history)).to.have.length(50);
     expect(state.history.c0).to.equal(undefined);
+
+    service.clearHistory();
+    expect(service.listHistory()).to.deep.equal([]);
+    expect(state.history).to.deep.equal({});
   });
 
   it("runs a read-only tool loop and resumes the upstream chat", async () => {

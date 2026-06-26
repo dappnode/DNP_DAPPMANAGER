@@ -20,6 +20,7 @@ import { getRpcHandler } from "./handler/index.js";
 import {
   nexusChatCompletions,
   nexusChatConfirm,
+  nexusChatHistoryClear,
   nexusChatHistoryDelete,
   nexusChatHistoryGet,
   nexusChatHistoryList,
@@ -203,6 +204,7 @@ export function startHttpApi({
   app.post("/nexus/chat/completions", auth.onlyAdmin, nexusChatCompletions);
   app.post("/nexus/chat/confirm", auth.onlyAdmin, nexusChatConfirm);
   app.get("/nexus/chat/history", auth.onlyAdmin, nexusChatHistoryList);
+  app.delete("/nexus/chat/history", auth.onlyAdmin, nexusChatHistoryClear);
   app.get("/nexus/chat/history/:id", auth.onlyAdmin, nexusChatHistoryGet);
   app.put("/nexus/chat/history/:id", auth.onlyAdmin, nexusChatHistoryUpsert);
   app.delete("/nexus/chat/history/:id", auth.onlyAdmin, nexusChatHistoryDelete);

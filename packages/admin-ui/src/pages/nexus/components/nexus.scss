@@ -77,6 +77,12 @@
   opacity: 0.6;
 }
 
+.nexus-history-sidebar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
 .nexus-history-sidebar-list {
   flex: 1;
   min-height: 0;
@@ -177,6 +183,16 @@
     border-color: var(--dappnode-strong-main-color);
   }
 
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  &:disabled:hover {
+    background: transparent;
+    border-color: var(--border-color);
+  }
+
   &::after {
     display: none !important;
   }
@@ -233,6 +249,41 @@
   background: var(--border-color);
   padding: 0.15rem 0.45rem;
   border-radius: 999px;
+}
+
+.nexus-history-header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.nexus-history-clear {
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.55;
+  cursor: pointer;
+  transition:
+    opacity 0.15s ease,
+    background 0.15s ease,
+    color 0.15s ease;
+
+  &:hover:not(:disabled) {
+    opacity: 1;
+    color: var(--danger-color);
+    background: rgba(188, 47, 57, 0.08);
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
 }
 
 .nexus-history-item {
@@ -1216,5 +1267,9 @@
 }
 
 #dark .nexus-history-delete:hover {
+  background: rgba(239, 68, 68, 0.15);
+}
+
+#dark .nexus-history-clear:hover:not(:disabled) {
   background: rgba(239, 68, 68, 0.15);
 }
