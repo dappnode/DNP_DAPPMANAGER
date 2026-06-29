@@ -189,14 +189,6 @@ body,
   @media (max-width: 55rem) {
     padding-top: var(--topbar-height) !important;
   }
-
-  @media (min-width: 55rem) {
-    padding-right: calc(var(--container-padding) + var(--nexus-floating-safe-area));
-
-    &.main-no-floating-chat-clearance {
-      padding-right: var(--container-padding);
-    }
-  }
 }
 
 /********************
