@@ -72,6 +72,11 @@
   }
 }
 
+#dark .nexus-floating-panel {
+  background: var(--color-dark-card);
+  border-color: var(--color-dark-border);
+}
+
 @media (min-width: 640px) {
   .nexus-floating-panel {
     inset: auto;

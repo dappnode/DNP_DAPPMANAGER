@@ -1116,6 +1116,16 @@
 #dark .nexus-history-sidebar {
   background-color: var(--color-dark-card);
   border-color: var(--color-dark-border);
+  color: var(--color-dark-maintext);
+}
+
+#dark .nexus-chat-subtitle,
+#dark .nexus-empty-hero p,
+#dark .nexus-composer-hint,
+#dark .nexus-history-sidebar-subtitle,
+#dark .nexus-history-empty,
+#dark .nexus-key-editor-text {
+  color: var(--color-dark-secondarytext);
 }
 
 #dark .nexus-history-sidebar-header {
@@ -1146,11 +1156,19 @@
 }
 
 #dark .nexus-composer-input {
+  background-color: #605f5fd6;
+  border-color: transparent;
   color: var(--color-dark-maintext);
 
   &::placeholder {
     color: var(--color-dark-secondarytext);
   }
+}
+
+#dark .nexus-model-picker select {
+  background-color: #605f5fd6;
+  border-color: transparent;
+  color: var(--color-dark-maintext);
 }
 
 #dark .nexus-not-configured-icon,
