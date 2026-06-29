@@ -13,7 +13,7 @@ import {
 import { sanitizeDependencies } from "../dappGet/utils/sanitizeDependencies.js";
 import { parseTimeoutSeconds } from "../utils.js";
 import { logs, getLogUi, logUiClear } from "@dappnode/logger";
-import { getDockerImageManifest, loadImage } from "@dappnode/dockerapi";
+import { getDockerImageManifest, listPackages, loadImage } from "@dappnode/dockerapi";
 import { ComposeEditor, setDappnodeComposeDefaults, writeMetadataToLabels } from "@dappnode/dockercompose";
 import { computeGlobalEnvsFromDb } from "@dappnode/db";
 import { params } from "@dappnode/params";
@@ -103,11 +103,13 @@ export async function packageInstallDev({
       signatureStatus: { status: ReleaseSignatureStatusCode.notSigned }
     };
 
+    const installedPackage = (await listPackages()).find((pkg) => pkg.dnpName === dnpName);
+
     const packagesData = await getInstallerPackagesData({
       releases: [release],
       userSettings: {},
       notificationsSettings: {},
-      currentVersions: { [dnpName]: undefined },
+      currentVersions: { [dnpName]: installedPackage?.version },
       reqName: dnpName
     });
 
