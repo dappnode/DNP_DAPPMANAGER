@@ -44,12 +44,16 @@ describe("Util: logs", () => {
         RTL_PASSWORD: "super-password",
         SECRET_PHRASE: "black cheese robin door",
         PRIVATE_KEY: "8986182398162471627461892763891726398124123123213",
+        apiKey: "sk-secret",
+        AUTHORIZATION: "Bearer secret",
         NORMAL: "value"
       })
     ).to.deep.equal({
       RTL_PASSWORD: "**********",
       SECRET_PHRASE: "**********",
       PRIVATE_KEY: "**********",
+      apiKey: "**********",
+      AUTHORIZATION: "**********",
       NORMAL: "value"
     });
   });

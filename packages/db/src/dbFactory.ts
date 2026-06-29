@@ -13,6 +13,11 @@ export const dbMain = dbFactory(params.DB_MAIN_PATH);
  * and may be deleted by the user if necessary
  */
 export const dbCache = dbFactory(params.DB_CACHE_PATH);
+/**
+ * Stores Nexus-specific data. Kept separate from dbCache so user chat history
+ * is not affected by generic cache cleanup.
+ */
+export const dbNexus = dbFactory(params.DB_NEXUS_PATH);
 
 export function dbFactory(dbPath: string): {
   staticKey: <T>(key: string, defaultValue: T) => { get: () => T; set: (value: T) => void };

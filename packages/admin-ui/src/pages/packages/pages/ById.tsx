@@ -10,7 +10,7 @@ import { FileManager } from "../components/FileManager";
 import { Backup } from "../components/Backup";
 import { NoDnpInstalled } from "../components/NoDnpInstalled";
 import { Network } from "../components/Network";
-import { basePath, mySubPath, systemSubPath } from "../data";
+import { basePath, customSubPath, mySubPath, systemSubPath } from "../data";
 // Components
 import Loading from "components/Loading";
 import ErrorView from "components/ErrorView";
@@ -58,7 +58,8 @@ export const PackageById: React.FC = () => {
     backup = [],
     containers,
     updateAvailable,
-    isCore
+    isCore,
+    isDev
   } = dnp;
 
   /**
@@ -110,11 +111,14 @@ export const PackageById: React.FC = () => {
     }
   ].filter((route) => route.available);
 
+  const backSubPath = isCore ? systemSubPath : isDev ? customSubPath : mySubPath;
+  const backLabel = isCore ? "SYSTEM PACKAGES" : isDev ? "CUSTOM PACKAGES" : "MY PACKAGES";
+
   return (
     <div>
-      <Link to={isCore ? `/${basePath}/${systemSubPath}` : `/${basePath}/${mySubPath}`} className="pkgs-back-btn">
+      <Link to={`/${basePath}/${backSubPath}`} className="pkgs-back-btn">
         <MdKeyboardArrowLeft />
-        <span>{(isCore ? `${systemSubPath}` : `${mySubPath}`).toUpperCase()} PACKAGES</span>
+        <span>{backLabel}</span>
       </Link>
 
       <Title title={prettyDnpName(dnpName)} />

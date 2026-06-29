@@ -1,9 +1,10 @@
 // PackagesNavigator.tsx
 import React from "react";
-import { Routes, Route, NavLink, useMatch } from "react-router-dom";
+import { Routes, Route, NavLink, Navigate, useLocation, useMatch } from "react-router-dom";
+import { useApi } from "api";
 import { SectionNavigator } from "components/SectionNavigator";
 import { PackagesList } from "../components/PackagesList";
-import { subPaths, title } from "../data";
+import { basePath, customSubPath, subPaths, title } from "../data";
 import { PackageById } from "../pages/ById";
 import { RouteType } from "types";
 import Title from "components/Title";
@@ -15,12 +16,20 @@ type NavRoute = {
   link: string;
 };
 
-const routesForNavbar: NavRoute[] = [
-  { name: "My packages", subPath: subPaths.my, link: "my" },
-  { name: "System packages", subPath: subPaths.system, link: "system" }
-];
+const myPackagesRoute: NavRoute = { name: "My packages", subPath: subPaths.my, link: "my" };
+const customPackagesRoute: NavRoute = { name: "My custom packages", subPath: subPaths.custom, link: customSubPath };
+const systemPackagesRoute: NavRoute = { name: "System packages", subPath: subPaths.system, link: "system" };
+
+const isPackagesPath = (pathname: string, subPath: string) =>
+  pathname === `/${basePath}/${subPath}` || pathname.startsWith(`/${basePath}/${subPath}/`);
 
 export const PackagesNavigator: React.FC = () => {
+  const dnpsRequest = useApi.packagesGet();
+  const hasCustomPackages = Boolean(dnpsRequest.data?.some((dnp) => dnp.isDev));
+  const routesForNavbar = hasCustomPackages
+    ? [myPackagesRoute, customPackagesRoute, systemPackagesRoute]
+    : [myPackagesRoute, systemPackagesRoute];
+
   const sectionRoutes: RouteType[] = [
     {
       name: "My packages",
@@ -32,6 +41,20 @@ export const PackagesNavigator: React.FC = () => {
         </Routes>
       )
     },
+    ...(hasCustomPackages
+      ? [
+          {
+            name: "My custom packages",
+            subPath: subPaths.custom,
+            element: (
+              <Routes>
+                <Route index element={<PackagesList coreDnps={false} customDnps={true} />} />
+                <Route path=":id/*" element={<PackageById />} />
+              </Routes>
+            )
+          }
+        ]
+      : []),
     {
       name: "System packages",
       subPath: subPaths.system,
@@ -45,9 +68,15 @@ export const PackagesNavigator: React.FC = () => {
   ];
 
   // Hide navbar when in a package detail view
+  const location = useLocation();
   const scopePath: string = "/packages/:scope";
   const match = useMatch({ path: scopePath, end: true });
   const isBaseSubpath = !!match && routesForNavbar.some((r) => r.link === (match.params?.scope ?? ""));
+  const isCustomPackagesPath = isPackagesPath(location.pathname, customSubPath);
+
+  if (dnpsRequest.data !== undefined && !hasCustomPackages && isCustomPackagesPath) {
+    return <Navigate to="/packages/my" replace />;
+  }
 
   return (
     <>

@@ -1,0 +1,113 @@
+.nexus-floating-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-index-chat-backdrop);
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.nexus-floating-bubble {
+  position: fixed;
+  bottom: calc(var(--nexus-floating-offset) + env(safe-area-inset-bottom));
+  right: var(--nexus-floating-offset);
+  z-index: var(--z-index-chat);
+  width: var(--nexus-floating-bubble-size);
+  height: var(--nexus-floating-bubble-size);
+  border-radius: 16px;
+  border: none;
+  background: linear-gradient(135deg, var(--dappnode-strong-main-color), var(--dappnode-darker-main-color));
+  color: white;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 177, 244, 0.35);
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 177, 244, 0.45);
+  }
+}
+
+.nexus-floating-panel {
+  position: fixed;
+  z-index: var(--z-index-chat);
+  background: var(--color-light-background-sidebar-topbar, #fff);
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  transition: opacity 0.15s ease;
+
+  // Mobile: nearly fullscreen with a bottom gap for the bubble
+  inset: var(--nexus-floating-offset);
+  bottom: calc(var(--nexus-floating-panel-bottom) + env(safe-area-inset-bottom));
+
+  &.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  &.closed {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .nexus-chat-card {
+    border: none;
+    border-radius: 0;
+    height: 100%;
+    max-height: none;
+  }
+
+  .nexus-chat-body {
+    flex: 1;
+  }
+
+  .nexus-bubble {
+    max-width: 92%;
+  }
+}
+
+@media (min-width: 640px) {
+  .nexus-floating-panel {
+    inset: auto;
+    bottom: calc(var(--nexus-floating-panel-bottom) + env(safe-area-inset-bottom));
+    right: var(--nexus-floating-offset);
+    width: 520px;
+    height: #{"min(760px, calc(100vh - var(--nexus-floating-panel-bottom) - var(--nexus-floating-offset)))"};
+    height: #{"min(760px, calc(100dvh - var(--nexus-floating-panel-bottom) - var(--nexus-floating-offset) - env(safe-area-inset-bottom)))"};
+  }
+}
+
+@media (min-width: 1200px) {
+  .nexus-floating-panel {
+    width: 600px;
+  }
+}
+
+@media (max-width: 40rem) {
+  .nexus-floating-panel {
+    top: calc(var(--nexus-floating-offset) + env(safe-area-inset-top));
+    right: var(--nexus-floating-offset);
+    bottom: calc(var(--nexus-floating-panel-bottom) + env(safe-area-inset-bottom));
+    left: calc(var(--sidenav-collapsed-width) + var(--nexus-floating-offset));
+    border-radius: 12px;
+  }
+}
+
+@media (max-width: 24rem) {
+  .nexus-floating-panel {
+    top: calc(0.5rem + env(safe-area-inset-top));
+    right: 0.5rem;
+    bottom: calc(var(--nexus-floating-panel-bottom) + env(safe-area-inset-bottom));
+    left: calc(var(--sidenav-collapsed-width) + 0.5rem);
+  }
+
+  .nexus-floating-bubble {
+    right: 0.5rem;
+  }
+}

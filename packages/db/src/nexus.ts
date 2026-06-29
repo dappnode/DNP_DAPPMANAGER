@@ -1,0 +1,30 @@
+import { dbMain, dbNexus } from "./dbFactory.js";
+
+/**
+ * Persisted chat conversations. Stored in dbNexus so conversations survive
+ * page reloads on the same DAppNode without living in the generic cache DB.
+ * The proxy caps the registry at MAX_HISTORY entries.
+ */
+export interface NexusStoredChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
+export interface NexusStoredConversation {
+  id: string;
+  title: string;
+  messages: NexusStoredChatMessage[];
+  createdAt: number;
+  updatedAt: number;
+}
+
+const NEXUS_CHAT_HISTORY = "nexus-chat-history";
+
+export const nexusChatHistory = dbNexus.indexedByKey<NexusStoredConversation, string>({
+  rootKey: NEXUS_CHAT_HISTORY,
+  getKey: (id) => id
+});
+
+const nexusApiKeyDbKey = "nexus-api-key";
+
+export const nexusApiKey = dbMain.staticKey<string>(nexusApiKeyDbKey, "");

@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "types": ["node", "mocha"],
+    "outDir": "dist",
+    "lib": ["ES2020", "ESNext", "ESNext.Promise", "DOM"]
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "test/**/*", "dist"]
+}
