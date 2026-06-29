@@ -76,6 +76,7 @@ export const packages: Pick<
       ...sampleDnp,
       dnpName: name,
       version: manifest.version || "0.1.0",
+      isDev: true,
       avatarUrl: "",
       origin: "dev",
       gettingStarted: `Custom package **${name}** installed locally`,

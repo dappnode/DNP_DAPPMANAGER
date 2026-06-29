@@ -4,7 +4,7 @@ import { Routes, Route, NavLink, Navigate, useLocation, useMatch } from "react-r
 import { useApi } from "api";
 import { SectionNavigator } from "components/SectionNavigator";
 import { PackagesList } from "../components/PackagesList";
-import { subPaths, title } from "../data";
+import { basePath, customSubPath, subPaths, title } from "../data";
 import { PackageById } from "../pages/ById";
 import { RouteType } from "types";
 import Title from "components/Title";
@@ -17,8 +17,11 @@ type NavRoute = {
 };
 
 const myPackagesRoute: NavRoute = { name: "My packages", subPath: subPaths.my, link: "my" };
-const customPackagesRoute: NavRoute = { name: "My custom packages", subPath: subPaths.dev, link: "dev" };
+const customPackagesRoute: NavRoute = { name: "My custom packages", subPath: subPaths.custom, link: customSubPath };
 const systemPackagesRoute: NavRoute = { name: "System packages", subPath: subPaths.system, link: "system" };
+
+const isPackagesPath = (pathname: string, subPath: string) =>
+  pathname === `/${basePath}/${subPath}` || pathname.startsWith(`/${basePath}/${subPath}/`);
 
 export const PackagesNavigator: React.FC = () => {
   const dnpsRequest = useApi.packagesGet();
@@ -42,7 +45,7 @@ export const PackagesNavigator: React.FC = () => {
       ? [
           {
             name: "My custom packages",
-            subPath: subPaths.dev,
+            subPath: subPaths.custom,
             element: (
               <Routes>
                 <Route index element={<PackagesList coreDnps={false} customDnps={true} />} />
@@ -69,7 +72,7 @@ export const PackagesNavigator: React.FC = () => {
   const scopePath: string = "/packages/:scope";
   const match = useMatch({ path: scopePath, end: true });
   const isBaseSubpath = !!match && routesForNavbar.some((r) => r.link === (match.params?.scope ?? ""));
-  const isCustomPackagesPath = location.pathname === "/packages/dev" || location.pathname.startsWith("/packages/dev/");
+  const isCustomPackagesPath = isPackagesPath(location.pathname, customSubPath);
 
   if (dnpsRequest.data !== undefined && !hasCustomPackages && isCustomPackagesPath) {
     return <Navigate to="/packages/my" replace />;
