@@ -1033,22 +1033,28 @@ function Composer({
           onKeyDown={onKeyDown}
           rows={1}
           placeholder="Send a message…"
-          className="nexus-composer-input"
+          className="form-control nexus-composer-input"
           disabled={disabled}
         />
         {isRunning ? (
-          <button className="nexus-send-button nexus-stop-button" onClick={onCancel} title="Stop generating">
-            <FiSquare />
-          </button>
+          <Button
+            variant="outline-danger"
+            className="nexus-send-button"
+            onClick={onCancel}
+            title="Stop generating"
+          >
+            <FiSquare className="nexus-send-button-icon" />
+          </Button>
         ) : (
-          <button
+          <Button
+            variant="dappnode"
             className="nexus-send-button"
             onClick={onSend}
             disabled={disabled || !draft.trim()}
             title="Send message"
           >
-            <FiSend />
-          </button>
+            <FiSend className="nexus-send-button-icon nexus-send-button-icon-send" />
+          </Button>
         )}
       </div>
       <small className="nexus-composer-hint">Enter to send · Shift+Enter for newline</small>
