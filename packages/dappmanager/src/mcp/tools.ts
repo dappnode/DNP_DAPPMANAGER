@@ -11,6 +11,7 @@ import {
 import { Network, PortProtocol } from "@dappnode/types";
 import type {
   Compose,
+  DashboardSupportedNetwork,
   Manifest,
   PackageContainer,
   PortMapping,
@@ -21,9 +22,15 @@ import type {
 import { validateManifestSchema, validateDappnodeCompose, validateSetupWizardSchema } from "@dappnode/schemas";
 import { yamlParse } from "@dappnode/utils";
 import { logs } from "@dappnode/logger";
+import { getUserActionLogs } from "../calls/getUserActionLogs.js";
+import { nodeStatusGetByNetwork } from "../calls/nodeStatusGet.js";
+import { packageRemove } from "../calls/packageRemove.js";
 import { packageRestart } from "../calls/packageRestart.js";
+import { packageRestartVolumes } from "../calls/packageRestartVolumes.js";
 import { packageSetEnvironment } from "../calls/packageSetEnvironment.js";
 import { packageSetPortMappings } from "../calls/packageSetPortMappings.js";
+import { portsApiStatusGet, portsUpnpStatusGet } from "../calls/portsStatusGet.js";
+import { portsToOpenGet } from "../calls/portsToOpenGet.js";
 import { MAX_UPLOAD_FILE_SIZE_BYTES, UPLOAD_TTL_MS } from "../uploads/tempTransfer.js";
 import { statsCpuGet } from "../calls/statsCpuGet.js";
 import { statsMemoryGet } from "../calls/statsMemoryGet.js";
@@ -32,6 +39,7 @@ import { systemInfoGet } from "../calls/systemInfoGet.js";
 import { diagnose } from "../calls/diagnose.js";
 import { autoUpdateDataGet } from "../calls/autoUpdateDataGet.js";
 import { notificationsGetAll } from "../calls/notifications.js";
+import { volumeRemove } from "../calls/volumeRemove.js";
 import { searchDocs, fetchDocPage } from "./docs.js";
 import {
   abortMcpDevImageUpload,
@@ -108,6 +116,14 @@ function truncate(s: string, max: number): string {
 function errMessage(err: unknown): string {
   return err instanceof Error ? err.message : String(err);
 }
+
+const dashboardSupportedNetworks = [
+  Network.Mainnet,
+  Network.Gnosis,
+  Network.Lukso,
+  Network.Hoodi,
+  Network.Sepolia
+] as [Network.Mainnet, Network.Gnosis, Network.Lukso, Network.Hoodi, Network.Sepolia];
 
 /* ────────────── Tools ────────────── */
 
@@ -229,6 +245,100 @@ const restartPackageTool: DappnodeTool = {
       dnpName,
       serviceNames: serviceNames ?? "all"
     };
+  }
+};
+
+const removePackageTool: DappnodeTool = {
+  name: "dappnode_remove_package",
+  displayName: "Remove package",
+  description:
+    "Remove an installed package by dnpName. Set `deleteVolumes` only when the user explicitly wants to permanently delete the package's persistent data too. This stops and removes package containers and deletes package files; core packages cannot be removed. Ask the user to confirm before calling.",
+  mutating: true,
+  schema: {
+    dnpName: z.string().min(1).describe("The package dnpName to remove."),
+    deleteVolumes: z
+      .boolean()
+      .optional()
+      .describe("If true, permanently delete the package's Docker volumes/persistent data. Default false.")
+  },
+  async execute({ dnpName, deleteVolumes = false }: { dnpName: string; deleteVolumes?: boolean }) {
+    logs.info(`MCP: dappnode_remove_package(${dnpName}, deleteVolumes=${deleteVolumes})`);
+    await packageRemove({ dnpName, deleteVolumes });
+    return { ok: true, dnpName, deleteVolumes };
+  }
+};
+
+const removePackageVolumeTool: DappnodeTool = {
+  name: "dappnode_remove_package_volume",
+  displayName: "Remove package volume",
+  description:
+    "Permanently delete one named volume for a package, or all package-owned named volumes if `volumeId` is omitted. This removes package data, removes affected containers, and re-ups the package. Use dappnode_get_package_details or dappnode_get_disk_usage first to identify the volume, and ask the user to confirm before calling.",
+  mutating: true,
+  schema: {
+    dnpName: z.string().min(1).describe("The package dnpName whose volume data should be removed."),
+    volumeId: z
+      .string()
+      .min(1)
+      .optional()
+      .describe("Docker volume name to remove. If omitted, removes all package-owned named volumes.")
+  },
+  async execute({ dnpName, volumeId }: { dnpName: string; volumeId?: string }) {
+    logs.info(`MCP: dappnode_remove_package_volume(${dnpName}, ${volumeId ?? "all"})`);
+    await packageRestartVolumes({ dnpName, volumeId });
+    return { ok: true, dnpName, volumeId: volumeId ?? "all" };
+  }
+};
+
+const listVolumesTool: DappnodeTool = {
+  name: "dappnode_list_volumes",
+  displayName: "List Docker volumes",
+  description:
+    "List Docker volumes known to DAppManager with owner package, internal compose volume name, size/refCount when available, orphan status, and custom mountpoint data. Use before deleting volume data so you can identify the exact volume name.",
+  schema: {
+    owner: z
+      .string()
+      .min(1)
+      .optional()
+      .describe("Optional package dnpName filter. Use 'unowned' to show volumes without an owner."),
+    onlyOrphan: z.boolean().optional().describe("If true, return only orphan volumes. Default false.")
+  },
+  async execute({ owner, onlyOrphan = false }: { owner?: string; onlyOrphan?: boolean }) {
+    const volumes = await getVolumeSystemData();
+    const filtered = volumes.filter((volume) => {
+      if (onlyOrphan && !volume.isOrphan) return false;
+      if (!owner) return true;
+      if (owner === "unowned") return !volume.owner;
+      return volume.owner === owner;
+    });
+
+    return {
+      count: filtered.length,
+      volumes: filtered
+    };
+  }
+};
+
+const removeOrphanVolumeTool: DappnodeTool = {
+  name: "dappnode_remove_orphan_volume",
+  displayName: "Remove orphan volume",
+  description:
+    "Permanently delete an orphan/unowned Docker volume by exact volume name. This refuses package-owned or currently referenced volumes; use dappnode_list_volumes first and ask the user to confirm before calling.",
+  mutating: true,
+  schema: {
+    name: z.string().min(1).describe("Exact Docker volume name to remove.")
+  },
+  async execute({ name }: { name: string }) {
+    const volume = (await getVolumeSystemData()).find((vol) => vol.name === name);
+    if (!volume) throw Error(`Volume not found: ${name}`);
+    if (!volume.isOrphan) {
+      throw Error(
+        `Refusing to remove non-orphan volume ${name}${volume.owner ? ` owned by ${volume.owner}` : ""}. Use dappnode_remove_package_volume for package-owned volumes.`
+      );
+    }
+
+    logs.info(`MCP: dappnode_remove_orphan_volume(${name})`);
+    await volumeRemove({ name });
+    return { ok: true, name };
   }
 };
 
@@ -380,6 +490,79 @@ const getDiskUsageTool: DappnodeTool = {
       grouped: byOwner,
       total: Object.values(byOwner).reduce((acc, b) => acc + b.totalBytes, 0)
     };
+  }
+};
+
+const getPortsStatusTool: DappnodeTool = {
+  name: "dappnode_get_ports_status",
+  displayName: "Check ports status",
+  description:
+    "Return ports that packages need exposed, plus optional UPnP mapping status and optional external TCP scan status. Use for networking/port-forwarding troubleshooting.",
+  schema: {
+    checkUpnp: z.boolean().optional().describe("If true, compare required ports with current UPnP mappings. Default true."),
+    checkApi: z
+      .boolean()
+      .optional()
+      .describe("If true, run the external port scanner service for TCP ports. Default true.")
+  },
+  async execute({ checkUpnp = true, checkApi = true }: { checkUpnp?: boolean; checkApi?: boolean }) {
+    const portsToOpen = await portsToOpenGet();
+    const errors: Record<string, string> = {};
+    let upnpStatus: unknown;
+    let apiStatus: unknown;
+
+    if (portsToOpen.length > 0 && checkUpnp) {
+      try {
+        upnpStatus = await portsUpnpStatusGet({ portsToOpen });
+      } catch (err) {
+        errors.upnp = errMessage(err);
+      }
+    }
+
+    if (portsToOpen.length > 0 && checkApi) {
+      try {
+        apiStatus = await portsApiStatusGet({ portsToOpen });
+      } catch (err) {
+        errors.api = errMessage(err);
+      }
+    }
+
+    return {
+      portsToOpen,
+      upnpStatus: upnpStatus ?? null,
+      apiStatus: apiStatus ?? null,
+      errors
+    };
+  }
+};
+
+const getUserActionLogsTool: DappnodeTool = {
+  name: "dappnode_get_user_action_logs",
+  displayName: "Read user action logs",
+  description:
+    "Read recent DAppManager user action logs, newest first. Useful for support questions like 'what changed recently?' or failed package operations.",
+  schema: {
+    first: z.number().int().min(1).max(200).optional().describe("Number of log entries to return. Default 50, max 200."),
+    after: z.number().int().min(0).optional().describe("Pagination offset, where 0 is the newest log. Default 0.")
+  },
+  async execute({ first = 50, after = 0 }: { first?: number; after?: number }) {
+    return await getUserActionLogs({ first, after });
+  }
+};
+
+const getNodeStatusTool: DappnodeTool = {
+  name: "dappnode_get_node_status",
+  displayName: "Check node status",
+  description:
+    "Check execution and consensus client status for staking dashboard networks: client name, sync status/progress, current block/slot, peers, or RPC errors. If `networks` is omitted, checks every supported dashboard network.",
+  schema: {
+    networks: z
+      .array(z.enum(dashboardSupportedNetworks))
+      .optional()
+      .describe("Networks to check. Defaults to mainnet, gnosis, lukso, hoodi, and sepolia.")
+  },
+  async execute({ networks = dashboardSupportedNetworks }: { networks?: DashboardSupportedNetwork[] }) {
+    return await nodeStatusGetByNetwork({ networks });
   }
 };
 
@@ -898,14 +1081,21 @@ export const dappnodeTools: Record<string, DappnodeTool> = {
   [listPackagesTool.name]: listPackagesTool,
   [getPackageDetailsTool.name]: getPackageDetailsTool,
   [getPackageLogsTool.name]: getPackageLogsTool,
+  [listVolumesTool.name]: listVolumesTool,
   [getSystemInfoTool.name]: getSystemInfoTool,
   [getDiskUsageTool.name]: getDiskUsageTool,
+  [getPortsStatusTool.name]: getPortsStatusTool,
+  [getUserActionLogsTool.name]: getUserActionLogsTool,
+  [getNodeStatusTool.name]: getNodeStatusTool,
   [getAvailableUpdatesTool.name]: getAvailableUpdatesTool,
   [listNotificationsTool.name]: listNotificationsTool,
   [diagnoseTool.name]: diagnoseTool,
   [startPackageTool.name]: startPackageTool,
   [stopPackageTool.name]: stopPackageTool,
   [restartPackageTool.name]: restartPackageTool,
+  [removePackageTool.name]: removePackageTool,
+  [removePackageVolumeTool.name]: removePackageVolumeTool,
+  [removeOrphanVolumeTool.name]: removeOrphanVolumeTool,
   [updatePackageTool.name]: updatePackageTool,
   [getStakerConfigTool.name]: getStakerConfigTool,
   [setStakerConfigTool.name]: setStakerConfigTool,
