@@ -3,8 +3,19 @@ import newTabProps from "utils/newTabProps";
 import { MdHome, MdSettingsRemote, MdSettings, MdInfo } from "react-icons/md";
 import { AiFillBug } from "react-icons/ai";
 import { Manifest } from "@dappnode/types";
+import { prettyDnpName } from "utils/format";
 
-export function Links({ links, bugs }: { links: Manifest["links"]; bugs: Manifest["bugs"] }) {
+export function Links({
+  links,
+  bugs,
+  packageIconUrl,
+  packageTitle
+}: {
+  bugs: Manifest["bugs"];
+  links: Manifest["links"];
+  packageIconUrl?: string;
+  packageTitle?: string;
+}) {
   const linksArray =
     typeof links === "object"
       ? Object.entries(links || {})
@@ -17,10 +28,14 @@ export function Links({ links, bugs }: { links: Manifest["links"]; bugs: Manifes
         : [];
 
   if (linksArray && bugs) linksArray.push({ name: "report", url: bugs.url });
+  const packageLinkProps = {
+    "data-dappnode-package-icon": packageIconUrl,
+    "data-dappnode-package-title": packageTitle ? prettyDnpName(packageTitle) : undefined
+  };
 
   const items = linksArray.map(({ name, url }) =>
     name === "homepage" || name === "ui" || name === "webui" || name === "gateway" || name === "report" ? (
-      <a className="links-url" href={url} {...newTabProps}>
+      <a className="links-url" href={url} {...newTabProps} {...packageLinkProps}>
         <span className="links-icon">
           {name === "homepage" ? (
             <MdInfo />

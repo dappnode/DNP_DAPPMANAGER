@@ -1,6 +1,7 @@
 import electron from "electron";
-import type { BrowserWindow as ElectronBrowserWindow, MenuItemConstructorOptions } from "electron";
+import type { BrowserWindow as ElectronBrowserWindow, MenuItemConstructorOptions, NativeImage } from "electron";
 import { spawn, type ChildProcess } from "node:child_process";
+import { randomBytes } from "node:crypto";
 import { createReadStream, constants as fsConstants } from "node:fs";
 import { access, mkdir, readFile, stat, unlink, writeFile } from "node:fs/promises";
 import http, { type IncomingMessage, type ServerResponse } from "node:http";
@@ -11,11 +12,16 @@ import path from "node:path";
 import httpProxy from "http-proxy";
 import { SocksProxyAgent } from "socks-proxy-agent";
 
-const { app, BrowserWindow, ipcMain, Menu, shell } = electron;
+const { app, BrowserWindow, dialog, ipcMain, Menu, nativeImage, session, shell } = electron;
 
 interface DesktopConfig {
   backendUrl?: string;
   wireguardEnabled?: boolean;
+}
+
+interface PendingWireguardDevice {
+  backendUrl: string;
+  device: string;
 }
 
 interface DesktopServer {
@@ -35,11 +41,28 @@ interface ConnectionInput {
   };
 }
 
+interface AutoWireguardInput {
+  backendUrl?: unknown;
+  password?: unknown;
+  username?: unknown;
+}
+
 interface ConnectionStatus {
   backendUrl: string;
   hasTunnelHelper: boolean;
   hasWireguardConfig: boolean;
   wireguardEnabled: boolean;
+}
+
+interface PackageWindowInput {
+  iconUrl?: unknown;
+  title?: unknown;
+  url?: unknown;
+}
+
+interface PackageWindowMetadata {
+  iconUrl?: string;
+  title?: string;
 }
 
 interface TunnelRuntime {
@@ -48,6 +71,17 @@ interface TunnelRuntime {
   process: ChildProcess;
   socksPort: number;
 }
+
+interface RpcResponse<T = unknown> {
+  error?: {
+    code?: number;
+    data?: unknown;
+    message?: string;
+  };
+  result?: T;
+}
+
+type WireguardConfigScope = "remote" | "local";
 
 type IpcResult<T extends object = Record<never, never>> = ({ ok: true } & T) | { ok: false; error: string };
 
@@ -60,8 +94,17 @@ const defaultAdminUiPath = app.isPackaged
   ? path.join(process.resourcesPath, "admin-ui")
   : path.join(repoRoot, "packages/admin-ui/build");
 const appIconPath = path.join(packageRoot, "resources/icon.png");
+const tunnelBackendUrl = "http://172.33.1.7";
 const backendValidationTimeoutMs = 7_000;
 const tunnelStartupTimeoutMs = 8_000;
+const wireguardConfigRetryDelayMs = 5_000;
+const wireguardConfigTimeoutMs = 10 * 60_000;
+const tunnelValidationRetryDelayMs = 5_000;
+const tunnelValidationTimeoutMs = 10 * 60_000;
+const iconRequestTimeoutMs = 5_000;
+const maxIconBytes = 2 * 1024 * 1024;
+
+const dappmanagerHostnames = new Set(["dappmanager.dappnode", "my.dappnode", "dappnode.local", "172.33.1.7"]);
 
 const proxyExactGetPaths = new Set(["/global-envs", "/metrics", "/ping", "/public-packages", "/user-action-logs"]);
 
@@ -99,9 +142,14 @@ const mimeTypes: Record<string, string> = {
 
 let mainWindow: ElectronBrowserWindow | null = null;
 let desktopServer: DesktopServer | null = null;
+const packageWindows = new Set<ElectronBrowserWindow>();
 
 function configPath(): string {
   return path.join(app.getPath("userData"), "desktop-config.json");
+}
+
+function pendingWireguardDevicePath(): string {
+  return path.join(app.getPath("userData"), "pending-wireguard-device.json");
 }
 
 function wireguardConfigPath(): string {
@@ -128,6 +176,114 @@ function getWireproxyBinaryPath(): string {
 
 function getErrorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
+}
+
+function parseHttpUrl(input: unknown): URL | null {
+  if (typeof input !== "string" || !input.trim()) return null;
+
+  try {
+    const parsedUrl = new URL(input.trim());
+    return parsedUrl.protocol === "http:" || parsedUrl.protocol === "https:" ? parsedUrl : null;
+  } catch {
+    return null;
+  }
+}
+
+function isDappnodeLocalHostname(hostname: string): boolean {
+  const normalizedHostname = hostname.toLowerCase();
+
+  return (
+    dappmanagerHostnames.has(normalizedHostname) ||
+    normalizedHostname.endsWith(".dappnode") ||
+    normalizedHostname.endsWith(".dappnode.local") ||
+    normalizedHostname.endsWith(".dappnode.private")
+  );
+}
+
+function isPrivateIpv4Address(hostname: string): boolean {
+  const parts = hostname.split(".").map((part) => Number(part));
+
+  if (parts.length !== 4 || parts.some((part) => !Number.isInteger(part) || part < 0 || part > 255)) return false;
+
+  return (
+    parts[0] === 10 ||
+    (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) ||
+    (parts[0] === 192 && parts[1] === 168) ||
+    (parts[0] === 169 && parts[1] === 254)
+  );
+}
+
+function isLikelyLocalBackendUrl(backendUrl: string): boolean {
+  const hostname = new URL(backendUrl).hostname.toLowerCase();
+
+  return hostname === "localhost" || isDappnodeLocalHostname(hostname) || isPrivateIpv4Address(hostname);
+}
+
+function isDesktopWireguardDevice(device: string): boolean {
+  return /^desktop[a-f0-9]{10}$/i.test(device);
+}
+
+function isDappnodePackageUrl(url: URL): boolean {
+  const hostname = url.hostname.toLowerCase();
+
+  return isDappnodeLocalHostname(hostname) && !dappmanagerHostnames.has(hostname);
+}
+
+function normalizePackageWindowInput(input: unknown): { metadata: PackageWindowMetadata; url: URL } {
+  const packageWindowInput = input as PackageWindowInput;
+  const url = parseHttpUrl(packageWindowInput?.url);
+
+  if (!url || !isDappnodePackageUrl(url)) {
+    throw new Error("Only DAppNode package URLs can be opened inside the desktop app.");
+  }
+
+  return {
+    metadata: {
+      iconUrl: typeof packageWindowInput.iconUrl === "string" ? packageWindowInput.iconUrl.trim() : undefined,
+      title: typeof packageWindowInput.title === "string" ? packageWindowInput.title.trim() : undefined
+    },
+    url
+  };
+}
+
+function normalizeAutoWireguardInput(input: unknown): {
+  backendUrl: string;
+  password: string;
+  username: string;
+} {
+  const autoWireguardInput = input as AutoWireguardInput;
+  const username = typeof autoWireguardInput?.username === "string" ? autoWireguardInput.username.trim() : "";
+  const password = typeof autoWireguardInput?.password === "string" ? autoWireguardInput.password : "";
+
+  if (!username) throw new Error("Enter your Dappmanager username.");
+  if (!password) throw new Error("Enter your Dappmanager password.");
+
+  return {
+    backendUrl: normalizeBackendUrl(autoWireguardInput?.backendUrl),
+    password,
+    username
+  };
+}
+
+function createDesktopWireguardDeviceName(): string {
+  return `desktop${randomBytes(5).toString("hex")}`;
+}
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+function getPackageWindowTitle(url: URL, metadata?: PackageWindowMetadata): string {
+  if (metadata?.title) return metadata.title;
+
+  const firstHostnamePart = url.hostname.split(".")[0] || url.hostname;
+  return firstHostnamePart
+    .split("-")
+    .filter(Boolean)
+    .map((part) => `${part.charAt(0).toUpperCase()}${part.slice(1)}`)
+    .join(" ");
 }
 
 function normalizeBackendUrl(input: unknown): string {
@@ -178,9 +334,27 @@ async function readConfigFile(): Promise<DesktopConfig> {
   }
 }
 
+async function readPendingWireguardDevice(backendUrl: string): Promise<string | undefined> {
+  try {
+    const rawConfig = await readFile(pendingWireguardDevicePath(), "utf8");
+    const pendingDevice = JSON.parse(rawConfig) as PendingWireguardDevice;
+
+    return pendingDevice.backendUrl === backendUrl && /^[a-z0-9]+$/i.test(pendingDevice.device)
+      ? pendingDevice.device
+      : undefined;
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return undefined;
+    throw error;
+  }
+}
+
 async function writeConfigFile(config: DesktopConfig): Promise<void> {
   await mkdir(path.dirname(configPath()), { recursive: true });
   await writePrivateFile(configPath(), `${JSON.stringify(config, null, 2)}\n`);
+}
+
+async function writePendingWireguardDevice(config: PendingWireguardDevice): Promise<void> {
+  await writePrivateFile(pendingWireguardDevicePath(), `${JSON.stringify(config, null, 2)}\n`);
 }
 
 async function writePrivateFile(filePath: string, content: string): Promise<void> {
@@ -260,6 +434,350 @@ function requestBackend(
     request.on("error", reject);
     request.on("timeout", () => request.destroy(new Error(`Connection to ${endpoint.origin} timed out.`)));
     request.end(body);
+  });
+}
+
+function requestJson<T>(
+  endpoint: URL,
+  body: unknown,
+  options: { cookie?: string; timeoutMs?: number } = {}
+): Promise<{ body: T; headers: http.IncomingHttpHeaders; statusCode?: number }> {
+  const transport = endpoint.protocol === "https:" ? https : http;
+  const requestBody = JSON.stringify(body ?? {});
+  const headers: http.OutgoingHttpHeaders = {
+    "Content-Length": Buffer.byteLength(requestBody),
+    "Content-Type": "application/json"
+  };
+
+  if (options.cookie) headers.Cookie = options.cookie;
+
+  return new Promise((resolve, reject) => {
+    const request = transport.request(
+      endpoint,
+      {
+        headers,
+        method: "POST",
+        rejectUnauthorized: false,
+        timeout: options.timeoutMs ?? backendValidationTimeoutMs
+      },
+      (response) => {
+        let responseBody = "";
+
+        response.setEncoding("utf8");
+        response.on("data", (chunk: string) => {
+          responseBody += chunk;
+        });
+        response.on("end", () => {
+          let parsedBody: T;
+
+          try {
+            parsedBody = responseBody ? (JSON.parse(responseBody) as T) : ({} as T);
+          } catch {
+            reject(new Error(responseBody || `Invalid JSON response from ${endpoint.pathname}.`));
+            return;
+          }
+
+          if (response.statusCode && response.statusCode >= 400) {
+            reject(new Error(getResponseErrorMessage(parsedBody, response.statusCode)));
+            return;
+          }
+
+          resolve({
+            body: parsedBody,
+            headers: response.headers,
+            statusCode: response.statusCode
+          });
+        });
+      }
+    );
+
+    request.on("error", reject);
+    request.on("timeout", () => request.destroy(new Error(`Request to ${endpoint.origin} timed out.`)));
+    request.end(requestBody);
+  });
+}
+
+function getResponseErrorMessage(body: unknown, statusCode: number): string {
+  const responseBody = body as { error?: { message?: unknown } | string };
+
+  if (typeof responseBody?.error === "string") return responseBody.error;
+  if (typeof responseBody?.error?.message === "string") return responseBody.error.message;
+
+  return `Request failed with HTTP ${statusCode}.`;
+}
+
+function getCookieHeader(setCookieHeader: string | string[] | undefined): string {
+  const cookies = (Array.isArray(setCookieHeader) ? setCookieHeader : setCookieHeader ? [setCookieHeader] : [])
+    .map((cookie) => cookie.split(";")[0])
+    .filter(Boolean);
+
+  return cookies.join("; ");
+}
+
+async function loginToBackend(backendUrl: string, username: string, password: string): Promise<string> {
+  const response = await requestJson<{ ok?: boolean }>(resolveBackendPath(backendUrl, "/login"), {
+    password,
+    username
+  });
+  const cookie = getCookieHeader(response.headers["set-cookie"]);
+
+  if (!cookie) throw new Error("Dappmanager login did not return a session cookie.");
+
+  return cookie;
+}
+
+async function callBackendRpc<T>(backendUrl: string, cookie: string, method: string, params: unknown[]): Promise<T> {
+  const response = await requestJson<RpcResponse<T>>(
+    resolveBackendPath(backendUrl, "/rpc"),
+    {
+      method,
+      params
+    },
+    { cookie, timeoutMs: 30_000 }
+  );
+
+  if (response.body.error) {
+    throw new Error(response.body.error.message || `Dappmanager RPC failed: ${method}`);
+  }
+
+  return response.body.result as T;
+}
+
+async function getWireguardDeviceConfigWithRetry(
+  backendUrl: string,
+  cookie: string,
+  device: string,
+  isLocal: boolean,
+  timeoutMs = wireguardConfigTimeoutMs
+): Promise<string> {
+  const deadline = Date.now() + timeoutMs;
+  let lastError: unknown;
+
+  while (Date.now() < deadline) {
+    try {
+      return await callBackendRpc<string>(backendUrl, cookie, "wireguardDeviceConfigGet", [{ device, isLocal }]);
+    } catch (error) {
+      lastError = error;
+      if (Date.now() + wireguardConfigRetryDelayMs >= deadline) break;
+      await delay(wireguardConfigRetryDelayMs);
+    }
+  }
+
+  throw lastError instanceof Error ? lastError : new Error("Could not fetch the WireGuard config.");
+}
+
+async function validateBackendUrlWithRetry(
+  backendUrl: string,
+  agent: SocksProxyAgent,
+  timeoutMs = tunnelValidationTimeoutMs
+): Promise<void> {
+  const deadline = Date.now() + timeoutMs;
+  let lastError: unknown;
+
+  while (Date.now() < deadline) {
+    try {
+      await validateBackendUrl(backendUrl, agent);
+      return;
+    } catch (error) {
+      lastError = error;
+      if (Date.now() + tunnelValidationRetryDelayMs >= deadline) break;
+      await delay(tunnelValidationRetryDelayMs);
+    }
+  }
+
+  throw lastError instanceof Error ? lastError : new Error(`Could not reach ${backendUrl} through the tunnel.`);
+}
+
+async function applyWireguardConfigAndValidate(config: string): Promise<void> {
+  let tunnel: TunnelRuntime | undefined;
+
+  try {
+    await updateWireguardConfig(config, true);
+    tunnel = await startWireguardTunnel();
+    await validateBackendUrlWithRetry(tunnelBackendUrl, tunnel.agent);
+  } catch (error) {
+    throw new Error(formatTunnelValidationError(error, tunnel));
+  } finally {
+    stopWireguardTunnel(tunnel);
+  }
+}
+
+function formatWireguardConfigFallbackError(remoteError: unknown, localError: unknown): string {
+  return [
+    "Could not validate WireGuard with either remote DynDNS or local network credentials.",
+    "",
+    `Remote credentials: ${getErrorMessage(remoteError)}`,
+    "",
+    `Local credentials: ${getErrorMessage(localError)}`
+  ].join("\n");
+}
+
+function getAutoWireguardConfigScopes(backendUrl: string): WireguardConfigScope[] {
+  return isLikelyLocalBackendUrl(backendUrl) ? ["local", "remote"] : ["remote", "local"];
+}
+
+function formatAutoWireguardSetupError(device: string, error: unknown): string {
+  if (!device) return getErrorMessage(error);
+
+  return [
+    `Started setup for WireGuard device ${device}, but could not validate the tunnel before the timeout.`,
+    "The device was left on DAppNode to avoid triggering another WireGuard reconfiguration.",
+    "Try Connect again to keep waiting with the same device.",
+    "",
+    getErrorMessage(error)
+  ].join("\n");
+}
+
+function shouldContinueAfterDeviceAddError(error: unknown): boolean {
+  const message = getErrorMessage(error);
+  const code = (error as NodeJS.ErrnoException)?.code;
+
+  return code === "ECONNRESET" || code === "ETIMEDOUT" || /ECONNRESET|ETIMEDOUT|socket hang up|timeout/i.test(message);
+}
+
+async function getReusableDesktopWireguardDevice(backendUrl: string, cookie: string): Promise<string | undefined> {
+  const pendingDevice = await readPendingWireguardDevice(backendUrl);
+  if (pendingDevice) return pendingDevice;
+
+  const devices = await callBackendRpc<string[]>(backendUrl, cookie, "wireguardDevicesGet", []);
+  const desktopDevice = devices.filter(isDesktopWireguardDevice).at(-1);
+
+  if (desktopDevice) await writePendingWireguardDevice({ backendUrl, device: desktopDevice });
+
+  return desktopDevice;
+}
+
+async function fetchAndValidateAutoWireguardConfig(
+  backendUrl: string,
+  cookie: string,
+  device: string,
+  scope: WireguardConfigScope
+): Promise<void> {
+  const config = await getWireguardDeviceConfigWithRetry(backendUrl, cookie, device, scope === "local");
+  await applyWireguardConfigAndValidate(config);
+}
+
+async function setupWireguardAutomatically(
+  input: unknown
+): Promise<{ backendUrl: string; configScope: WireguardConfigScope; device: string }> {
+  const { backendUrl, password, username } = normalizeAutoWireguardInput(input);
+  const wireproxyPath = getWireproxyBinaryPath();
+  let cookie = "";
+  let createdDevice = "";
+  let previousWireguardConfig: string | undefined;
+  let configScope: WireguardConfigScope = "remote";
+
+  try {
+    await assertWireproxyBinaryExists(wireproxyPath);
+    await assertAdminUiBuildExists();
+    await validateBackendUrl(backendUrl);
+
+    cookie = await loginToBackend(backendUrl, username, password);
+    createdDevice = (await getReusableDesktopWireguardDevice(backendUrl, cookie)) || "";
+    if (!createdDevice) {
+      createdDevice = createDesktopWireguardDeviceName();
+      await writePendingWireguardDevice({ backendUrl, device: createdDevice });
+      try {
+        await callBackendRpc<void>(backendUrl, cookie, "wireguardDeviceAdd", [createdDevice]);
+      } catch (error) {
+        if (!shouldContinueAfterDeviceAddError(error)) throw error;
+        console.warn(
+          `WireGuard device add response failed for ${createdDevice}; continuing because the peer may have been created.`,
+          error
+        );
+      }
+    }
+
+    previousWireguardConfig = await readFile(wireguardConfigPath(), "utf8").catch((error) => {
+      if ((error as NodeJS.ErrnoException).code === "ENOENT") return undefined;
+      throw error;
+    });
+
+    let validatedScope: WireguardConfigScope | undefined;
+    const errors: Partial<Record<WireguardConfigScope, unknown>> = {};
+    for (const scope of getAutoWireguardConfigScopes(backendUrl)) {
+      try {
+        await fetchAndValidateAutoWireguardConfig(backendUrl, cookie, createdDevice, scope);
+        validatedScope = scope;
+        break;
+      } catch (error) {
+        errors[scope] = error;
+      }
+    }
+
+    if (!validatedScope) {
+      throw new Error(formatWireguardConfigFallbackError(errors.remote, errors.local));
+    }
+    configScope = validatedScope;
+
+    await writeConfigFile({ backendUrl: tunnelBackendUrl, wireguardEnabled: true });
+    await removeFileIfExists(pendingWireguardDevicePath());
+    await loadAdminUi(tunnelBackendUrl, true);
+
+    const device = createdDevice;
+    createdDevice = "";
+
+    return { backendUrl: tunnelBackendUrl, configScope, device };
+  } catch (error) {
+    if (previousWireguardConfig !== undefined) {
+      await writePrivateFile(wireguardConfigPath(), previousWireguardConfig);
+    } else {
+      await unlink(wireguardConfigPath()).catch((unlinkError) => {
+        if ((unlinkError as NodeJS.ErrnoException).code !== "ENOENT") throw unlinkError;
+      });
+    }
+
+    throw new Error(formatAutoWireguardSetupError(createdDevice, error));
+  }
+}
+
+function requestBuffer(endpoint: URL, agent?: SocksProxyAgent, redirectsLeft = 2): Promise<Buffer> {
+  const transport = endpoint.protocol === "https:" ? https : http;
+
+  return new Promise((resolve, reject) => {
+    const request = transport.request(
+      endpoint,
+      {
+        agent,
+        method: "GET",
+        rejectUnauthorized: false,
+        timeout: iconRequestTimeoutMs
+      },
+      (response) => {
+        const statusCode = response.statusCode ?? 0;
+        const location = response.headers.location;
+
+        if (statusCode >= 300 && statusCode < 400 && location && redirectsLeft > 0) {
+          response.resume();
+          requestBuffer(new URL(location, endpoint), agent, redirectsLeft - 1).then(resolve, reject);
+          return;
+        }
+
+        if (statusCode >= 400) {
+          response.resume();
+          reject(new Error(`Icon request failed with HTTP ${statusCode}.`));
+          return;
+        }
+
+        const chunks: Uint8Array[] = [];
+        let byteLength = 0;
+
+        response.on("data", (chunk: Buffer) => {
+          byteLength += chunk.length;
+          if (byteLength > maxIconBytes) {
+            request.destroy(new Error("Icon response is too large."));
+            return;
+          }
+
+          chunks.push(Uint8Array.from(chunk));
+        });
+        response.on("end", () => resolve(Buffer.concat(chunks, byteLength)));
+      }
+    );
+
+    request.on("error", reject);
+    request.on("timeout", () => request.destroy(new Error(`Icon request to ${endpoint.origin} timed out.`)));
+    request.end();
   });
 }
 
@@ -344,6 +862,7 @@ async function stopDesktopServer(): Promise<void> {
 
   const { server, sockets, tunnel } = desktopServer;
   desktopServer = null;
+  closePackageWindows();
 
   for (const socket of sockets) socket.destroy();
 
@@ -495,6 +1014,23 @@ function waitForPort(
   });
 }
 
+function normalizeWireguardConfigForWireproxy(config: string): string {
+  let currentSection = "";
+
+  return config
+    .trim()
+    .split(/\r?\n/)
+    .filter((line) => {
+      const trimmedLine = line.trim();
+      const sectionMatch = trimmedLine.match(/^\[([^\]]+)\]$/);
+
+      if (sectionMatch) currentSection = sectionMatch[1].toLowerCase();
+
+      return !(currentSection === "interface" && /^listenport\s*=/i.test(trimmedLine));
+    })
+    .join("\n");
+}
+
 async function updateWireguardConfig(config: unknown, enabled: boolean): Promise<void> {
   if (!enabled) return;
   if (typeof config !== "string" || !config.trim()) {
@@ -502,7 +1038,7 @@ async function updateWireguardConfig(config: unknown, enabled: boolean): Promise
     return;
   }
 
-  const normalizedConfig = config.trim();
+  const normalizedConfig = normalizeWireguardConfigForWireproxy(config);
   if (!normalizedConfig.includes("[Interface]") || !normalizedConfig.includes("[Peer]")) {
     throw new Error("WireGuard config must include [Interface] and [Peer] sections.");
   }
@@ -634,6 +1170,137 @@ function sendJsonError(response: ServerResponse, statusCode: number, message: st
   response.end(JSON.stringify({ error: { message } }));
 }
 
+async function createPackageIcon(metadata?: PackageWindowMetadata): Promise<string | NativeImage> {
+  const iconUrl = parseHttpUrl(metadata?.iconUrl);
+  if (!iconUrl) return appIconPath;
+
+  try {
+    const agent =
+      desktopServer?.tunnel && isDappnodeLocalHostname(iconUrl.hostname) && !dappmanagerHostnames.has(iconUrl.hostname)
+        ? desktopServer.tunnel.agent
+        : undefined;
+    const iconBuffer = await requestBuffer(iconUrl, agent);
+    const icon = nativeImage.createFromBuffer(iconBuffer);
+
+    return icon.isEmpty() ? appIconPath : icon;
+  } catch (error) {
+    console.error("Error loading package window icon", error);
+    return appIconPath;
+  }
+}
+
+function openExternalUrl(url: string): void {
+  shell.openExternal(url).catch((error) => console.error("Error opening external URL", error));
+}
+
+async function openUrlFromApp(url: string, metadata?: PackageWindowMetadata): Promise<void> {
+  const parsedUrl = parseHttpUrl(url);
+
+  if (parsedUrl && isDappnodePackageUrl(parsedUrl)) {
+    await openPackageWindow(parsedUrl, metadata);
+    return;
+  }
+
+  openExternalUrl(url);
+}
+
+async function openPackageWindow(url: URL, metadata?: PackageWindowMetadata): Promise<void> {
+  if (!desktopServer) throw new Error("Connect to Dappmanager before opening package windows.");
+
+  const packageSession = session.fromPartition(`package:${Date.now()}:${Math.random()}`);
+  if (desktopServer.tunnel) {
+    await packageSession.setProxy({
+      proxyBypassRules: "<local>",
+      proxyRules: `socks5://127.0.0.1:${desktopServer.tunnel.socksPort}`
+    });
+  }
+
+  const browserWindow = new BrowserWindow({
+    backgroundColor: "#ffffff",
+    height: 780,
+    icon: await createPackageIcon(metadata),
+    minHeight: 520,
+    minWidth: 760,
+    show: false,
+    title: getPackageWindowTitle(url, metadata),
+    webPreferences: {
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: true,
+      session: packageSession
+    },
+    width: 1180
+  });
+
+  packageWindows.add(browserWindow);
+  browserWindow.once("ready-to-show", () => browserWindow.show());
+  browserWindow.once("closed", () => packageWindows.delete(browserWindow));
+  browserWindow.webContents.setWindowOpenHandler(({ url: nextUrl }) => {
+    openUrlFromApp(nextUrl).catch((error) => console.error("Error opening package URL", error));
+    return { action: "deny" };
+  });
+  browserWindow.webContents.on("will-navigate", (event, nextUrl) => {
+    const parsedUrl = parseHttpUrl(nextUrl);
+    if (parsedUrl && isDappnodePackageUrl(parsedUrl)) return;
+
+    event.preventDefault();
+    openExternalUrl(nextUrl);
+  });
+
+  await browserWindow.loadURL(url.toString());
+}
+
+function closePackageWindows(): void {
+  for (const browserWindow of packageWindows) {
+    if (!browserWindow.isDestroyed()) browserWindow.close();
+  }
+
+  packageWindows.clear();
+}
+
+async function removeFileIfExists(filePath: string): Promise<void> {
+  await unlink(filePath).catch((error) => {
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+  });
+}
+
+async function clearDesktopSettings(): Promise<void> {
+  await stopDesktopServer();
+  closePackageWindows();
+  await Promise.all([
+    removeFileIfExists(configPath()),
+    removeFileIfExists(pendingWireguardDevicePath()),
+    removeFileIfExists(wireguardConfigPath()),
+    removeFileIfExists(wireproxyConfigPath())
+  ]);
+  await mainWindow?.loadFile(connectionPagePath);
+}
+
+async function confirmAndClearDesktopSettings(): Promise<void> {
+  const options = {
+    buttons: ["Clear Settings", "Cancel"],
+    cancelId: 1,
+    defaultId: 1,
+    detail:
+      "This removes the saved backend URL and local WireGuard config from this computer. It does not remove WireGuard devices from your DAppNode.",
+    message: "Clear all DAppNode Desktop settings?",
+    type: "warning" as const
+  };
+  const result = mainWindow ? await dialog.showMessageBox(mainWindow, options) : await dialog.showMessageBox(options);
+
+  if (result.response !== 0) return;
+  await clearDesktopSettings();
+}
+
+function setupAppIdentity(): void {
+  app.setName("DAppNode Desktop");
+
+  if (process.platform === "darwin" && app.dock) {
+    const dockIcon = nativeImage.createFromPath(appIconPath);
+    if (!dockIcon.isEmpty()) app.dock.setIcon(dockIcon);
+  }
+}
+
 function createMainWindow(): ElectronBrowserWindow {
   const browserWindow = new BrowserWindow({
     backgroundColor: "#f5f7f0",
@@ -654,7 +1321,7 @@ function createMainWindow(): ElectronBrowserWindow {
 
   browserWindow.once("ready-to-show", () => browserWindow.show());
   browserWindow.webContents.setWindowOpenHandler(({ url }) => {
-    shell.openExternal(url).catch((error) => console.error("Error opening external URL", error));
+    openUrlFromApp(url).catch((error) => console.error("Error opening URL", error));
     return { action: "deny" };
   });
   browserWindow.webContents.on("will-navigate", (event, url) => {
@@ -664,7 +1331,7 @@ function createMainWindow(): ElectronBrowserWindow {
     if (url.startsWith("file://")) return;
 
     event.preventDefault();
-    shell.openExternal(url).catch((error) => console.error("Error opening external URL", error));
+    openUrlFromApp(url).catch((error) => console.error("Error opening URL", error));
   });
 
   if (process.env.ELECTRON_DEBUG) browserWindow.webContents.openDevTools();
@@ -704,6 +1371,33 @@ function setupIpcHandlers(): void {
       wireguardEnabled: config.wireguardEnabled === true
     };
   });
+
+  ipcMain.handle("package:open", async (_event, input: unknown): Promise<IpcResult> => {
+    try {
+      const { metadata, url } = normalizePackageWindowInput(input);
+      await openPackageWindow(url, metadata);
+
+      return { ok: true };
+    } catch (error) {
+      return { ok: false, error: getErrorMessage(error) };
+    }
+  });
+
+  ipcMain.handle(
+    "connection:auto-wireguard",
+    async (
+      _event,
+      input: unknown
+    ): Promise<IpcResult<{ backendUrl: string; configScope: WireguardConfigScope; device: string }>> => {
+      try {
+        const result = await setupWireguardAutomatically(input);
+
+        return { ok: true, ...result };
+      } catch (error) {
+        return { ok: false, error: getErrorMessage(error) };
+      }
+    }
+  );
 
   ipcMain.handle("backend:save", async (_event, input: unknown): Promise<IpcResult<{ backendUrl: string }>> => {
     try {
@@ -748,11 +1442,7 @@ function setupIpcHandlers(): void {
 
   ipcMain.handle("backend:clear", async (): Promise<IpcResult> => {
     try {
-      await writeConfigFile({});
-      await unlink(wireguardConfigPath()).catch((error) => {
-        if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
-      });
-      await showConnectionScreen();
+      await clearDesktopSettings();
 
       return { ok: true };
     } catch (error) {
@@ -788,6 +1478,13 @@ function setupMenu(): void {
           },
           label: "Change Connection"
         },
+        {
+          click: () => {
+            confirmAndClearDesktopSettings().catch((error) => console.error("Error clearing desktop settings", error));
+          },
+          label: "Clear All Settings..."
+        },
+        { type: "separator" },
         {
           click: () => mainWindow?.reload(),
           label: "Reload",
@@ -829,7 +1526,7 @@ app.on("before-quit", () => {
 app
   .whenReady()
   .then(async () => {
-    app.setName("DAppNode Desktop");
+    setupAppIdentity();
     setupIpcHandlers();
     setupMenu();
     mainWindow = createMainWindow();

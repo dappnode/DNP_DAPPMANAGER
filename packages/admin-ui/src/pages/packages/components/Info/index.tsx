@@ -111,6 +111,8 @@ export function Info({
               links={links || ((manifest as any) || {}).homepage || {}}
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               bugs={bugs || ((manifest as any) || {}).url || {}}
+              packageIconUrl={dnp.avatarUrl}
+              packageTitle={dnpName}
             />
           </div>
         </div>

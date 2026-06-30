@@ -19,11 +19,21 @@ For development, `yarn desktop` automatically downloads the pinned `wireproxy` b
 Normal tunnel flow:
 
 1. Run `yarn desktop`.
-2. Choose `WireGuard tunnel`.
-3. Paste or select your WireGuard `.conf` file.
-4. Click `Connect`.
+2. Connect this computer to your DAppNode once using local Wi-Fi, an existing VPN, or any other route where Dappmanager opens.
+3. Enter a setup URL this computer can reach, such as `http://my.dappnode`.
+4. Enter your Dappmanager username and password.
+5. The app creates a new desktop WireGuard device, stores the config locally, and switches to the tunnel.
 
 Tunnel mode automatically uses `http://172.33.1.7`, the Dappmanager internal core IP.
+
+The setup URL is only used for first contact. After setup, the saved backend URL is `http://172.33.1.7`, and the desktop app connects through its own app-only WireGuard proxy. The user no longer needs global VPN or direct local Wi-Fi access for the desktop app.
+The Dappmanager password is used only for this setup request and is not stored by the desktop app.
+After creating the device, the app waits for the DAppNode WireGuard package to apply the new peer; WireGuard may be temporarily unavailable for several minutes during this step.
+If the device-add response is lost while WireGuard is reconfiguring, the app keeps waiting for the generated device instead of creating another one.
+If validation still times out after a device is created, the app leaves that device in place instead of removing it and triggering a second WireGuard reconfiguration. The next setup attempt reuses that pending device, and if the local pending marker is missing it reuses the newest auto-created `desktop...` WireGuard device it finds.
+Before starting `wireproxy`, the app removes `ListenPort` from the downloaded client config so the local WireGuard proxy helper does not try to bind the DAppNode WireGuard port.
+
+If automatic setup is not possible, paste or select an existing WireGuard `.conf` file and click `Connect`.
 
 Manual override, if you want to use your own binary:
 
@@ -44,6 +54,12 @@ packages/electron-app/vendor/wireproxy/<platform>-<arch>/wireproxy
 ```
 
 The WireGuard config contains a private key and is written to Electron's `userData` folder as `wireguard.conf` with `0600` permissions where supported.
+
+## Package app windows
+
+When a package link points to a DAppNode-local package URL such as `http://brain.web3signer.dappnode/`, the desktop app opens it in a separate Electron window instead of the system browser. Links from the package info page pass the package title and avatar to Electron, so the child window can use the package name and icon when available.
+
+If the main app is connected through the WireGuard tunnel, each package window gets its own isolated Electron session configured with the local `wireproxy` SOCKS5 proxy. This keeps package UI traffic inside the desktop app without changing system routes.
 
 Useful commands:
 
@@ -83,7 +99,7 @@ yarn desktop:dist:win
 
 Build the Windows installer on Windows, or on a Windows CI runner. Cross-building the NSIS installer from macOS may require Wine and is less reliable. The `.exe` output is written to `packages/electron-app/release/`.
 
-To fail the build if the tunnel helper cannot be downloaded or bundled, use:
+To fail the build if the WireGuard proxy helper cannot be downloaded or bundled, use:
 
 ```sh
 DAPPNODE_REQUIRE_WIREPROXY=1 yarn desktop:dist:mac

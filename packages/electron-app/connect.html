@@ -12,15 +12,16 @@
       :root {
         color-scheme: light;
         --ink: #18211f;
-        --muted: #68716e;
-        --line: #d8dfd8;
-        --surface: #fbfcf8;
-        --surface-strong: #f3f7ee;
+        --muted: #5d6a68;
+        --line: #dce5e4;
+        --surface: #f7f9f9;
         --panel: #ffffff;
-        --brand: #00b88d;
-        --brand-ink: #04362e;
+        --brand: #007dfc;
+        --brand-hover: #0068d8;
+        --brand-soft: #edf7ff;
         --danger: #b23b3b;
-        --shadow: 0 24px 80px rgba(21, 36, 31, 0.16);
+        --success: #0b8f6d;
+        --ease-out: cubic-bezier(0.25, 1, 0.5, 1);
       }
 
       * {
@@ -30,6 +31,10 @@
       body {
         margin: 0;
         min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(135deg, #edf7ff 0%, var(--surface) 42%, #effbf6 100%);
+        color: var(--ink);
         font-family:
           ui-sans-serif,
           system-ui,
@@ -37,76 +42,157 @@
           BlinkMacSystemFont,
           "Segoe UI",
           sans-serif;
-        color: var(--ink);
-        background: linear-gradient(120deg, rgba(0, 184, 141, 0.12), transparent 36%),
-          linear-gradient(300deg, rgba(255, 195, 77, 0.18), transparent 32%), #f5f7f0;
-        display: grid;
-        place-items: center;
       }
 
       main {
-        width: min(920px, calc(100vw - 48px));
-        min-height: min(620px, calc(100vh - 48px));
+        width: min(860px, calc(100vw - 48px));
+        min-height: min(560px, calc(100vh - 48px));
         display: grid;
-        grid-template-columns: minmax(0, 0.95fr) minmax(340px, 1.05fr);
+        grid-template-columns: 300px minmax(0, 1fr);
         overflow: hidden;
-        border: 1px solid rgba(24, 33, 31, 0.12);
-        border-radius: 18px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
         background: var(--panel);
-        box-shadow: var(--shadow);
+        box-shadow: 0 8px 14px rgba(20, 33, 30, 0.08);
       }
 
       .brand {
-        padding: 44px;
-        background: #14211e;
-        color: #f4fff8;
+        position: relative;
+        padding: 36px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        gap: 40px;
+        gap: 32px;
+        overflow: hidden;
+        background: linear-gradient(160deg, #0d2b28 0%, #14211e 52%, #0e2540 100%);
+        color: #f4fff8;
+      }
+
+      .brand::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+        opacity: 0;
+        pointer-events: none;
+        transform: translateX(-120%);
+      }
+
+      body.is-busy .brand::after {
+        animation: brandSweep 2.4s var(--ease-out) infinite;
+      }
+
+      .brand > * {
+        position: relative;
+        z-index: 1;
       }
 
       .brand-logo {
-        width: min(220px, 80%);
+        width: 190px;
+        max-width: 100%;
         height: auto;
       }
 
       .app-mark {
         display: inline-flex;
         align-items: center;
-        gap: 12px;
+        gap: 10px;
         color: rgba(244, 255, 248, 0.78);
         font-size: 13px;
-        font-weight: 800;
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
+        font-weight: 750;
       }
 
       .app-mark img {
-        width: 44px;
-        height: 44px;
-        border-radius: 10px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+        width: 38px;
+        height: 38px;
+        border-radius: 8px;
       }
 
       .brand h1 {
-        margin: 0;
-        max-width: 12ch;
-        font-size: clamp(42px, 8vw, 76px);
-        line-height: 0.92;
+        margin: 22px 0 0;
+        max-width: 11ch;
+        font-size: 38px;
+        line-height: 1;
         letter-spacing: 0;
       }
 
       .brand p {
-        margin: 18px 0 0;
-        max-width: 28rem;
+        margin: 14px 0 0;
         color: rgba(244, 255, 248, 0.72);
-        font-size: 16px;
-        line-height: 1.55;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .connection-path {
+        margin-top: 24px;
+        padding: 14px;
+        border: 1px solid rgba(244, 255, 248, 0.14);
+        border-radius: 10px;
+        background: rgba(244, 255, 248, 0.06);
+      }
+
+      .path-step {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: rgba(244, 255, 248, 0.82);
+        font-size: 12px;
+        font-weight: 750;
+        line-height: 1.25;
+      }
+
+      .path-node {
+        width: 12px;
+        height: 12px;
+        flex: 0 0 auto;
+        border: 2px solid rgba(244, 255, 248, 0.48);
+        border-radius: 999px;
+        background: #14211e;
+      }
+
+      .path-node.active {
+        border-color: #78d5ff;
+        background: #78d5ff;
+        box-shadow: 0 0 0 4px rgba(120, 213, 255, 0.14);
+      }
+
+      .path-node.secure {
+        border-color: #59e0b7;
+        background: #59e0b7;
+      }
+
+      .path-line {
+        position: relative;
+        width: 2px;
+        height: 26px;
+        margin: 5px 0 5px 5px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: rgba(244, 255, 248, 0.18);
+      }
+
+      .path-line span {
+        position: absolute;
+        top: -14px;
+        left: 0;
+        width: 2px;
+        height: 14px;
+        border-radius: 999px;
+        background: linear-gradient(#78d5ff, #59e0b7);
+        opacity: 0;
+      }
+
+      body.is-busy .path-line span {
+        opacity: 1;
+        animation: pathTravel 1.35s var(--ease-out) infinite;
+      }
+
+      body.is-busy .path-line.delayed span {
+        animation-delay: 180ms;
       }
 
       .form-side {
-        padding: 56px;
+        padding: 44px;
         display: flex;
         align-items: center;
       }
@@ -116,151 +202,238 @@
       }
 
       h2 {
-        margin: 0 0 10px;
-        font-size: 29px;
-        line-height: 1.08;
+        margin: 0 0 8px;
+        font-size: 26px;
+        line-height: 1.15;
         letter-spacing: 0;
       }
 
+      h3 {
+        margin: 0 0 12px;
+        font-size: 14px;
+        line-height: 1.2;
+      }
+
       .lede {
-        margin: 0 0 30px;
+        margin: 0 0 16px;
+        max-width: 36rem;
         color: var(--muted);
-        font-size: 15px;
+        font-size: 14px;
         line-height: 1.5;
+      }
+
+      .setup-note {
+        display: flex;
+        gap: 11px;
+        margin: 0 0 20px;
+        padding: 12px;
+        border: 1px solid #cfe4ff;
+        border-radius: 10px;
+        background: #f4fbff;
+        color: #1f3e56;
+        font-size: 13px;
+        line-height: 1.42;
+      }
+
+      .note-mark {
+        width: 10px;
+        height: 10px;
+        flex: 0 0 auto;
+        margin-top: 4px;
+        border-radius: 999px;
+        background: var(--brand);
+        box-shadow: 0 0 0 4px rgba(0, 125, 252, 0.12);
+      }
+
+      .setup-note strong {
+        display: block;
+        margin-bottom: 2px;
+        color: var(--ink);
       }
 
       label {
         display: block;
-        margin: 0 0 10px;
-        font-weight: 700;
+        margin: 0 0 8px;
         font-size: 13px;
+        font-weight: 700;
       }
 
-      .field-group {
-        margin: 0 0 24px;
+      .field-group,
+      .credentials-grid {
+        margin: 0 0 16px;
       }
 
-      .field-group.hidden {
-        display: none;
+      .credentials-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      input,
+      textarea {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #ffffff;
+        color: var(--ink);
+        font: inherit;
+        outline: none;
+        transition:
+          border-color 140ms ease,
+          box-shadow 140ms ease,
+          background 140ms ease;
       }
 
       input {
-        width: 100%;
-        height: 48px;
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        padding: 0 14px;
-        font: inherit;
-        color: var(--ink);
-        background: var(--surface);
-        outline: none;
-        transition:
-          border-color 120ms ease,
-          box-shadow 120ms ease,
-          background 120ms ease;
+        height: 46px;
+        padding: 0 13px;
       }
 
-      input:focus {
-        border-color: var(--brand);
-        background: #ffffff;
-        box-shadow: 0 0 0 4px rgba(0, 184, 141, 0.15);
-      }
-
-      .mode-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-        margin: 0 0 24px;
-      }
-
-      .mode-option {
-        position: relative;
-      }
-
-      .mode-option input {
-        position: absolute;
-        opacity: 0;
-        pointer-events: none;
-      }
-
-      .mode-card {
-        min-height: 88px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        gap: 6px;
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        padding: 14px;
-        background: var(--surface);
-        cursor: pointer;
-        transition:
-          border-color 120ms ease,
-          box-shadow 120ms ease,
-          background 120ms ease;
-      }
-
-      .mode-title {
-        color: var(--ink);
-        font-size: 14px;
-        font-weight: 800;
-        line-height: 1.1;
-      }
-
-      .mode-description {
-        color: var(--muted);
+      textarea {
+        min-height: 110px;
+        resize: vertical;
+        padding: 11px 13px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
         font-size: 12px;
-        line-height: 1.35;
       }
 
-      .mode-option input:focus + .mode-card {
+      input:focus,
+      textarea:focus {
         border-color: var(--brand);
-        box-shadow: 0 0 0 4px rgba(0, 184, 141, 0.15);
+        box-shadow: 0 0 0 3px rgba(0, 125, 252, 0.16);
       }
 
-      .mode-option input:checked + .mode-card {
-        border-color: var(--brand);
-        background: #effaf4;
+      input:hover,
+      textarea:hover {
+        border-color: #bfd0ce;
       }
 
       .examples {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
-        margin: 12px 0 0;
+        margin: 10px 0 0;
       }
 
       .example {
         border: 1px solid var(--line);
         border-radius: 999px;
         background: transparent;
-        color: var(--brand-ink);
-        padding: 8px 11px;
+        color: var(--muted);
+        padding: 7px 10px;
         font: inherit;
         font-size: 12px;
         cursor: pointer;
+        transition:
+          border-color 150ms ease,
+          background 150ms ease,
+          color 150ms ease,
+          transform 150ms var(--ease-out);
       }
 
       .example:hover {
         border-color: var(--brand);
-        background: rgba(0, 184, 141, 0.08);
+        color: var(--ink);
+        background: var(--brand-soft);
+        transform: translateY(-1px);
       }
 
-      .tunnel-panel {
-        display: none;
-        margin: 0 0 24px;
-        padding: 16px;
+      button {
+        height: 44px;
+        border-radius: 8px;
+        font: inherit;
+        font-weight: 800;
+        cursor: pointer;
+        transition:
+          border-color 150ms ease,
+          background 150ms ease,
+          box-shadow 150ms ease,
+          color 150ms ease,
+          opacity 150ms ease,
+          transform 150ms var(--ease-out);
+      }
+
+      button:disabled {
+        cursor: progress;
+        opacity: 0.64;
+      }
+
+      .primary-button {
+        width: 100%;
+        border: 1px solid var(--brand-hover);
+        background: var(--brand-hover);
+        color: #ffffff;
+      }
+
+      .primary-button:not(:disabled):hover {
+        background: #005fca;
+        box-shadow: 0 6px 10px rgba(0, 104, 216, 0.18);
+        transform: translateY(-1px);
+      }
+
+      button:not(:disabled):active {
+        transform: translateY(0) scale(0.985);
+      }
+
+      .secondary-button {
+        width: 100%;
+        border: 1px solid var(--line);
+        background: #ffffff;
+        color: var(--ink);
+      }
+
+      .secondary-button:not(:disabled):hover {
+        border-color: var(--brand);
+        background: var(--brand-soft);
+        transform: translateY(-1px);
+      }
+
+      .advanced {
+        margin-top: 20px;
+      }
+
+      .advanced summary {
+        width: fit-content;
+        color: var(--brand-hover);
+        font-size: 13px;
+        font-weight: 750;
+        cursor: pointer;
+        transition: color 150ms ease;
+      }
+
+      .advanced summary:hover {
+        color: #005fca;
+      }
+
+      .advanced-body {
+        margin-top: 16px;
         border: 1px solid var(--line);
         border-radius: 8px;
-        background: var(--surface-strong);
+        overflow: hidden;
       }
 
-      .tunnel-panel.enabled .tunnel-fields {
-        display: block;
+      .advanced[open] .advanced-body {
+        animation: revealAdvanced 180ms var(--ease-out);
       }
 
-      .tunnel-panel.enabled {
-        display: block;
+      .advanced-section {
+        padding: 16px;
+        background: #ffffff;
+      }
+
+      .advanced-section + .advanced-section {
+        border-top: 1px solid var(--line);
+      }
+
+      .hint {
+        margin: 0 0 12px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      .hint.error {
+        color: var(--danger);
       }
 
       .file-input {
@@ -269,93 +442,172 @@
       }
 
       .file-input::file-selector-button {
-        margin-right: 12px;
+        margin-right: 10px;
         border: 1px solid var(--line);
         border-radius: 7px;
         background: #ffffff;
-        color: var(--brand-ink);
-        padding: 8px 11px;
+        color: var(--ink);
+        padding: 7px 10px;
         font: inherit;
         font-weight: 750;
         cursor: pointer;
       }
 
-      textarea {
-        width: 100%;
-        min-height: 120px;
-        resize: vertical;
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        padding: 12px 14px;
-        font: inherit;
-        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-        font-size: 12px;
-        color: var(--ink);
-        background: var(--surface);
-        outline: none;
-      }
-
-      textarea:focus {
-        border-color: var(--brand);
-        background: #ffffff;
-        box-shadow: 0 0 0 4px rgba(0, 184, 141, 0.15);
-      }
-
-      .hint {
-        margin: 8px 0 0;
-        color: var(--muted);
-        font-size: 12px;
-        line-height: 1.45;
-      }
-
-      .hint:first-child {
-        margin-top: 0;
-      }
-
-      .hint.error {
-        color: var(--danger);
-      }
-
-      .actions {
-        display: flex;
-        gap: 12px;
-        align-items: center;
-      }
-
-      button[type="submit"] {
-        min-width: 150px;
-        height: 46px;
-        border: 0;
-        border-radius: 8px;
-        background: var(--brand);
-        color: #04231e;
-        font: inherit;
-        font-weight: 800;
-        cursor: pointer;
-      }
-
-      button[type="submit"]:disabled {
-        cursor: progress;
-        opacity: 0.65;
-      }
-
       #status {
         min-height: 22px;
-        margin: 18px 0 0;
-        padding: 0 2px;
+        margin: 10px 0 0;
         color: var(--muted);
         font-size: 13px;
         line-height: 1.45;
+        white-space: pre-line;
       }
 
       #status.error {
         color: var(--danger);
       }
 
+      #status.success {
+        color: var(--success);
+        font-weight: 700;
+      }
+
+      #status:empty {
+        min-height: 0;
+        margin-top: 0;
+      }
+
+      .busy-state {
+        position: relative;
+        min-height: 46px;
+        margin: 16px 0 0;
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        overflow: hidden;
+        border: 1px solid #cfe4ff;
+        border-radius: 8px;
+        background: var(--brand-soft);
+        color: #1f3e56;
+        padding: 11px 12px;
+        font-size: 13px;
+        line-height: 1.35;
+        animation: busyIn 220ms var(--ease-out);
+      }
+
+      .busy-state[hidden] {
+        display: none;
+      }
+
+      .busy-state::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, transparent, rgba(0, 125, 252, 0.08), transparent);
+        transform: translateX(-100%);
+        animation: busySweep 1.8s linear infinite;
+        pointer-events: none;
+      }
+
+      .spinner {
+        position: relative;
+        z-index: 1;
+        width: 18px;
+        height: 18px;
+        flex: 0 0 auto;
+        border: 2px solid rgba(0, 125, 252, 0.2);
+        border-top-color: var(--brand-hover);
+        border-radius: 50%;
+        animation: spin 800ms linear infinite;
+      }
+
+      #busy-phrase {
+        position: relative;
+        z-index: 1;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @keyframes busyIn {
+        from {
+          opacity: 0;
+          transform: translateY(-4px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes busySweep {
+        to {
+          transform: translateX(100%);
+        }
+      }
+
+      @keyframes brandSweep {
+        0% {
+          opacity: 0;
+          transform: translateX(-120%);
+        }
+        18% {
+          opacity: 1;
+        }
+        70%,
+        100% {
+          opacity: 0;
+          transform: translateX(120%);
+        }
+      }
+
+      @keyframes pathTravel {
+        from {
+          transform: translateY(0);
+        }
+        to {
+          transform: translateY(40px);
+        }
+      }
+
+      @keyframes revealAdvanced {
+        from {
+          opacity: 0;
+          transform: translateY(-4px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          scroll-behavior: auto !important;
+          transition-duration: 0.01ms !important;
+        }
+
+        .spinner {
+          animation: none;
+          border-color: var(--brand-hover);
+        }
+
+        .busy-state::after,
+        .brand::after,
+        .path-line span {
+          display: none;
+        }
+      }
+
       @media (max-width: 760px) {
         body {
           display: block;
-          background: #f5f7f0;
         }
 
         main {
@@ -367,18 +619,25 @@
         }
 
         .brand {
-          padding: 28px;
-          gap: 28px;
+          padding: 26px 28px;
         }
 
         .brand h1 {
           max-width: 100%;
-          font-size: 42px;
+          font-size: 34px;
+        }
+
+        .connection-path {
+          margin-top: 18px;
         }
 
         .form-side {
-          padding: 32px 28px;
-          align-items: start;
+          padding: 30px 28px;
+          align-items: flex-start;
+        }
+
+        .credentials-grid {
+          grid-template-columns: 1fr;
         }
       }
     </style>
@@ -394,137 +653,236 @@
             <img src="resources/icon.png" alt="" />
             <span>Desktop</span>
           </div>
-          <h1>Connect your node.</h1>
-          <p>
-            The desktop app uses the existing Dappmanager frontend and routes traffic through a local secure desktop
-            bridge.
-          </p>
+          <h1>Reach it once.</h1>
+          <p>Then Desktop keeps its own app-only route to your DAppNode.</p>
+          <div class="connection-path" aria-label="Connection flow">
+            <div class="path-step">
+              <span class="path-node active" aria-hidden="true"></span>
+              <span>Reach DAppNode once</span>
+            </div>
+            <div class="path-line"><span></span></div>
+            <div class="path-step">
+              <span class="path-node" aria-hidden="true"></span>
+              <span>Create desktop profile</span>
+            </div>
+            <div class="path-line delayed"><span></span></div>
+            <div class="path-step">
+              <span class="path-node secure" aria-hidden="true"></span>
+              <span>Use app-only proxy</span>
+            </div>
+          </div>
         </div>
       </section>
+
       <section class="form-side">
         <form id="connect-form">
-          <h2>Dappmanager backend</h2>
-          <p class="lede">
-            Choose how this desktop app should reach your DAppNode. The app will remember this computer.
-          </p>
-          <div class="mode-grid" role="radiogroup" aria-label="Connection mode">
-            <label class="mode-option">
-              <input id="mode-tunnel" type="radio" name="connection-mode" value="tunnel" checked />
-              <span class="mode-card">
-                <span class="mode-title">WireGuard tunnel</span>
-                <span class="mode-description"
-                  >Best for remote access. Uses the DAppNode internal address automatically.</span
-                >
-              </span>
-            </label>
-            <label class="mode-option">
-              <input id="mode-direct" type="radio" name="connection-mode" value="direct" />
-              <span class="mode-card">
-                <span class="mode-title">Direct URL</span>
-                <span class="mode-description">Use when this computer already reaches your DAppNode.</span>
-              </span>
-            </label>
+          <h2>Set up private access</h2>
+          <p class="lede">Start with a Dappmanager URL that works from this computer right now.</p>
+
+          <div class="setup-note">
+            <span class="note-mark" aria-hidden="true"></span>
+            <div>
+              <strong>First setup needs a current route.</strong>
+              Use local Wi-Fi, an existing VPN, or any reachable URL. After setup, Desktop connects through its own
+              WireGuard proxy, so global VPN or direct Wi-Fi access is not needed.
+            </div>
           </div>
-          <div id="backend-url-panel" class="field-group hidden">
-            <label for="backend-url">Backend URL</label>
-            <input id="backend-url" name="backend-url" placeholder="http://my.dappnode" autocomplete="url" required />
+
+          <div class="field-group">
+            <label for="setup-url">Reachable setup URL</label>
+            <input id="setup-url" name="setup-url" placeholder="http://my.dappnode" autocomplete="url" required />
             <div class="examples" aria-label="Common URLs">
               <button class="example" type="button" data-url="http://my.dappnode">my.dappnode</button>
               <button class="example" type="button" data-url="http://dappnode.local">dappnode.local</button>
               <button class="example" type="button" data-url="http://my.dappnode.private">private domain</button>
             </div>
           </div>
-          <div id="tunnel-panel" class="tunnel-panel enabled">
-            <div class="tunnel-fields">
-              <p class="hint">Tunnel mode connects to Dappmanager at <b>http://172.33.1.7</b> automatically.</p>
-              <p id="wireproxy-helper" class="hint"></p>
-              <label for="wireguard-file">WireGuard config file</label>
-              <input id="wireguard-file" class="file-input" type="file" accept=".conf,.txt,text/plain" />
-              <p id="wireguard-saved" class="hint"></p>
-              <label for="wireguard-config">Paste WireGuard config</label>
-              <textarea
-                id="wireguard-config"
-                spellcheck="false"
-                placeholder="[Interface]&#10;PrivateKey = ...&#10;Address = ...&#10;&#10;[Peer]&#10;PublicKey = ..."
-              ></textarea>
+
+          <div class="credentials-grid">
+            <div>
+              <label for="setup-username">Username</label>
+              <input id="setup-username" name="setup-username" autocomplete="username" required />
+            </div>
+            <div>
+              <label for="setup-password">Password</label>
+              <input
+                id="setup-password"
+                name="setup-password"
+                type="password"
+                autocomplete="current-password"
+                required
+              />
             </div>
           </div>
-          <div class="actions">
-            <button id="connect-button" type="submit">Connect</button>
+
+          <button id="auto-setup-button" class="primary-button" type="submit">Connect with tunnel</button>
+
+          <div id="busy-state" class="busy-state" role="status" aria-live="polite" hidden>
+            <span class="spinner" aria-hidden="true"></span>
+            <span id="busy-phrase"></span>
           </div>
           <p id="status" role="status" aria-live="polite"></p>
+
+          <details class="advanced">
+            <summary>Advanced options</summary>
+            <div class="advanced-body">
+              <section class="advanced-section">
+                <h3>Direct URL</h3>
+                <p class="hint">Use this only when this computer can always reach the same Dappmanager URL.</p>
+                <label for="backend-url">Backend URL</label>
+                <input id="backend-url" name="backend-url" placeholder="http://my.dappnode" autocomplete="url" />
+                <button id="direct-connect-button" class="secondary-button" type="button">
+                  Connect without tunnel
+                </button>
+              </section>
+
+              <section class="advanced-section">
+                <h3>Existing WireGuard config</h3>
+                <p id="wireproxy-helper" class="hint"></p>
+                <label for="wireguard-file">WireGuard config file</label>
+                <input id="wireguard-file" class="file-input" type="file" accept=".conf,.txt,text/plain" />
+                <p id="wireguard-saved" class="hint"></p>
+                <label for="wireguard-config">Paste config</label>
+                <textarea
+                  id="wireguard-config"
+                  spellcheck="false"
+                  placeholder="[Interface]&#10;PrivateKey = ...&#10;Address = ...&#10;&#10;[Peer]&#10;PublicKey = ..."
+                ></textarea>
+                <button id="manual-tunnel-button" class="secondary-button" type="button">
+                  Connect with this config
+                </button>
+              </section>
+            </div>
+          </details>
         </form>
       </section>
     </main>
 
     <script>
       const form = document.querySelector("#connect-form");
-      const input = document.querySelector("#backend-url");
-      const backendUrlPanel = document.querySelector("#backend-url-panel");
-      const button = document.querySelector("#connect-button");
-      const status = document.querySelector("#status");
-      const modeTunnel = document.querySelector("#mode-tunnel");
-      const modeDirect = document.querySelector("#mode-direct");
-      const tunnelPanel = document.querySelector("#tunnel-panel");
+      const setupUrl = document.querySelector("#setup-url");
+      const setupUsername = document.querySelector("#setup-username");
+      const setupPassword = document.querySelector("#setup-password");
+      const backendUrl = document.querySelector("#backend-url");
+      const autoSetupButton = document.querySelector("#auto-setup-button");
+      const directConnectButton = document.querySelector("#direct-connect-button");
+      const manualTunnelButton = document.querySelector("#manual-tunnel-button");
       const wireguardFile = document.querySelector("#wireguard-file");
       const wireguardConfig = document.querySelector("#wireguard-config");
       const wireguardSaved = document.querySelector("#wireguard-saved");
       const wireproxyHelper = document.querySelector("#wireproxy-helper");
+      const busyState = document.querySelector("#busy-state");
+      const busyPhrase = document.querySelector("#busy-phrase");
+      const status = document.querySelector("#status");
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
       const params = new URLSearchParams(window.location.search);
       const startupError = params.get("error");
+      const defaultSetupUrl = "http://my.dappnode";
       const tunnelBackendUrl = "http://172.33.1.7";
-      let directBackendUrl = "http://my.dappnode";
+      const busyPhrases = {
+        automatic: [
+          "Creating a fresh WireGuard device...",
+          "Waiting for DAppNode WireGuard to apply the new peer...",
+          "Pocketing the config where only this app can use it...",
+          "Giving the WireGuard API time to come back online...",
+          "This can take several minutes after the peer is added...",
+          "Checking the tunnel handshake...",
+          "Taking the private route to 172.33.1.7...",
+          "Keeping the rest of the computer out of it..."
+        ],
+        direct: [
+          "Checking that address...",
+          "Looking for the Dappmanager API...",
+          "Making sure this is more than a nice-looking URL..."
+        ],
+        manual: [
+          "Reading the WireGuard config...",
+          "Starting the local WireGuard proxy...",
+          "Checking the tunnel handshake...",
+          "Taking the private route to 172.33.1.7..."
+        ]
+      };
+      let busyPhraseTimer;
+      let busyPhraseIndex = 0;
 
-      function setStatus(message, isError = false) {
+      function setStatus(message, isError = false, isSuccess = false) {
         status.textContent = message;
         status.classList.toggle("error", isError);
+        status.classList.toggle("success", Boolean(message) && isSuccess);
+      }
+
+      function setBusyPhrase(message, shouldAnimate = false) {
+        busyPhrase.textContent = message;
+        if (!shouldAnimate || reducedMotion.matches) return;
+
+        busyPhrase.animate(
+          [
+            { opacity: 0, transform: "translateY(4px)" },
+            { opacity: 1, transform: "translateY(0)" }
+          ],
+          { duration: 220, easing: "cubic-bezier(0.25, 1, 0.5, 1)" }
+        );
+      }
+
+      function startBusy(phrases) {
+        window.clearInterval(busyPhraseTimer);
+        busyPhraseIndex = 0;
+        setBusyPhrase(phrases[busyPhraseIndex]);
+        busyState.hidden = false;
+        setStatus("");
+
+        busyPhraseTimer = window.setInterval(() => {
+          busyPhraseIndex = (busyPhraseIndex + 1) % phrases.length;
+          setBusyPhrase(phrases[busyPhraseIndex], true);
+        }, 2200);
+      }
+
+      function stopBusy() {
+        window.clearInterval(busyPhraseTimer);
+        busyPhraseTimer = undefined;
+        busyState.hidden = true;
+      }
+
+      function setBusy(isBusy, phrases = busyPhrases.automatic) {
+        autoSetupButton.disabled = isBusy;
+        directConnectButton.disabled = isBusy;
+        manualTunnelButton.disabled = isBusy;
+        document.body.classList.toggle("is-busy", isBusy);
+        if (isBusy) startBusy(phrases);
+        else stopBusy();
+      }
+
+      function setReachableUrl(url) {
+        setupUrl.value = url;
+        backendUrl.value = url;
       }
 
       async function init() {
         const savedConfig = await window.dappnodeDesktop.getConnectionConfig();
-        const useTunnel = savedConfig.wireguardEnabled || !savedConfig.backendUrl;
-        directBackendUrl =
-          savedConfig.backendUrl && !savedConfig.wireguardEnabled ? savedConfig.backendUrl : directBackendUrl;
-        modeTunnel.checked = useTunnel;
-        modeDirect.checked = !useTunnel;
-        input.value = useTunnel ? tunnelBackendUrl : directBackendUrl;
-        updateMode();
+        const initialUrl =
+          savedConfig.backendUrl && !savedConfig.wireguardEnabled ? savedConfig.backendUrl : defaultSetupUrl;
+        setReachableUrl(initialUrl);
+
         wireproxyHelper.textContent = savedConfig.hasTunnelHelper
-          ? "Tunnel helper is bundled and ready."
-          : "Tunnel helper is not bundled yet. Run yarn desktop with internet once, or connect without the tunnel.";
+          ? ""
+          : "WireGuard proxy helper is not bundled yet. Run yarn desktop with internet once, or connect without the tunnel.";
         wireproxyHelper.classList.toggle("error", !savedConfig.hasTunnelHelper);
-        wireguardSaved.textContent =
-          savedConfig.hasWireguardConfig && useTunnel
-            ? "A WireGuard config is already saved. Choose a file or paste a new config to replace it."
-            : "";
+        wireguardSaved.textContent = savedConfig.hasWireguardConfig
+          ? "A WireGuard config is already saved. Choose a file or paste a new config to replace it."
+          : "";
+
         if (startupError) setStatus(startupError, true);
       }
 
       document.querySelectorAll(".example").forEach((example) => {
         example.addEventListener("click", () => {
-          input.value = example.dataset.url;
-          input.focus();
+          setReachableUrl(example.dataset.url);
+          setupUrl.focus();
         });
       });
 
-      function updateMode() {
-        const useTunnel = modeTunnel.checked;
-        tunnelPanel.classList.toggle("enabled", useTunnel);
-        backendUrlPanel.classList.toggle("hidden", useTunnel);
-
-        if (useTunnel) {
-          directBackendUrl = input.value && input.value !== tunnelBackendUrl ? input.value : directBackendUrl;
-          input.value = tunnelBackendUrl;
-        } else {
-          input.value = directBackendUrl;
-          input.focus();
-        }
-      }
-
-      modeTunnel.addEventListener("change", updateMode);
-      modeDirect.addEventListener("change", updateMode);
-      input.addEventListener("input", () => {
-        if (modeDirect.checked) directBackendUrl = input.value;
+      setupUrl.addEventListener("input", () => {
+        backendUrl.value = setupUrl.value;
       });
 
       async function readWireguardConfig() {
@@ -533,31 +891,97 @@
         return wireguardConfig.value;
       }
 
-      form.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        button.disabled = true;
-        setStatus("Checking connection...");
+      async function connectAutomatically() {
+        setBusy(true, busyPhrases.automatic);
 
         try {
-          const result = await window.dappnodeDesktop.saveConnectionConfig({
-            backendUrl: modeTunnel.checked ? tunnelBackendUrl : input.value,
-            wireguard: {
-              config: await readWireguardConfig(),
-              enabled: modeTunnel.checked
-            }
+          const result = await window.dappnodeDesktop.setupWireguardAutomatically({
+            backendUrl: setupUrl.value,
+            password: setupPassword.value,
+            username: setupUsername.value
           });
+
           if (!result.ok) {
             setStatus(result.error, true);
-            button.disabled = false;
+            setBusy(false);
             return;
           }
 
-          setStatus(`Connected to ${result.backendUrl}`);
+          wireguardConfig.value = "";
+          wireguardFile.value = "";
+          setBusy(false);
+          setStatus(
+            result.configScope === "local"
+              ? `Connected through the app-only WireGuard proxy as ${result.device} using local credentials. This works on this network; use remote credentials outside it.`
+              : `Connected through the app-only WireGuard proxy as ${result.device}`,
+            false,
+            true
+          );
+        } catch (error) {
+          setStatus(error.message || "Could not set up the app-only WireGuard proxy.", true);
+          setBusy(false);
+        }
+      }
+
+      async function connectDirectly() {
+        setBusy(true, busyPhrases.direct);
+
+        try {
+          const result = await window.dappnodeDesktop.saveConnectionConfig({
+            backendUrl: backendUrl.value,
+            wireguard: {
+              config: "",
+              enabled: false
+            }
+          });
+
+          if (!result.ok) {
+            setStatus(result.error, true);
+            setBusy(false);
+            return;
+          }
+
+          setBusy(false);
+          setStatus(`Connected to ${result.backendUrl}`, false, true);
         } catch (error) {
           setStatus(error.message || "Could not connect to that backend URL.", true);
-          button.disabled = false;
+          setBusy(false);
         }
+      }
+
+      async function connectWithExistingConfig() {
+        setBusy(true, busyPhrases.manual);
+
+        try {
+          const result = await window.dappnodeDesktop.saveConnectionConfig({
+            backendUrl: tunnelBackendUrl,
+            wireguard: {
+              config: await readWireguardConfig(),
+              enabled: true
+            }
+          });
+
+          if (!result.ok) {
+            setStatus(result.error, true);
+            setBusy(false);
+            return;
+          }
+
+          setBusy(false);
+          setStatus("Connected through the app-only WireGuard proxy", false, true);
+        } catch (error) {
+          setStatus(error.message || "Could not connect with that WireGuard config.", true);
+          setBusy(false);
+        }
+      }
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        connectAutomatically();
       });
+      directConnectButton.addEventListener("click", connectDirectly);
+      manualTunnelButton.addEventListener("click", connectWithExistingConfig);
+      window.addEventListener("beforeunload", stopBusy);
 
       init().catch((error) => setStatus(error.message || "Could not initialize the connection screen.", true));
     </script>
