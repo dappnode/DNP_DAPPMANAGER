@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self' file:; img-src 'self' file: data:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self'"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DAppNode Desktop</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #18211f;
+        --muted: #68716e;
+        --line: #d8dfd8;
+        --surface: #fbfcf8;
+        --surface-strong: #f3f7ee;
+        --panel: #ffffff;
+        --brand: #00b88d;
+        --brand-ink: #04362e;
+        --danger: #b23b3b;
+        --shadow: 0 24px 80px rgba(21, 36, 31, 0.16);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family:
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        color: var(--ink);
+        background: linear-gradient(120deg, rgba(0, 184, 141, 0.12), transparent 36%),
+          linear-gradient(300deg, rgba(255, 195, 77, 0.18), transparent 32%), #f5f7f0;
+        display: grid;
+        place-items: center;
+      }
+
+      main {
+        width: min(920px, calc(100vw - 48px));
+        min-height: min(620px, calc(100vh - 48px));
+        display: grid;
+        grid-template-columns: minmax(0, 0.95fr) minmax(340px, 1.05fr);
+        overflow: hidden;
+        border: 1px solid rgba(24, 33, 31, 0.12);
+        border-radius: 18px;
+        background: var(--panel);
+        box-shadow: var(--shadow);
+      }
+
+      .brand {
+        padding: 44px;
+        background: #14211e;
+        color: #f4fff8;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 40px;
+      }
+
+      .brand-logo {
+        width: min(220px, 80%);
+        height: auto;
+      }
+
+      .app-mark {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        color: rgba(244, 255, 248, 0.78);
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .app-mark img {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+      }
+
+      .brand h1 {
+        margin: 0;
+        max-width: 12ch;
+        font-size: clamp(42px, 8vw, 76px);
+        line-height: 0.92;
+        letter-spacing: 0;
+      }
+
+      .brand p {
+        margin: 18px 0 0;
+        max-width: 28rem;
+        color: rgba(244, 255, 248, 0.72);
+        font-size: 16px;
+        line-height: 1.55;
+      }
+
+      .form-side {
+        padding: 56px;
+        display: flex;
+        align-items: center;
+      }
+
+      form {
+        width: 100%;
+      }
+
+      h2 {
+        margin: 0 0 10px;
+        font-size: 29px;
+        line-height: 1.08;
+        letter-spacing: 0;
+      }
+
+      .lede {
+        margin: 0 0 30px;
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.5;
+      }
+
+      label {
+        display: block;
+        margin: 0 0 10px;
+        font-weight: 700;
+        font-size: 13px;
+      }
+
+      .field-group {
+        margin: 0 0 24px;
+      }
+
+      .field-group.hidden {
+        display: none;
+      }
+
+      input {
+        width: 100%;
+        height: 48px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 0 14px;
+        font: inherit;
+        color: var(--ink);
+        background: var(--surface);
+        outline: none;
+        transition:
+          border-color 120ms ease,
+          box-shadow 120ms ease,
+          background 120ms ease;
+      }
+
+      input:focus {
+        border-color: var(--brand);
+        background: #ffffff;
+        box-shadow: 0 0 0 4px rgba(0, 184, 141, 0.15);
+      }
+
+      .mode-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin: 0 0 24px;
+      }
+
+      .mode-option {
+        position: relative;
+      }
+
+      .mode-option input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .mode-card {
+        min-height: 88px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 6px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 14px;
+        background: var(--surface);
+        cursor: pointer;
+        transition:
+          border-color 120ms ease,
+          box-shadow 120ms ease,
+          background 120ms ease;
+      }
+
+      .mode-title {
+        color: var(--ink);
+        font-size: 14px;
+        font-weight: 800;
+        line-height: 1.1;
+      }
+
+      .mode-description {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.35;
+      }
+
+      .mode-option input:focus + .mode-card {
+        border-color: var(--brand);
+        box-shadow: 0 0 0 4px rgba(0, 184, 141, 0.15);
+      }
+
+      .mode-option input:checked + .mode-card {
+        border-color: var(--brand);
+        background: #effaf4;
+      }
+
+      .examples {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 12px 0 0;
+      }
+
+      .example {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: transparent;
+        color: var(--brand-ink);
+        padding: 8px 11px;
+        font: inherit;
+        font-size: 12px;
+        cursor: pointer;
+      }
+
+      .example:hover {
+        border-color: var(--brand);
+        background: rgba(0, 184, 141, 0.08);
+      }
+
+      .tunnel-panel {
+        display: none;
+        margin: 0 0 24px;
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface-strong);
+      }
+
+      .tunnel-panel.enabled .tunnel-fields {
+        display: block;
+      }
+
+      .tunnel-panel.enabled {
+        display: block;
+      }
+
+      .file-input {
+        height: auto;
+        padding: 10px;
+      }
+
+      .file-input::file-selector-button {
+        margin-right: 12px;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        background: #ffffff;
+        color: var(--brand-ink);
+        padding: 8px 11px;
+        font: inherit;
+        font-weight: 750;
+        cursor: pointer;
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 120px;
+        resize: vertical;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 12px 14px;
+        font: inherit;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 12px;
+        color: var(--ink);
+        background: var(--surface);
+        outline: none;
+      }
+
+      textarea:focus {
+        border-color: var(--brand);
+        background: #ffffff;
+        box-shadow: 0 0 0 4px rgba(0, 184, 141, 0.15);
+      }
+
+      .hint {
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      .hint:first-child {
+        margin-top: 0;
+      }
+
+      .hint.error {
+        color: var(--danger);
+      }
+
+      .actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+
+      button[type="submit"] {
+        min-width: 150px;
+        height: 46px;
+        border: 0;
+        border-radius: 8px;
+        background: var(--brand);
+        color: #04231e;
+        font: inherit;
+        font-weight: 800;
+        cursor: pointer;
+      }
+
+      button[type="submit"]:disabled {
+        cursor: progress;
+        opacity: 0.65;
+      }
+
+      #status {
+        min-height: 22px;
+        margin: 18px 0 0;
+        padding: 0 2px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.45;
+      }
+
+      #status.error {
+        color: var(--danger);
+      }
+
+      @media (max-width: 760px) {
+        body {
+          display: block;
+          background: #f5f7f0;
+        }
+
+        main {
+          width: 100%;
+          min-height: 100vh;
+          grid-template-columns: 1fr;
+          border: 0;
+          border-radius: 0;
+        }
+
+        .brand {
+          padding: 28px;
+          gap: 28px;
+        }
+
+        .brand h1 {
+          max-width: 100%;
+          font-size: 42px;
+        }
+
+        .form-side {
+          padding: 32px 28px;
+          align-items: start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="brand" aria-label="DAppNode Desktop">
+        <div>
+          <img class="brand-logo" src="resources/dappnode-logo-wide-min-dark.png" alt="DAppNode" />
+        </div>
+        <div>
+          <div class="app-mark">
+            <img src="resources/icon.png" alt="" />
+            <span>Desktop</span>
+          </div>
+          <h1>Connect your node.</h1>
+          <p>
+            The desktop app uses the existing Dappmanager frontend and routes traffic through a local secure desktop
+            bridge.
+          </p>
+        </div>
+      </section>
+      <section class="form-side">
+        <form id="connect-form">
+          <h2>Dappmanager backend</h2>
+          <p class="lede">
+            Choose how this desktop app should reach your DAppNode. The app will remember this computer.
+          </p>
+          <div class="mode-grid" role="radiogroup" aria-label="Connection mode">
+            <label class="mode-option">
+              <input id="mode-tunnel" type="radio" name="connection-mode" value="tunnel" checked />
+              <span class="mode-card">
+                <span class="mode-title">WireGuard tunnel</span>
+                <span class="mode-description"
+                  >Best for remote access. Uses the DAppNode internal address automatically.</span
+                >
+              </span>
+            </label>
+            <label class="mode-option">
+              <input id="mode-direct" type="radio" name="connection-mode" value="direct" />
+              <span class="mode-card">
+                <span class="mode-title">Direct URL</span>
+                <span class="mode-description">Use when this computer already reaches your DAppNode.</span>
+              </span>
+            </label>
+          </div>
+          <div id="backend-url-panel" class="field-group hidden">
+            <label for="backend-url">Backend URL</label>
+            <input id="backend-url" name="backend-url" placeholder="http://my.dappnode" autocomplete="url" required />
+            <div class="examples" aria-label="Common URLs">
+              <button class="example" type="button" data-url="http://my.dappnode">my.dappnode</button>
+              <button class="example" type="button" data-url="http://dappnode.local">dappnode.local</button>
+              <button class="example" type="button" data-url="http://my.dappnode.private">private domain</button>
+            </div>
+          </div>
+          <div id="tunnel-panel" class="tunnel-panel enabled">
+            <div class="tunnel-fields">
+              <p class="hint">Tunnel mode connects to Dappmanager at <b>http://172.33.1.7</b> automatically.</p>
+              <p id="wireproxy-helper" class="hint"></p>
+              <label for="wireguard-file">WireGuard config file</label>
+              <input id="wireguard-file" class="file-input" type="file" accept=".conf,.txt,text/plain" />
+              <p id="wireguard-saved" class="hint"></p>
+              <label for="wireguard-config">Paste WireGuard config</label>
+              <textarea
+                id="wireguard-config"
+                spellcheck="false"
+                placeholder="[Interface]&#10;PrivateKey = ...&#10;Address = ...&#10;&#10;[Peer]&#10;PublicKey = ..."
+              ></textarea>
+            </div>
+          </div>
+          <div class="actions">
+            <button id="connect-button" type="submit">Connect</button>
+          </div>
+          <p id="status" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+    </main>
+
+    <script>
+      const form = document.querySelector("#connect-form");
+      const input = document.querySelector("#backend-url");
+      const backendUrlPanel = document.querySelector("#backend-url-panel");
+      const button = document.querySelector("#connect-button");
+      const status = document.querySelector("#status");
+      const modeTunnel = document.querySelector("#mode-tunnel");
+      const modeDirect = document.querySelector("#mode-direct");
+      const tunnelPanel = document.querySelector("#tunnel-panel");
+      const wireguardFile = document.querySelector("#wireguard-file");
+      const wireguardConfig = document.querySelector("#wireguard-config");
+      const wireguardSaved = document.querySelector("#wireguard-saved");
+      const wireproxyHelper = document.querySelector("#wireproxy-helper");
+      const params = new URLSearchParams(window.location.search);
+      const startupError = params.get("error");
+      const tunnelBackendUrl = "http://172.33.1.7";
+      let directBackendUrl = "http://my.dappnode";
+
+      function setStatus(message, isError = false) {
+        status.textContent = message;
+        status.classList.toggle("error", isError);
+      }
+
+      async function init() {
+        const savedConfig = await window.dappnodeDesktop.getConnectionConfig();
+        const useTunnel = savedConfig.wireguardEnabled || !savedConfig.backendUrl;
+        directBackendUrl =
+          savedConfig.backendUrl && !savedConfig.wireguardEnabled ? savedConfig.backendUrl : directBackendUrl;
+        modeTunnel.checked = useTunnel;
+        modeDirect.checked = !useTunnel;
+        input.value = useTunnel ? tunnelBackendUrl : directBackendUrl;
+        updateMode();
+        wireproxyHelper.textContent = savedConfig.hasTunnelHelper
+          ? "Tunnel helper is bundled and ready."
+          : "Tunnel helper is not bundled yet. Run yarn desktop with internet once, or connect without the tunnel.";
+        wireproxyHelper.classList.toggle("error", !savedConfig.hasTunnelHelper);
+        wireguardSaved.textContent =
+          savedConfig.hasWireguardConfig && useTunnel
+            ? "A WireGuard config is already saved. Choose a file or paste a new config to replace it."
+            : "";
+        if (startupError) setStatus(startupError, true);
+      }
+
+      document.querySelectorAll(".example").forEach((example) => {
+        example.addEventListener("click", () => {
+          input.value = example.dataset.url;
+          input.focus();
+        });
+      });
+
+      function updateMode() {
+        const useTunnel = modeTunnel.checked;
+        tunnelPanel.classList.toggle("enabled", useTunnel);
+        backendUrlPanel.classList.toggle("hidden", useTunnel);
+
+        if (useTunnel) {
+          directBackendUrl = input.value && input.value !== tunnelBackendUrl ? input.value : directBackendUrl;
+          input.value = tunnelBackendUrl;
+        } else {
+          input.value = directBackendUrl;
+          input.focus();
+        }
+      }
+
+      modeTunnel.addEventListener("change", updateMode);
+      modeDirect.addEventListener("change", updateMode);
+      input.addEventListener("input", () => {
+        if (modeDirect.checked) directBackendUrl = input.value;
+      });
+
+      async function readWireguardConfig() {
+        const file = wireguardFile.files?.[0];
+        if (file) return await file.text();
+        return wireguardConfig.value;
+      }
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        button.disabled = true;
+        setStatus("Checking connection...");
+
+        try {
+          const result = await window.dappnodeDesktop.saveConnectionConfig({
+            backendUrl: modeTunnel.checked ? tunnelBackendUrl : input.value,
+            wireguard: {
+              config: await readWireguardConfig(),
+              enabled: modeTunnel.checked
+            }
+          });
+          if (!result.ok) {
+            setStatus(result.error, true);
+            button.disabled = false;
+            return;
+          }
+
+          setStatus(`Connected to ${result.backendUrl}`);
+        } catch (error) {
+          setStatus(error.message || "Could not connect to that backend URL.", true);
+          button.disabled = false;
+        }
+      });
+
+      init().catch((error) => setStatus(error.message || "Could not initialize the connection screen.", true));
+    </script>
+  </body>
+</html>

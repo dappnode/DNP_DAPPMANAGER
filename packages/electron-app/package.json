@@ -1,0 +1,90 @@
+{
+  "name": "@dappnode/electron-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Desktop shell for the DAppNode Dappmanager UI",
+  "author": "DAppNode",
+  "license": "GPL-3.0",
+  "type": "commonjs",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "dist": "yarn wireproxy:install && yarn build && electron-builder",
+    "dist:dir": "yarn wireproxy:install && yarn build && electron-builder --dir",
+    "dist:mac": "yarn wireproxy:install && yarn build && electron-builder --mac dmg",
+    "dist:win": "yarn wireproxy:install && yarn build && electron-builder --win nsis",
+    "wireproxy:install": "node scripts/install-wireproxy.cjs",
+    "start": "yarn wireproxy:install && yarn build && electron .",
+    "start:with-ui-build": "yarn workspace @dappnode/admin-ui build && yarn start"
+  },
+  "build": {
+    "appId": "io.dappnode.desktop",
+    "productName": "DAppNode Desktop",
+    "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+    "directories": {
+      "buildResources": "resources",
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "connect.html",
+      "preload.cjs",
+      "resources/dappnode-logo-wide-min-dark.png",
+      "resources/icon.png",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "../admin-ui/build",
+        "to": "admin-ui"
+      },
+      {
+        "from": "vendor/wireproxy",
+        "to": "wireproxy"
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.utilities",
+      "icon": "resources/icon.icns",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ]
+    },
+    "dmg": {
+      "artifactName": "${productName}-${version}-${arch}.${ext}"
+    },
+    "win": {
+      "icon": "resources/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
+  "dependencies": {
+    "http-proxy": "^1.18.1",
+    "socks-proxy-agent": "^8.0.5"
+  },
+  "devDependencies": {
+    "@types/http-proxy": "^1.17.17",
+    "electron": "42.5.1",
+    "electron-builder": "^26.15.3",
+    "typescript": "^5.8.2"
+  }
+}

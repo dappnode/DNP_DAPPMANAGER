@@ -43,6 +43,10 @@ packages/*/tsconfig.tsbuildinfo
 packages/*/node_modules/
 packages/*/dist/
 packages/*/build
+packages/*/release/
+packages/*/*.tgz
+packages/electron-app/vendor/wireproxy/*/wireproxy
+packages/electron-app/vendor/wireproxy/*/wireproxy.exe
 packages/*/npm-debug.log*
 packages/*/yarn-debug.log*
 packages/*/yarn-error.log*
