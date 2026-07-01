@@ -1,4 +1,4 @@
-# DAppNode Electron App
+# Dappnode Electron App
 
 This workspace wraps the existing `@dappnode/admin-ui` build in Electron.
 
@@ -19,7 +19,7 @@ For development, `yarn desktop` automatically downloads the pinned `wireproxy` b
 Normal tunnel flow:
 
 1. Run `yarn desktop`.
-2. Connect this computer to your DAppNode once using local Wi-Fi, an existing VPN, or any other route where Dappmanager opens.
+2. Connect this computer to your Dappnode once using local Wi-Fi, an existing VPN, or any other route where Dappmanager opens.
 3. Enter a setup URL this computer can reach, such as `http://my.dappnode`.
 4. Enter your Dappmanager username and password.
 5. The app creates a new desktop WireGuard device, stores the config locally, and switches to the tunnel.
@@ -28,10 +28,10 @@ Tunnel mode automatically uses `http://172.33.1.7`, the Dappmanager internal cor
 
 The setup URL is only used for first contact. After setup, the saved backend URL is `http://172.33.1.7`, and the desktop app connects through its own app-only WireGuard proxy. The user no longer needs global VPN or direct local Wi-Fi access for the desktop app.
 The Dappmanager password is used only for this setup request and is not stored by the desktop app.
-After creating the device, the app waits for the DAppNode WireGuard package to apply the new peer; WireGuard may be temporarily unavailable for several minutes during this step.
+After creating the device, the app waits for the Dappnode WireGuard package to apply the new peer; WireGuard may be temporarily unavailable for several minutes during this step.
 If the device-add response is lost while WireGuard is reconfiguring, the app keeps waiting for the generated device instead of creating another one.
 If validation still times out after a device is created, the app leaves that device in place instead of removing it and triggering a second WireGuard reconfiguration. The next setup attempt reuses that pending device, and if the local pending marker is missing it reuses the newest auto-created `desktop...` WireGuard device it finds.
-Before starting `wireproxy`, the app removes `ListenPort` from the downloaded client config so the local WireGuard proxy helper does not try to bind the DAppNode WireGuard port.
+Before starting `wireproxy`, the app removes `ListenPort` from the downloaded client config so the local WireGuard proxy helper does not try to bind the Dappnode WireGuard port.
 
 If automatic setup is not possible, paste or select an existing WireGuard `.conf` file and click `Connect`.
 
@@ -57,7 +57,7 @@ The WireGuard config contains a private key and is written to Electron's `userDa
 
 ## Package app windows
 
-When a package link points to a DAppNode-local package URL such as `http://brain.web3signer.dappnode/`, the desktop app opens it in a separate Electron window instead of the system browser. Links from the package info page pass the package title and avatar to Electron, so the child window can use the package name and icon when available.
+When a package link points to a Dappnode-local package URL such as `http://brain.web3signer.dappnode/`, the desktop app opens it in a separate Electron window instead of the system browser. Links from the package info page pass the package title and avatar to Electron, so the child window can use the package name and icon when available.
 
 If the main app is connected through the WireGuard tunnel, each package window gets its own isolated Electron session configured with the local `wireproxy` SOCKS5 proxy. This keeps package UI traffic inside the desktop app without changing system routes.
 
@@ -88,7 +88,7 @@ yarn desktop:dist:mac
 The DMG is written to:
 
 ```txt
-packages/electron-app/release/DAppNode Desktop-0.1.0-arm64.dmg
+packages/electron-app/release/Dappnode Desktop-0.1.0-arm64.dmg
 ```
 
 Windows installer:
@@ -106,7 +106,7 @@ DAPPNODE_REQUIRE_WIREPROXY=1 yarn desktop:dist:mac
 DAPPNODE_REQUIRE_WIREPROXY=1 yarn desktop:dist:win
 ```
 
-The app icons are generated from the DAppNode mark and live in `packages/electron-app/resources/`:
+The app icons are generated from the Dappnode mark and live in `packages/electron-app/resources/`:
 
 ```txt
 icon.png

@@ -3,7 +3,7 @@ import type { BrowserWindow as ElectronBrowserWindow, MenuItemConstructorOptions
 import { spawn, type ChildProcess } from "node:child_process";
 import { randomBytes } from "node:crypto";
 import { createReadStream, constants as fsConstants } from "node:fs";
-import { access, mkdir, readFile, stat, unlink, writeFile } from "node:fs/promises";
+import { access, mkdir, readFile, rm, stat, unlink, writeFile } from "node:fs/promises";
 import http, { type IncomingMessage, type ServerResponse } from "node:http";
 import https from "node:https";
 import net from "node:net";
@@ -15,8 +15,21 @@ import { SocksProxyAgent } from "socks-proxy-agent";
 const { app, BrowserWindow, dialog, ipcMain, Menu, nativeImage, session, shell } = electron;
 
 interface DesktopConfig {
+  activeProfileId?: string;
   backendUrl?: string;
+  profiles?: DappnodeProfile[];
   wireguardEnabled?: boolean;
+}
+
+interface DappnodeProfile {
+  avatar: string;
+  backendUrl: string;
+  createdAt: string;
+  id: string;
+  name: string;
+  updatedAt: string;
+  wireguardConfigFile?: string;
+  wireguardEnabled: boolean;
 }
 
 interface PendingWireguardDevice {
@@ -30,6 +43,7 @@ interface DesktopServer {
   sockets: Set<Socket>;
   tunnel?: TunnelRuntime;
   url: string;
+  wireguardConfigPath?: string;
   wireguardEnabled: boolean;
 }
 
@@ -42,16 +56,27 @@ interface ConnectionInput {
 }
 
 interface AutoWireguardInput {
+  avatar?: unknown;
   backendUrl?: unknown;
+  name?: unknown;
   password?: unknown;
+  profileId?: unknown;
   username?: unknown;
 }
 
 interface ConnectionStatus {
+  activeProfileId?: string;
   backendUrl: string;
   hasTunnelHelper: boolean;
   hasWireguardConfig: boolean;
+  profiles: DappnodeProfile[];
   wireguardEnabled: boolean;
+}
+
+interface ProfileConnectionInput extends ConnectionInput {
+  avatar?: unknown;
+  name?: unknown;
+  profileId?: unknown;
 }
 
 interface PackageWindowInput {
@@ -160,6 +185,133 @@ function wireproxyConfigPath(): string {
   return path.join(app.getPath("userData"), "wireproxy.conf");
 }
 
+function profileWireguardConfigDir(): string {
+  return path.join(app.getPath("userData"), "wireguard");
+}
+
+function getProfileWireguardConfigFile(profileId: string): string {
+  return `wireguard/${profileId}.conf`;
+}
+
+function createProfileId(): string {
+  return `node${randomBytes(8).toString("hex")}`;
+}
+
+function isValidProfileId(profileId: string): boolean {
+  return /^[a-z0-9_-]{3,64}$/i.test(profileId);
+}
+
+function normalizeProfileId(input: unknown): string | undefined {
+  const profileId = typeof input === "string" ? input.trim() : "";
+  return profileId && isValidProfileId(profileId) ? profileId : undefined;
+}
+
+function normalizeProfileName(input: unknown): string {
+  const name = typeof input === "string" ? input.trim().replace(/\s+/g, " ") : "";
+  if (!name) throw new Error("Give this Dappnode a name.");
+
+  return name.slice(0, 64);
+}
+
+function getProfileInitials(name: string): string {
+  const words = name
+    .replace(/[^a-z0-9\s-]/gi, " ")
+    .split(/[\s-]+/)
+    .filter(Boolean);
+
+  if (words.length === 0) return "DN";
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+
+  return `${words[0][0]}${words[1][0]}`.toUpperCase();
+}
+
+function hashString(input: string): number {
+  let hash = 0;
+  for (let i = 0; i < input.length; i += 1) {
+    hash = (hash << 5) - hash + input.charCodeAt(i);
+    hash |= 0;
+  }
+
+  return Math.abs(hash);
+}
+
+function escapeSvgText(input: string): string {
+  return input.replace(/[&<>"']/g, (char) => {
+    switch (char) {
+      case "&":
+        return "&amp;";
+      case "<":
+        return "&lt;";
+      case ">":
+        return "&gt;";
+      case '"':
+        return "&quot;";
+      default:
+        return "&apos;";
+    }
+  });
+}
+
+function createProfileAvatarDataUri(name: string, seed: string): string {
+  const palettes = [
+    ["#0068d8", "#78d5ff", "#f4fbff"],
+    ["#0b8f6d", "#59e0b7", "#f0fff9"],
+    ["#6b5bff", "#a8ceff", "#f7f5ff"],
+    ["#b23b3b", "#ffb199", "#fff6f3"],
+    ["#126a7a", "#8ee7f1", "#f1fdff"],
+    ["#5f6c1d", "#d2e36b", "#fbfff0"]
+  ];
+  const palette = palettes[hashString(`${name}:${seed}`) % palettes.length];
+  const initials = escapeSvgText(getProfileInitials(name));
+  const stripeOffset = hashString(seed) % 48;
+  const svg = [
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="${escapeSvgText(name)}">`,
+    `<rect width="96" height="96" rx="20" fill="${palette[0]}"/>`,
+    `<circle cx="${26 + (stripeOffset % 18)}" cy="24" r="34" fill="${palette[1]}" opacity=".32"/>`,
+    `<circle cx="${72 - (stripeOffset % 16)}" cy="76" r="42" fill="${palette[2]}" opacity=".28"/>`,
+    `<path d="M12 ${58 + (stripeOffset % 10)} C30 46 44 72 84 ${45 + (stripeOffset % 8)}" fill="none" stroke="${
+      palette[1]
+    }" stroke-width="8" stroke-linecap="round" opacity=".7"/>`,
+    `<text x="48" y="57" text-anchor="middle" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif" font-size="28" font-weight="800" fill="#ffffff">${initials}</text>`,
+    `</svg>`
+  ].join("");
+
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+}
+
+function normalizeProfileAvatar(input: unknown, name: string, profileId: string): string {
+  const avatar = typeof input === "string" ? input.trim() : "";
+  if (avatar.startsWith("data:image/svg+xml") && avatar.length < 12_000) return avatar;
+
+  return createProfileAvatarDataUri(name, profileId);
+}
+
+function resolveUserDataRelativePath(relativePath: string): string {
+  const userDataPath = path.resolve(app.getPath("userData"));
+  const resolvedPath = path.resolve(userDataPath, relativePath);
+
+  if (!isPathInside(resolvedPath, userDataPath)) {
+    throw new Error("Invalid profile config path.");
+  }
+
+  return resolvedPath;
+}
+
+function sanitizeWireguardConfigFile(input: unknown, profileId: string, wireguardEnabled: boolean): string | undefined {
+  if (typeof input === "string" && input === "wireguard.conf") return input;
+
+  const profileConfigFile = getProfileWireguardConfigFile(profileId);
+  if (typeof input === "string" && input === profileConfigFile) return input;
+
+  return wireguardEnabled ? profileConfigFile : undefined;
+}
+
+function getWireguardConfigPath(profile?: Pick<DappnodeProfile, "id" | "wireguardConfigFile">): string {
+  if (!profile) return wireguardConfigPath();
+
+  return resolveUserDataRelativePath(profile.wireguardConfigFile ?? getProfileWireguardConfigFile(profile.id));
+}
+
 function getAdminUiPath(): string {
   return process.env.DAPPNODE_ADMIN_UI_PATH ? path.resolve(process.env.DAPPNODE_ADMIN_UI_PATH) : defaultAdminUiPath;
 }
@@ -234,7 +386,7 @@ function normalizePackageWindowInput(input: unknown): { metadata: PackageWindowM
   const url = parseHttpUrl(packageWindowInput?.url);
 
   if (!url || !isDappnodePackageUrl(url)) {
-    throw new Error("Only DAppNode package URLs can be opened inside the desktop app.");
+    throw new Error("Only Dappnode package URLs can be opened inside the desktop app.");
   }
 
   return {
@@ -247,8 +399,11 @@ function normalizePackageWindowInput(input: unknown): { metadata: PackageWindowM
 }
 
 function normalizeAutoWireguardInput(input: unknown): {
+  avatar?: unknown;
   backendUrl: string;
+  name: string;
   password: string;
+  profileId?: string;
   username: string;
 } {
   const autoWireguardInput = input as AutoWireguardInput;
@@ -259,8 +414,11 @@ function normalizeAutoWireguardInput(input: unknown): {
   if (!password) throw new Error("Enter your Dappmanager password.");
 
   return {
+    avatar: autoWireguardInput?.avatar,
     backendUrl: normalizeBackendUrl(autoWireguardInput?.backendUrl),
+    name: normalizeProfileName(autoWireguardInput?.name),
     password,
+    profileId: normalizeProfileId(autoWireguardInput?.profileId),
     username
   };
 }
@@ -317,17 +475,138 @@ function resolveBackendPath(backendUrl: string, requestPath: string): URL {
   return parsedUrl;
 }
 
+function normalizeStoredProfile(input: unknown): DappnodeProfile | null {
+  const storedProfile = input as Partial<DappnodeProfile>;
+  const profileId = normalizeProfileId(storedProfile?.id);
+
+  if (!profileId || typeof storedProfile?.backendUrl !== "string") return null;
+
+  let backendUrl: string;
+  try {
+    backendUrl = normalizeBackendUrl(storedProfile.backendUrl);
+  } catch {
+    return null;
+  }
+
+  const name =
+    typeof storedProfile.name === "string" && storedProfile.name.trim()
+      ? storedProfile.name.trim().replace(/\s+/g, " ").slice(0, 64)
+      : "Dappnode";
+  const wireguardEnabled = storedProfile.wireguardEnabled === true;
+  const createdAt = typeof storedProfile.createdAt === "string" ? storedProfile.createdAt : new Date().toISOString();
+  const updatedAt = typeof storedProfile.updatedAt === "string" ? storedProfile.updatedAt : createdAt;
+  const wireguardConfigFile = sanitizeWireguardConfigFile(
+    storedProfile.wireguardConfigFile,
+    profileId,
+    wireguardEnabled
+  );
+
+  return {
+    avatar: normalizeProfileAvatar(storedProfile.avatar, name, profileId),
+    backendUrl,
+    createdAt,
+    id: profileId,
+    name,
+    updatedAt,
+    wireguardConfigFile,
+    wireguardEnabled
+  };
+}
+
+function createLegacyProfile(config: DesktopConfig): DappnodeProfile | null {
+  if (typeof config.backendUrl !== "string") return null;
+
+  let backendUrl: string;
+  try {
+    backendUrl = normalizeBackendUrl(config.backendUrl);
+  } catch {
+    return null;
+  }
+
+  const now = new Date().toISOString();
+  const profileId = "legacy-default";
+  const name = "My Dappnode";
+  const wireguardEnabled = config.wireguardEnabled === true;
+
+  return {
+    avatar: createProfileAvatarDataUri(name, profileId),
+    backendUrl,
+    createdAt: now,
+    id: profileId,
+    name,
+    updatedAt: now,
+    wireguardConfigFile: wireguardEnabled ? "wireguard.conf" : undefined,
+    wireguardEnabled
+  };
+}
+
+function getActiveProfile(config: DesktopConfig): DappnodeProfile | undefined {
+  return config.profiles?.find((profile) => profile.id === config.activeProfileId) ?? config.profiles?.[0];
+}
+
+function createDappnodeProfile(
+  config: DesktopConfig,
+  input: {
+    avatar?: unknown;
+    backendUrl: string;
+    name: string;
+    profileId?: string;
+    wireguardEnabled: boolean;
+  }
+): DappnodeProfile {
+  const existingProfile = input.profileId
+    ? config.profiles?.find((profile) => profile.id === input.profileId)
+    : undefined;
+  const profileId = existingProfile?.id ?? input.profileId ?? createProfileId();
+  const now = new Date().toISOString();
+  const wireguardConfigFile = input.wireguardEnabled
+    ? (existingProfile?.wireguardConfigFile ?? getProfileWireguardConfigFile(profileId))
+    : existingProfile?.wireguardConfigFile;
+
+  return {
+    avatar: normalizeProfileAvatar(input.avatar ?? existingProfile?.avatar, input.name, profileId),
+    backendUrl: input.backendUrl,
+    createdAt: existingProfile?.createdAt ?? now,
+    id: profileId,
+    name: input.name,
+    updatedAt: now,
+    wireguardConfigFile,
+    wireguardEnabled: input.wireguardEnabled
+  };
+}
+
+function upsertProfile(config: DesktopConfig, profile: DappnodeProfile): DesktopConfig {
+  const profiles = config.profiles ?? [];
+  const profileExists = profiles.some((storedProfile) => storedProfile.id === profile.id);
+
+  return {
+    activeProfileId: profile.id,
+    profiles: profileExists
+      ? profiles.map((storedProfile) => (storedProfile.id === profile.id ? profile : storedProfile))
+      : [...profiles, profile]
+  };
+}
+
 async function readConfigFile(): Promise<DesktopConfig> {
   try {
     const rawConfig = await readFile(configPath(), "utf8");
     const parsedConfig = JSON.parse(rawConfig) as DesktopConfig;
+    const profiles = Array.isArray(parsedConfig.profiles)
+      ? parsedConfig.profiles
+          .map(normalizeStoredProfile)
+          .filter((profile): profile is DappnodeProfile => Boolean(profile))
+      : [];
+    const legacyProfile = profiles.length === 0 ? createLegacyProfile(parsedConfig) : null;
+    const normalizedProfiles = legacyProfile ? [legacyProfile] : profiles;
+    const activeProfileId = normalizeProfileId(parsedConfig.activeProfileId) ?? normalizedProfiles[0]?.id;
+    const activeProfile = normalizedProfiles.find((profile) => profile.id === activeProfileId) ?? normalizedProfiles[0];
 
-    return typeof parsedConfig.backendUrl === "string"
-      ? {
-          backendUrl: parsedConfig.backendUrl,
-          wireguardEnabled: parsedConfig.wireguardEnabled === true
-        }
-      : {};
+    return {
+      activeProfileId: activeProfile?.id,
+      backendUrl: activeProfile?.backendUrl,
+      profiles: normalizedProfiles,
+      wireguardEnabled: activeProfile?.wireguardEnabled === true
+    };
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") return {};
     throw error;
@@ -350,7 +629,19 @@ async function readPendingWireguardDevice(backendUrl: string): Promise<string | 
 
 async function writeConfigFile(config: DesktopConfig): Promise<void> {
   await mkdir(path.dirname(configPath()), { recursive: true });
-  await writePrivateFile(configPath(), `${JSON.stringify(config, null, 2)}\n`);
+  const profiles = config.profiles ?? [];
+  const activeProfile = getActiveProfile({ ...config, profiles });
+  await writePrivateFile(
+    configPath(),
+    `${JSON.stringify(
+      {
+        activeProfileId: activeProfile?.id,
+        profiles
+      },
+      null,
+      2
+    )}\n`
+  );
 }
 
 async function writePendingWireguardDevice(config: PendingWireguardDevice): Promise<void> {
@@ -588,12 +879,12 @@ async function validateBackendUrlWithRetry(
   throw lastError instanceof Error ? lastError : new Error(`Could not reach ${backendUrl} through the tunnel.`);
 }
 
-async function applyWireguardConfigAndValidate(config: string): Promise<void> {
+async function applyWireguardConfigAndValidate(config: string, configPathForTunnel: string): Promise<void> {
   let tunnel: TunnelRuntime | undefined;
 
   try {
-    await updateWireguardConfig(config, true);
-    tunnel = await startWireguardTunnel();
+    await updateWireguardConfig(config, true, configPathForTunnel);
+    tunnel = await startWireguardTunnel(configPathForTunnel);
     await validateBackendUrlWithRetry(tunnelBackendUrl, tunnel.agent);
   } catch (error) {
     throw new Error(formatTunnelValidationError(error, tunnel));
@@ -621,7 +912,7 @@ function formatAutoWireguardSetupError(device: string, error: unknown): string {
 
   return [
     `Started setup for WireGuard device ${device}, but could not validate the tunnel before the timeout.`,
-    "The device was left on DAppNode to avoid triggering another WireGuard reconfiguration.",
+    "The device was left on Dappnode to avoid triggering another WireGuard reconfiguration.",
     "Try Connect again to keep waiting with the same device.",
     "",
     getErrorMessage(error)
@@ -650,17 +941,27 @@ async function getReusableDesktopWireguardDevice(backendUrl: string, cookie: str
 async function fetchAndValidateAutoWireguardConfig(
   backendUrl: string,
   cookie: string,
+  configPathForTunnel: string,
   device: string,
   scope: WireguardConfigScope
 ): Promise<void> {
   const config = await getWireguardDeviceConfigWithRetry(backendUrl, cookie, device, scope === "local");
-  await applyWireguardConfigAndValidate(config);
+  await applyWireguardConfigAndValidate(config, configPathForTunnel);
 }
 
 async function setupWireguardAutomatically(
   input: unknown
-): Promise<{ backendUrl: string; configScope: WireguardConfigScope; device: string }> {
-  const { backendUrl, password, username } = normalizeAutoWireguardInput(input);
+): Promise<{ backendUrl: string; configScope: WireguardConfigScope; device: string; profile: DappnodeProfile }> {
+  const { avatar, backendUrl, name, password, profileId, username } = normalizeAutoWireguardInput(input);
+  const desktopConfig = await readConfigFile();
+  const profile = createDappnodeProfile(desktopConfig, {
+    avatar,
+    backendUrl: tunnelBackendUrl,
+    name,
+    profileId,
+    wireguardEnabled: true
+  });
+  const configPathForTunnel = getWireguardConfigPath(profile);
   const wireproxyPath = getWireproxyBinaryPath();
   let cookie = "";
   let createdDevice = "";
@@ -688,7 +989,7 @@ async function setupWireguardAutomatically(
       }
     }
 
-    previousWireguardConfig = await readFile(wireguardConfigPath(), "utf8").catch((error) => {
+    previousWireguardConfig = await readFile(configPathForTunnel, "utf8").catch((error) => {
       if ((error as NodeJS.ErrnoException).code === "ENOENT") return undefined;
       throw error;
     });
@@ -697,7 +998,7 @@ async function setupWireguardAutomatically(
     const errors: Partial<Record<WireguardConfigScope, unknown>> = {};
     for (const scope of getAutoWireguardConfigScopes(backendUrl)) {
       try {
-        await fetchAndValidateAutoWireguardConfig(backendUrl, cookie, createdDevice, scope);
+        await fetchAndValidateAutoWireguardConfig(backendUrl, cookie, configPathForTunnel, createdDevice, scope);
         validatedScope = scope;
         break;
       } catch (error) {
@@ -710,19 +1011,19 @@ async function setupWireguardAutomatically(
     }
     configScope = validatedScope;
 
-    await writeConfigFile({ backendUrl: tunnelBackendUrl, wireguardEnabled: true });
+    await writeConfigFile(upsertProfile(await readConfigFile(), profile));
     await removeFileIfExists(pendingWireguardDevicePath());
-    await loadAdminUi(tunnelBackendUrl, true);
+    await loadAdminUi(profile.backendUrl, profile.wireguardEnabled, configPathForTunnel);
 
     const device = createdDevice;
     createdDevice = "";
 
-    return { backendUrl: tunnelBackendUrl, configScope, device };
+    return { backendUrl: profile.backendUrl, configScope, device, profile };
   } catch (error) {
     if (previousWireguardConfig !== undefined) {
-      await writePrivateFile(wireguardConfigPath(), previousWireguardConfig);
+      await writePrivateFile(configPathForTunnel, previousWireguardConfig);
     } else {
-      await unlink(wireguardConfigPath()).catch((unlinkError) => {
+      await unlink(configPathForTunnel).catch((unlinkError) => {
         if ((unlinkError as NodeJS.ErrnoException).code !== "ENOENT") throw unlinkError;
       });
     }
@@ -781,15 +1082,23 @@ function requestBuffer(endpoint: URL, agent?: SocksProxyAgent, redirectsLeft = 2
   });
 }
 
-async function startDesktopServer(backendUrl: string, wireguardEnabled: boolean): Promise<string> {
-  if (desktopServer?.backendUrl === backendUrl && desktopServer.wireguardEnabled === wireguardEnabled) {
+async function startDesktopServer(
+  backendUrl: string,
+  wireguardEnabled: boolean,
+  configPathForTunnel?: string
+): Promise<string> {
+  if (
+    desktopServer?.backendUrl === backendUrl &&
+    desktopServer.wireguardEnabled === wireguardEnabled &&
+    desktopServer.wireguardConfigPath === configPathForTunnel
+  ) {
     return desktopServer.url;
   }
 
   await stopDesktopServer();
   await assertAdminUiBuildExists();
 
-  const tunnel = wireguardEnabled ? await startWireguardTunnel() : undefined;
+  const tunnel = wireguardEnabled ? await startWireguardTunnel(configPathForTunnel) : undefined;
   const proxy = httpProxy.createProxyServer({
     agent: tunnel?.agent,
     changeOrigin: true,
@@ -844,7 +1153,7 @@ async function startDesktopServer(backendUrl: string, wireguardEnabled: boolean)
       const address = server.address();
 
       if (!address || typeof address === "string") {
-        reject(new Error("Could not bind DAppNode desktop server."));
+        reject(new Error("Could not bind Dappnode desktop server."));
         return;
       }
 
@@ -852,7 +1161,15 @@ async function startDesktopServer(backendUrl: string, wireguardEnabled: boolean)
     });
   });
 
-  desktopServer = { backendUrl, server, sockets, tunnel, url, wireguardEnabled };
+  desktopServer = {
+    backendUrl,
+    server,
+    sockets,
+    tunnel,
+    url,
+    wireguardConfigPath: configPathForTunnel,
+    wireguardEnabled
+  };
 
   return url;
 }
@@ -876,11 +1193,11 @@ async function stopDesktopServer(): Promise<void> {
   stopWireguardTunnel(tunnel);
 }
 
-async function startWireguardTunnel(): Promise<TunnelRuntime> {
+async function startWireguardTunnel(configPathForTunnel = wireguardConfigPath()): Promise<TunnelRuntime> {
   const wireproxyPath = getWireproxyBinaryPath();
-  const wireguardPath = wireguardConfigPath();
+  const wireguardPath = configPathForTunnel;
 
-  await assertWireguardConfigExists();
+  await assertWireguardConfigExists(wireguardPath);
   await assertWireproxyBinaryExists(wireproxyPath);
 
   const socksPort = await getFreeLoopbackPort();
@@ -932,9 +1249,9 @@ function stopWireguardTunnel(tunnel?: TunnelRuntime): void {
   tunnel.process.kill();
 }
 
-async function assertWireguardConfigExists(): Promise<void> {
+async function assertWireguardConfigExists(configPathForTunnel = wireguardConfigPath()): Promise<void> {
   try {
-    await access(wireguardConfigPath(), fsConstants.R_OK);
+    await access(configPathForTunnel, fsConstants.R_OK);
   } catch {
     throw new Error("WireGuard tunnel is enabled, but no WireGuard config is saved.");
   }
@@ -1031,10 +1348,14 @@ function normalizeWireguardConfigForWireproxy(config: string): string {
     .join("\n");
 }
 
-async function updateWireguardConfig(config: unknown, enabled: boolean): Promise<void> {
+async function updateWireguardConfig(
+  config: unknown,
+  enabled: boolean,
+  configPathForTunnel = wireguardConfigPath()
+): Promise<void> {
   if (!enabled) return;
   if (typeof config !== "string" || !config.trim()) {
-    await assertWireguardConfigExists();
+    await assertWireguardConfigExists(configPathForTunnel);
     return;
   }
 
@@ -1043,12 +1364,12 @@ async function updateWireguardConfig(config: unknown, enabled: boolean): Promise
     throw new Error("WireGuard config must include [Interface] and [Peer] sections.");
   }
 
-  await writePrivateFile(wireguardConfigPath(), `${normalizedConfig}\n`);
+  await writePrivateFile(configPathForTunnel, `${normalizedConfig}\n`);
 }
 
-async function hasWireguardConfig(): Promise<boolean> {
+async function hasWireguardConfig(configPathForTunnel = wireguardConfigPath()): Promise<boolean> {
   try {
-    await access(wireguardConfigPath(), fsConstants.R_OK);
+    await access(configPathForTunnel, fsConstants.R_OK);
     return true;
   } catch {
     return false;
@@ -1056,17 +1377,23 @@ async function hasWireguardConfig(): Promise<boolean> {
 }
 
 async function normalizeConnectionInput(input: unknown): Promise<{
+  avatar?: unknown;
   backendUrl: string;
+  name: string;
+  profileId?: string;
   wireguardConfig?: unknown;
   wireguardEnabled: boolean;
 }> {
   if (typeof input === "string") {
-    return { backendUrl: normalizeBackendUrl(input), wireguardEnabled: false };
+    return { backendUrl: normalizeBackendUrl(input), name: "My Dappnode", wireguardEnabled: false };
   }
 
-  const connectionInput = input as ConnectionInput;
+  const connectionInput = input as ProfileConnectionInput;
   return {
+    avatar: connectionInput?.avatar,
     backendUrl: normalizeBackendUrl(connectionInput?.backendUrl),
+    name: normalizeProfileName(connectionInput?.name),
+    profileId: normalizeProfileId(connectionInput?.profileId),
     wireguardConfig: connectionInput?.wireguard?.config,
     wireguardEnabled: connectionInput?.wireguard?.enabled === true
   };
@@ -1271,7 +1598,8 @@ async function clearDesktopSettings(): Promise<void> {
     removeFileIfExists(configPath()),
     removeFileIfExists(pendingWireguardDevicePath()),
     removeFileIfExists(wireguardConfigPath()),
-    removeFileIfExists(wireproxyConfigPath())
+    removeFileIfExists(wireproxyConfigPath()),
+    rm(profileWireguardConfigDir(), { force: true, recursive: true })
   ]);
   await mainWindow?.loadFile(connectionPagePath);
 }
@@ -1282,8 +1610,8 @@ async function confirmAndClearDesktopSettings(): Promise<void> {
     cancelId: 1,
     defaultId: 1,
     detail:
-      "This removes the saved backend URL and local WireGuard config from this computer. It does not remove WireGuard devices from your DAppNode.",
-    message: "Clear all DAppNode Desktop settings?",
+      "This removes the saved backend URL and local WireGuard config from this computer. It does not remove WireGuard devices from your Dappnode.",
+    message: "Clear all Dappnode Desktop settings?",
     type: "warning" as const
   };
   const result = mainWindow ? await dialog.showMessageBox(mainWindow, options) : await dialog.showMessageBox(options);
@@ -1293,7 +1621,7 @@ async function confirmAndClearDesktopSettings(): Promise<void> {
 }
 
 function setupAppIdentity(): void {
-  app.setName("DAppNode Desktop");
+  app.setName("Dappnode Desktop");
 
   if (process.platform === "darwin" && app.dock) {
     const dockIcon = nativeImage.createFromPath(appIconPath);
@@ -1309,7 +1637,7 @@ function createMainWindow(): ElectronBrowserWindow {
     minHeight: 640,
     minWidth: 980,
     show: false,
-    title: "DAppNode Desktop",
+    title: "Dappnode Desktop",
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
@@ -1339,37 +1667,90 @@ function createMainWindow(): ElectronBrowserWindow {
   return browserWindow;
 }
 
-async function showConnectionScreen(message?: string): Promise<void> {
+async function showConnectionScreen(message?: string, view?: "add"): Promise<void> {
+  const query: Record<string, string> = {};
+  if (message) query.error = message;
+  if (view) query.view = view;
+
   await stopDesktopServer();
-  await mainWindow?.loadFile(
-    connectionPagePath,
-    message
-      ? {
-          query: { error: message }
-        }
-      : undefined
-  );
+  await mainWindow?.loadFile(connectionPagePath, Object.keys(query).length > 0 ? { query } : undefined);
 }
 
-async function loadAdminUi(backendUrl: string, wireguardEnabled: boolean): Promise<void> {
-  const localUrl = await startDesktopServer(backendUrl, wireguardEnabled);
+async function loadAdminUi(backendUrl: string, wireguardEnabled: boolean, configPathForTunnel?: string): Promise<void> {
+  const localUrl = await startDesktopServer(backendUrl, wireguardEnabled, configPathForTunnel);
   await mainWindow?.loadURL(localUrl);
 }
 
 function setupIpcHandlers(): void {
   ipcMain.handle("backend:get", async (): Promise<string> => {
     const config = await readConfigFile();
-    return config.backendUrl ?? "";
+    return getActiveProfile(config)?.backendUrl ?? "";
   });
 
   ipcMain.handle("connection:get", async (): Promise<ConnectionStatus> => {
     const config = await readConfigFile();
+    const activeProfile = getActiveProfile(config);
     return {
-      backendUrl: config.backendUrl ?? "",
+      activeProfileId: activeProfile?.id,
+      backendUrl: activeProfile?.backendUrl ?? "",
       hasTunnelHelper: await hasWireproxyBinary(),
-      hasWireguardConfig: await hasWireguardConfig(),
-      wireguardEnabled: config.wireguardEnabled === true
+      hasWireguardConfig: activeProfile ? await hasWireguardConfig(getWireguardConfigPath(activeProfile)) : false,
+      profiles: config.profiles ?? [],
+      wireguardEnabled: activeProfile?.wireguardEnabled === true
     };
+  });
+
+  ipcMain.handle("menu:show", async (): Promise<IpcResult> => {
+    try {
+      await showConnectionScreen();
+
+      return { ok: true };
+    } catch (error) {
+      return { ok: false, error: getErrorMessage(error) };
+    }
+  });
+
+  ipcMain.handle(
+    "profile:connect",
+    async (_event, input: unknown): Promise<IpcResult<{ profile: DappnodeProfile }>> => {
+      try {
+        const profileId = normalizeProfileId(input);
+        if (!profileId) throw new Error("Choose a Dappnode profile.");
+
+        const config = await readConfigFile();
+        const profile = config.profiles?.find((storedProfile) => storedProfile.id === profileId);
+        if (!profile) throw new Error("That Dappnode profile no longer exists.");
+
+        await writeConfigFile({ ...config, activeProfileId: profile.id });
+        await loadAdminUi(profile.backendUrl, profile.wireguardEnabled, getWireguardConfigPath(profile));
+
+        return { ok: true, profile };
+      } catch (error) {
+        return { ok: false, error: getErrorMessage(error) };
+      }
+    }
+  );
+
+  ipcMain.handle("profile:delete", async (_event, input: unknown): Promise<IpcResult> => {
+    try {
+      const profileId = normalizeProfileId(input);
+      if (!profileId) throw new Error("Choose a Dappnode profile.");
+
+      const config = await readConfigFile();
+      const profile = config.profiles?.find((storedProfile) => storedProfile.id === profileId);
+      if (!profile) throw new Error("That Dappnode profile no longer exists.");
+
+      await removeFileIfExists(getWireguardConfigPath(profile));
+      const profiles = (config.profiles ?? []).filter((storedProfile) => storedProfile.id !== profile.id);
+      await writeConfigFile({
+        activeProfileId: profiles[0]?.id,
+        profiles
+      });
+
+      return { ok: true };
+    } catch (error) {
+      return { ok: false, error: getErrorMessage(error) };
+    }
   });
 
   ipcMain.handle("package:open", async (_event, input: unknown): Promise<IpcResult> => {
@@ -1388,7 +1769,9 @@ function setupIpcHandlers(): void {
     async (
       _event,
       input: unknown
-    ): Promise<IpcResult<{ backendUrl: string; configScope: WireguardConfigScope; device: string }>> => {
+    ): Promise<
+      IpcResult<{ backendUrl: string; configScope: WireguardConfigScope; device: string; profile: DappnodeProfile }>
+    > => {
       try {
         const result = await setupWireguardAutomatically(input);
 
@@ -1399,46 +1782,68 @@ function setupIpcHandlers(): void {
     }
   );
 
-  ipcMain.handle("backend:save", async (_event, input: unknown): Promise<IpcResult<{ backendUrl: string }>> => {
-    try {
-      const backendUrl = normalizeBackendUrl(input);
-      await validateBackendUrl(backendUrl);
-      await assertAdminUiBuildExists();
-      await writeConfigFile({ backendUrl, wireguardEnabled: false });
-      await loadAdminUi(backendUrl, false);
+  ipcMain.handle(
+    "backend:save",
+    async (_event, input: unknown): Promise<IpcResult<{ backendUrl: string; profile: DappnodeProfile }>> => {
+      try {
+        const { avatar, backendUrl, name, profileId } = await normalizeConnectionInput(input);
+        await validateBackendUrl(backendUrl);
+        await assertAdminUiBuildExists();
+        const profile = createDappnodeProfile(await readConfigFile(), {
+          avatar,
+          backendUrl,
+          name,
+          profileId,
+          wireguardEnabled: false
+        });
+        await writeConfigFile(upsertProfile(await readConfigFile(), profile));
+        await loadAdminUi(backendUrl, false);
 
-      return { ok: true, backendUrl };
-    } catch (error) {
-      return { ok: false, error: getErrorMessage(error) };
+        return { ok: true, backendUrl, profile };
+      } catch (error) {
+        return { ok: false, error: getErrorMessage(error) };
+      }
     }
-  });
+  );
 
-  ipcMain.handle("connection:save", async (_event, input: unknown): Promise<IpcResult<{ backendUrl: string }>> => {
-    let tunnel: TunnelRuntime | undefined;
-
-    try {
-      const { backendUrl, wireguardConfig, wireguardEnabled } = await normalizeConnectionInput(input);
-      await updateWireguardConfig(wireguardConfig, wireguardEnabled);
-      tunnel = wireguardEnabled ? await startWireguardTunnel() : undefined;
+  ipcMain.handle(
+    "connection:save",
+    async (_event, input: unknown): Promise<IpcResult<{ backendUrl: string; profile: DappnodeProfile }>> => {
+      let tunnel: TunnelRuntime | undefined;
 
       try {
-        await validateBackendUrl(backendUrl, tunnel?.agent);
+        const { avatar, backendUrl, name, profileId, wireguardConfig, wireguardEnabled } =
+          await normalizeConnectionInput(input);
+        const profile = createDappnodeProfile(await readConfigFile(), {
+          avatar,
+          backendUrl,
+          name,
+          profileId,
+          wireguardEnabled
+        });
+        const configPathForTunnel = wireguardEnabled ? getWireguardConfigPath(profile) : undefined;
+        await updateWireguardConfig(wireguardConfig, wireguardEnabled, configPathForTunnel);
+        tunnel = wireguardEnabled ? await startWireguardTunnel(configPathForTunnel) : undefined;
+
+        try {
+          await validateBackendUrl(backendUrl, tunnel?.agent);
+        } catch (error) {
+          throw new Error(formatTunnelValidationError(error, tunnel));
+        }
+        stopWireguardTunnel(tunnel);
+        tunnel = undefined;
+
+        await assertAdminUiBuildExists();
+        await writeConfigFile(upsertProfile(await readConfigFile(), profile));
+        await loadAdminUi(backendUrl, wireguardEnabled, configPathForTunnel);
+
+        return { ok: true, backendUrl, profile };
       } catch (error) {
-        throw new Error(formatTunnelValidationError(error, tunnel));
+        stopWireguardTunnel(tunnel);
+        return { ok: false, error: getErrorMessage(error) };
       }
-      stopWireguardTunnel(tunnel);
-      tunnel = undefined;
-
-      await assertAdminUiBuildExists();
-      await writeConfigFile({ backendUrl, wireguardEnabled });
-      await loadAdminUi(backendUrl, wireguardEnabled);
-
-      return { ok: true, backendUrl };
-    } catch (error) {
-      stopWireguardTunnel(tunnel);
-      return { ok: false, error: getErrorMessage(error) };
     }
-  });
+  );
 
   ipcMain.handle("backend:clear", async (): Promise<IpcResult> => {
     try {
@@ -1470,13 +1875,23 @@ function formatTunnelValidationError(error: unknown, tunnel?: TunnelRuntime): st
 function setupMenu(): void {
   const template: MenuItemConstructorOptions[] = [
     {
-      label: "DAppNode",
+      label: "Dappnode",
       submenu: [
         {
           click: () => {
             showConnectionScreen().catch((error) => console.error("Error opening connection screen", error));
           },
-          label: "Change Connection"
+          label: "Main Menu",
+          accelerator: "CmdOrCtrl+Shift+M"
+        },
+        {
+          click: () => {
+            showConnectionScreen(undefined, "add").catch((error) =>
+              console.error("Error opening add Dappnode screen", error)
+            );
+          },
+          label: "Add Dappnode...",
+          accelerator: "CmdOrCtrl+N"
         },
         {
           click: () => {
@@ -1531,19 +1946,9 @@ app
     setupMenu();
     mainWindow = createMainWindow();
 
-    const config = await readConfigFile();
-    if (!config.backendUrl) {
-      await showConnectionScreen();
-      return;
-    }
-
-    try {
-      await loadAdminUi(config.backendUrl, config.wireguardEnabled === true);
-    } catch (error) {
-      await showConnectionScreen(getErrorMessage(error));
-    }
+    await showConnectionScreen();
   })
   .catch((error) => {
-    console.error("Error starting DAppNode desktop app", error);
+    console.error("Error starting Dappnode desktop app", error);
     app.quit();
   });

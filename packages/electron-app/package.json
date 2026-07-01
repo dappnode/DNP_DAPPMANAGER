@@ -2,8 +2,8 @@
   "name": "@dappnode/electron-app",
   "version": "0.1.0",
   "private": true,
-  "description": "Desktop shell for the DAppNode Dappmanager UI",
-  "author": "DAppNode",
+  "description": "Desktop shell for the Dappnode Dappmanager UI",
+  "author": "Dappnode",
   "license": "GPL-3.0",
   "type": "commonjs",
   "main": "dist/main.js",
@@ -20,7 +20,7 @@
   },
   "build": {
     "appId": "io.dappnode.desktop",
-    "productName": "DAppNode Desktop",
+    "productName": "Dappnode Desktop",
     "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
     "directories": {
       "buildResources": "resources",
