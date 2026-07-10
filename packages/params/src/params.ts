@@ -438,6 +438,18 @@ export const params = {
       key: "0x18eE60706Ed150f6E21D020C1Cede55E4267f409"
     },
     {
+      name: "Dappnode Association - Luka (dnp)",
+      dnpNameSuffix: ".dnp.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0xF9E77a0537338f8394Aec2Ea9d0273E5Cd4F66dc"
+    },
+    {
+      name: "Dappnode Association - Luka (public)",
+      dnpNameSuffix: ".public.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0xF9E77a0537338f8394Aec2Ea9d0273E5Cd4F66dc"
+    },
+    {
       name: "Chainnodes",
       dnpNameSuffix: ".dnp.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
