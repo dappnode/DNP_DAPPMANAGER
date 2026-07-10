@@ -412,7 +412,8 @@ const updatePackageTool: DappnodeTool = {
     options: z
       .object({
         BYPASS_RESOLVER: z.boolean().optional(),
-        BYPASS_CORE_RESTRICTION: z.boolean().optional()
+        BYPASS_CORE_RESTRICTION: z.boolean().optional(),
+        BYPASS_SIGNED_RESTRICTION: z.boolean().optional()
       })
       .optional()
       .describe("Advanced update flags. Omit unless the user explicitly asked for them.")
@@ -424,7 +425,7 @@ const updatePackageTool: DappnodeTool = {
   }: {
     dnpName: string;
     version?: string;
-    options?: { BYPASS_RESOLVER?: boolean; BYPASS_CORE_RESTRICTION?: boolean };
+    options?: { BYPASS_RESOLVER?: boolean; BYPASS_CORE_RESTRICTION?: boolean; BYPASS_SIGNED_RESTRICTION?: boolean };
   }) {
     logs.info(`MCP: dappnode_update_package(${dnpName}, ${version ?? "latest"})`);
     const { packageInstall } = await import("../calls/packageInstall.js");
@@ -1061,7 +1062,8 @@ const installPackageTool: DappnodeTool = {
     options: z
       .object({
         BYPASS_RESOLVER: z.boolean().optional(),
-        BYPASS_CORE_RESTRICTION: z.boolean().optional()
+        BYPASS_CORE_RESTRICTION: z.boolean().optional(),
+        BYPASS_SIGNED_RESTRICTION: z.boolean().optional()
       })
       .optional()
       .describe("Advanced install flags. Omit unless the user explicitly asked for them.")
@@ -1075,7 +1077,11 @@ const installPackageTool: DappnodeTool = {
     name: string;
     version?: string;
     userSettings?: UserSettingsAllDnps;
-    options?: { BYPASS_RESOLVER?: boolean; BYPASS_CORE_RESTRICTION?: boolean };
+    options?: {
+      BYPASS_RESOLVER?: boolean;
+      BYPASS_CORE_RESTRICTION?: boolean;
+      BYPASS_SIGNED_RESTRICTION?: boolean;
+    };
   }) {
     logs.info(`MCP: dappnode_install_package(${name}, ${version ?? "latest"})`);
     const { packageInstall } = await import("../calls/packageInstall.js");
