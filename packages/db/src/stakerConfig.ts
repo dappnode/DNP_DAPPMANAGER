@@ -55,56 +55,6 @@ export const mevBoostGnosis = interceptGlobalEnvOnSet(
   Object.keys({ MEVBOOST_GNOSIS })[0]
 );
 
-// Prater
-
-const CONSENSUS_CLIENT_PRATER = "consensus-client-prater";
-const EXECUTION_CLIENT_PRATER = "execution-client-prater";
-const MEVBOOST_PRATER = "mevboost-prater";
-
-// Null means not set
-// Undefined means its set but the user has not selected any value
-export const consensusClientPrater = interceptGlobalEnvOnSet(
-  dbMain.staticKey<string | undefined | null>(CONSENSUS_CLIENT_PRATER, null),
-  Object.keys({ CONSENSUS_CLIENT_PRATER })[0]
-);
-
-// Null means not set
-// Undefined means its set but the user has not selected any value
-export const executionClientPrater = interceptGlobalEnvOnSet(
-  dbMain.staticKey<string | undefined | null>(EXECUTION_CLIENT_PRATER, null),
-  Object.keys({ EXECUTION_CLIENT_PRATER })[0]
-);
-
-export const mevBoostPrater = interceptGlobalEnvOnSet(
-  dbMain.staticKey<boolean>(MEVBOOST_PRATER, false),
-  Object.keys({ MEVBOOST_PRATER })[0]
-);
-
-// Holesky
-
-const CONSENSUS_CLIENT_HOLESKY = "consensus-client-holesky";
-const EXECUTION_CLIENT_HOLESKY = "execution-client-holesky";
-const MEVBOOST_HOLESKY = "mevboost-holesky";
-
-// Null means not set
-// Undefined means its set but the user has not selected any value
-export const consensusClientHolesky = interceptGlobalEnvOnSet(
-  dbMain.staticKey<string | undefined | null>(CONSENSUS_CLIENT_HOLESKY, null),
-  Object.keys({ CONSENSUS_CLIENT_HOLESKY })[0]
-);
-
-// Null means not set
-// Undefined means its set but the user has not selected any value
-export const executionClientHolesky = interceptGlobalEnvOnSet(
-  dbMain.staticKey<string | undefined | null>(EXECUTION_CLIENT_HOLESKY, null),
-  Object.keys({ EXECUTION_CLIENT_HOLESKY })[0]
-);
-
-export const mevBoostHolesky = interceptGlobalEnvOnSet(
-  dbMain.staticKey<boolean>(MEVBOOST_HOLESKY, false),
-  Object.keys({ MEVBOOST_HOLESKY })[0]
-);
-
 // Hoodi
 
 const CONSENSUS_CLIENT_HOODI = "consensus-client-hoodi";

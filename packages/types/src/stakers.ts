@@ -4,10 +4,8 @@ import { PackageRelease } from "./pkg.js";
 
 export enum Network {
   Mainnet = "mainnet",
-  Prater = "prater",
   Gnosis = "gnosis",
   Lukso = "lukso",
-  Holesky = "holesky",
   Sepolia = "sepolia",
   Hoodi = "hoodi",
   StarknetMainnet = "starknet",
@@ -16,7 +14,7 @@ export enum Network {
 
 export const networksByType = {
   mainnets: [Network.Mainnet, Network.Gnosis, Network.Lukso, Network.StarknetMainnet],
-  testnets: [Network.Hoodi, Network.Prater, Network.Holesky, Network.Sepolia, Network.StarknetSepolia]
+  testnets: [Network.Hoodi, Network.Sepolia, Network.StarknetSepolia]
 };
 
 // MAINNET
@@ -39,49 +37,6 @@ export enum SignerMainnet {
 }
 export enum MevBoostMainnet {
   Mevboost = "mev-boost.dnp.dappnode.eth"
-}
-
-// PRATER
-export enum ConsensusClientPrater {
-  Prysm = "prysm-prater.dnp.dappnode.eth",
-  Lighthouse = "lighthouse-prater.dnp.dappnode.eth",
-  Teku = "teku-prater.dnp.dappnode.eth",
-  Nimbus = "nimbus-prater.dnp.dappnode.eth",
-  Lodestar = "lodestar-prater.dnp.dappnode.eth"
-}
-export enum ExecutionClientPrater {
-  Geth = "goerli-geth.dnp.dappnode.eth",
-  Erigon = "goerli-erigon.dnp.dappnode.eth",
-  Nethermind = "goerli-nethermind.dnp.dappnode.eth",
-  Besu = "goerli-besu.dnp.dappnode.eth"
-}
-export enum SignerPrater {
-  Web3signer = "web3signer-prater.dnp.dappnode.eth"
-}
-export enum MevBoostPrater {
-  Mevboost = "mev-boost-goerli.dnp.dappnode.eth"
-}
-
-// HOLESKY
-export enum ConsensusClientHolesky {
-  Prysm = "prysm-holesky.dnp.dappnode.eth",
-  Lighthouse = "lighthouse-holesky.dnp.dappnode.eth",
-  Teku = "teku-holesky.dnp.dappnode.eth",
-  Nimbus = "nimbus-holesky.dnp.dappnode.eth",
-  Lodestar = "lodestar-holesky.dnp.dappnode.eth"
-}
-export enum ExecutionClientHolesky {
-  Geth = "holesky-geth.dnp.dappnode.eth",
-  Erigon = "holesky-erigon.dnp.dappnode.eth",
-  Nethermind = "holesky-nethermind.dnp.dappnode.eth",
-  Besu = "holesky-besu.dnp.dappnode.eth",
-  Reth = "holesky-reth.dnp.dappnode.eth"
-}
-export enum SignerHolesky {
-  Web3signer = "web3signer-holesky.dnp.dappnode.eth"
-}
-export enum MevBoostHolesky {
-  Mevboost = "mev-boost-holesky.dnp.dappnode.eth"
 }
 
 // HOODI

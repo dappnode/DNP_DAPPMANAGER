@@ -137,22 +137,6 @@ export default function StakerNetwork({ network, description }: { network: Netwo
       <ActivateBackupModal show={premiumModalShow} onClose={premiumModalOnClose} network={network} />
       <StakerDisclaimerModal show={disclaimerModalShow} onClose={disclaimerModalOnClose} />
 
-      {network === Network.Prater && (
-        <AlertDismissible variant="warning">
-          <p>
-            The prater network is deprecated, please migrate to <b>Hoodi</b>.
-          </p>
-        </AlertDismissible>
-      )}
-
-      {network === Network.Holesky && (
-        <AlertDismissible variant="warning">
-          <p>
-            The holesky network is deprecated, please migrate to <b>Hoodi</b>.
-          </p>
-        </AlertDismissible>
-      )}
-
       {(network === Network.Hoodi || network === Network.Mainnet) && (
         <AlertDismissible variant="info">
           <p>
@@ -251,7 +235,7 @@ export default function StakerNetwork({ network, description }: { network: Netwo
                   />
                 </Col>
               )}
-              {[Network.Prater, Network.Mainnet, Network.Holesky, Network.Hoodi].includes(network) &&
+              {[Network.Mainnet, Network.Hoodi].includes(network) &&
                 currentStakerConfigReq.data.mevBoost && (
                   <Col>
                     <SubTitle>Mev Boost</SubTitle>
