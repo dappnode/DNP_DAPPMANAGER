@@ -408,9 +408,25 @@ const updatePackageTool: DappnodeTool = {
   mutating: true,
   schema: {
     dnpName: z.string().min(1).describe("The package dnpName to update"),
-    version: z.string().optional().describe("Optional target version (semver or IPFS hash). Defaults to latest.")
+    version: z.string().optional().describe("Optional target version (semver or IPFS hash). Defaults to latest."),
+    options: z
+      .object({
+        BYPASS_RESOLVER: z.boolean().optional(),
+        BYPASS_CORE_RESTRICTION: z.boolean().optional(),
+        BYPASS_SIGNED_RESTRICTION: z.boolean().optional()
+      })
+      .optional()
+      .describe("Advanced update flags. Omit unless the user explicitly asked for them.")
   },
-  async execute({ dnpName, version }: { dnpName: string; version?: string }) {
+  async execute({
+    dnpName,
+    version,
+    options
+  }: {
+    dnpName: string;
+    version?: string;
+    options?: { BYPASS_RESOLVER?: boolean; BYPASS_CORE_RESTRICTION?: boolean; BYPASS_SIGNED_RESTRICTION?: boolean };
+  }) {
     logs.info(`MCP: dappnode_update_package(${dnpName}, ${version ?? "latest"})`);
     const { packageInstall } = await import("../calls/packageInstall.js");
     await packageInstall({
@@ -418,7 +434,7 @@ const updatePackageTool: DappnodeTool = {
       version,
       userSettings: {},
       notificationsSettings: {},
-      options: {}
+      options: options ?? {}
     });
     return { ok: true, dnpName, version: version ?? "latest" };
   }
@@ -1046,7 +1062,8 @@ const installPackageTool: DappnodeTool = {
     options: z
       .object({
         BYPASS_RESOLVER: z.boolean().optional(),
-        BYPASS_CORE_RESTRICTION: z.boolean().optional()
+        BYPASS_CORE_RESTRICTION: z.boolean().optional(),
+        BYPASS_SIGNED_RESTRICTION: z.boolean().optional()
       })
       .optional()
       .describe("Advanced install flags. Omit unless the user explicitly asked for them.")
@@ -1060,7 +1077,11 @@ const installPackageTool: DappnodeTool = {
     name: string;
     version?: string;
     userSettings?: UserSettingsAllDnps;
-    options?: { BYPASS_RESOLVER?: boolean; BYPASS_CORE_RESTRICTION?: boolean };
+    options?: {
+      BYPASS_RESOLVER?: boolean;
+      BYPASS_CORE_RESTRICTION?: boolean;
+      BYPASS_SIGNED_RESTRICTION?: boolean;
+    };
   }) {
     logs.info(`MCP: dappnode_install_package(${name}, ${version ?? "latest"})`);
     const { packageInstall } = await import("../calls/packageInstall.js");
