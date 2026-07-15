@@ -5,6 +5,49 @@ import { Compose, Manifest } from "@dappnode/types";
 import { setDappnodeComposeDefaults } from "../../src/index.js";
 
 describe("setDappnodeComposeDefaults", () => {
+  it("Should not add a version to a versionless compose", () => {
+    const compose: Compose = {
+      services: {
+        serviceA: {
+          image: "some.image:1.0.0"
+        }
+      }
+    };
+    const manifest: Manifest = {
+      name: "some.dnp.dappnode.eth",
+      version: "1.0.0",
+      description: "Test package",
+      type: "service",
+      license: "GPL-3.0"
+    };
+
+    const composeWithDefaults = setDappnodeComposeDefaults(compose, manifest);
+
+    expect(composeWithDefaults).to.not.have.property("version");
+  });
+
+  it("Should preserve a legacy compose version", () => {
+    const compose: Compose = {
+      version: "2",
+      services: {
+        serviceA: {
+          image: "some.image:1.0.0"
+        }
+      }
+    };
+    const manifest: Manifest = {
+      name: "some.dnp.dappnode.eth",
+      version: "1.0.0",
+      description: "Test package",
+      type: "service",
+      license: "GPL-3.0"
+    };
+
+    const composeWithDefaults = setDappnodeComposeDefaults(compose, manifest);
+
+    expect(composeWithDefaults.version).to.equal("2");
+  });
+
   it("Should set dappnode defaults to a validated compose from a non-core package", () => {
     const compose: Compose = {
       version: "3.5",

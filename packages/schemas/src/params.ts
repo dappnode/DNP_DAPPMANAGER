@@ -29,6 +29,5 @@ export const dockerParams = {
     "bind.dappnode"
   ],
   DNS_SERVICE: "172.33.1.2",
-  MINIMUM_COMPOSE_FILE_VERSION: "3.4",
   SKIP_COMPOSE_VALIDATION: /true/i.test(process.env.SKIP_COMPOSE_VALIDATION || "")
 };

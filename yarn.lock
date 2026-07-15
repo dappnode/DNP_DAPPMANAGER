@@ -1551,7 +1551,6 @@ __metadata:
     "@types/mocha": "npm:^10"
     ajv: "npm:^8.17.1"
     mocha: "npm:^10.7.0"
-    semver: "npm:^7.5.0"
   languageName: unknown
   linkType: soft
 

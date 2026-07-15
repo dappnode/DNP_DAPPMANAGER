@@ -107,6 +107,12 @@ describe("files / compose / validateDappnodeCompose", () => {
     validateDappnodeCompose(compose, manifest);
   });
 
+  it("Should validate a compose file without a version", () => {
+    const composeWithoutVersion = { ...compose };
+    delete composeWithoutVersion.version;
+    validateDappnodeCompose(composeWithoutVersion, manifest);
+  });
+
   it("Should throw an error due to unsafe networks", () => {
     expect(() =>
       validateDappnodeCompose(
@@ -166,18 +172,8 @@ service validator volume /var/run/docker.sock:/var/run/docker.sock is a bind-mou
 service validator has key credential_spec that is not allowed. Allowed keys are: cap_add,cap_drop,command,depends_on,devices,entrypoint,environment,expose,extra_hosts,healthcheck,labels,logging,network_mode,networks,ports,privileged,restart,stop_grace_period,stop_signal,user,volumes,working_dir,security_opt,image,build,volumes,environment`);
   });
 
-  it("Should throw an error due to unsafe compose version", () => {
-    expect(() =>
-      validateDappnodeCompose(
-        {
-          ...compose,
-          version: "3.3"
-        },
-        manifest
-      )
-    ).to.throw(`Error validating compose file with dappnode requirements:
-
-Compose version 3.3 is not supported. Minimum version is 3.4`);
+  it("Should validate a compose file with a legacy version", () => {
+    validateDappnodeCompose({ ...compose, version: "2" }, manifest);
   });
 
   it("Should throw an error due to unsafe service networks in string format", () => {
@@ -231,12 +227,12 @@ service validator has the network danger_network with reserved docker alias. Ali
 service validator has a non-whitelisted docker network: other_network. Only docker networks dncore_network,dnpublic_network are allowed`);
   });
 
-  it("Should throw an error due to unsafe compose version and unsafe volumes", () => {
+  it("Should only reject unsafe volumes when a legacy compose version is present", () => {
     expect(() =>
       validateDappnodeCompose(
         {
           ...compose,
-          version: "3.3",
+          version: "2",
           services: {
             ...compose.services,
             validator: {
@@ -249,7 +245,6 @@ service validator has a non-whitelisted docker network: other_network. Only dock
       )
     ).to.throw(`Error validating compose file with dappnode requirements:
 
-Compose version 3.3 is not supported. Minimum version is 3.4
 service validator volume /var/run/docker.sock:/var/run/docker.sock is a bind-mount, only named non-external volumes are allowed`);
   });
 });
