@@ -1,6 +1,7 @@
 import * as isIPFS from "is-ipfs";
 import { CID, IPFSEntry } from "kubo-rpc-client";
 import { CarReader } from "@ipld/car";
+import { decode as decodeDagPb } from "@ipld/dag-pb";
 import { recursive as exporter } from "ipfs-unixfs-exporter";
 import { Version } from "multiformats";
 import path from "path";
@@ -453,10 +454,13 @@ export class DappnodeRepository extends ApmRepository {
   }
 
   /**
-   * Lists the contents of a directory pointed by the given hash using IPFS dag-json.
+   * Lists the contents of a directory pointed by the given hash.
    * Returns entries with individual file CIDs (required for signature verification).
    *
-   * TODO: research why the size is different, i.e for the hash QmWcJrobqhHF7GWpqEbxdv2cWCCXbACmq85Hh7aJ1eu8rn Tsize is 64461521 and size is 64446140
+   * Uses ?format=raw to fetch the raw dag-pb block and decodes it client-side.
+   * This is compatible with Kubo v0.40+ where cross-codec conversion (dag-pb → dag-json)
+   * is disabled by default per IPIP-524.
+   * Falls back to dag-json for older gateways that may not serve raw blocks.
    *
    * @param hash - The content identifier (CID) of the directory.
    * @returns An array of entries in the directory.
@@ -464,15 +468,40 @@ export class DappnodeRepository extends ApmRepository {
    */
   public async list(hash: string): Promise<IPFSEntry[]> {
     const cidStr = this.sanitizeIpfsPath(hash.toString());
-    const url = `${this.gatewayUrl}/ipfs/${cidStr}?format=dag-json`;
-    const res = await fetch(url, {
-      headers: { Accept: "application/vnd.ipld.dag-json" }
+
+    // Primary: fetch raw dag-pb block and decode client-side (works on all Trustless Gateways)
+    const rawUrl = `${this.gatewayUrl}/ipfs/${cidStr}?format=raw`;
+    const rawRes = await fetch(rawUrl, {
+      headers: { Accept: "application/vnd.ipld.raw" }
     });
-    if (!res.ok) {
-      throw new Error(`Failed to list directory ${cidStr}: ${res.status} ${res.statusText}`);
+
+    if (rawRes.ok) {
+      const bytes = new Uint8Array(await rawRes.arrayBuffer());
+      const pbNode = decodeDagPb(bytes);
+
+      if (!pbNode.Links || pbNode.Links.length === 0) {
+        throw new Error(`Invalid IPFS directory CID ${cidStr}`);
+      }
+
+      return pbNode.Links.map((link) => ({
+        type: "file" as const,
+        cid: link.Hash,
+        name: link.Name ?? "",
+        path: `${link.Hash.toString()}/${link.Name ?? ""}`,
+        size: link.Tsize ?? 0
+      }));
     }
 
-    const dagJson = (await res.json()) as {
+    // Fallback: dag-json for older gateways that predate IPIP-524
+    const dagJsonUrl = `${this.gatewayUrl}/ipfs/${cidStr}?format=dag-json`;
+    const dagJsonRes = await fetch(dagJsonUrl, {
+      headers: { Accept: "application/vnd.ipld.dag-json" }
+    });
+    if (!dagJsonRes.ok) {
+      throw new Error(`Failed to list directory ${cidStr}: ${dagJsonRes.status} ${dagJsonRes.statusText}`);
+    }
+
+    const dagJson = (await dagJsonRes.json()) as {
       Links?: Array<{
         Name: string;
         Hash: { "/": string };
