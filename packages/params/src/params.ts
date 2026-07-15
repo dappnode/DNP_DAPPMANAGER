@@ -127,10 +127,8 @@ export const params = {
   DOCKER_EXTERNAL_NETWORK_NAME: "dnpublic_network",
   DOCKER_STAKER_NETWORKS: {
     [Network.Mainnet]: "mainnet_network",
-    [Network.Holesky]: "holesky_network",
     [Network.Hoodi]: "hoodi_network",
     [Network.Sepolia]: "sepolia_network",
-    [Network.Prater]: "prater_network",
     [Network.Gnosis]: "gnosis_network",
     [Network.Lukso]: "lukso_network",
     [Network.StarknetMainnet]: "starknet_network",
@@ -180,20 +178,8 @@ export const params = {
   ETH_MAINNET_RPC_URL_REMOTE: process.env.ETH_MAINNET_RPC_URL_REMOTE || "https://web3.dappnode.net",
   ETH_MAINNET_CHECKPOINTSYNC_URL_REMOTE: "https://checkpoint-sync.dappnode.net",
 
-  // Prysm legacy specs for: prater, gnosis and mainnet
+  // Prysm legacy specs for: gnosis and mainnet
   prysmLegacySpecs: [
-    //  v0.2.46
-    {
-      prysmDnpName: "prysm-prater.dnp.dappnode.eth",
-      prysmVersion: "0.1.7",
-      web3signerDnpName: "web3signer-prater.dnp.dappnode.eth",
-      incompatibleClientsDnpNames: [
-        "teku-prater.dnp.dappnode.eth",
-        "lighthouse-prater.dnp.dappnode.eth",
-        "nimbus-prater.dnp.dappnode.eth",
-        "lodestar-prater.dnp.dappnode.eth"
-      ]
-    },
     // v0.2.51
     {
       prysmDnpName: "gnosis-beacon-chain-prysm.dnp.dappnode.eth",

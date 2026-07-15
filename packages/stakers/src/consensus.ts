@@ -1,11 +1,9 @@
 import {
   ConsensusClientGnosis,
-  ConsensusClientHolesky,
   ConsensusClientHoodi,
   ConsensusClientSepolia,
   ConsensusClientLukso,
   ConsensusClientMainnet,
-  ConsensusClientPrater,
   StarknetConsensusMainnet,
   StarknetConsensusSepolia,
   Network,
@@ -34,8 +32,6 @@ export class Consensus extends StakerComponent {
   > = {
     [Network.Mainnet]: db.consensusClientMainnet,
     [Network.Gnosis]: db.consensusClientGnosis,
-    [Network.Prater]: db.consensusClientPrater,
-    [Network.Holesky]: db.consensusClientHolesky,
     [Network.Sepolia]: db.consensusClientSepolia,
     [Network.Hoodi]: db.consensusClientHoodi,
     [Network.Lukso]: db.consensusClientLukso,
@@ -55,20 +51,6 @@ export class Consensus extends StakerComponent {
       { dnpName: ConsensusClientGnosis.Teku, minVersion: "0.1.5" },
       { dnpName: ConsensusClientGnosis.Lodestar, minVersion: "0.1.0" },
       { dnpName: ConsensusClientGnosis.Nimbus, minVersion: "0.1.4" }
-    ],
-    [Network.Prater]: [
-      { dnpName: ConsensusClientPrater.Prysm, minVersion: "1.0.15" },
-      { dnpName: ConsensusClientPrater.Lighthouse, minVersion: "0.1.9" },
-      { dnpName: ConsensusClientPrater.Teku, minVersion: "0.1.10" },
-      { dnpName: ConsensusClientPrater.Nimbus, minVersion: "0.1.7" },
-      { dnpName: ConsensusClientPrater.Lodestar, minVersion: "0.1.0" }
-    ],
-    [Network.Holesky]: [
-      { dnpName: ConsensusClientHolesky.Lighthouse, minVersion: "0.1.2" },
-      { dnpName: ConsensusClientHolesky.Prysm, minVersion: "0.1.3" },
-      { dnpName: ConsensusClientHolesky.Teku, minVersion: "0.1.2" },
-      { dnpName: ConsensusClientHolesky.Nimbus, minVersion: "0.1.2" },
-      { dnpName: ConsensusClientHolesky.Lodestar, minVersion: "0.1.3" }
     ],
     [Network.Hoodi]: [
       { dnpName: ConsensusClientHoodi.Lighthouse, minVersion: "0.1.0" },

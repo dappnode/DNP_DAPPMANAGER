@@ -4,12 +4,12 @@ import { Manifest, Compose } from "@dappnode/types";
 
 describe("files / compose / validateDappnodeCompose", () => {
   const manifest: Manifest = {
-    name: "prysm-prater.dnp.dappnode.eth",
+    name: "prysm.dnp.dappnode.eth",
     version: "1.0.0",
     upstreamVersion: "v2.1.2",
     upstreamRepo: "prysmaticlabs/prysm",
     upstreamArg: "UPSTREAM_VERSION",
-    shortDescription: "Prysm prater ETH2.0 Beacon chain + validator",
+    shortDescription: "Prysm ETH2.0 Beacon chain + validator",
     description:
       "Validate with prysm: a Go implementation of the Ethereum 2.0 Serenity protocol and open source project created by Prysmatic Labs. Beacon node which powers the beacon chain at the core of Ethereum 2.0\n\nIt includes a Grafana dashboard for the [DMS](http://my.dappnode/#/installer/dms.dnp.dappnode.eth) thanks to the amazing work of [metanull-operator](https://github.com/metanull-operator/eth2-grafana)",
     type: "service",
@@ -29,10 +29,10 @@ describe("files / compose / validateDappnodeCompose", () => {
     license: "GPL-3.0",
     repository: {
       type: "git",
-      url: "git+https://github.com/dappnode/DAppNodePackage-prysm-prater.git"
+      url: "git+https://github.com/dappnode/DAppNodePackage-prysm.git"
     },
     bugs: {
-      url: "https://github.com/dappnode/DAppNodePackage-prysm-prater/issues"
+      url: "https://github.com/dappnode/DAppNodePackage-prysm/issues"
     },
     requirements: {
       minimumDappnodeVersion: "0.2.51"
@@ -40,17 +40,17 @@ describe("files / compose / validateDappnodeCompose", () => {
     categories: ["Blockchain", "ETH2.0"],
     warnings: {
       onMajorUpdate:
-        "This is a major update of Prysm Prater, it will start validating with the web3signer. There will be a migration where your keystores will be replaced to another location, pay attention to the update"
+        "This is a major update of Prysm, it will start validating with the web3signer. There will be a migration where your keystores will be replaced to another location, pay attention to the update"
     },
     links: {
-      ui: "http://ui.web3signer-prater.dappnode?signer_url=http://web3signer.web3signer-prater.dappnode:9000",
+      ui: "http://ui.web3signer.dappnode?signer_url=http://web3signer.web3signer.dappnode:9000",
       homepage: "https://prysmaticlabs.com/",
-      readme: "https://github.com/dappnode/DAppNodePackage-prysm-prater",
+      readme: "https://github.com/dappnode/DAppNodePackage-prysm",
       docs: "https://docs.prylabs.network/docs/getting-started"
     },
     dependencies: {
-      "goerli-geth.dnp.dappnode.eth": "latest",
-      "web3signer-prater.dnp.dappnode.eth": "latest"
+      "geth.dnp.dappnode.eth": "latest",
+      "web3signer.dnp.dappnode.eth": "latest"
     }
   };
 
@@ -58,7 +58,7 @@ describe("files / compose / validateDappnodeCompose", () => {
     version: "3.5",
     services: {
       "beacon-chain": {
-        image: "beacon-chain.prysm-prater.dnp.dappnode.eth:1.0.0",
+        image: "beacon-chain.prysm.dnp.dappnode.eth:1.0.0",
         build: {
           context: "beacon-chain",
           args: {
@@ -69,15 +69,15 @@ describe("files / compose / validateDappnodeCompose", () => {
         ports: ["13000", "12000/udp"],
         restart: "unless-stopped",
         environment: {
-          HTTP_WEB3PROVIDER: "http://goerli-geth.dappnode:8545",
+          HTTP_WEB3PROVIDER: "http://geth.dappnode:8545",
           CHECKPOINT_SYNC_URL: "",
-          CORSDOMAIN: "http://prysm-prater.dappnode",
+          CORSDOMAIN: "http://prysm.dappnode",
           WEB3_BACKUP: "",
           EXTRA_OPTS: ""
         }
       },
       validator: {
-        image: "validator.prysm-prater.dnp.dappnode.eth:1.0.0",
+        image: "validator.prysm.dnp.dappnode.eth:1.0.0",
         build: {
           context: "validator",
           dockerfile: "Dockerfile",
@@ -90,8 +90,8 @@ describe("files / compose / validateDappnodeCompose", () => {
         restart: "unless-stopped",
         environment: {
           LOG_TYPE: "INFO",
-          BEACON_RPC_PROVIDER: "beacon-chain.prysm-prater.dappnode:4000",
-          BEACON_RPC_GATEWAY_PROVIDER: "beacon-chain.prysm-prater.dappnode:3500",
+          BEACON_RPC_PROVIDER: "beacon-chain.prysm.dappnode:4000",
+          BEACON_RPC_GATEWAY_PROVIDER: "beacon-chain.prysm.dappnode:3500",
           GRAFFITI: "validating_from_DAppNode",
           EXTRA_OPTS: ""
         }

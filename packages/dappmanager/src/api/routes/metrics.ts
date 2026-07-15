@@ -12,7 +12,7 @@ import { mevBoost, execution, consensus } from "../../index.js";
  * Collect the metrics:
  *   - IPFS node local or remote
  *   - Ethereum node local or remote
- *   - Which clients running on Ethereum, Gnosis, Lukso, Prater, Holesky
+ *   - Which clients running on Ethereum, Gnosis, Lukso
  *   - Which is the favourite connectivity method: Wifi, VPN, Wireguard, local
  *   - Auto-updates enabled
  *   - Fallback enabled
@@ -70,7 +70,7 @@ register.registerMetric(
         return 0;
       }
 
-      for (const network of ["mainnet", "prater", "gnosis", "lukso", "holesky", "hoodi", "sepolia"] as Network[]) {
+      for (const network of ["mainnet", "gnosis", "lukso", "hoodi", "sepolia"] as Network[]) {
         const isMevBoostSelected = mevBoost.DbHandlers[network].get();
         const executionClient = execution.DbHandlers[network].get();
         const consensusClient = consensus.DbHandlers[network].get();

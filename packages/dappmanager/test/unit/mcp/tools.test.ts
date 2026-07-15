@@ -60,7 +60,7 @@ describe("mcp / tools", () => {
   });
 
   it("rejects unsupported dashboard networks before execution", async () => {
-    const result = await dispatchTool("dappnode_get_node_status", { networks: ["holesky"] });
+    const result = await dispatchTool("dappnode_get_node_status", { networks: ["foo" as never] });
 
     expect(result.ok).to.equal(false);
     expect(result.error).to.include("Invalid enum value");

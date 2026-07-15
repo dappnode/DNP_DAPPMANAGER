@@ -636,7 +636,7 @@ const getStakerConfigTool: DappnodeTool = {
     network: z
       .nativeEnum(Network)
       .describe(
-        "Staker network: 'mainnet', 'gnosis', 'lukso', 'hoodi', 'holesky', 'sepolia', 'prater', 'starknet', 'starknet-sepolia'."
+        "Staker network: 'mainnet', 'gnosis', 'lukso', 'hoodi', 'sepolia', 'starknet', 'starknet-sepolia'."
       )
   },
   async execute({ network }: { network: Network }) {
