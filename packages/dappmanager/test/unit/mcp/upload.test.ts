@@ -1,6 +1,7 @@
 import fs from "fs";
 import crypto from "crypto";
 import { expect } from "chai";
+import sinon from "sinon";
 import * as db from "@dappnode/db";
 import {
   abortMcpDevImageUpload,
@@ -8,7 +9,13 @@ import {
   beginMcpDevImageUpload,
   finishMcpDevImageUpload
 } from "../../../src/mcp/upload.js";
-import { tempTransferDir } from "../../../src/uploads/tempTransfer.js";
+import {
+  MCP_UPLOAD_IDLE_TTL_MS,
+  MCP_UPLOAD_MAX_FILE_SIZE_BYTES,
+  TEMP_TRANSFER_TTL_MS,
+  tempTransferDir,
+  uploadResourceGuard
+} from "../../../src/uploads/tempTransfer.js";
 
 describe("mcp / dev image upload", () => {
   beforeEach(() => {
@@ -46,6 +53,7 @@ describe("mcp / dev image upload", () => {
     const finished = await finishMcpDevImageUpload(upload.uploadId);
     expect(finished.imageFileId).to.equal(upload.uploadId);
     expect(finished.sha256).to.equal(sha256);
+    expect(finished.expiresInMs).to.equal(TEMP_TRANSFER_TTL_MS);
 
     const filePath = db.fileTransferPath.get(finished.imageFileId);
     expect(filePath).to.be.a("string");
@@ -105,5 +113,55 @@ describe("mcp / dev image upload", () => {
     } catch (err) {
       expect((err as Error).message).to.include("No active MCP upload");
     }
+  });
+
+  it("rejects files above the MCP-specific 5 GiB limit", async () => {
+    try {
+      await beginMcpDevImageUpload({ sizeBytes: MCP_UPLOAD_MAX_FILE_SIZE_BYTES + 1 });
+      throw new Error("expected file size rejection");
+    } catch (err) {
+      expect((err as Error).message).to.include(`between 1 and ${MCP_UPLOAD_MAX_FILE_SIZE_BYTES}`);
+    }
+  });
+
+  it("refreshes the MCP idle expiry after each accepted chunk", async () => {
+    const clock = sinon.useFakeTimers();
+    try {
+      const payload = Buffer.from("test");
+      const upload = await beginMcpDevImageUpload({ sizeBytes: payload.length });
+      const initialExpiry = upload.expiresAt;
+
+      clock.tick(MCP_UPLOAD_IDLE_TTL_MS - 1_000);
+      const appended = await appendMcpDevImageUploadChunk({
+        uploadId: upload.uploadId,
+        offset: 0,
+        chunkBase64: payload.toString("base64")
+      });
+
+      expect(appended.expiresAt).to.equal(Date.now() + MCP_UPLOAD_IDLE_TTL_MS);
+      expect(appended.expiresAt).to.be.greaterThan(initialExpiry);
+
+      clock.tick(MCP_UPLOAD_IDLE_TTL_MS - 1_000);
+      await finishMcpDevImageUpload(upload.uploadId);
+    } finally {
+      clock.restore();
+    }
+  });
+
+  it("shares the concurrent upload guard with other upload paths", async () => {
+    const first = await beginMcpDevImageUpload({ sizeBytes: 1 });
+    const second = await beginMcpDevImageUpload({ sizeBytes: 1 });
+
+    try {
+      await beginMcpDevImageUpload({ sizeBytes: 1 });
+      throw new Error("expected concurrency rejection");
+    } catch (err) {
+      expect((err as Error).message).to.include("Too many active uploads");
+    } finally {
+      await abortMcpDevImageUpload(first.uploadId);
+      await abortMcpDevImageUpload(second.uploadId);
+    }
+
+    expect(uploadResourceGuard.getActiveCount()).to.equal(0);
   });
 });

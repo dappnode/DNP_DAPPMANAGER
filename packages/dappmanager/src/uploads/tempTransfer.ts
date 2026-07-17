@@ -4,10 +4,26 @@ import crypto from "crypto";
 import { params } from "@dappnode/params";
 import * as db from "@dappnode/db";
 import { logs } from "@dappnode/logger";
+import { UploadResourceGuard } from "./uploadResourceGuard.js";
 
 export const tempTransferDir = params.TEMP_TRANSFER_DIR;
-export const UPLOAD_TTL_MS = 15 * 60 * 1000;
-export const MAX_UPLOAD_FILE_SIZE_BYTES = 500 * 1024 * 1024;
+export const TEMP_TRANSFER_TTL_MS = 30 * 60 * 1000;
+export const MCP_UPLOAD_IDLE_TTL_MS = 30 * 60 * 1000;
+
+export const HTTP_UPLOAD_MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024 * 1024;
+export const MCP_UPLOAD_MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024 * 1024;
+export const HTTP_UPLOAD_MAX_REQUEST_OVERHEAD_BYTES = 1024 * 1024;
+
+export const MAX_CONCURRENT_UPLOADS = 2;
+export const MAX_RESERVED_UPLOAD_BYTES = 10 * 1024 * 1024 * 1024;
+export const MIN_FREE_UPLOAD_DISK_BYTES = 1024 * 1024 * 1024;
+
+export const uploadResourceGuard = new UploadResourceGuard({
+  directory: tempTransferDir,
+  maxConcurrentUploads: MAX_CONCURRENT_UPLOADS,
+  maxReservedBytes: MAX_RESERVED_UPLOAD_BYTES,
+  minFreeBytes: MIN_FREE_UPLOAD_DISK_BYTES
+});
 
 export function createFileTransferId(): string {
   return crypto.randomBytes(32).toString("hex");
@@ -38,6 +54,6 @@ export function scheduleFileCleanup(fileId: string, filePath: string): void {
         logs.error(`Error deleting uploaded file ${filePath}: ${errFs.message}`);
       }
     });
-  }, UPLOAD_TTL_MS);
+  }, TEMP_TRANSFER_TTL_MS);
   timer.unref?.();
 }

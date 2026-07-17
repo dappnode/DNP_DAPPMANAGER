@@ -31,7 +31,15 @@ import { packageSetEnvironment } from "../calls/packageSetEnvironment.js";
 import { packageSetPortMappings } from "../calls/packageSetPortMappings.js";
 import { portsApiStatusGet, portsUpnpStatusGet } from "../calls/portsStatusGet.js";
 import { portsToOpenGet } from "../calls/portsToOpenGet.js";
-import { MAX_UPLOAD_FILE_SIZE_BYTES, UPLOAD_TTL_MS } from "../uploads/tempTransfer.js";
+import {
+  HTTP_UPLOAD_MAX_FILE_SIZE_BYTES,
+  MAX_CONCURRENT_UPLOADS,
+  MAX_RESERVED_UPLOAD_BYTES,
+  MCP_UPLOAD_IDLE_TTL_MS,
+  MCP_UPLOAD_MAX_FILE_SIZE_BYTES,
+  MIN_FREE_UPLOAD_DISK_BYTES,
+  TEMP_TRANSFER_TTL_MS
+} from "../uploads/tempTransfer.js";
 import { statsCpuGet } from "../calls/statsCpuGet.js";
 import { statsMemoryGet } from "../calls/statsMemoryGet.js";
 import { statsDiskGet } from "../calls/statsDiskGet.js";
@@ -855,10 +863,12 @@ const getDevUploadInfoTool: DappnodeTool = {
           "dappnode_finish_dev_image_upload",
           "dappnode_abort_dev_image_upload"
         ],
-        maxFileSizeBytes: MAX_UPLOAD_FILE_SIZE_BYTES,
+        maxFileSizeBytes: MCP_UPLOAD_MAX_FILE_SIZE_BYTES,
         maxChunkBytes: MCP_UPLOAD_CHUNK_BYTES,
         maxChunkBase64Chars: MCP_UPLOAD_CHUNK_BASE64_CHARS,
-        ttlMs: UPLOAD_TTL_MS,
+        idleTtlMs: MCP_UPLOAD_IDLE_TTL_MS,
+        ttlRefreshesAfterEachChunk: true,
+        completedFileTtlMs: TEMP_TRANSFER_TTL_MS,
         finishResponse: "JSON object with imageFileId, sizeBytes, sha256, and expiresInMs",
         note: "Use this path when the MCP client can call POST /mcp but cannot make a separate authenticated multipart request to /upload. Chunks must be standard padded base64 and appended in order using the returned uploadId and byte offset. Finish returns imageFileId."
       },
@@ -866,12 +876,19 @@ const getDevUploadInfoTool: DappnodeTool = {
         uploadPath: "/upload",
         formFieldName: "file",
         method: "POST",
-        maxFileSizeBytes: MAX_UPLOAD_FILE_SIZE_BYTES,
-        maxFiles: 10,
+        maxFileSizeBytes: HTTP_UPLOAD_MAX_FILE_SIZE_BYTES,
+        maxFiles: 1,
+        requiresContentLength: true,
         auth: "Admin browser session cookie only. The generated MCP API key is scoped to POST /mcp and is not accepted by /upload.",
         responseType: "plain text fileId"
       },
-      note: "After staging the image by either method, pass the returned fileId/imageFileId to dappnode_install_dev_package. Uploaded files expire after 15 minutes. External MCP exposes mutating tools such as uploads and dappnode_install_dev_package only when the admin enables mutating MCP tools in System > Advanced; embedded Nexus chat uses its own confirmation flow."
+      resourceLimits: {
+        maxConcurrentUploads: MAX_CONCURRENT_UPLOADS,
+        maxReservedUploadBytes: MAX_RESERVED_UPLOAD_BYTES,
+        minFreeDiskBytes: MIN_FREE_UPLOAD_DISK_BYTES,
+        scope: "Shared by HTTP and MCP uploads"
+      },
+      note: "After staging the image by either method, pass the returned fileId/imageFileId to dappnode_install_dev_package. External MCP exposes mutating tools such as uploads and dappnode_install_dev_package only when the admin enables mutating MCP tools in System > Advanced; embedded Nexus chat uses its own confirmation flow."
     };
   }
 };
@@ -887,7 +904,7 @@ const beginDevImageUploadTool: DappnodeTool = {
       .number()
       .int()
       .min(1)
-      .max(MAX_UPLOAD_FILE_SIZE_BYTES)
+      .max(MCP_UPLOAD_MAX_FILE_SIZE_BYTES)
       .describe("Total byte size of the docker save tarball."),
     sha256: z.string().length(64).optional().describe("Optional expected SHA-256 hex digest of the complete tarball."),
     fileName: z.string().max(255).optional().describe("Optional local filename for operator-facing context.")
