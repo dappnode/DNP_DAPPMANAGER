@@ -3,7 +3,7 @@ import { runAtMostEvery } from "@dappnode/utils";
 import { notifications } from "@dappnode/notifications";
 import { Category, Priority, Status } from "@dappnode/types";
 import * as db from "@dappnode/db";
-import { getIpfsUrl } from "@dappnode/installer";
+import { getIpfsUrls } from "@dappnode/installer";
 import { params } from "@dappnode/params";
 import { eventBus } from "@dappnode/eventbus";
 
@@ -16,27 +16,36 @@ let ethNotificationSent = false;
 
 async function checkIpfsHealth(): Promise<void> {
   const ipfsClientTarget = db.ipfsClientTarget.get();
-  const ipfsUrl = getIpfsUrl();
-
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 10_000);
+  const ipfsUrls = getIpfsUrls();
 
   const correlationId = "core-ipfs-check";
 
   try {
     // check health by fetching CID of empty directory QmUNLLsPACCz1vLxQVkXqqLX5R1X345qqfHbsf67hvA3Nn. Most of ipfs nodes should have it.
     // checked against: https://ipfs.io https://gateway-dev.ipfs.dappnode.io https://ipfs-gateway.dappnode.net
-    const res = await fetch(`${ipfsUrl}/ipfs/QmUNLLsPACCz1vLxQVkXqqLX5R1X345qqfHbsf67hvA3Nn`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-      signal: controller.signal
-    });
+    let healthyUrl: string | undefined;
+    const errors: string[] = [];
+    for (const ipfsUrl of ipfsUrls) {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10_000);
+      try {
+        const res = await fetch(`${ipfsUrl}/ipfs/QmUNLLsPACCz1vLxQVkXqqLX5R1X345qqfHbsf67hvA3Nn`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          signal: controller.signal
+        });
+        if (!res.ok) throw new Error(`Status ${res.status}`);
+        healthyUrl = ipfsUrl;
+        break;
+      } catch (error) {
+        errors.push(`${ipfsUrl}: ${error}`);
+      } finally {
+        clearTimeout(timeout);
+      }
+    }
+    if (!healthyUrl) throw new Error(errors.join("; "));
 
-    clearTimeout(timeout);
-
-    if (!res.ok) throw new Error(`Status ${res.status}`);
-
-    logs.info(`IPFS endpoint (${ipfsClientTarget}) at ${ipfsUrl} is healthy`);
+    logs.info(`IPFS endpoint (${ipfsClientTarget}) at ${healthyUrl} is healthy`);
 
     // reset failure count on success
     ipfsFailureCount = 0;
@@ -55,8 +64,7 @@ async function checkIpfsHealth(): Promise<void> {
       ipfsNotificationSent = false;
     }
   } catch (error) {
-    clearTimeout(timeout);
-    logs.error(`IPFS endpoint (${ipfsClientTarget}) at ${ipfsUrl} is unhealthy: ${error}`);
+    logs.error(`IPFS endpoints (${ipfsClientTarget}) at ${ipfsUrls.join(", ")} are unhealthy: ${error}`);
 
     // increment failure count and send notification after threshold
     ipfsFailureCount += 1;
@@ -64,7 +72,7 @@ async function checkIpfsHealth(): Promise<void> {
       await notifications.sendNotification({
         title: "Your Dappnode IPFS endpoint is not resolving content correctly.",
         dnpName: params.dappmanagerDnpName,
-        body: `Dappnode IPFS endpoint (${ipfsClientTarget}) at ${ipfsUrl} is currently unreachable or not resolving content correctly. This may affect access to decentralized content or applications relying on IPFS.`,
+        body: `Dappnode IPFS endpoints (${ipfsClientTarget}) at ${ipfsUrls.join(", ")} are currently unreachable or not resolving content correctly. This may affect access to decentralized content or applications relying on IPFS.`,
         category: Category.system,
         priority: Priority.high,
         status: Status.triggered,

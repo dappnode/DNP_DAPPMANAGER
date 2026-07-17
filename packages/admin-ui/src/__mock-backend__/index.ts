@@ -262,7 +262,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   ipfsClientTargetSet: async () => {},
   ipfsClientTargetGet: async () => ({
     ipfsClientTarget: IpfsClientTarget.remote,
-    ipfsGateway: "https://ipfs-gateway.dappnode.net"
+    ipfsGateway: ["https://ipfs-gateway.dappnode.net"]
   }),
   mirrorProviderGet: async () => ({ enabled: false }),
   mirrorProviderSet: async () => {},

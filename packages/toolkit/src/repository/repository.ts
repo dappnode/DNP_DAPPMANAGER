@@ -30,6 +30,7 @@ import { isEnsDomain } from "../isEnsDomain.js";
 import { dappnodeRegistry } from "./params.js";
 import { JsonRpcApiProvider } from "ethers";
 import { MirrorOptions, MirrorFileEntry, HttpMirrorProvider } from "./contentProvider/index.js";
+import { IpfsGatewayClient } from "./ipfsGatewayClient.js";
 
 const source = "ipfs" as const;
 
@@ -55,7 +56,7 @@ type ListResult =
  * @extends ApmRepository
  */
 export class DappnodeRepository extends ApmRepository {
-  protected gatewayUrl: string;
+  private readonly ipfsGatewayClient: IpfsGatewayClient;
   protected localIpfsUrl = "http://ipfs.dappnode:5001";
   private readonly mirrorProvider: HttpMirrorProvider;
   private readonly isMirrorEnabled: () => boolean;
@@ -67,9 +68,14 @@ export class DappnodeRepository extends ApmRepository {
    * @param mirrorOptions - Mirror HTTP provider configuration (baseUrl, timeouts, size limits).
    * @param isMirrorEnabled - Called before each operation to decide whether to use the mirror.
    */
-  constructor(ipfsUrl: string, provider: JsonRpcApiProvider, mirrorOptions: MirrorOptions, isMirrorEnabled: () => boolean) {
+  constructor(
+    ipfsUrl: string | string[],
+    provider: JsonRpcApiProvider,
+    mirrorOptions: MirrorOptions,
+    isMirrorEnabled: () => boolean
+  ) {
     super(provider);
-    this.gatewayUrl = ipfsUrl.replace(/\/?$/, "");
+    this.ipfsGatewayClient = new IpfsGatewayClient(ipfsUrl);
     this.mirrorProvider = new HttpMirrorProvider(mirrorOptions);
     this.isMirrorEnabled = isMirrorEnabled;
   }
@@ -78,8 +84,8 @@ export class DappnodeRepository extends ApmRepository {
    * Changes the IPFS provider and target.
    * @param ipfsUrl - The new URL of the IPFS network node.
    */
-  public changeIpfsGatewayUrl(ipfsUrl: string): void {
-    this.gatewayUrl = ipfsUrl.replace(/\/?$/, "");
+  public changeIpfsGatewayUrl(ipfsUrl: string | string[]): void {
+    this.ipfsGatewayClient.setGatewayUrls(ipfsUrl);
   }
 
   /**
@@ -201,16 +207,20 @@ export class DappnodeRepository extends ApmRepository {
         : { status: ReleaseSignatureStatusCode.notSigned };
 
     const signedSafe =
-      listResult.source === "mirror"
-        ? true
-        : signatureStatus.status === ReleaseSignatureStatusCode.signedByKnownKey;
+      listResult.source === "mirror" ? true : signatureStatus.status === ReleaseSignatureStatusCode.signedByKnownKey;
 
     // Avatar: look up by filename regex; source drives which DistributedFile shape to use
     let avatarFile: DistributedFile | undefined;
     if (listResult.source === "mirror") {
       const entry = listResult.files.find((f) => releaseFiles.avatar.regex.test(f.name));
       if (entry)
-        avatarFile = { hash: listResult.packageCidStr, size: entry.size, source: "mirror", filename: entry.name, packageHash: listResult.packageCidStr };
+        avatarFile = {
+          hash: listResult.packageCidStr,
+          size: entry.size,
+          source: "mirror",
+          filename: entry.name,
+          packageHash: listResult.packageCidStr
+        };
     } else {
       const entry = listResult.entries.find((e) => releaseFiles.avatar.regex.test(e.name));
       if (entry) avatarFile = { hash: entry.cid.toString(), size: entry.size, source };
@@ -307,7 +317,12 @@ export class DappnodeRepository extends ApmRepository {
    * @param fileCid - Individual file CID. Available for IPFS-listed packages only; absent for mirror-listed packages.
    * @param maxLength - Maximum file size in bytes.
    */
-  private async downloadReleaseAsset(filename: string, packageCidStr: string, fileCid?: string, maxLength?: number): Promise<string> {
+  private async downloadReleaseAsset(
+    filename: string,
+    packageCidStr: string,
+    fileCid?: string,
+    maxLength?: number
+  ): Promise<string> {
     // Provider 1: Mirror — try first if configured
     if (this.isMirrorEnabled()) {
       const mirrorCid = this.sanitizeIpfsPath(packageCidStr);
@@ -464,25 +479,21 @@ export class DappnodeRepository extends ApmRepository {
    */
   public async list(hash: string): Promise<IPFSEntry[]> {
     const cidStr = this.sanitizeIpfsPath(hash.toString());
-    const url = `${this.gatewayUrl}/ipfs/${cidStr}?format=dag-json`;
-    const res = await fetch(url, {
-      headers: { Accept: "application/vnd.ipld.dag-json" }
-    });
-    if (!res.ok) {
-      throw new Error(`Failed to list directory ${cidStr}: ${res.status} ${res.statusText}`);
-    }
-
-    const dagJson = (await res.json()) as {
-      Links?: Array<{
-        Name: string;
-        Hash: { "/": string };
-        Tsize: number;
-      }>;
-    };
-
-    if (!dagJson.Links) {
-      throw new Error(`Invalid IPFS directory CID ${cidStr}`);
-    }
+    const dagJson = await this.ipfsGatewayClient.fetch(
+      `/ipfs/${cidStr}?format=dag-json`,
+      { headers: { Accept: "application/vnd.ipld.dag-json" } },
+      async (res) => {
+        const result = (await res.json()) as {
+          Links?: Array<{
+            Name: string;
+            Hash: { "/": string };
+            Tsize: number;
+          }>;
+        };
+        if (!result.Links) throw new Error(`Invalid IPFS directory CID ${cidStr}`);
+        return { Links: result.Links };
+      }
+    );
 
     return dagJson.Links.map((link) => ({
       type: "file",
@@ -531,24 +542,22 @@ export class DappnodeRepository extends ApmRepository {
     root: CID;
   }> {
     // 1. Download the CAR
-    const url = `${this.gatewayUrl}/ipfs/${hash}?format=car`;
-    const res = await fetch(url, {
-      headers: { Accept: "application/vnd.ipld.car" }
-    });
-    if (!res.ok) throw new Error(`Gateway error: ${res.status} ${res.statusText}`);
-
-    // 2. Parse into a CarReader
-    const bytes = new Uint8Array(await res.arrayBuffer());
-    const carReader = await CarReader.fromBytes(bytes);
-
-    // 3. Verify the root CID
-    const roots = await carReader.getRoots();
-    const root = roots[0];
-    if (roots.length !== 1 || root.toString() !== CID.parse(hash).toString()) {
-      throw new Error(`UNTRUSTED CONTENT: expected root ${hash}, got ${roots}`);
-    }
-
-    return { carReader, root };
+    return this.ipfsGatewayClient.fetch(
+      `/ipfs/${hash}?format=car`,
+      { headers: { Accept: "application/vnd.ipld.car" } },
+      async (res) => {
+        // Parse and verify inside the retry boundary. Truncated or untrusted
+        // responses are discarded before trying the next gateway.
+        const bytes = new Uint8Array(await res.arrayBuffer());
+        const carReader = await CarReader.fromBytes(bytes);
+        const roots = await carReader.getRoots();
+        const root = roots[0];
+        if (roots.length !== 1 || root.toString() !== CID.parse(hash).toString()) {
+          throw new Error(`UNTRUSTED CONTENT: expected root ${hash}, got ${roots}`);
+        }
+        return { carReader, root };
+      }
+    );
   }
 
   /**
@@ -610,7 +619,9 @@ export class DappnodeRepository extends ApmRepository {
     const missingImageError = (): Error =>
       Error(
         `No image for architecture '${nodeArch}'. ${
-          manifest.architectures && manifest.architectures.includes(arch) ? `image for ${arch} is missing in release` : undefined
+          manifest.architectures && manifest.architectures.includes(arch)
+            ? `image for ${arch} is missing in release`
+            : undefined
         }`
       );
 

@@ -55,7 +55,10 @@
       color: var(--dappnode-color);
     }
   }
-  transition: color 0.15s, background-color 0.15s, border-color 0.15s,
+  transition:
+    color 0.15s,
+    background-color 0.15s,
+    border-color 0.15s,
     box-shadow 0.15s;
 }
 
@@ -91,6 +94,11 @@
     font-size: var(--eth-multi-client-description-font-size);
     color: var(--eth-multi-client-description-color);
   }
+}
+
+.ipfs-gateway-list {
+  display: grid;
+  gap: 0.5rem;
 }
 
 .eth-multi-clients-and-fallback {

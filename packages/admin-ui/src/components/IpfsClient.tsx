@@ -40,9 +40,9 @@ export function IpfsClient({
   localRequiresInstall = false
 }: {
   clientTarget: IpfsClientTarget | null;
-  gatewayTarget: string | null;
+  gatewayTarget: string[] | null;
   onClientTargetChange: (newTarget: IpfsClientTarget) => void;
-  onGatewayTargetChange: (newTarget: string) => void;
+  onGatewayTargetChange: (newTarget: string[]) => void;
   localRequiresInstall?: boolean;
 }) {
   return (
@@ -75,12 +75,43 @@ export function IpfsClient({
                 </div>
               ) : null}
 
-              {option === "remote" && (
-                <Input
-                  placeholder="https://ipfs-gateway.dappnode.net"
-                  value={gatewayTarget || ""}
-                  onValueChange={onGatewayTargetChange}
-                />
+              {option === "remote" && gatewayTarget && (
+                <div className="ipfs-gateway-list">
+                  {gatewayTarget.map((gateway, index) => (
+                    <Input
+                      key={index}
+                      placeholder="https://ipfs-gateway.dappnode.net"
+                      value={gateway}
+                      onValueChange={(value) =>
+                        onGatewayTargetChange(
+                          gatewayTarget.map((currentGateway, currentIndex) =>
+                            currentIndex === index ? value : currentGateway
+                          )
+                        )
+                      }
+                      append={
+                        gatewayTarget.length > 1 ? (
+                          <button
+                            type="button"
+                            className="btn btn-outline-secondary"
+                            aria-label={`Remove gateway ${index + 1}`}
+                            onClick={() => onGatewayTargetChange(gatewayTarget.filter((_, i) => i !== index))}
+                          >
+                            Remove
+                          </button>
+                        ) : undefined
+                      }
+                    />
+                  ))}
+                  <button
+                    type="button"
+                    className="btn btn-outline-secondary"
+                    onClick={() => onGatewayTargetChange([...gatewayTarget, ""])}
+                  >
+                    Add gateway
+                  </button>
+                  <div className="description">Gateways are tried from top to bottom.</div>
+                </div>
               )}
             </Card>
           );

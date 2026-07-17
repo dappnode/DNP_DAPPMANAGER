@@ -23,23 +23,31 @@ export async function ipfsClientTargetSet({ ipfsRepository }: { ipfsRepository: 
  * @param nextTarget "local" | "remote"
  * @param nextGateway Gateway endpoint to be used by remote node. By default dappnode gateway
  */
-async function changeIpfsClient(nextTarget: IpfsClientTarget, nextGateway?: string): Promise<void> {
+async function changeIpfsClient(nextTarget: IpfsClientTarget, nextGateway?: string[]): Promise<void> {
   try {
     // Return if targets and gateways are equal
     const currentTarget = db.ipfsClientTarget.get();
     const currentGateway = db.ipfsGateway.get();
-    if (currentTarget === nextTarget && currentGateway === nextGateway) return;
+    if (currentTarget === nextTarget && JSON.stringify(currentGateway) === JSON.stringify(nextGateway)) return;
 
     if (nextTarget === IpfsClientTarget.local) {
       db.ipfsClientTarget.set(IpfsClientTarget.local);
       dappnodeInstaller.changeIpfsGatewayUrl(params.IPFS_LOCAL);
     } else {
       // Set new values in db
-      db.ipfsGateway.set(nextGateway || params.IPFS_GATEWAY);
+      const gateways = (nextGateway || []).map((gateway) => gateway.trim()).filter(Boolean);
+      if (gateways.length === 0) throw new Error("At least one remote IPFS gateway is required");
+      for (const gateway of gateways) {
+        const protocol = new URL(gateway).protocol;
+        if (protocol !== "http:" && protocol !== "https:") {
+          throw new Error(`IPFS gateway must use HTTP or HTTPS: ${gateway}`);
+        }
+      }
+      db.ipfsGateway.set(gateways);
       db.ipfsClientTarget.set(IpfsClientTarget.remote);
 
       // Change IPFS host
-      dappnodeInstaller.changeIpfsGatewayUrl(db.ipfsGateway.get());
+      dappnodeInstaller.changeIpfsGatewayUrl(gateways);
     }
   } catch (e) {
     throw Error(`Error changing ipfs client to ${nextTarget}, ${e}`);

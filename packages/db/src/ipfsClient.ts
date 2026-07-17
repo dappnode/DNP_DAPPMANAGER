@@ -8,4 +8,6 @@ const IPFS_GATEWAY = "ipfs-gateway";
 
 export const ipfsClientTarget = dbMain.staticKey<IpfsClientTarget>(IPFS_CLIENT_TARGET, IpfsClientTarget.local);
 
-export const ipfsGateway = dbMain.staticKey<string>(IPFS_GATEWAY, params.IPFS_REMOTE);
+// The union keeps pre-migration databases readable. initializeDb migrates the
+// legacy single string to an ordered array.
+export const ipfsGateway = dbMain.staticKey<string | string[]>(IPFS_GATEWAY, [params.IPFS_REMOTE]);
