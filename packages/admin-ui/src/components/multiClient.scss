@@ -99,6 +99,10 @@
 .ipfs-gateway-list {
   display: grid;
   gap: 0.5rem;
+
+  input::placeholder {
+    opacity: 0.35;
+  }
 }
 
 .eth-multi-clients-and-fallback {
