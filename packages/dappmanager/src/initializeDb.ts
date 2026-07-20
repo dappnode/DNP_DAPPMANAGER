@@ -47,7 +47,6 @@ export async function initializeDb(): Promise<void> {
     if (!ipfsContainer) {
       logs.info("IPFS package not found, setting ipfsClientTarget to remote");
       db.ipfsClientTarget.set(IpfsClientTarget.remote);
-      db.ipfsGateway.set([params.IPFS_REMOTE]);
     } else {
       const ipfsClientTarget = db.ipfsClientTarget.get();
       if (!ipfsClientTarget) {
@@ -64,10 +63,10 @@ export async function initializeDb(): Promise<void> {
    * Migrate ipfs remote gateway endpoint from http://ipfs.dappnode.io:8081 to https://ipfs.gateway.dappnode.io
    * The endpoint http://ipfs.dappnode.io:8081 is being deprecated
    */
-  const storedIpfsGateway = db.ipfsGateway.get();
-  if (typeof storedIpfsGateway === "string") {
-    db.ipfsGateway.set([storedIpfsGateway === "http://ipfs.dappnode.io:8081" ? params.IPFS_REMOTE : storedIpfsGateway]);
-  }
+  const storedIpfsGateways = db.getIpfsGateways();
+  db.setIpfsGateways(
+    storedIpfsGateways.map((gateway) => (gateway === "http://ipfs.dappnode.io:8081" ? params.IPFS_REMOTE : gateway))
+  );
 
   /**
    * Initialize telegram notifications settings

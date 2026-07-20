@@ -41,8 +41,7 @@ export function getIpfsUrls(): string[] {
   // local
   if (ipfsClientTarget === IpfsClientTarget.local) return [params.IPFS_LOCAL];
   // remote
-  const gateways = db.ipfsGateway.get();
-  return Array.isArray(gateways) ? gateways : [gateways];
+  return db.getIpfsGateways();
 }
 
 export class DappnodeInstaller extends DappnodeRepository {

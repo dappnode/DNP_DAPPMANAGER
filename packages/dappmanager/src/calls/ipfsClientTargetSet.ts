@@ -27,7 +27,7 @@ async function changeIpfsClient(nextTarget: IpfsClientTarget, nextGateway?: stri
   try {
     // Return if targets and gateways are equal
     const currentTarget = db.ipfsClientTarget.get();
-    const currentGateway = db.ipfsGateway.get();
+    const currentGateway = db.getIpfsGateways();
     if (currentTarget === nextTarget && JSON.stringify(currentGateway) === JSON.stringify(nextGateway)) return;
 
     if (nextTarget === IpfsClientTarget.local) {
@@ -43,7 +43,7 @@ async function changeIpfsClient(nextTarget: IpfsClientTarget, nextGateway?: stri
           throw new Error(`IPFS gateway must use HTTP or HTTPS: ${gateway}`);
         }
       }
-      db.ipfsGateway.set(gateways);
+      db.setIpfsGateways(gateways);
       db.ipfsClientTarget.set(IpfsClientTarget.remote);
 
       // Change IPFS host
