@@ -16,8 +16,11 @@ export function AutoUpdateRowItem({
   displayName,
   enabled,
   feedback,
+  isMixed,
+  isCustomized,
   isInstalling,
   isSinglePackage,
+  isDefaultControl,
   // Actions
   setUpdateSettings
 }: {
@@ -26,8 +29,11 @@ export function AutoUpdateRowItem({
   enabled: boolean;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   feedback: any;
+  isMixed: boolean;
+  isCustomized: boolean;
   isInstalling: boolean;
   isSinglePackage: boolean;
+  isDefaultControl: boolean;
   setUpdateSettings: (id: string, enable: boolean) => void;
 }) {
   const [collapsed, setCollapsed] = useState(true);
@@ -68,13 +74,20 @@ export function AutoUpdateRowItem({
 
   return (
     <React.Fragment key={id}>
-      <span className={`state-badge center badge-${enabled ? "success" : "secondary"}`} style={{ opacity: 0.85 }}>
-        <span className="content">{enabled ? "on" : "off"}</span>
+      <span
+        className={`state-badge center badge-${isMixed ? "warning" : enabled ? "success" : "secondary"}`}
+        style={{ opacity: 0.85 }}
+      >
+        <span className="content">{isMixed ? "mixed" : enabled ? "on" : "off"}</span>
       </span>
 
       <span className="name">
         {isSinglePackage && <li className="bullet" />}
-        {displayName}
+        <span className="auto-update-name">
+          <span>{displayName}</span>
+          {isSinglePackage && <small>{isCustomized ? "Customized" : "Using default"}</small>}
+          {isDefaultControl && <small>Used by new and non-customized packages</small>}
+        </span>
       </span>
 
       <span className="last-update">
@@ -92,7 +105,7 @@ export function AutoUpdateRowItem({
         ) : null}
       </span>
 
-      <Switch checked={enabled ? true : false} onToggle={() => setUpdateSettings(id, !enabled)} label="" />
+      <Switch checked={enabled} onToggle={(checked) => setUpdateSettings(id, checked)} label="" />
 
       {!collapsed && <div className="extra-info">{errorMessage}</div>}
 

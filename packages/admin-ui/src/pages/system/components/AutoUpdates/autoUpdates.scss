@@ -10,6 +10,27 @@
   margin-bottom: var(--default-spacing);
 }
 
+.auto-updates-bulk-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--default-spacing);
+  margin-bottom: var(--default-spacing);
+  padding: 0.75rem;
+  border: var(--border-style);
+  border-radius: 0.25rem;
+
+  > span {
+    color: var(--light-text-color);
+  }
+
+  .buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+}
+
 .list-grid.auto-updates {
   /*
   Col 1: Shrink the text to an extend, otherwise fill all available space
@@ -30,13 +51,22 @@
   }
 
   .state-badge {
-    width: 2.5rem;
+    width: 3.5rem;
     overflow: hidden;
     overflow-wrap: normal;
   }
 
   .name {
     display: flex;
+  }
+  .auto-update-name {
+    display: flex;
+    flex-direction: column;
+
+    small {
+      color: var(--light-text-color);
+      font-size: 75%;
+    }
   }
   .bullet {
     padding-left: 15px;
@@ -75,6 +105,17 @@
 
     .extra-info {
       display: none;
+    }
+  }
+}
+
+@media screen and (max-width: 40rem) {
+  .auto-updates-bulk-actions {
+    align-items: stretch;
+    flex-direction: column;
+
+    .buttons > button {
+      flex: 1;
     }
   }
 }
