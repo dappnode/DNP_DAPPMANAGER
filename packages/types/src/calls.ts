@@ -937,7 +937,8 @@ export interface DistributedFile {
 
 export interface IpfsRepository {
   ipfsClientTarget: IpfsClientTarget;
-  ipfsGateway: string;
+  /** Remote gateways in priority order. */
+  ipfsGateway: string[];
 }
 
 export enum IpfsClientTarget {
