@@ -73,7 +73,7 @@ const autoUpdateData: AutoUpdateDataView = {
     },
     {
       id: "my-packages",
-      displayName: "Default for my packages",
+      displayName: "My packages",
       enabled: true,
       feedback: {}
     },

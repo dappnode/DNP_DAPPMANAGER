@@ -1,14 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
+import { BsChevronDown } from "react-icons/bs";
 import { api, useApi } from "api";
 // Components
 import Card from "components/Card";
 import Button from "components/Button";
+import Switch from "components/Switch";
 import { confirm } from "components/ConfirmDialog";
 import { withToast } from "components/toast/Toast";
 // Utils
 import { prettyDnpName } from "utils/format";
-import { coreDnpName, autoUpdateIds } from "params";
+import { autoUpdateIds } from "params";
 // External
 import { getProgressLogsByDnp } from "services/isInstallingLogs/selectors";
 // Styles
@@ -26,6 +28,7 @@ const getIsSinglePackage = (id: string) => id !== MY_PACKAGES && id !== SYSTEM_P
 export default function AutoUpdates() {
   const autoUpdateDataReq = useApi.autoUpdateDataGet();
   const progressLogsByDnp = useSelector(getProgressLogsByDnp);
+  const [showPackageSettings, setShowPackageSettings] = useState(false);
 
   async function setUpdateSettings(id: string, enabled: boolean, applyToAll?: boolean): Promise<void> {
     try {
@@ -45,12 +48,12 @@ export default function AutoUpdates() {
     }
   }
 
-  function confirmSetAllPackages(enabled: boolean): void {
-    const action = enabled ? "Enable" : "Disable";
+  function confirmApplyDefault(enabled: boolean): void {
+    const defaultLabel = enabled ? "enabled" : "disabled";
     confirm({
-      title: `${action} auto-updates for all my packages?`,
-      text: "This will remove every per-package customization and cannot be undone automatically.",
-      label: `${action} all my packages`,
+      title: `Apply the ${defaultLabel} default to all my packages?`,
+      text: "This will remove every per-package customization and make all packages use the current default.",
+      label: "Apply default to all",
       variant: enabled ? "dappnode" : "outline-danger",
       onClick: () => setUpdateSettings(MY_PACKAGES, enabled, true)
     });
@@ -58,10 +61,12 @@ export default function AutoUpdates() {
 
   return renderResponse(autoUpdateDataReq, ["Loading auto-update data"], (autoUpdateData) => {
     const { dnpsToShow = [], settings = {} } = autoUpdateData || {};
+    const systemPackages = dnpsToShow.find(({ id }) => id === SYSTEM_PACKAGES);
     const myPackages = dnpsToShow.find(({ id }) => id === MY_PACKAGES);
-    const packageSettingsAreMixed = dnpsToShow
-      .filter(({ id }) => getIsSinglePackage(id))
-      .some(({ enabled }) => enabled !== myPackages?.enabled);
+    const singlePackages = dnpsToShow.filter(({ id }) => getIsSinglePackage(id));
+    const customizedPackageCount = singlePackages.filter(({ id }) => Boolean(settings[id])).length;
+
+    if (!systemPackages || !myPackages) return <Card>Auto-update settings are unavailable.</Card>;
 
     return (
       <Card>
@@ -70,47 +75,93 @@ export default function AutoUpdates() {
           your approval will always be required.
         </div>
 
-        <div className="auto-updates-bulk-actions">
-          <span>Default changes preserve customized packages.</span>
-          <div className="buttons">
-            <Button variant="outline-dappnode" onClick={() => confirmSetAllPackages(true)}>
-              Enable all my packages
-            </Button>
-            <Button variant="outline-danger" onClick={() => confirmSetAllPackages(false)}>
-              Disable all my packages
+        <section className="auto-updates-section">
+          <div className="auto-updates-section-heading">
+            <div>
+              <h4>Default settings</h4>
+              <p>These settings control automatic updates unless a package has its own customized setting.</p>
+            </div>
+          </div>
+
+          <div className="auto-updates-default-setting">
+            <span className="auto-update-name">
+              <strong>System packages</strong>
+              <small>All DAppNode system packages share this setting and are updated together.</small>
+            </span>
+            <Switch
+              checked={systemPackages.enabled}
+              onToggle={(enabled) => setUpdateSettings(SYSTEM_PACKAGES, enabled)}
+              label=""
+            />
+          </div>
+
+          <div className="auto-updates-default-setting">
+            <span className="auto-update-name">
+              <strong>My packages</strong>
+              <small>Used by new packages and packages without a customized setting.</small>
+            </span>
+            <Switch
+              checked={myPackages.enabled}
+              onToggle={(enabled) => setUpdateSettings(MY_PACKAGES, enabled, false)}
+              label=""
+            />
+          </div>
+        </section>
+
+        <section className="auto-updates-section">
+          <div className="auto-updates-section-heading">
+            <div>
+              <h4>Per-package settings</h4>
+              <p>Customize individual packages or reset every package to the current “My packages” default.</p>
+            </div>
+            <Button
+              variant={myPackages.enabled ? "outline-dappnode" : "outline-danger"}
+              disabled={singlePackages.length === 0}
+              onClick={() => confirmApplyDefault(myPackages.enabled)}
+            >
+              Apply {myPackages.enabled ? "enabled" : "disabled"} default to all
             </Button>
           </div>
-        </div>
 
-        <div className="list-grid auto-updates">
-          {/* Table header */}
-          <span className="state-badge" />
-          <span className="name" />
-          <span className="last-update header">Last auto-update</span>
-          <span className="header">Enabled</span>
+          <button
+            type="button"
+            className="auto-updates-section-expand"
+            onClick={() => setShowPackageSettings((isOpen) => !isOpen)}
+            aria-expanded={showPackageSettings}
+          >
+            <span>
+              {showPackageSettings ? "Hide" : "Show"} {singlePackages.length} package settings
+              {customizedPackageCount > 0 ? ` (${customizedPackageCount} customized)` : ""}
+            </span>
+            <BsChevronDown className={showPackageSettings ? "rotated" : ""} />
+          </button>
 
-          <hr />
-          {/* Items of the table */}
-          {dnpsToShow.map(({ id, displayName, enabled, feedback }) => (
-            <AutoUpdateRowItem
-              key={id}
-              {...{
-                id,
-                displayName,
-                enabled,
-                feedback,
-                isMixed: id === MY_PACKAGES && packageSettingsAreMixed,
-                isCustomized: getIsSinglePackage(id) && Boolean(settings[id]),
-                isInstalling: Boolean((progressLogsByDnp || {})[id === SYSTEM_PACKAGES ? coreDnpName : id]),
-                isSinglePackage: getIsSinglePackage(id),
-                isDefaultControl: id === MY_PACKAGES,
-                // Actions
-                setUpdateSettings: (settingId: string, settingEnabled: boolean) =>
-                  setUpdateSettings(settingId, settingEnabled, settingId === MY_PACKAGES ? false : undefined)
-              }}
-            />
-          ))}
-        </div>
+          {showPackageSettings && (
+            <div className="list-grid auto-updates auto-updates-package-list">
+              <span className="state-badge" />
+              <span className="name" />
+              <span className="last-update header">Last auto-update</span>
+              <span className="header">Enabled</span>
+              <hr />
+
+              {singlePackages.map(({ id, displayName, enabled, feedback }) => (
+                <AutoUpdateRowItem
+                  key={id}
+                  {...{
+                    id,
+                    displayName,
+                    enabled,
+                    feedback,
+                    isCustomized: Boolean(settings[id]),
+                    isInstalling: Boolean((progressLogsByDnp || {})[id]),
+                    isSinglePackage: true,
+                    setUpdateSettings
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </section>
       </Card>
     );
   });

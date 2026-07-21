@@ -10,25 +10,86 @@
   margin-bottom: var(--default-spacing);
 }
 
-.auto-updates-bulk-actions {
+.auto-updates-section {
+  padding: var(--default-spacing);
+  border: var(--border-style);
+  border-radius: 0.35rem;
+
+  & + & {
+    margin-top: var(--default-spacing);
+  }
+}
+
+.auto-updates-section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--default-spacing);
+  margin-bottom: var(--default-spacing);
+
+  h4,
+  p {
+    margin: 0;
+  }
+
+  p {
+    margin-top: 0.25rem;
+    color: var(--light-text-color);
+  }
+
+  > button {
+    flex-shrink: 0;
+  }
+}
+
+.auto-update-name {
+  display: flex;
+  flex-direction: column;
+
+  small {
+    color: var(--light-text-color);
+    font-size: 75%;
+  }
+}
+
+.auto-updates-default-setting {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--default-spacing);
-  margin-bottom: var(--default-spacing);
+  padding: 0.75rem 0;
+  border-top: var(--border-style);
+
+  .switch {
+    flex-shrink: 0;
+  }
+}
+
+.auto-updates-section-expand {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 0.75rem;
   border: var(--border-style);
   border-radius: 0.25rem;
+  color: inherit;
+  background: transparent;
+  text-align: left;
 
-  > span {
-    color: var(--light-text-color);
-  }
-
-  .buttons {
-    display: flex;
-    gap: 0.5rem;
+  svg {
     flex-shrink: 0;
+    margin-left: var(--default-spacing);
+    transition: transform 0.2s ease;
+
+    &.rotated {
+      transform: rotate(180deg);
+    }
   }
+}
+
+.auto-updates-package-list {
+  margin-top: var(--default-spacing);
 }
 
 .list-grid.auto-updates {
@@ -58,20 +119,13 @@
 
   .name {
     display: flex;
-  }
-  .auto-update-name {
-    display: flex;
-    flex-direction: column;
 
-    small {
-      color: var(--light-text-color);
-      font-size: 75%;
+    &.nested {
+      margin-left: 1rem;
+      padding-left: 1rem;
+      border-left: 2px solid var(--border-color);
     }
   }
-  .bullet {
-    padding-left: 15px;
-  }
-
   .last-update {
     justify-self: right;
     color: #8c8c8c;
@@ -110,13 +164,9 @@
 }
 
 @media screen and (max-width: 40rem) {
-  .auto-updates-bulk-actions {
+  .auto-updates-section-heading {
     align-items: stretch;
     flex-direction: column;
-
-    .buttons > button {
-      flex: 1;
-    }
   }
 }
 

@@ -39,7 +39,7 @@ export async function autoUpdateDataGet(): Promise<AutoUpdateDataView> {
     },
     {
       id: MY_PACKAGES,
-      displayName: "Default for my packages",
+      displayName: "My packages",
       enabled: isDnpUpdateEnabled(),
       feedback: {}
     }
