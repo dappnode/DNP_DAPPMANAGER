@@ -65,6 +65,15 @@ export class DappnodeInstaller extends DappnodeRepository {
   }
 
   /**
+   * Resolve a small IPFS file using the currently selected gateway target.
+   * Used by DAppManager's content-addressed avatar endpoint.
+   */
+  public async getIpfsFileBytes(hash: string, maxLength: number): Promise<Uint8Array> {
+    await this.updateProviders();
+    return super.writeFileToBytes(hash, maxLength);
+  }
+
+  /**
    * Get release assets for a request
    */
   async getRelease(name: string, version?: string): Promise<PackageRelease> {

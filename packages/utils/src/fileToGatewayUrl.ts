@@ -1,12 +1,17 @@
 import { DistributedFile } from "@dappnode/types";
 import { normalizeHash } from "./normalizeHash.js";
-import url from "url";
 import { params } from "@dappnode/params";
 
+export const IPFS_AVATAR_ROUTE = "/avatar/ipfs/";
+
 /**
- * Return a queriable gateway url for a distributed file
+ * Return a URL for a distributed file.
+ *
+ * IPFS avatars are resolved by DAppManager so the backend can use the
+ * currently configured local or remote gateways instead of pinning the
+ * browser to one hard-coded public gateway.
  * @param distributedFile
- * @returns link to fetch file "http://ipfs-gateway/Qm7763518d4"
+ * @returns A relative DAppManager URL for IPFS, or an absolute mirror URL.
  */
 export function fileToGatewayUrl(distributedFile?: DistributedFile): string {
   // Fallback
@@ -14,7 +19,7 @@ export function fileToGatewayUrl(distributedFile?: DistributedFile): string {
 
   switch (distributedFile.source) {
     case "ipfs":
-      return url.resolve(url.resolve(params.IPFS_REMOTE, params.IPFS_GATEWAY), normalizeHash(distributedFile.hash));
+      return `${IPFS_AVATAR_ROUTE}${normalizeHash(distributedFile.hash)}`;
     case "mirror": {
       if (!distributedFile.filename || !distributedFile.packageHash) return "";
       const base = params.CONTENT_MIRROR_BASE_URL.replace(/\/?$/, "");

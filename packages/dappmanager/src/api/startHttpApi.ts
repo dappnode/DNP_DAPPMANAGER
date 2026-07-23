@@ -34,6 +34,7 @@ import { handleMcpRequest } from "../mcp/server.js";
 import { MCP_UPLOAD_CHUNK_BASE64_CHARS } from "../mcp/upload.js";
 import { params as dappnodeParams } from "@dappnode/params";
 import { ensureTempTransferDir, MAX_UPLOAD_FILE_SIZE_BYTES } from "../uploads/tempTransfer.js";
+import { createIpfsAvatarHandler, GetIpfsFileBytes } from "./avatar.js";
 
 export interface HttpApiParams extends ClientSideCookiesParams, AuthPasswordSessionParams {
   AUTH_IP_ALLOW_LOCAL_IP: boolean;
@@ -78,7 +79,8 @@ export function startHttpApi({
   subscriptionsLogger,
   adminPasswordDb,
   eventBus,
-  isNewDappmanagerVersion
+  isNewDappmanagerVersion,
+  getIpfsFileBytes
 }: {
   params: HttpApiParams;
   logs: Logs;
@@ -92,6 +94,7 @@ export function startHttpApi({
   adminPasswordDb: AdminPasswordDb;
   eventBus: EventBus;
   isNewDappmanagerVersion: () => boolean;
+  getIpfsFileBytes: GetIpfsFileBytes;
 }): http.Server {
   const app = express();
   const server = new http.Server(app);
@@ -194,6 +197,7 @@ export function startHttpApi({
   app.get("/file-download/:containerName", auth.onlyAdmin, routes.fileDownload);
   app.get("/download/:fileId", auth.onlyAdmin, routes.download);
   app.get("/user-action-logs", auth.onlyAdmin, routes.downloadUserActionLogs);
+  app.get("/avatar/ipfs/:cid", auth.onlyAdmin, createIpfsAvatarHandler(getIpfsFileBytes));
   app.post("/upload", auth.onlyAdmin, ensureTempTransferDirMiddleware, uploadFileMiddleware, routes.upload);
 
   // Nexus chat proxy (Nexus API key held server-side).

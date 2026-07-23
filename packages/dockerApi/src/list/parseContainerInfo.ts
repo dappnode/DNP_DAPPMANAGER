@@ -34,7 +34,8 @@ export function parseContainerInfo(container: ContainerInfo): PackageContainer {
   }));
   // Declared here for reusability purposes
   const isDnp = Boolean(labels.dnpName) || containerName.includes(CONTAINER_NAME_PREFIX);
-  const isCore = typeof labels.isCore === "boolean" ? labels.isCore : containerName.includes(CONTAINER_CORE_NAME_PREFIX);
+  const isCore =
+    typeof labels.isCore === "boolean" ? labels.isCore : containerName.includes(CONTAINER_CORE_NAME_PREFIX);
 
   return {
     // Identification
@@ -108,7 +109,7 @@ export function parseDnpNameFromContainerName(containerName: string): string {
 /**
  * Resolves an avatar label value to a usable URL.
  * Prefers a locally-downloaded avatar file when one exists on disk.
- * Otherwise falls back to the remote IPFS gateway or HTTP mirror URL.
+ * Otherwise falls back to the DAppManager IPFS avatar route or HTTP mirror URL.
  * @param avatar - The raw Docker label value ("/ipfs/Qm..." or HTTP URL). May be empty.
  * @param dnpName - Package name, used to locate the local avatar file.
  * @param isCore - Whether the package is a core DAppNode package.
@@ -118,12 +119,19 @@ export function resolveAvatarUrl(avatar: string | undefined, dnpName: string, is
   // Prefer locally-downloaded avatar if it exists on disk
   try {
     const localPath = getAvatarPath(dnpName, isCore);
-    if (fs.existsSync(localPath)) return `/avatars/${dnpName}.png`;
+    if (fs.existsSync(localPath)) {
+      return getLocalAvatarUrl(dnpName, avatar);
+    }
   } catch {
     // Ignore filesystem errors — fall through to remote resolution
   }
 
   if (!avatar) return "";
   if (avatar.startsWith("http")) return avatar; // Avatar URL is already an HTTP URL. Package was likely installed from mirror
-  return fileToGatewayUrl({ source: "ipfs", hash: normalizeHash(avatar), size: 0 }); // Convert IPFS multiaddress to a gateway URL.
+  return fileToGatewayUrl({ source: "ipfs", hash: normalizeHash(avatar), size: 0 });
+}
+
+export function getLocalAvatarUrl(dnpName: string, avatar?: string): string {
+  const version = avatar ? `?v=${encodeURIComponent(avatar)}` : "";
+  return `/avatars/${dnpName}.png${version}`;
 }

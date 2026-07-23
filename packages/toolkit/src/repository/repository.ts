@@ -33,6 +33,7 @@ import { MirrorOptions, MirrorFileEntry, HttpMirrorProvider } from "./contentPro
 import { IpfsGatewayClient } from "./ipfsGatewayClient.js";
 
 const source = "ipfs" as const;
+const MAX_CAR_OVERHEAD_BYTES = 1024 * 1024;
 
 /** Discriminated union returned by listWithIpfsFallback. Avoids placeholder CIDs in the mirror path. */
 type ListResult =
@@ -285,18 +286,24 @@ export class DappnodeRepository extends ApmRepository {
   }
 
   /**
-   * Fetches an IPFS file by CID into memory. Used ONLY by ipfsTest method to verify IPFS connectivity.
+   * Fetches a size-bounded IPFS file by CID into memory as bytes.
    * Does not attempt mirror routing — use downloadReleaseAsset for release files.
    */
-  public async writeFileToMemory(hash: string, maxLength?: number): Promise<string> {
+  public async writeFileToBytes(hash: string, maxLength?: number): Promise<Uint8Array> {
     const cidStr = this.sanitizeIpfsPath(hash);
     const chunks: Uint8Array[] = [];
-    const { carReader, root } = await this.getAndVerifyContentFromGateway(cidStr);
+    const maxCarBytes = maxLength === undefined ? undefined : maxLength + MAX_CAR_OVERHEAD_BYTES;
+    const { carReader, root } = await this.getAndVerifyContentFromGateway(cidStr, maxCarBytes);
     const content = await this.unpackCarReader(carReader, root);
-    for await (const chunk of content) chunks.push(chunk);
-
     let totalLength = 0;
-    chunks.forEach((chunk) => (totalLength += chunk.length));
+    for await (const chunk of content) {
+      totalLength += chunk.length;
+      if (maxLength !== undefined && totalLength > maxLength) {
+        throw Error(`Maximum size ${maxLength} bytes exceeded`);
+      }
+      chunks.push(chunk);
+    }
+
     const buffer = new Uint8Array(totalLength);
     let offset = 0;
     chunks.forEach((chunk) => {
@@ -304,8 +311,15 @@ export class DappnodeRepository extends ApmRepository {
       offset += chunk.length;
     });
 
-    if (maxLength && buffer.length >= maxLength) throw Error(`Maximum size ${maxLength} bytes exceeded`);
-    return new TextDecoder("utf-8").decode(buffer);
+    return buffer;
+  }
+
+  /**
+   * Fetches an IPFS file by CID into memory as UTF-8 text. Used ONLY by
+   * ipfsTest to verify IPFS connectivity.
+   */
+  public async writeFileToMemory(hash: string, maxLength?: number): Promise<string> {
+    return new TextDecoder("utf-8").decode(await this.writeFileToBytes(hash, maxLength));
   }
 
   /**
@@ -537,7 +551,10 @@ export class DappnodeRepository extends ApmRepository {
    * @returns The content as a CAR reader and the root CID.
    * @throws Error when the root CID does not match the provided hash (content is untrusted).
    */
-  private async getAndVerifyContentFromGateway(hash: string): Promise<{
+  private async getAndVerifyContentFromGateway(
+    hash: string,
+    maxResponseBytes?: number
+  ): Promise<{
     carReader: CarReader;
     root: CID;
   }> {
@@ -548,7 +565,7 @@ export class DappnodeRepository extends ApmRepository {
       async (res) => {
         // Parse and verify inside the retry boundary. Truncated or untrusted
         // responses are discarded before trying the next gateway.
-        const bytes = new Uint8Array(await res.arrayBuffer());
+        const bytes = await readResponseBytes(res, maxResponseBytes);
         const carReader = await CarReader.fromBytes(bytes);
         const roots = await carReader.getRoots();
         const root = roots[0];
@@ -739,4 +756,42 @@ export class DappnodeRepository extends ApmRepository {
    * @returns Arch tag in the format <os>-<arch>
    */
   private getArchTag = (arch: Architecture): string => arch.replace(/\//g, "-");
+}
+
+async function readResponseBytes(response: Response, maxBytes?: number): Promise<Uint8Array> {
+  const contentLength = response.headers.get("content-length");
+  if (maxBytes !== undefined && contentLength !== null && Number(contentLength) > maxBytes) {
+    throw Error(`Maximum gateway response size ${maxBytes} bytes exceeded`);
+  }
+
+  if (!response.body) {
+    const bytes = new Uint8Array(await response.arrayBuffer());
+    if (maxBytes !== undefined && bytes.length > maxBytes) {
+      throw Error(`Maximum gateway response size ${maxBytes} bytes exceeded`);
+    }
+    return bytes;
+  }
+
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let totalLength = 0;
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    totalLength += value.length;
+    if (maxBytes !== undefined && totalLength > maxBytes) {
+      await reader.cancel();
+      throw Error(`Maximum gateway response size ${maxBytes} bytes exceeded`);
+    }
+    chunks.push(value);
+  }
+
+  const bytes = new Uint8Array(totalLength);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.length;
+  }
+  return bytes;
 }
