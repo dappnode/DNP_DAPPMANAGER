@@ -19,6 +19,7 @@ const MAX_HISTORY_ENTRIES = 50;
 const MAX_TITLE_LENGTH = 80;
 const MAX_TOOL_ITERATIONS = 8;
 const MAX_TOOL_RESULT_BYTES = 50_000;
+const NEXUS_REQUEST_TIMEOUT_MS = 15_000;
 
 interface ErrorPayload {
   error: { code: string; message: string };
@@ -119,11 +120,13 @@ export class NexusApi {
   }
 
   readStatus(): NexusStatus {
+    const configured = this.getApiKey() !== "";
     return {
-      configured: this.getApiKey() !== "",
+      configured,
       gatewayUrl: this.getGatewayUrl(),
       defaultModel: this.getDefaultModel(),
-      keySource: this.getApiKey() ? "db" : "none"
+      keySource: configured ? (this.deps.apiKeyStore.getSource?.() ?? "manual") : "none",
+      accountLabel: configured ? (this.deps.apiKeyStore.getAccountLabel?.() ?? null) : null
     };
   }
 
@@ -220,7 +223,8 @@ export class NexusApi {
     let upstream: Awaited<ReturnType<FetchLike>>;
     try {
       upstream = await this.fetchImpl(`${this.getGatewayUrl()}/models`, {
-        headers: { accept: "application/json", authorization: `Bearer ${apiKey}` }
+        headers: { accept: "application/json", authorization: `Bearer ${apiKey}` },
+        signal: AbortSignal.timeout(NEXUS_REQUEST_TIMEOUT_MS)
       });
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to reach Nexus gateway";
@@ -317,7 +321,8 @@ export class NexusApi {
     let upstream: Awaited<ReturnType<FetchLike>>;
     try {
       upstream = await this.fetchImpl(`${this.getGatewayUrl()}/models`, {
-        headers: { accept: "application/json", authorization: `Bearer ${apiKey}` }
+        headers: { accept: "application/json", authorization: `Bearer ${apiKey}` },
+        signal: AbortSignal.timeout(NEXUS_REQUEST_TIMEOUT_MS)
       });
     } catch (err) {
       return err instanceof Error ? err.message : "Failed to reach the Nexus gateway";
@@ -359,7 +364,7 @@ export class NexusApi {
       if (!upstream.ok || !upstream.body) {
         const text = await upstream.text().catch(() => "");
         this.deps.logger.warn(`nexus proxy: upstream ${upstream.status}: ${text.slice(0, 200)}`);
-        writeSyntheticContent(writer, `\n\n_(upstream error ${upstream.status})_\n\n`, responseModelId);
+        writeStreamError(writer, `upstream_${upstream.status || 502}`, readUpstreamErrorMessage(text, upstream.status));
         break;
       }
 
@@ -534,6 +539,44 @@ function writeSyntheticContent(writer: NexusStreamWriter, text: string, modelId:
     choices: [{ index: 0, delta: { content: text }, finish_reason: null }]
   };
   writer.write(`data: ${JSON.stringify(chunk)}\n\n`);
+}
+
+function writeStreamError(writer: NexusStreamWriter, code: string, message: string): void {
+  if (writer.writableEnded) return;
+  writer.write(`data: ${JSON.stringify({ error: { code, message } })}\n\n`);
+}
+
+function readUpstreamErrorMessage(body: string, status: number): string {
+  const fallback = readUpstreamStatusMessage(status);
+  if (!body.trim()) return fallback;
+
+  try {
+    const parsed = JSON.parse(body) as unknown;
+    if (parsed && typeof parsed === "object" && "error" in parsed) {
+      const error = (parsed as { error?: unknown }).error;
+      if (typeof error === "string" && error.trim()) return `${fallback}: ${error.trim()}`;
+      if (error && typeof error === "object" && "message" in error) {
+        const message = (error as { message?: unknown }).message;
+        if (typeof message === "string" && message.trim()) return `${fallback}: ${message.trim()}`;
+      }
+    }
+    if (parsed && typeof parsed === "object" && "message" in parsed) {
+      const message = (parsed as { message?: unknown }).message;
+      if (typeof message === "string" && message.trim()) return `${fallback}: ${message.trim()}`;
+    }
+  } catch {
+    const text = collapseWhitespace(body).slice(0, 200);
+    if (text) return `${fallback}: ${text}`;
+  }
+
+  return fallback;
+}
+
+function readUpstreamStatusMessage(status: number): string {
+  if (status === 401 || status === 403) return `Nexus gateway rejected this API key (${status})`;
+  if (status === 402) return "Nexus gateway requires payment or credits (402)";
+  if (status === 429) return "Nexus gateway rate limit exceeded (429)";
+  return `Nexus gateway error (${status || 502})`;
 }
 
 function writeDappmanagerEvent(writer: NexusStreamWriter, payload: unknown): void {

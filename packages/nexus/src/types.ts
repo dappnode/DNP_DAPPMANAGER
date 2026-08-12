@@ -30,13 +30,16 @@ export interface NexusHistoryStore {
 export interface NexusApiKeyStore {
   get(): string;
   set(value: string): void;
+  getSource?(): "manual" | "nexus";
+  getAccountLabel?(): string | null;
 }
 
 export interface NexusStatus {
   configured: boolean;
   gatewayUrl: string;
   defaultModel: string;
-  keySource: "db" | "none";
+  keySource: "manual" | "nexus" | "none";
+  accountLabel: string | null;
 }
 
 export interface GatewayModel {

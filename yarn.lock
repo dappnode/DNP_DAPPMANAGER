@@ -1283,6 +1283,7 @@ __metadata:
     helmet: "npm:^4.4.1"
     http-proxy: "npm:^1.18.0"
     is-ip: "npm:^3.0.0"
+    jose: "npm:^6.2.3"
     kubo-rpc-client: "npm:^3.0.2"
     lodash-es: "npm:^4.17.21"
     memoizee: "npm:^0.4.14"
@@ -12442,6 +12443,13 @@ __metadata:
   version: 6.2.3
   resolution: "jose@npm:6.2.3"
   checksum: 10c0/aa91bccba22cc84d86308f833749bcb0b00441e35c24e0ac79abeac5f76dc62d47bdef9c1da6a0c609f5da6478595f52b252085888b89dbdb163861e40ea4188
+  languageName: node
+  linkType: hard
+
+"jose@npm:^6.2.3":
+  version: 6.2.8
+  resolution: "jose@npm:6.2.8"
+  checksum: 10c0/fe4c6a7197a1adab2251b000c1eaaa8b40b6cb7cfbef43dbc9e959dacd43bf2532827b2d5e0f4069731da79d26e4d9e4368ccb26559a42a884b3fe036927e6e1
   languageName: node
   linkType: hard
 

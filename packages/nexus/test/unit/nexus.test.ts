@@ -34,7 +34,8 @@ describe("nexus / api", () => {
       configured: true,
       gatewayUrl: "https://gateway.example/v1",
       defaultModel: "nexus/test",
-      keySource: "db"
+      keySource: "manual",
+      accountLabel: null
     });
     expect(JSON.stringify(status)).to.not.include("secret-key");
   });
@@ -193,7 +194,7 @@ describe("nexus / api", () => {
     expect(writer.body).to.include("Skipped **Mutating tool** - not now");
   });
 
-  it("writes an upstream error into the stream", async () => {
+  it("writes an upstream error event into the stream", async () => {
     const writer = new MemoryWriter();
     const { service } = makeService({
       apiKey: "secret",
@@ -205,7 +206,8 @@ describe("nexus / api", () => {
 
     await service.chatCompletions({ messages: [] }, writer, new AbortController().signal);
 
-    expect(writer.body).to.include("upstream error 502");
+    expect(writer.body).to.include('"code":"upstream_502"');
+    expect(writer.body).to.include("Nexus gateway error (502): bad gateway");
     expect(writer.body).to.include("[DONE]");
   });
 

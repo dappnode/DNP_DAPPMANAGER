@@ -72,6 +72,7 @@
     "helmet": "^4.4.1",
     "http-proxy": "^1.18.0",
     "is-ip": "^3.0.0",
+    "jose": "^6.2.3",
     "lodash-es": "^4.17.21",
     "memoizee": "^0.4.14",
     "multicodec": "^3.2.1",

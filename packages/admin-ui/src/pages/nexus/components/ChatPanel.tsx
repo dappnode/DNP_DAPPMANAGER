@@ -5,8 +5,20 @@ import Select from "components/Select";
 import NexusMarkdown from "./NexusMarkdown";
 import Dropdown from "react-bootstrap/Dropdown";
 import { MdChatBubbleOutline, MdHistory } from "react-icons/md";
-import { FiTrash2, FiPlus, FiKey, FiSend, FiSquare, FiEye, FiEyeOff, FiMaximize2, FiMinimize2 } from "react-icons/fi";
+import {
+  FiTrash2,
+  FiPlus,
+  FiKey,
+  FiSend,
+  FiSquare,
+  FiEye,
+  FiEyeOff,
+  FiMaximize2,
+  FiMinimize2,
+  FiLogIn
+} from "react-icons/fi";
 import { nexusExternalUrl } from "../data";
+import { disconnectDappnodeNexus, loginWithDappnodeNexus } from "../auth";
 import "./nexus.scss";
 import {
   ChatError,
@@ -398,7 +410,6 @@ export function ChatPanel({ variant = "page", onOpenFullScreen, onOpenFloating }
     clearHistory,
     applyStatus
   } = useNexusChat();
-
   useEffect(() => {
     initialize();
   }, [initialize]);
@@ -464,8 +475,14 @@ export function ChatPanel({ variant = "page", onOpenFullScreen, onOpenFloating }
             await applyStatus(next);
             setShowKeyEditor(false);
           }}
+          onLoginWithNexus={async () => {
+            const { status: nextStatus } = await loginWithDappnodeNexus();
+            await applyStatus(nextStatus);
+            setShowKeyEditor(false);
+          }}
           onClear={async () => {
-            const next = await clearNexusApiKey();
+            const next =
+              status.keySource === "nexus" ? (await disconnectDappnodeNexus()).status : await clearNexusApiKey();
             await applyStatus(next);
             setShowKeyEditor(false);
           }}
@@ -1037,12 +1054,7 @@ function Composer({
           disabled={disabled}
         />
         {isRunning ? (
-          <Button
-            variant="outline-danger"
-            className="nexus-send-button"
-            onClick={onCancel}
-            title="Stop generating"
-          >
+          <Button variant="outline-danger" className="nexus-send-button" onClick={onCancel} title="Stop generating">
             <FiSquare className="nexus-send-button-icon" />
           </Button>
         ) : (
@@ -1072,10 +1084,10 @@ function NotConfigured({ onConfigure }: { onConfigure: () => void }) {
       </div>
       <div className="nexus-not-configured-text">
         <strong>Nexus chat is not configured</strong>
-        <p>Paste a Nexus API key to get started — generate one in the Nexus user portal.</p>
+        <p>Log in with Dappnode Nexus to create a key automatically, or paste a Nexus API key manually.</p>
         <div className="nexus-not-configured-actions">
           <Button variant="dappnode" onClick={onConfigure}>
-            Add API key
+            Configure Nexus
           </Button>
           <Button variant="outline-secondary" onClick={() => window.open(nexusExternalUrl, "_blank")}>
             Open Nexus
@@ -1091,41 +1103,56 @@ function NotConfigured({ onConfigure }: { onConfigure: () => void }) {
 function ApiKeyEditor({
   status,
   onSave,
+  onLoginWithNexus,
   onClear,
   onClose
 }: {
   status: NexusStatus;
   onSave: (key: string) => Promise<void>;
+  onLoginWithNexus: () => Promise<void>;
   onClear: () => Promise<void>;
   onClose: () => void;
 }) {
   const [value, setValue] = useState("");
   const [show, setShow] = useState(false);
-  const [busy, setBusy] = useState(false);
+  const [busyAction, setBusyAction] = useState<"login" | "save" | "clear" | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const busy = busyAction !== null;
+
+  const login = async () => {
+    if (busy) return;
+    setBusyAction("login");
+    setError(null);
+    try {
+      await onLoginWithNexus();
+    } catch (err) {
+      setError((err as Error).message || "Failed to connect to Dappnode Nexus");
+      setBusyAction(null);
+    }
+  };
 
   const submit = async () => {
     const key = value.trim();
     if (!key || busy) return;
-    setBusy(true);
+    setBusyAction("save");
     setError(null);
     try {
       await onSave(key);
     } catch (err) {
       setError((err as Error).message || "Failed to save the API key");
-      setBusy(false);
+      setBusyAction(null);
     }
   };
 
   const clear = async () => {
     if (busy) return;
-    setBusy(true);
+    setBusyAction("clear");
     setError(null);
     try {
       await onClear();
     } catch (err) {
       setError((err as Error).message || "Failed to clear the API key");
-      setBusy(false);
+      setBusyAction(null);
     }
   };
 
@@ -1140,12 +1167,29 @@ function ApiKeyEditor({
         </div>
 
         <p className="nexus-key-editor-text">
-          The key is stored on this DAppNode and used to talk to Nexus.{" "}
+          The key is stored on this DAppNode and used to talk to Nexus. Log in to create one automatically, or{" "}
           <a href={nexusExternalUrl} target="_blank" rel="noopener noreferrer">
-            Generate one in the Nexus user portal
-          </a>
-          .
+            generate one in the Nexus user portal
+          </a>{" "}
+          and paste it below.
         </p>
+
+        <div className="nexus-key-editor-login">
+          <Button variant="dappnode" onClick={login} disabled={busy} fullwidth Icon={FiLogIn}>
+            {busyAction === "login" ? "Connecting..." : "Login with Dappnode Nexus"}
+          </Button>
+          {status.keySource === "nexus" && status.accountLabel ? (
+            <small className="nexus-key-editor-account">
+              Already logged in as <strong>{status.accountLabel}</strong>.
+            </small>
+          ) : (
+            <small>Creates a Dappmanager Chat key in Nexus and saves it on this DAppNode.</small>
+          )}
+        </div>
+
+        <div className="nexus-key-editor-divider">
+          <span>or paste an API key</span>
+        </div>
 
         <div className="nexus-key-editor-input-group">
           <input
@@ -1176,9 +1220,15 @@ function ApiKeyEditor({
 
         <div className="nexus-key-editor-actions">
           <div>
-            {status.keySource === "db" && (
+            {status.keySource !== "none" && (
               <Button variant="outline-danger" onClick={clear} disabled={busy}>
-                Remove key
+                {busyAction === "clear"
+                  ? status.keySource === "nexus"
+                    ? "Disconnecting..."
+                    : "Removing..."
+                  : status.keySource === "nexus"
+                    ? "Disconnect Nexus"
+                    : "Remove key"}
               </Button>
             )}
           </div>
@@ -1187,7 +1237,7 @@ function ApiKeyEditor({
               Cancel
             </Button>
             <Button variant="dappnode" onClick={submit} disabled={busy || !value.trim()}>
-              {busy ? "Saving…" : status.configured ? "Save" : "Save & connect"}
+              {busyAction === "save" ? "Saving..." : status.configured ? "Save" : "Save & connect"}
             </Button>
           </div>
         </div>

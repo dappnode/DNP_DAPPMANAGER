@@ -26,5 +26,13 @@ export const nexusChatHistory = dbNexus.indexedByKey<NexusStoredConversation, st
 });
 
 const nexusApiKeyDbKey = "nexus-api-key";
+const nexusManagedApiKeyDbKey = "nexus-managed-api-key";
+
+export interface NexusManagedApiKey {
+  id: string;
+  accountSub: string;
+  accountLabel: string | null;
+}
 
 export const nexusApiKey = dbMain.staticKey<string>(nexusApiKeyDbKey, "");
+export const nexusManagedApiKey = dbMain.staticKey<NexusManagedApiKey | null>(nexusManagedApiKeyDbKey, null);

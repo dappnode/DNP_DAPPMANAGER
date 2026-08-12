@@ -8,6 +8,7 @@ import { dappnodeToolList } from "../../mcp/tools.js";
 import { dispatchTool, getOpenAITools } from "../../mcp/dispatch.js";
 import { createPendingConfirmation, resolveConfirmation } from "../../mcp/confirmation.js";
 import { startDocsWarmup } from "../../mcp/docs.js";
+import { completeNexusAuth, NexusAuthError } from "./nexusAuth.js";
 
 /**
  * Thin Express adapter for the route-neutral Nexus backend module.
@@ -20,7 +21,9 @@ import { startDocsWarmup } from "../../mcp/docs.js";
 const nexus = new NexusApi({
   apiKeyStore: {
     get: () => db.nexusApiKey.get(),
-    set: (value) => db.nexusApiKey.set(value)
+    set: (value) => db.nexusApiKey.set(value),
+    getSource: () => (db.nexusManagedApiKey.get() ? "nexus" : "manual"),
+    getAccountLabel: () => db.nexusManagedApiKey.get()?.accountLabel ?? null
   },
   historyStore: {
     getAll: () => db.nexusChatHistory.getAll(),
@@ -50,15 +53,72 @@ export const nexusStatus = wrapHandler(async (_req: Request, res: ExpressRespons
 /** POST /nexus/config - validate and save the Nexus API key. */
 export const nexusSetApiKey = wrapHandler(async (req: Request, res: ExpressResponse) => {
   try {
-    res.status(200).json(await nexus.setApiKey((req.body as { apiKey?: unknown } | undefined)?.apiKey));
+    if (db.nexusManagedApiKey.get() && db.nexusApiKey.get()) {
+      res.status(409).json({
+        error: {
+          code: "nexus_key_managed",
+          message: "Disconnect the Nexus account before replacing its managed API key."
+        }
+      });
+      return;
+    }
+
+    await nexus.setApiKey((req.body as { apiKey?: unknown } | undefined)?.apiKey);
+    db.nexusManagedApiKey.set(null);
+    res.status(200).json(nexus.readStatus());
   } catch (err) {
     sendNexusError(res, err);
   }
 });
 
+/** POST /nexus/auth/login - complete a Nexus login or authenticated disconnect. */
+export const nexusLogin = wrapHandler(async (req: Request, res: ExpressResponse) => {
+  try {
+    const result = await completeNexusAuth(req.body, {
+      getApiKey: () => db.nexusApiKey.get(),
+      saveApiKey: async (rawKey) => {
+        await nexus.setApiKey(rawKey);
+      },
+      restoreApiKey: (rawKey) => db.nexusApiKey.set(rawKey),
+      clearApiKey: () => {
+        nexus.clearApiKey();
+      },
+      readStatus: () => nexus.readStatus(),
+      getManagedApiKey: () => db.nexusManagedApiKey.get(),
+      setManagedApiKey: (value) => db.nexusManagedApiKey.set(value)
+    });
+    res.status(200).json(result);
+  } catch (err) {
+    if (err instanceof NexusApiError) {
+      sendNexusError(res, err);
+      return;
+    }
+    if (err instanceof NexusAuthError) {
+      logs.warn(`nexus auth: ${err.message}`);
+      res.status(err.statusCode).json({ error: { code: err.code, message: err.message } });
+      return;
+    }
+    const message = err instanceof Error ? err.message : "Nexus login failed";
+    logs.warn(`nexus auth: ${message}`);
+    res.status(502).json({ error: { code: "nexus_login_failed", message } });
+  }
+});
+
 /** DELETE /nexus/config - clear the stored Nexus API key. */
 export const nexusClearApiKey = wrapHandler(async (_req: Request, res: ExpressResponse) => {
-  res.status(200).json(nexus.clearApiKey());
+  if (db.nexusManagedApiKey.get() && db.nexusApiKey.get()) {
+    res.status(409).json({
+      error: {
+        code: "nexus_key_managed",
+        message: "Use Disconnect Nexus to revoke this managed API key."
+      }
+    });
+    return;
+  }
+
+  nexus.clearApiKey();
+  db.nexusManagedApiKey.set(null);
+  res.status(200).json(nexus.readStatus());
 });
 
 /** GET /nexus/models - list chat-capable Nexus gateway models. */
