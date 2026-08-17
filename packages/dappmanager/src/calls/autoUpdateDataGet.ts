@@ -45,38 +45,36 @@ export async function autoUpdateDataGet(): Promise<AutoUpdateDataView> {
     }
   ];
 
-  if (isDnpUpdateEnabled()) {
-    const singleDnpsToShow: InstalledPackageData[] = [];
-    for (const dnp of dnpList) {
-      const storedDnp = singleDnpsToShow.find((_dnp) => _dnp.dnpName === dnp.dnpName);
-      const storedVersion = storedDnp ? storedDnp.version : "";
-      if (
-        dnp.dnpName &&
-        // Ignore core DNPs
-        dnp.isDnp &&
-        !dnp.isCore &&
-        // Ignore wierd versions
-        valid(dnp.version) &&
-        // Ensure there are no duplicates
-        (!storedVersion || gt(storedVersion, dnp.version))
-      )
-        singleDnpsToShow.push(dnp);
-    }
+  const singleDnpsToShow: InstalledPackageData[] = [];
+  for (const dnp of dnpList) {
+    const storedDnp = singleDnpsToShow.find((_dnp) => _dnp.dnpName === dnp.dnpName);
+    const storedVersion = storedDnp ? storedDnp.version : "";
+    if (
+      dnp.dnpName &&
+      // Ignore core DNPs
+      dnp.isDnp &&
+      !dnp.isCore &&
+      // Ignore wierd versions
+      valid(dnp.version) &&
+      // Ensure there are no duplicates
+      (!storedVersion || gt(storedVersion, dnp.version))
+    )
+      singleDnpsToShow.push(dnp);
+  }
 
-    for (const dnp of singleDnpsToShow) {
-      const enabled = isDnpUpdateEnabled(dnp.dnpName);
-      dnpsToShow.push({
-        id: dnp.dnpName,
-        displayName: prettyDnpName(dnp.dnpName),
-        enabled,
-        feedback: enabled
-          ? getDnpFeedbackMessage({
-              dnpName: dnp.dnpName,
-              currentVersion: dnp.version
-            })
-          : {}
-      });
-    }
+  for (const dnp of singleDnpsToShow) {
+    const enabled = isDnpUpdateEnabled(dnp.dnpName);
+    dnpsToShow.push({
+      id: dnp.dnpName,
+      displayName: prettyDnpName(dnp.dnpName),
+      enabled,
+      feedback: enabled
+        ? getDnpFeedbackMessage({
+            dnpName: dnp.dnpName,
+            currentVersion: dnp.version
+          })
+        : {}
+    });
   }
 
   return {

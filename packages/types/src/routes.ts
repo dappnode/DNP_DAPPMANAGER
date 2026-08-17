@@ -73,8 +73,9 @@ export interface Routes {
    * Edits the auto-update settings
    * @param id = "my-packages", "system-packages" or "bitcoin.dnp.dappnode.eth"
    * @param enabled Auto update is enabled for ID
+   * @param applyToAll Clear package overrides when editing "my-packages"
    */
-  autoUpdateSettingsEdit: (kwargs: { id: string; enabled: boolean }) => Promise<void>;
+  autoUpdateSettingsEdit: (kwargs: { id: string; enabled: boolean; applyToAll?: boolean }) => Promise<void>;
 
   /**
    * Generates a backup of a package and sends it to the client for download.
