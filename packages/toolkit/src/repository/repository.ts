@@ -289,11 +289,11 @@ export class DappnodeRepository extends ApmRepository {
    * Fetches a size-bounded IPFS file by CID into memory as bytes.
    * Does not attempt mirror routing — use downloadReleaseAsset for release files.
    */
-  public async writeFileToBytes(hash: string, maxLength?: number): Promise<Uint8Array> {
+  public async writeFileToBytes(hash: string, maxLength?: number, gatewayTimeoutMs?: number): Promise<Uint8Array> {
     const cidStr = this.sanitizeIpfsPath(hash);
     const chunks: Uint8Array[] = [];
     const maxCarBytes = maxLength === undefined ? undefined : maxLength + MAX_CAR_OVERHEAD_BYTES;
-    const { carReader, root } = await this.getAndVerifyContentFromGateway(cidStr, maxCarBytes);
+    const { carReader, root } = await this.getAndVerifyContentFromGateway(cidStr, maxCarBytes, gatewayTimeoutMs);
     const content = await this.unpackCarReader(carReader, root);
     let totalLength = 0;
     for await (const chunk of content) {
@@ -553,7 +553,8 @@ export class DappnodeRepository extends ApmRepository {
    */
   private async getAndVerifyContentFromGateway(
     hash: string,
-    maxResponseBytes?: number
+    maxResponseBytes?: number,
+    gatewayTimeoutMs?: number
   ): Promise<{
     carReader: CarReader;
     root: CID;
@@ -573,7 +574,8 @@ export class DappnodeRepository extends ApmRepository {
           throw new Error(`UNTRUSTED CONTENT: expected root ${hash}, got ${roots}`);
         }
         return { carReader, root };
-      }
+      },
+      { timeoutMs: gatewayTimeoutMs }
     );
   }
 

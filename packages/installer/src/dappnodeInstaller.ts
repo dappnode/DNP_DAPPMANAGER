@@ -70,7 +70,7 @@ export class DappnodeInstaller extends DappnodeRepository {
    */
   public async getIpfsFileBytes(hash: string, maxLength: number): Promise<Uint8Array> {
     await this.updateProviders();
-    return super.writeFileToBytes(hash, maxLength);
+    return super.writeFileToBytes(hash, maxLength, params.IPFS_TIMEOUT);
   }
 
   /**

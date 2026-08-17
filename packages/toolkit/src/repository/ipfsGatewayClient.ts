@@ -14,16 +14,46 @@ export class IpfsGatewayClient {
    * boundary, so failures while reading or parsing a response also try the next
    * gateway.
    */
-  public async fetch<T>(ipfsPath: string, init: RequestInit, consume: (response: Response) => Promise<T>): Promise<T> {
+  public async fetch<T>(
+    ipfsPath: string,
+    init: RequestInit,
+    consume: (response: Response) => Promise<T>,
+    options: { timeoutMs?: number } = {}
+  ): Promise<T> {
     const errors: string[] = [];
 
     for (const gatewayUrl of this.gatewayUrls) {
+      const controller = new AbortController();
+      const callerSignal = init.signal;
+      let timedOut = false;
+      let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+      const abortFromCaller = (): void => controller.abort(callerSignal?.reason);
+      if (callerSignal?.aborted) abortFromCaller();
+      else callerSignal?.addEventListener("abort", abortFromCaller, { once: true });
+
+      if (options.timeoutMs !== undefined) {
+        timeoutId = setTimeout(() => {
+          timedOut = true;
+          controller.abort();
+        }, options.timeoutMs);
+      }
+
       try {
-        const response = await fetch(`${gatewayUrl}${ipfsPath}`, init);
+        const response = await fetch(`${gatewayUrl}${ipfsPath}`, { ...init, signal: controller.signal });
         if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
         return await consume(response);
       } catch (error) {
-        errors.push(`${gatewayUrl}: ${error instanceof Error ? error.message : String(error)}`);
+        if (callerSignal?.aborted) throw error;
+        const message = timedOut
+          ? `timed out after ${options.timeoutMs} ms`
+          : error instanceof Error
+            ? error.message
+            : String(error);
+        errors.push(`${gatewayUrl}: ${message}`);
+      } finally {
+        if (timeoutId !== undefined) clearTimeout(timeoutId);
+        callerSignal?.removeEventListener("abort", abortFromCaller);
       }
     }
 
