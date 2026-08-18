@@ -16,8 +16,9 @@ export interface NexusStatus {
   configured: boolean;
   gatewayUrl: string;
   defaultModel: string;
-  /** Where the active key comes from: set in-app or unset. */
-  keySource: "db" | "none";
+  /** Whether the active key was pasted manually, created through Nexus login, or is unset. */
+  keySource: "manual" | "nexus" | "none";
+  accountLabel: string | null;
 }
 
 const STATUS_URL = "/nexus/status";
@@ -151,7 +152,7 @@ export async function clearChatHistory(): Promise<void> {
 
 interface OpenAIDelta {
   choices?: { delta?: { content?: string }; finish_reason?: string | null }[];
-  error?: { message?: string; type?: string };
+  error?: { code?: string; message?: string; type?: string };
 }
 
 interface ChatErrorBody {
@@ -287,7 +288,7 @@ export async function* streamChat(options: StreamChatOptions): AsyncGenerator<St
       continue;
     }
 
-    if (chunk.error) throw new ChatError(chunk.error.message ?? "stream error", "stream_error");
+    if (chunk.error) throw new ChatError(chunk.error.message ?? "stream error", chunk.error.code ?? "stream_error");
     const delta = chunk.choices?.[0]?.delta?.content;
     if (delta) yield { type: "content", delta };
   }

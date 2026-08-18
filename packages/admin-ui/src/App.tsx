@@ -21,6 +21,8 @@ import { PwaPermissionsAlert, PwaPermissionsModal } from "components/PwaPermissi
 import { LocalProxyBanner } from "pages/wifi/components/localProxying/LocalProxyBanner";
 import { FloatingChatLauncher } from "pages/nexus/components/FloatingChatLauncher";
 import { NexusChatProvider } from "pages/nexus/components/ChatPanel";
+import NexusAuthCallback from "pages/nexus/components/NexusAuthCallback";
+import { NEXUS_AUTH_CALLBACK_PATH } from "pages/nexus/auth";
 // Grafana Faro for frontend monitoring and tracing
 import { FaroRoutes } from "@grafana/faro-react";
 import { useUiTelemetryConsent } from "hooks/useUiTelemetryConsent";
@@ -74,8 +76,7 @@ function MainApp({ username }: { username: string }) {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [screenLocation.pathname]);
-  const isNexusPage =
-    screenLocation.pathname === "/nexus" || screenLocation.pathname.startsWith("/nexus/");
+  const isNexusPage = screenLocation.pathname === "/nexus" || screenLocation.pathname.startsWith("/nexus/");
 
   const appContext: AppContextIface = {
     theme,
@@ -150,6 +151,12 @@ function DefaultRedirect() {
 }
 
 export default function App() {
+  const location = useLocation();
+  if (location.pathname === NEXUS_AUTH_CALLBACK_PATH) return <NexusAuthCallback />;
+  return <AuthenticatedApp />;
+}
+
+function AuthenticatedApp() {
   const [loginStatus, setLoginStatus] = useState<LoginStatus>();
   // Handles the login, register and connecting logic. Nothing else will render
   // Until the app has been logged in
