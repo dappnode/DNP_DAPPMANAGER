@@ -239,7 +239,7 @@ async function createApiKey(accessToken: string, fetchImpl: typeof fetch): Promi
   const { res, json } = await fetchJsonWithTimeout(fetchImpl, `${NEXUS_CONTROL_PLANE_URL}/user/apikeys`, {
     method: "POST",
     headers: { authorization: `Bearer ${accessToken}`, "content-type": "application/json" },
-    body: JSON.stringify({ name: "Dappmanager Chat", pii_mode: "balanced" })
+    body: JSON.stringify({ name: "Dappmanager Chat", pii_mode: "off" })
   });
   const apiKeyResponse = json as NexusApiKeyResponse | undefined;
 
