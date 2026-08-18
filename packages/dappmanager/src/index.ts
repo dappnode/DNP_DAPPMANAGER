@@ -101,7 +101,8 @@ const server = startHttpApi({
   subscriptionsLogger,
   adminPasswordDb,
   eventBus,
-  isNewDappmanagerVersion
+  isNewDappmanagerVersion,
+  getIpfsFileBytes: (cid, maxBytes) => dappnodeInstaller.getIpfsFileBytes(cid, maxBytes)
 });
 
 // Start Test API

@@ -38,6 +38,25 @@ describe("IpfsGatewayClient", () => {
     expect(requestCount).to.equal(2);
   });
 
+  it("tries the next gateway when an attempt times out", async () => {
+    const requestedUrls: string[] = [];
+    globalThis.fetch = async (input, init) => {
+      requestedUrls.push(input.toString());
+      if (requestedUrls.length === 1) {
+        return await new Promise<Response>((_resolve, reject) => {
+          init?.signal?.addEventListener("abort", () => reject(new Error("aborted")), { once: true });
+        });
+      }
+      return new Response('{"ok":true}', { status: 200 });
+    };
+
+    const client = new IpfsGatewayClient(["https://first.example", "https://second.example"]);
+    const result = await client.fetch("/ipfs/cid", {}, async (response) => response.json(), { timeoutMs: 10 });
+
+    expect(result).to.deep.equal({ ok: true });
+    expect(requestedUrls).to.deep.equal(["https://first.example/ipfs/cid", "https://second.example/ipfs/cid"]);
+  });
+
   it("reports every gateway error when all attempts fail", async () => {
     globalThis.fetch = async () => new Response("unavailable", { status: 502, statusText: "Bad Gateway" });
     const client = new IpfsGatewayClient(["https://first.example", "https://second.example"]);
