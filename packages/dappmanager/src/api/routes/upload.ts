@@ -4,13 +4,13 @@ import {
   createFileTransferId,
   ensureTempTransferDir,
   getTempTransferPath,
-  MAX_UPLOAD_FILE_SIZE_BYTES,
+  HTTP_UPLOAD_MAX_FILE_SIZE_BYTES,
   registerTempTransferFile
 } from "../../uploads/tempTransfer.js";
 
 /**
  * Endpoint to upload files.
- * Any file type and size will be accepted
+ * Any file type up to HTTP_UPLOAD_MAX_FILE_SIZE_BYTES will be accepted
  * A fileId will be provided afterwards to be used in another useful call
  */
 export const upload = wrapHandler(async (req, res) => {
@@ -26,7 +26,7 @@ export const upload = wrapHandler(async (req, res) => {
   const file = Array.isArray(req.files.file) ? req.files.file[0] : req.files.file;
   if (!file) return res.status(400).send("Argument file missing");
   if (file.truncated) {
-    return res.status(413).send(`Uploaded file exceeds maximum size of ${MAX_UPLOAD_FILE_SIZE_BYTES} bytes`);
+    return res.status(413).send(`Uploaded file exceeds maximum size of ${HTTP_UPLOAD_MAX_FILE_SIZE_BYTES} bytes`);
   }
 
   try {

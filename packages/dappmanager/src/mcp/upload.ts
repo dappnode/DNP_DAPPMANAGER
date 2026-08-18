@@ -5,10 +5,13 @@ import {
   ensureTempTransferDir,
   getTempTransferPartPath,
   getTempTransferPath,
-  MAX_UPLOAD_FILE_SIZE_BYTES,
+  MCP_UPLOAD_IDLE_TTL_MS,
+  MCP_UPLOAD_MAX_FILE_SIZE_BYTES,
   registerTempTransferFile,
-  UPLOAD_TTL_MS
+  TEMP_TRANSFER_TTL_MS,
+  uploadResourceGuard
 } from "../uploads/tempTransfer.js";
+import { UploadReservation } from "../uploads/uploadResourceGuard.js";
 import { logs } from "@dappnode/logger";
 
 export const MCP_UPLOAD_CHUNK_BYTES = 1024 * 1024;
@@ -23,7 +26,8 @@ interface ActiveMcpUpload {
   partPath: string;
   expiresAt: number;
   hash: crypto.Hash;
-  cleanupTimer: NodeJS.Timeout;
+  cleanupTimer?: NodeJS.Timeout;
+  reservation: UploadReservation;
 }
 
 interface BeginUploadArgs {
@@ -43,6 +47,7 @@ interface AppendUploadResult {
   uploadId: string;
   receivedBytes: number;
   remainingBytes: number;
+  expiresAt: number;
 }
 
 interface FinishUploadResult {
@@ -59,41 +64,44 @@ export async function beginMcpDevImageUpload({
   sha256,
   fileName
 }: BeginUploadArgs): Promise<BeginUploadResult> {
-  if (!Number.isSafeInteger(sizeBytes) || sizeBytes <= 0 || sizeBytes > MAX_UPLOAD_FILE_SIZE_BYTES) {
-    throw new Error(`sizeBytes must be between 1 and ${MAX_UPLOAD_FILE_SIZE_BYTES}`);
+  if (!Number.isSafeInteger(sizeBytes) || sizeBytes <= 0 || sizeBytes > MCP_UPLOAD_MAX_FILE_SIZE_BYTES) {
+    throw new Error(`sizeBytes must be between 1 and ${MCP_UPLOAD_MAX_FILE_SIZE_BYTES}`);
   }
 
   const expectedSha256 = normalizeSha256(sha256);
   const uploadId = createFileTransferId();
   const partPath = getTempTransferPartPath(uploadId);
-  const expiresAt = Date.now() + UPLOAD_TTL_MS;
 
   ensureTempTransferDir();
-  const handle = await fs.promises.open(partPath, "wx");
-  await handle.close();
+  const reservation = await uploadResourceGuard.reserve({ id: `mcp:${uploadId}`, kind: "mcp", sizeBytes });
 
-  const cleanupTimer = setTimeout(() => {
-    cleanupExpiredUpload(uploadId);
-  }, UPLOAD_TTL_MS);
-  cleanupTimer.unref?.();
+  try {
+    const handle = await fs.promises.open(partPath, "wx");
+    await handle.close();
+  } catch (err) {
+    reservation.release();
+    throw err;
+  }
 
-  activeUploads.set(uploadId, {
+  const upload: ActiveMcpUpload = {
     uploadId,
     fileName,
     expectedSizeBytes: sizeBytes,
     expectedSha256,
     receivedBytes: 0,
     partPath,
-    expiresAt,
+    expiresAt: 0,
     hash: crypto.createHash("sha256"),
-    cleanupTimer
-  });
+    reservation
+  };
+  refreshUploadExpiry(upload);
+  activeUploads.set(uploadId, upload);
 
   return {
     uploadId,
     maxChunkBytes: MCP_UPLOAD_CHUNK_BYTES,
     maxChunkBase64Chars: MCP_UPLOAD_CHUNK_BASE64_CHARS,
-    expiresAt
+    expiresAt: upload.expiresAt
   };
 }
 
@@ -118,6 +126,9 @@ export async function appendMcpDevImageUploadChunk({
     throw new Error("Chunk would exceed declared upload size");
   }
 
+  // Refresh before the asynchronous write so the expiry timer cannot remove a
+  // healthy upload while its next accepted chunk is being persisted.
+  refreshUploadExpiry(upload);
   await fs.promises.appendFile(upload.partPath, chunk);
   upload.hash.update(chunk);
   upload.receivedBytes += chunk.length;
@@ -125,7 +136,8 @@ export async function appendMcpDevImageUploadChunk({
   return {
     uploadId,
     receivedBytes: upload.receivedBytes,
-    remainingBytes: upload.expectedSizeBytes - upload.receivedBytes
+    remainingBytes: upload.expectedSizeBytes - upload.receivedBytes,
+    expiresAt: upload.expiresAt
   };
 }
 
@@ -150,7 +162,7 @@ export async function finishMcpDevImageUpload(uploadId: string): Promise<FinishU
     imageFileId: upload.uploadId,
     sizeBytes: upload.receivedBytes,
     sha256: actualSha256,
-    expiresInMs: UPLOAD_TTL_MS
+    expiresInMs: TEMP_TRANSFER_TTL_MS
   };
 }
 
@@ -172,8 +184,18 @@ async function getActiveUpload(uploadId: string): Promise<ActiveMcpUpload> {
 }
 
 function clearActiveUpload(upload: ActiveMcpUpload): void {
-  clearTimeout(upload.cleanupTimer);
+  if (upload.cleanupTimer) clearTimeout(upload.cleanupTimer);
   activeUploads.delete(upload.uploadId);
+  upload.reservation.release();
+}
+
+function refreshUploadExpiry(upload: ActiveMcpUpload): void {
+  if (upload.cleanupTimer) clearTimeout(upload.cleanupTimer);
+  upload.expiresAt = Date.now() + MCP_UPLOAD_IDLE_TTL_MS;
+  upload.cleanupTimer = setTimeout(() => {
+    cleanupExpiredUpload(upload.uploadId);
+  }, MCP_UPLOAD_IDLE_TTL_MS);
+  upload.cleanupTimer.unref?.();
 }
 
 async function removeActiveUpload(upload: ActiveMcpUpload, reason: string): Promise<void> {

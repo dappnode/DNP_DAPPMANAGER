@@ -2,7 +2,6 @@ import http from "http";
 import express, { RequestHandler } from "express";
 import bodyParser from "body-parser";
 import compression from "compression";
-import fileUpload from "express-fileupload";
 import { helmetConf } from "./helmet.js";
 import cors from "cors";
 import { Server } from "socket.io";
@@ -33,7 +32,8 @@ import {
 import { handleMcpRequest } from "../mcp/server.js";
 import { MCP_UPLOAD_CHUNK_BASE64_CHARS } from "../mcp/upload.js";
 import { params as dappnodeParams } from "@dappnode/params";
-import { ensureTempTransferDir, MAX_UPLOAD_FILE_SIZE_BYTES } from "../uploads/tempTransfer.js";
+import { ensureTempTransferDir } from "../uploads/tempTransfer.js";
+import { parseHttpUploadFile, reserveHttpUploadCapacity } from "../uploads/httpUploadGuard.js";
 import { createIpfsAvatarHandler, GetIpfsFileBytes } from "./avatar.js";
 
 export interface HttpApiParams extends ClientSideCookiesParams, AuthPasswordSessionParams {
@@ -143,16 +143,6 @@ export function startHttpApi({
     next();
   };
 
-  // Route-local upload parser. It intentionally runs after auth so rejected
-  // requests cannot stream large temporary files to disk first.
-  const uploadFileMiddleware = fileUpload({
-    limits: { fileSize: MAX_UPLOAD_FILE_SIZE_BYTES, files: 10 },
-    abortOnLimit: true,
-    responseOnLimit: `Uploaded file exceeds maximum size of ${MAX_UPLOAD_FILE_SIZE_BYTES} bytes`,
-    useTempFiles: true,
-    tempFileDir: dappnodeParams.TEMP_TRANSFER_DIR
-  });
-
   // sessionHandler will mutate socket.handshake attaching .session object
   // Then, onlyAdmin will reject if socket.handshake.session.isAdmin !== true
   io.use(toSocketIoHandler(sessions.handler));
@@ -198,7 +188,16 @@ export function startHttpApi({
   app.get("/download/:fileId", auth.onlyAdmin, routes.download);
   app.get("/user-action-logs", auth.onlyAdmin, routes.downloadUserActionLogs);
   app.get("/avatar/ipfs/:cid", auth.onlyAdmin, createIpfsAvatarHandler(getIpfsFileBytes));
-  app.post("/upload", auth.onlyAdmin, ensureTempTransferDirMiddleware, uploadFileMiddleware, routes.upload);
+  // Keep capacity reservation and multipart parsing after authentication so
+  // rejected requests cannot reserve disk or stream temporary files first.
+  app.post(
+    "/upload",
+    auth.onlyAdmin,
+    ensureTempTransferDirMiddleware,
+    reserveHttpUploadCapacity,
+    parseHttpUploadFile,
+    routes.upload
+  );
 
   // Nexus chat proxy (Nexus API key held server-side).
   app.get("/nexus/status", auth.onlyAdmin, nexusStatus);
