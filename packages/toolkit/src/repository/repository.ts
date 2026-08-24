@@ -31,6 +31,7 @@ import { dappnodeRegistry } from "./params.js";
 import { JsonRpcApiProvider } from "ethers";
 import { MirrorOptions, MirrorFileEntry, HttpMirrorProvider } from "./contentProvider/index.js";
 import { IpfsGatewayClient } from "./ipfsGatewayClient.js";
+import type { IpfsGatewayLog } from "./ipfsGatewayClient.js";
 
 const source = "ipfs" as const;
 const MAX_CAR_OVERHEAD_BYTES = 1024 * 1024;
@@ -73,10 +74,11 @@ export class DappnodeRepository extends ApmRepository {
     ipfsUrl: string | string[],
     provider: JsonRpcApiProvider,
     mirrorOptions: MirrorOptions,
-    isMirrorEnabled: () => boolean
+    isMirrorEnabled: () => boolean,
+    ipfsGatewayLog?: IpfsGatewayLog
   ) {
     super(provider);
-    this.ipfsGatewayClient = new IpfsGatewayClient(ipfsUrl);
+    this.ipfsGatewayClient = new IpfsGatewayClient(ipfsUrl, ipfsGatewayLog);
     this.mirrorProvider = new HttpMirrorProvider(mirrorOptions);
     this.isMirrorEnabled = isMirrorEnabled;
   }
@@ -293,8 +295,7 @@ export class DappnodeRepository extends ApmRepository {
     const cidStr = this.sanitizeIpfsPath(hash);
     const chunks: Uint8Array[] = [];
     const maxCarBytes = maxLength === undefined ? undefined : maxLength + MAX_CAR_OVERHEAD_BYTES;
-    const { carReader, root } = await this.getAndVerifyContentFromGateway(cidStr, maxCarBytes, gatewayTimeoutMs);
-    const content = await this.unpackCarReader(carReader, root);
+    const content = await this.getVerifiedContentFromGateway(cidStr, maxCarBytes, gatewayTimeoutMs);
     let totalLength = 0;
     for await (const chunk of content) {
       totalLength += chunk.length;
@@ -351,8 +352,7 @@ export class DappnodeRepository extends ApmRepository {
 
     const cidStr = this.sanitizeIpfsPath(fileCid);
     const chunks: Uint8Array[] = [];
-    const { carReader, root } = await this.getAndVerifyContentFromGateway(cidStr);
-    const content = await this.unpackCarReader(carReader, root);
+    const content = await this.getVerifiedContentFromGateway(cidStr);
     for await (const chunk of content) chunks.push(chunk);
 
     // Concatenate the chunks into a single Uint8Array
@@ -419,8 +419,7 @@ export class DappnodeRepository extends ApmRepository {
     }
 
     // Provider 2: IPFS CAR — fallback (or primary when mirror is not configured)
-    const { carReader, root } = await this.getAndVerifyContentFromGateway(cidStr);
-    const readable = await this.unpackCarReader(carReader, root);
+    const readable = await this.getVerifiedContentFromGateway(cidStr, undefined, timeout);
 
     return new Promise((resolve, reject) => {
       async function handleDownload(): Promise<void> {
@@ -548,17 +547,14 @@ export class DappnodeRepository extends ApmRepository {
    * Gets the content from an IPFS gateway using the given hash and verifies its integrity.
    *
    * @param hash - The content identifier (CID) of the content to get and verify.
-   * @returns The content as a CAR reader and the root CID.
-   * @throws Error when the root CID does not match the provided hash (content is untrusted).
+   * @returns The verified UnixFS content.
+   * @throws Error when the CAR is incomplete or its root CID does not match the requested hash.
    */
-  private async getAndVerifyContentFromGateway(
+  private async getVerifiedContentFromGateway(
     hash: string,
     maxResponseBytes?: number,
     gatewayTimeoutMs?: number
-  ): Promise<{
-    carReader: CarReader;
-    root: CID;
-  }> {
+  ): Promise<AsyncIterable<Uint8Array>> {
     // 1. Download the CAR
     return this.ipfsGatewayClient.fetch(
       `/ipfs/${hash}?format=car`,
@@ -573,7 +569,13 @@ export class DappnodeRepository extends ApmRepository {
         if (roots.length !== 1 || root.toString() !== CID.parse(hash).toString()) {
           throw new Error(`UNTRUSTED CONTENT: expected root ${hash}, got ${roots}`);
         }
-        return { carReader, root };
+        // Consume the UnixFS file inside the retry boundary. Incomplete CAR
+        // responses can contain the expected root but omit a referenced block.
+        // Treat those as a failure of the gateway that supplied the response.
+        const content = await this.unpackCarReader(carReader, root);
+        const chunks: Uint8Array[] = [];
+        for await (const chunk of content) chunks.push(chunk);
+        return chunksToAsyncIterable(chunks);
       },
       { timeoutMs: gatewayTimeoutMs }
     );
@@ -796,4 +798,8 @@ async function readResponseBytes(response: Response, maxBytes?: number): Promise
     offset += chunk.length;
   }
   return bytes;
+}
+
+async function* chunksToAsyncIterable(chunks: Uint8Array[]): AsyncIterable<Uint8Array> {
+  yield* chunks;
 }

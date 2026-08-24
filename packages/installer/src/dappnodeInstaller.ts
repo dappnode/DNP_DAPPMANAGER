@@ -1,4 +1,5 @@
 import { params } from "@dappnode/params";
+import { logs } from "@dappnode/logger";
 import { DappnodeRepository } from "@dappnode/toolkit";
 import * as db from "@dappnode/db";
 import {
@@ -54,7 +55,8 @@ export class DappnodeInstaller extends DappnodeRepository {
         timeoutMs: params.CONTENT_MIRROR_TIMEOUT_MS,
         maxBytes: params.CONTENT_MIRROR_MAX_BYTES
       },
-      () => db.mirrorProviderEnabled.get()
+      () => db.mirrorProviderEnabled.get(),
+      (level, message) => logs[level](message)
     );
   }
 
