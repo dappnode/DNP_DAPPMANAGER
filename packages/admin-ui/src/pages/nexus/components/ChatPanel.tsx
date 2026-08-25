@@ -35,6 +35,7 @@ import {
   loadConversation,
   saveConversation,
   setNexusApiKey,
+  setNexusPrivateMode,
   smoothStream,
   streamChat,
   submitChatConfirmation
@@ -485,6 +486,10 @@ export function ChatPanel({ variant = "page", onOpenFullScreen, onOpenFloating }
               status.keySource === "nexus" ? (await disconnectDappnodeNexus()).status : await clearNexusApiKey();
             await applyStatus(next);
             setShowKeyEditor(false);
+          }}
+          onTogglePrivateMode={async (enabled) => {
+            const next = await setNexusPrivateMode(enabled);
+            await applyStatus(next);
           }}
         />
       )}
@@ -1105,17 +1110,19 @@ function ApiKeyEditor({
   onSave,
   onLoginWithNexus,
   onClear,
-  onClose
+  onClose,
+  onTogglePrivateMode
 }: {
   status: NexusStatus;
   onSave: (key: string) => Promise<void>;
   onLoginWithNexus: () => Promise<void>;
   onClear: () => Promise<void>;
   onClose: () => void;
+  onTogglePrivateMode: (enabled: boolean) => Promise<void>;
 }) {
   const [value, setValue] = useState("");
   const [show, setShow] = useState(false);
-  const [busyAction, setBusyAction] = useState<"login" | "save" | "clear" | null>(null);
+  const [busyAction, setBusyAction] = useState<"login" | "save" | "clear" | "privateMode" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const busy = busyAction !== null;
 
@@ -1142,6 +1149,18 @@ function ApiKeyEditor({
       setError((err as Error).message || "Failed to save the API key");
       setBusyAction(null);
     }
+  };
+
+  const togglePrivateMode = async (enabled: boolean) => {
+    if (busy) return;
+    setBusyAction("privateMode");
+    setError(null);
+    try {
+      await onTogglePrivateMode(enabled);
+    } catch (err) {
+      setError((err as Error).message || "Failed to change private mode");
+    }
+    setBusyAction(null);
   };
 
   const clear = async () => {
@@ -1214,6 +1233,37 @@ function ApiKeyEditor({
           >
             {show ? <FiEyeOff /> : <FiEye />}
           </button>
+        </div>
+
+        <div className="nexus-key-editor-private-mode">
+          <label className="nexus-private-mode-row">
+            <input
+              type="checkbox"
+              checked={status.privateMode}
+              disabled={busy}
+              onChange={(e) => togglePrivateMode(e.target.checked)}
+            />
+            <span>Private mode — route through the attested local proxy</span>
+          </label>
+          <p className="nexus-key-editor-text nexus-private-mode-help">
+            {status.privateMode ? (
+              <>
+                Prompts go through <strong>nexus-local-proxy</strong> on this DAppNode, which verifies the Gateway is
+                the expected code running inside an AWS Nitro Enclave and encrypts prompts and completions so Cloudflare
+                cannot read them. The proxy <strong>fails closed</strong>: if it cannot verify the Gateway, chat stops
+                working rather than silently falling back.{" "}
+                <a href={status.verificationUrl} target="_blank" rel="noopener noreferrer">
+                  See the verification evidence
+                </a>
+                .
+              </>
+            ) : (
+              <>
+                Prompts travel to Nexus over ordinary HTTPS, which is decrypted at Cloudflare before it reaches the
+                Gateway. Turn this on to route them through the attested proxy on this DAppNode instead.
+              </>
+            )}
+          </p>
         </div>
 
         {error && <div className="nexus-key-editor-error">{error}</div>}

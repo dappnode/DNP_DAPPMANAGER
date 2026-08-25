@@ -41,6 +41,10 @@ const nexus = new NexusApi({
     resolveConfirmation
   },
   getGatewayUrl: () => process.env.NEXUS_GATEWAY_URL,
+  privateModeStore: {
+    get: () => db.nexusPrivateMode.get(),
+    set: (value) => db.nexusPrivateMode.set(value)
+  },
   getDefaultModel: () => process.env.NEXUS_DEFAULT_MODEL,
   startDocsWarmup
 });
@@ -101,6 +105,15 @@ export const nexusLogin = wrapHandler(async (req: Request, res: ExpressResponse)
     const message = err instanceof Error ? err.message : "Nexus login failed";
     logs.warn(`nexus auth: ${message}`);
     res.status(502).json({ error: { code: "nexus_login_failed", message } });
+  }
+});
+
+/** POST /nexus/private-mode - route Nexus through the attested local proxy. */
+export const nexusSetPrivateMode = wrapHandler(async (req: Request, res: ExpressResponse) => {
+  try {
+    res.status(200).json(nexus.setPrivateMode((req.body as { privateMode?: unknown } | undefined)?.privateMode));
+  } catch (err) {
+    sendNexusError(res, err);
   }
 });
 

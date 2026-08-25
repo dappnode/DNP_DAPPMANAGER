@@ -19,10 +19,15 @@ export interface NexusStatus {
   /** Whether the active key was pasted manually, created through Nexus login, or is unset. */
   keySource: "manual" | "nexus" | "none";
   accountLabel: string | null;
+  /** True when traffic is routed through the attested local proxy. */
+  privateMode: boolean;
+  /** Where the operator can inspect the attestation evidence. */
+  verificationUrl: string;
 }
 
 const STATUS_URL = "/nexus/status";
 const CONFIG_URL = "/nexus/config";
+const PRIVATE_MODE_URL = "/nexus/private-mode";
 const MODELS_URL = "/nexus/models";
 const CHAT_URL = "/nexus/chat/completions";
 const CONFIRM_URL = "/nexus/chat/confirm";
@@ -73,6 +78,14 @@ export function setNexusApiKey(apiKey: string): Promise<NexusStatus> {
 /** Clears the in-app Nexus API key. */
 export function clearNexusApiKey(): Promise<NexusStatus> {
   return fetchJson<NexusStatus>(CONFIG_URL, { method: "DELETE" });
+}
+
+export function setNexusPrivateMode(privateMode: boolean): Promise<NexusStatus> {
+  return fetchJson<NexusStatus>(PRIVATE_MODE_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ privateMode })
+  });
 }
 
 export async function listNexusModels(): Promise<NexusModel[]> {

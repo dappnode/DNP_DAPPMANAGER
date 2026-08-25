@@ -40,6 +40,10 @@ export interface NexusStatus {
   defaultModel: string;
   keySource: "manual" | "nexus" | "none";
   accountLabel: string | null;
+  /** True when traffic is routed through the attested local proxy. */
+  privateMode: boolean;
+  /** Where the operator can inspect the attestation evidence. */
+  verificationUrl: string;
 }
 
 export interface GatewayModel {
@@ -128,6 +132,7 @@ export interface NexusApiDeps {
   fetch?: FetchLike;
   now?: () => number;
   getGatewayUrl?: () => string | undefined;
+  privateModeStore?: { get: () => boolean; set: (value: boolean) => void };
   getDefaultModel?: () => string | undefined;
   startDocsWarmup?: () => void;
 }
