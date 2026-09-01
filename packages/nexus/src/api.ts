@@ -14,6 +14,17 @@ import type {
 import { collapseWhitespace, trimAsciiWhitespace, trimTrailingSlashes } from "./utils.js";
 
 const DEFAULT_GATEWAY_URL = "https://nexus-api.dappnode.com/v1";
+
+// Private mode routes through nexus-local-proxy on this DAppNode, which
+// verifies the gateway's AWS Nitro attestation against a pinned policy and
+// encrypts request and response bodies with EHBP. The direct URL terminates
+// TLS at Cloudflare, where prompts are readable.
+//
+// The proxy is OpenAI-compatible on both endpoints this client uses --
+// /chat/completions over the attested channel and /models passed through --
+// so nothing else here has to change.
+const NEXUS_PROXY_GATEWAY_URL = "http://nexus-local-proxy.dappnode.private:3301/v1";
+const NEXUS_PROXY_VERIFICATION_URL = "http://nexus-local-proxy.dappnode.private:3301/verification";
 const DEFAULT_MODEL = "nexus/auto";
 const MAX_HISTORY_ENTRIES = 50;
 const MAX_TITLE_LENGTH = 80;
@@ -126,8 +137,27 @@ export class NexusApi {
       gatewayUrl: this.getGatewayUrl(),
       defaultModel: this.getDefaultModel(),
       keySource: configured ? (this.deps.apiKeyStore.getSource?.() ?? "manual") : "none",
-      accountLabel: configured ? (this.deps.apiKeyStore.getAccountLabel?.() ?? null) : null
+      accountLabel: configured ? (this.deps.apiKeyStore.getAccountLabel?.() ?? null) : null,
+      privateMode: this.isPrivateMode(),
+      verificationUrl: NEXUS_PROXY_VERIFICATION_URL
     };
+  }
+
+  /**
+   * Turn private mode on or off. Takes effect on the next request: the gateway
+   * URL is read per call, so no restart is needed.
+   */
+  setPrivateMode(rawEnabled: unknown): NexusStatus {
+    if (typeof rawEnabled !== "boolean")
+      throw NexusApiError.json(400, "invalid_request", "privateMode must be a boolean");
+    if (!this.deps.privateModeStore)
+      throw NexusApiError.json(501, "not_supported", "private mode is not available on this DAppNode");
+    this.deps.privateModeStore.set(rawEnabled);
+    return this.readStatus();
+  }
+
+  private isPrivateMode(): boolean {
+    return this.deps.privateModeStore?.get() === true;
   }
 
   async setApiKey(rawApiKey: unknown): Promise<NexusStatus> {
@@ -463,8 +493,12 @@ export class NexusApi {
   }
 
   private getGatewayUrl(): string {
-    const raw = this.deps.getGatewayUrl?.() || DEFAULT_GATEWAY_URL;
-    return trimTrailingSlashes(raw);
+    // An explicit NEXUS_GATEWAY_URL still wins, so a developer pointing at a
+    // staging gateway is not silently redirected to the local proxy.
+    const override = this.deps.getGatewayUrl?.();
+    if (override) return trimTrailingSlashes(override);
+    if (this.isPrivateMode()) return NEXUS_PROXY_GATEWAY_URL;
+    return DEFAULT_GATEWAY_URL;
   }
 
   private getDefaultModel(): string {

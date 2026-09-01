@@ -35,9 +35,81 @@ describe("nexus / api", () => {
       gatewayUrl: "https://gateway.example/v1",
       defaultModel: "nexus/test",
       keySource: "manual",
-      accountLabel: null
+      accountLabel: null,
+      privateMode: false,
+      verificationUrl: "http://nexus-local-proxy.dappnode.private:3301/verification"
     });
     expect(JSON.stringify(status)).to.not.include("secret-key");
+  });
+
+  it("routes through the attested local proxy when private mode is on", async () => {
+    let requested = "";
+    const { service } = makeService({
+      apiKey: "secret",
+      gatewayUrl: null,
+      privateMode: true,
+      fetch: async (url) => {
+        requested = String(url);
+        return jsonResponse({ data: [] });
+      }
+    });
+
+    await service.listModels();
+
+    expect(requested).to.equal("http://nexus-local-proxy.dappnode.private:3301/v1/models");
+    expect(service.readStatus().privateMode).to.equal(true);
+  });
+
+  it("routes direct when private mode is off", async () => {
+    let requested = "";
+    const { service } = makeService({
+      apiKey: "secret",
+      gatewayUrl: null,
+      privateMode: false,
+      fetch: async (url) => {
+        requested = String(url);
+        return jsonResponse({ data: [] });
+      }
+    });
+
+    await service.listModels();
+
+    expect(requested).to.equal("https://nexus-api.dappnode.com/v1/models");
+  });
+
+  // A developer pointing at a staging gateway must not be silently redirected
+  // to the local proxy.
+  it("lets an explicit gateway URL win over private mode", async () => {
+    let requested = "";
+    const { service } = makeService({
+      apiKey: "secret",
+      gatewayUrl: "https://staging.example/v1",
+      privateMode: true,
+      fetch: async (url) => {
+        requested = String(url);
+        return jsonResponse({ data: [] });
+      }
+    });
+
+    await service.listModels();
+
+    expect(requested).to.equal("https://staging.example/v1/models");
+  });
+
+  it("persists a private mode change and reflects it in status", () => {
+    const { service, state } = makeService({ apiKey: "secret", gatewayUrl: null });
+
+    expect(service.readStatus().privateMode).to.equal(false);
+    const status = service.setPrivateMode(true);
+
+    expect(state.privateMode).to.equal(true);
+    expect(status.privateMode).to.equal(true);
+    expect(status.gatewayUrl).to.equal("http://nexus-local-proxy.dappnode.private:3301/v1");
+  });
+
+  it("rejects a non-boolean private mode", () => {
+    const { service } = makeService({ apiKey: "secret" });
+    expect(() => service.setPrivateMode("yes")).to.throw();
   });
 
   it("filters model list to chat-completions capable models", async () => {
@@ -229,14 +301,21 @@ function makeService({
   apiKey = "",
   fetch = async () => jsonResponse({ data: [] }),
   now = () => 1000,
-  mcp
+  mcp,
+  gatewayUrl = "https://gateway.example/v1///",
+  privateMode = false
 }: {
   apiKey?: string;
   fetch?: FetchLike;
   now?: () => number;
   mcp?: NexusMcpAdapter;
-} = {}): { service: NexusApi; state: { apiKey: string; history: Record<string, NexusStoredConversation> } } {
-  const state = { apiKey, history: {} as Record<string, NexusStoredConversation> };
+  gatewayUrl?: string | null;
+  privateMode?: boolean;
+} = {}): {
+  service: NexusApi;
+  state: { apiKey: string; privateMode: boolean; history: Record<string, NexusStoredConversation> };
+} {
+  const state = { apiKey, privateMode, history: {} as Record<string, NexusStoredConversation> };
   const historyStore: NexusHistoryStore = {
     getAll: () => state.history,
     get: (id) => state.history[id],
@@ -266,7 +345,13 @@ function makeService({
     },
     fetch,
     now,
-    getGatewayUrl: () => "https://gateway.example/v1///",
+    getGatewayUrl: () => gatewayUrl ?? undefined,
+    privateModeStore: {
+      get: () => state.privateMode,
+      set: (value: boolean) => {
+        state.privateMode = value;
+      }
+    },
     getDefaultModel: () => "nexus/test"
   });
   return { service, state };
