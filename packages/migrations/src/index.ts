@@ -4,6 +4,7 @@ import { pruneUserActionLogs } from "./pruneUserActionLogs.js";
 import { recreateContainersIfLegacyDns } from "./recreateContainersIfLegacyDns.js";
 import { ensureCoreComposesHardcodedIpsRange } from "./ensureCoreComposesHardcodedIpsRange.js";
 import { determineIsDappnodeAws } from "./determineIsDappnodeAws.js";
+import { removeBloxrouteMaxProfitRelay } from "./removeBloxrouteMaxProfitRelay.js";
 
 class MigrationError extends Error {
   errors: Error[];
@@ -56,6 +57,11 @@ export async function executeMigrations(): Promise<void> {
       fn: determineIsDappnodeAws,
       migration: "determine if the dappnode is running in Dappnode AWS",
       coreVersion: "0.2.94"
+    },
+    {
+      fn: removeBloxrouteMaxProfitRelay,
+      migration: "remove the retired bloXroute Max Profit relay from MEV-Boost",
+      coreVersion: "0.2.127"
     }
   ];
 

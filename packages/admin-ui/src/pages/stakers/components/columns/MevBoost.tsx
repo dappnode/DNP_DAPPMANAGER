@@ -168,7 +168,6 @@ function Relay({
 
 // Utils
 
-// bloxroute (maxprofit) is OFAC compliant as of Dec 2023: https://x.com/bloXrouteLabs/status/1736819783520092357
 // Info on all relays specs: https://github.com/eth-educators/ethstaker-guides/blob/main/MEV-relay-list.md
 const getDefaultRelays = (network: Network): RelayIface[] => {
   switch (network) {
@@ -201,13 +200,6 @@ const getDefaultRelays = (network: Network): RelayIface[] => {
           docs: "https://boost.flashbots.net/",
           url:
             "https://0xac6e77dfe25ecd6110b8e780608cce0dab71fdd5ebea22a16c0205200f2f8e2e3ad3b71d3499c54ad14d6c21b41a37ae@boost-relay.flashbots.net"
-        },
-        {
-          operator: "bloXroute (Max profit)",
-          ofacCompliant: true,
-          docs: "https://bloxroute.com/",
-          url:
-            "https://0x8b5d2e73e2a3a55c6c87b8b6eb92e0149a125c852751db1422fa951e42a09b82c142c3ea98d0d9930b056a3bc9896b8f@bloxroute.max-profit.blxrbdn.com"
         },
         {
           operator: "bloXroute (Regulated)",
