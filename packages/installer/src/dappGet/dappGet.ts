@@ -17,7 +17,7 @@ export interface DappgetOptions {
  * Aggregates all relevant packages and their info given a specific request.
  * The resulting "repo" (dnps) is run through a brute force resolver.
  * It returns success when finds the first compatible combination of versions.
- * Otherwise it will return an error formated object
+ * Otherwise it will return an error formatted object
  *
  * The criteria to qualify the "first" found combination is:
  * - The requested package has the highest version
@@ -96,7 +96,7 @@ export async function dappGet(
   }
 
   const { success, message, state } = result;
-  // If the request could not be resolved, output a formated error:
+  // If the request could not be resolved, output a formatted error:
   if (!success) throw Error(`Could not find compatible state. ${message}`);
 
   // Otherwise, format the output
@@ -107,7 +107,7 @@ export async function dappGet(
     const nextVersion = state[dnp.dnpName];
     if (nextVersion && !shouldUpdate(prevVersion, nextVersion)) {
       // DNP is already updated.
-      // Remove from the success object and add it to the alreadyUpdatedd
+      // Remove from the success object and add it to the alreadyUpdated
       alreadyUpdated[dnp.dnpName] = state[dnp.dnpName];
       delete state[dnp.dnpName];
     }
