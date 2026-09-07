@@ -11,13 +11,19 @@ const trustedKeys = new Map<string, TrustedReleaseKey>([[initialTrustedKey.name,
 
 export const releaseTrustedKey: Pick<
   Routes,
-  "releaseTrustedKeyAdd" | "releaseTrustedKeyList" | "releaseTrustedKeyRemove"
+  "releaseTrustedKeyAdd" | "releaseTrustedKeyList" | "releaseTrustedKeyRemove" | "releaseTrustedKeyReset"
 > = {
   releaseTrustedKeyAdd: async (trustedKey) => {
     trustedKeys.set(trustedKey.name, trustedKey);
   },
   releaseTrustedKeyList: async () => Array.from(trustedKeys.values()),
-  releaseTrustedKeyRemove: async (keyName) => {
-    trustedKeys.delete(keyName);
+  releaseTrustedKeyRemove: async (keyName, dnpNameSuffix) => {
+    if (dnpNameSuffix === undefined || trustedKeys.get(keyName)?.dnpNameSuffix === dnpNameSuffix) {
+      trustedKeys.delete(keyName);
+    }
+  },
+  releaseTrustedKeyReset: async () => {
+    trustedKeys.clear();
+    trustedKeys.set(initialTrustedKey.name, initialTrustedKey);
   }
 };

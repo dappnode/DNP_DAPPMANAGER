@@ -20,7 +20,7 @@ export const dbCache = dbFactory(params.DB_CACHE_PATH);
 export const dbNexus = dbFactory(params.DB_NEXUS_PATH);
 
 export function dbFactory(dbPath: string): {
-  staticKey: <T>(key: string, defaultValue: T) => { get: () => T; set: (value: T) => void };
+  staticKey: <T>(key: string, defaultValue: T) => { get: () => T; set: (value: T) => void; remove: () => void };
   indexedByKey: <V, K>({
     rootKey,
     getKey,
@@ -54,12 +54,17 @@ export function dbFactory(dbPath: string): {
    * Factory methods
    */
 
-  function staticKey<T>(key: string, defaultValue: T): { get: () => T; set: (value: T) => void } {
+  function staticKey<T>(key: string, defaultValue: T): { get: () => T; set: (value: T) => void; remove: () => void } {
     return {
       get: (): T => jsonFileDb.read()[key] ?? defaultValue,
       set: (newValue: T): void => {
         const all = jsonFileDb.read();
         all[key] = newValue;
+        jsonFileDb.write(all);
+      },
+      remove: (): void => {
+        const all = jsonFileDb.read();
+        delete all[key];
         jsonFileDb.write(all);
       }
     };
