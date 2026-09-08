@@ -28,6 +28,7 @@ export interface NexusStatus {
 const STATUS_URL = "/nexus/status";
 const CONFIG_URL = "/nexus/config";
 const PRIVATE_MODE_URL = "/nexus/private-mode";
+const PRIVATE_MODE_PROBE_URL = "/nexus/private-mode/probe";
 const MODELS_URL = "/nexus/models";
 const CHAT_URL = "/nexus/chat/completions";
 const CONFIRM_URL = "/nexus/chat/confirm";
@@ -78,6 +79,21 @@ export function setNexusApiKey(apiKey: string): Promise<NexusStatus> {
 /** Clears the in-app Nexus API key. */
 export function clearNexusApiKey(): Promise<NexusStatus> {
   return fetchJson<NexusStatus>(CONFIG_URL, { method: "DELETE" });
+}
+
+/** What the local proxy reports about its own verification of the Gateway. */
+export interface NexusProxyProbe {
+  reachable: boolean;
+  verified: boolean;
+  status?: string;
+  gateway?: string | null;
+  sourceRevision?: string | null;
+  checks?: number;
+  reason?: string;
+}
+
+export function probeNexusPrivateMode(): Promise<NexusProxyProbe> {
+  return fetchJson<NexusProxyProbe>(PRIVATE_MODE_PROBE_URL);
 }
 
 export function setNexusPrivateMode(privateMode: boolean): Promise<NexusStatus> {

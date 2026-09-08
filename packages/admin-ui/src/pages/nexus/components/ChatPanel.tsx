@@ -25,6 +25,7 @@ import {
   ChatHistorySummary,
   ChatMessage,
   NexusModel,
+  NexusProxyProbe,
   NexusStatus,
   clearChatHistory,
   clearNexusApiKey,
@@ -33,6 +34,7 @@ import {
   listChatHistory,
   listNexusModels,
   loadConversation,
+  probeNexusPrivateMode,
   saveConversation,
   setNexusApiKey,
   setNexusPrivateMode,
@@ -1124,7 +1126,24 @@ function ApiKeyEditor({
   const [show, setShow] = useState(false);
   const [busyAction, setBusyAction] = useState<"login" | "save" | "clear" | "privateMode" | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [probe, setProbe] = useState<NexusProxyProbe | null>(null);
   const busy = busyAction !== null;
+
+  // Private mode fails closed, so the operator should be able to see whether
+  // the proxy is there and verified before switching over, and afterwards.
+  useEffect(() => {
+    let cancelled = false;
+    probeNexusPrivateMode()
+      .then((result) => {
+        if (!cancelled) setProbe(result);
+      })
+      .catch(() => {
+        if (!cancelled) setProbe({ reachable: false, verified: false, reason: "could not reach the local proxy" });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const login = async () => {
     if (busy) return;
@@ -1157,6 +1176,7 @@ function ApiKeyEditor({
     setError(null);
     try {
       await onTogglePrivateMode(enabled);
+      setProbe(await probeNexusPrivateMode());
     } catch (err) {
       setError((err as Error).message || "Failed to change private mode");
     }
@@ -1245,6 +1265,24 @@ function ApiKeyEditor({
             />
             <span>Private mode — route through the attested local proxy</span>
           </label>
+          {probe && !probe.reachable && (
+            <p className="nexus-private-mode-status nexus-private-mode-status-bad">
+              <strong>Nexus Local Proxy is not installed.</strong> Install the <strong>Nexus Local Proxy</strong>{" "}
+              package on this DAppNode before turning private mode on — without it, chat will stop working.
+            </p>
+          )}
+          {probe && probe.reachable && !probe.verified && (
+            <p className="nexus-private-mode-status nexus-private-mode-status-bad">
+              <strong>The proxy has not verified the Gateway.</strong>{" "}
+              {probe.reason ?? "It reports an unverified state."} It will not carry prompts until it can verify.
+            </p>
+          )}
+          {probe && probe.verified && (
+            <p className="nexus-private-mode-status nexus-private-mode-status-ok">
+              <strong>Gateway verified.</strong> The proxy performed {probe.checks ?? 0} checks and confirmed release{" "}
+              <code>{(probe.sourceRevision ?? "unknown").slice(0, 12)}</code> is running inside an AWS Nitro Enclave.
+            </p>
+          )}
           <p className="nexus-key-editor-text nexus-private-mode-help">
             {status.privateMode ? (
               <>

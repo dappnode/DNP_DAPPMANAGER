@@ -5,6 +5,7 @@ import type {
   HistorySummary,
   NexusRawResponse,
   NexusApiDeps,
+  NexusProxyProbe,
   NexusStatus,
   NexusStoredChatMessage,
   NexusStoredConversation,
@@ -16,15 +17,20 @@ import { collapseWhitespace, trimAsciiWhitespace, trimTrailingSlashes } from "./
 const DEFAULT_GATEWAY_URL = "https://nexus-api.dappnode.com/v1";
 
 // Private mode routes through nexus-local-proxy on this DAppNode, which
-// verifies the gateway's AWS Nitro attestation against a pinned policy and
-// encrypts request and response bodies with EHBP. The direct URL terminates
-// TLS at Cloudflare, where prompts are readable.
+// verifies the gateway's AWS Nitro attestation against measurements it takes
+// from cosign-signed Gateway releases, and encrypts request and response
+// bodies with EHBP. The direct URL terminates TLS at Cloudflare, where prompts
+// are readable.
 //
 // The proxy is OpenAI-compatible on both endpoints this client uses --
 // /chat/completions over the attested channel and /models passed through --
 // so nothing else here has to change.
 const NEXUS_PROXY_GATEWAY_URL = "http://nexus-local-proxy.dappnode.private:3301/v1";
 const NEXUS_PROXY_VERIFICATION_URL = "http://nexus-local-proxy.dappnode.private:3301/verification";
+// The machine-readable form of the page above, used to tell the operator
+// whether turning private mode on will actually work before they turn it on.
+const NEXUS_PROXY_VERIFICATION_API = "http://nexus-local-proxy.dappnode.private:3301/v1/verification";
+const NEXUS_PROXY_PROBE_TIMEOUT_MS = 5_000;
 const DEFAULT_MODEL = "nexus/auto";
 const MAX_HISTORY_ENTRIES = 50;
 const MAX_TITLE_LENGTH = 80;
@@ -154,6 +160,47 @@ export class NexusApi {
       throw NexusApiError.json(501, "not_supported", "private mode is not available on this DAppNode");
     this.deps.privateModeStore.set(rawEnabled);
     return this.readStatus();
+  }
+
+  /**
+   * Ask the local proxy whether it is installed and has verified the Gateway.
+   *
+   * Private mode fails closed, so without this the first sign that the proxy
+   * is missing is a chat message that does not send. Probing turns that into
+   * something the operator can act on before switching over.
+   */
+  async probeLocalProxy(): Promise<NexusProxyProbe> {
+    let upstream: Awaited<ReturnType<FetchLike>>;
+    try {
+      upstream = await this.fetchImpl(NEXUS_PROXY_VERIFICATION_API, {
+        headers: { accept: "application/json" },
+        signal: AbortSignal.timeout(NEXUS_PROXY_PROBE_TIMEOUT_MS)
+      });
+    } catch {
+      return { reachable: false, verified: false, reason: "nexus-local-proxy is not installed or not running" };
+    }
+    if (!upstream.ok) {
+      return { reachable: true, verified: false, reason: `the proxy returned HTTP ${upstream.status}` };
+    }
+    try {
+      const payload = (await upstream.json()) as {
+        status?: string;
+        gateway?: string;
+        current?: { source_revision?: string; checks?: unknown[] };
+      };
+      const current = payload.current ?? {};
+      return {
+        reachable: true,
+        verified: payload.status === "verified",
+        status: payload.status ?? "unknown",
+        gateway: payload.gateway ?? null,
+        sourceRevision: current.source_revision ?? null,
+        checks: Array.isArray(current.checks) ? current.checks.length : 0,
+        reason: payload.status === "verified" ? undefined : `the proxy reports status "${payload.status ?? "unknown"}"`
+      };
+    } catch {
+      return { reachable: true, verified: false, reason: "the proxy returned a response this DAppNode cannot read" };
+    }
   }
 
   private isPrivateMode(): boolean {

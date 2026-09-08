@@ -46,6 +46,28 @@ export interface NexusStatus {
   verificationUrl: string;
 }
 
+/**
+ * What the local proxy reports about its own verification of the Gateway.
+ * Read from the proxy rather than attested here: one verifier on the node,
+ * everything else reads its answer.
+ */
+export interface NexusProxyProbe {
+  /** Whether nexus-local-proxy answered at all. False means not installed. */
+  reachable: boolean;
+  /** Whether it has currently verified the Gateway. */
+  verified: boolean;
+  /** The proxy's own status string, when it answered. */
+  status?: string;
+  /** Gateway origin the proxy is verifying. */
+  gateway?: string | null;
+  /** Attested Gateway release currently in force. */
+  sourceRevision?: string | null;
+  /** How many checks the proxy performed. */
+  checks?: number;
+  /** Why the probe did not come back verified. */
+  reason?: string;
+}
+
 export interface GatewayModel {
   id: string;
   display_name?: string;

@@ -117,6 +117,15 @@ export const nexusSetPrivateMode = wrapHandler(async (req: Request, res: Express
   }
 });
 
+/** GET /nexus/private-mode/probe - is the local proxy installed and verified? */
+export const nexusProbePrivateMode = wrapHandler(async (_req: Request, res: ExpressResponse) => {
+  try {
+    res.status(200).json(await nexus.probeLocalProxy());
+  } catch (err) {
+    sendNexusError(res, err);
+  }
+});
+
 /** DELETE /nexus/config - clear the stored Nexus API key. */
 export const nexusClearApiKey = wrapHandler(async (_req: Request, res: ExpressResponse) => {
   if (db.nexusManagedApiKey.get() && db.nexusApiKey.get()) {

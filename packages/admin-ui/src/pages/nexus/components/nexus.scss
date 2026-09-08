@@ -1327,3 +1327,28 @@
   font-size: 0.85rem;
   line-height: 1.5;
 }
+
+// What the local proxy reports about itself. Shown whether private mode is on
+// or off: before, it says whether turning it on will work; after, it says
+// whether it still does.
+.nexus-private-mode-status {
+  margin: 0.5rem 0 0;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  line-height: 1.5;
+
+  code {
+    font-size: 0.95em;
+  }
+}
+
+.nexus-private-mode-status-ok {
+  background: rgba(52, 211, 153, 0.1);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+.nexus-private-mode-status-bad {
+  background: rgba(248, 113, 113, 0.1);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+}

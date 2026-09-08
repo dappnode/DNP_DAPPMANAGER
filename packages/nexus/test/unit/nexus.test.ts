@@ -112,6 +112,67 @@ describe("nexus / api", () => {
     expect(() => service.setPrivateMode("yes")).to.throw();
   });
 
+  it("reports a verified local proxy", async () => {
+    const { service } = makeService({
+      apiKey: "secret",
+      fetch: async () =>
+        jsonResponse({
+          status: "verified",
+          gateway: "https://nexus-api-tee.dappnode.com",
+          current: { source_revision: "893f4c9f306707b83f3b41782f25eb05adbc4f30", checks: [1, 2, 3] }
+        })
+    });
+
+    const probe = await service.probeLocalProxy();
+
+    expect(probe.reachable).to.equal(true);
+    expect(probe.verified).to.equal(true);
+    expect(probe.checks).to.equal(3);
+    expect(probe.sourceRevision).to.equal("893f4c9f306707b83f3b41782f25eb05adbc4f30");
+  });
+
+  // Private mode fails closed, so a missing proxy has to be reported as such
+  // rather than surfacing later as a chat message that will not send.
+  it("reports an absent local proxy as unreachable", async () => {
+    const { service } = makeService({
+      apiKey: "secret",
+      fetch: async () => {
+        throw new Error("ECONNREFUSED");
+      }
+    });
+
+    const probe = await service.probeLocalProxy();
+
+    expect(probe.reachable).to.equal(false);
+    expect(probe.verified).to.equal(false);
+    expect(probe.reason).to.include("not installed");
+  });
+
+  it("reports a running but unverified local proxy", async () => {
+    const { service } = makeService({
+      apiKey: "secret",
+      fetch: async () => jsonResponse({ status: "starting", current: null })
+    });
+
+    const probe = await service.probeLocalProxy();
+
+    expect(probe.reachable).to.equal(true);
+    expect(probe.verified).to.equal(false);
+    expect(probe.status).to.equal("starting");
+  });
+
+  it("reports an unreadable local proxy response as unverified", async () => {
+    const { service } = makeService({
+      apiKey: "secret",
+      fetch: async () => textResponse("not json", 200)
+    });
+
+    const probe = await service.probeLocalProxy();
+
+    expect(probe.reachable).to.equal(true);
+    expect(probe.verified).to.equal(false);
+  });
+
   it("filters model list to chat-completions capable models", async () => {
     const { service } = makeService({
       apiKey: "secret",
