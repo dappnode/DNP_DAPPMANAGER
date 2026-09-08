@@ -1,6 +1,8 @@
 import * as isIPFS from "is-ipfs";
 import { CID, IPFSEntry } from "kubo-rpc-client";
 import { CarReader } from "@ipld/car";
+import * as dagPb from "@ipld/dag-pb";
+import { sha256 } from "multiformats/hashes/sha2";
 import { recursive as exporter } from "ipfs-unixfs-exporter";
 import { Version } from "multiformats";
 import path from "path";
@@ -53,7 +55,7 @@ type ListResult =
  *
  * Provider priority (easy to swap — search for "Provider 1" and "Provider 2"):
  *   1. Mirror HTTP (if isMirrorEnabled())
- *   2. IPFS fallback (dag-json listing + CAR downloads)
+ *   2. IPFS fallback (DAG-PB listing + CAR downloads)
  *
  * @extends ApmRepository
  */
@@ -189,7 +191,7 @@ export class DappnodeRepository extends ApmRepository {
     const compose = await this.getPkgAsset<Compose>(releaseFilesToDownload.compose, listResult);
     if (!compose) throw Error(`Invalid pkg release ${contentUri}, compose not found`);
 
-    // Signature verification requires individual file CIDs from IPFS dag-json listing.
+    // Signature verification requires individual file CIDs from IPFS DAG-PB listing.
     // Mirror listings have no individual CIDs, so verification is skipped.
     // Packages sourced from the mirror are trusted by the mirror operator (signedSafe = true).
     const signature: ReleaseSignature | undefined =
@@ -481,7 +483,7 @@ export class DappnodeRepository extends ApmRepository {
   }
 
   /**
-   * Lists the contents of a directory pointed by the given hash using IPFS dag-json.
+   * Lists the contents of a directory pointed by the given hash using IPFS DAG-PB.
    * Returns entries with individual file CIDs (required for signature verification).
    *
    * TODO: research why the size is different, i.e for the hash QmWcJrobqhHF7GWpqEbxdv2cWCCXbACmq85Hh7aJ1eu8rn Tsize is 64461521 and size is 64446140
@@ -492,34 +494,33 @@ export class DappnodeRepository extends ApmRepository {
    */
   public async list(hash: string): Promise<IPFSEntry[]> {
     const cidStr = this.sanitizeIpfsPath(hash.toString());
-    const dagJson = await this.ipfsGatewayClient.fetch(
-      `/ipfs/${cidStr}?format=dag-json`,
-      { headers: { Accept: "application/vnd.ipld.dag-json" } },
+    const cid = CID.parse(cidStr);
+    if (cid.code !== dagPb.code || cid.multihash.code !== sha256.code) {
+      throw new Error(`Unsupported IPFS directory CID ${cidStr}`);
+    }
+    return this.ipfsGatewayClient.fetch(
+      `/ipfs/${cidStr}?format=raw`,
+      { headers: { Accept: "application/vnd.ipld.raw" } },
       async (res) => {
-        const result = (await res.json()) as {
-          Links?: Array<{
-            Name: string;
-            Hash: { "/": string };
-            Tsize: number;
-          }>;
-        };
-        if (!result.Links) throw new Error(`Invalid IPFS directory CID ${cidStr}`);
-        return { Links: result.Links };
+        // Decode locally: newer gateways reject DAG-PB to DAG-JSON conversion.
+        const bytes = new Uint8Array(await res.arrayBuffer());
+        const actualCid = CID.create(cid.version, dagPb.code, await sha256.digest(bytes));
+        if (!actualCid.equals(cid)) throw new Error(`UNTRUSTED CONTENT: expected directory ${cidStr}`);
+        const directory = dagPb.decode(bytes);
+        return directory.Links.map((link) => ({
+          type: "file" as const,
+          cid: CID.parse(link.Hash.toString()),
+          name: link.Name ?? "",
+          path: `${link.Hash}/${link.Name ?? ""}`,
+          size: link.Tsize ?? 0
+        }));
       }
     );
-
-    return dagJson.Links.map((link) => ({
-      type: "file",
-      cid: CID.parse(this.sanitizeIpfsPath(link.Hash["/"])),
-      name: link.Name,
-      path: `${link.Hash["/"]}/${link.Name}`,
-      size: link.Tsize
-    }));
   }
 
   /**
    * Provider 1: Mirror JSON listing — fast, real filenames, no individual file CIDs.
-   * Provider 2: IPFS dag-json listing — real individual file CIDs (required for signature verification).
+   * Provider 2: IPFS DAG-PB listing — real individual file CIDs (required for signature verification).
    *
    * Returns a discriminated union so callers never deal with placeholder CIDs.
    * When source is "mirror", signature verification is skipped and signedSafe = true
@@ -538,7 +539,7 @@ export class DappnodeRepository extends ApmRepository {
       }
     }
 
-    // Provider 2: IPFS dag-json — has real individual file CIDs
+    // Provider 2: IPFS DAG-PB — has real individual file CIDs
     const entries = await this.list(hash);
     return { source: "ipfs", entries, packageCidStr };
   }
