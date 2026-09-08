@@ -778,9 +778,11 @@ export interface Routes {
   /** Add a release key to trusted keys db */
   releaseTrustedKeyAdd(newTrustedKey: TrustedReleaseKey): Promise<void>;
   /** List all keys from trusted keys db */
-  releaseTrustedKeyList(): Promise<TrustedReleaseKey[]>;
+  releaseTrustedKeyList(): Promise<{ keys: TrustedReleaseKey[]; isDefault: boolean }>;
   /** Remove a release key from trusted keys db, by name */
-  releaseTrustedKeyRemove(keyName: string): Promise<void>;
+  releaseTrustedKeyRemove(keyName: string, dnpNameSuffix?: string): Promise<void>;
+  /** Delete the saved trusted keys list and restore defaults */
+  releaseTrustedKeyReset(): Promise<void>;
 
   /**
    * Returns weather or not should show the smooth modal
@@ -1058,6 +1060,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   releaseTrustedKeyAdd: { log: true },
   releaseTrustedKeyList: {},
   releaseTrustedKeyRemove: { log: true },
+  releaseTrustedKeyReset: { log: true },
   setShouldShownSmooth: {},
   getShouldShowSmooth: {},
   signerByNetworkGet: {},

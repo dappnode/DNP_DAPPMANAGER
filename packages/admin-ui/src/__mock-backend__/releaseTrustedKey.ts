@@ -9,15 +9,29 @@ const initialTrustedKey: TrustedReleaseKey = {
 
 const trustedKeys = new Map<string, TrustedReleaseKey>([[initialTrustedKey.name, initialTrustedKey]]);
 
+let isDefault = true;
+
 export const releaseTrustedKey: Pick<
   Routes,
-  "releaseTrustedKeyAdd" | "releaseTrustedKeyList" | "releaseTrustedKeyRemove"
+  "releaseTrustedKeyAdd" | "releaseTrustedKeyList" | "releaseTrustedKeyRemove" | "releaseTrustedKeyReset"
 > = {
   releaseTrustedKeyAdd: async (trustedKey) => {
     trustedKeys.set(trustedKey.name, trustedKey);
+    isDefault = false;
   },
-  releaseTrustedKeyList: async () => Array.from(trustedKeys.values()),
-  releaseTrustedKeyRemove: async (keyName) => {
-    trustedKeys.delete(keyName);
+  releaseTrustedKeyList: async () => ({
+    keys: Array.from(trustedKeys.values()),
+    isDefault
+  }),
+  releaseTrustedKeyRemove: async (keyName, dnpNameSuffix) => {
+    if (dnpNameSuffix === undefined || trustedKeys.get(keyName)?.dnpNameSuffix === dnpNameSuffix) {
+      trustedKeys.delete(keyName);
+      isDefault = false;
+    }
+  },
+  releaseTrustedKeyReset: async () => {
+    trustedKeys.clear();
+    trustedKeys.set(initialTrustedKey.name, initialTrustedKey);
+    isDefault = true;
   }
 };
