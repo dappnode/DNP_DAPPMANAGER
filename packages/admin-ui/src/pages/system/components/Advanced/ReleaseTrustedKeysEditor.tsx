@@ -40,7 +40,7 @@ export function ReleaseTrustedKeysEditor() {
     <Card spacing>
       <p>The default trusted keys are used until you add or remove a key. Reset to defaults to discard your changes.</p>
       {trustedKeys.data ? (
-        <ReleaseTrustedKeysGrid keys={trustedKeys.data} onEdit={trustedKeys.revalidate} />
+        <ReleaseTrustedKeysGrid keys={trustedKeys.data.keys} onEdit={trustedKeys.revalidate} />
       ) : trustedKeys.error ? (
         <ErrorView error={trustedKeys.error} hideIcon red />
       ) : trustedKeys.isValidating ? (
@@ -56,14 +56,20 @@ export function ReleaseTrustedKeysEditor() {
               trustedKeys.revalidate();
             }}
           />
-          <Button onClick={() => setAddingKey(false)}>Cancel</Button>
         </>
-      ) : (
-        <Button type="submit" onClick={() => setAddingKey(true)}>
-          Add new key
+      ) : null}
+      <div className="release-trusted-keys-actions">
+        {addingKey ? (
+          <Button onClick={() => setAddingKey(false)}>Cancel</Button>
+        ) : (
+          <Button type="submit" onClick={() => setAddingKey(true)}>
+            Add new key
+          </Button>
+        )}
+        <Button onClick={resetTrustedKeys} disabled={!trustedKeys.data || trustedKeys.data.isDefault}>
+          Reset to defaults
         </Button>
-      )}
-      <Button onClick={resetTrustedKeys}>Reset to defaults</Button>
+      </div>
     </Card>
   );
 }

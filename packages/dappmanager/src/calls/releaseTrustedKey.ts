@@ -49,8 +49,11 @@ export async function releaseTrustedKeyRemove(keyName: string, dnpNameSuffix?: s
 /**
  * List all keys from trusted keys db
  */
-export async function releaseTrustedKeyList(): Promise<TrustedReleaseKey[]> {
-  return db.releaseKeysTrusted.get();
+export async function releaseTrustedKeyList(): Promise<{ keys: TrustedReleaseKey[]; isDefault: boolean }> {
+  return {
+    keys: db.releaseKeysTrusted.get(),
+    isDefault: !db.releaseKeysTrusted.has()
+  };
 }
 
 /** Restore defaults by deleting the saved trusted keys list. */

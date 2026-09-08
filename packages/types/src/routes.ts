@@ -778,7 +778,7 @@ export interface Routes {
   /** Add a release key to trusted keys db */
   releaseTrustedKeyAdd(newTrustedKey: TrustedReleaseKey): Promise<void>;
   /** List all keys from trusted keys db */
-  releaseTrustedKeyList(): Promise<TrustedReleaseKey[]>;
+  releaseTrustedKeyList(): Promise<{ keys: TrustedReleaseKey[]; isDefault: boolean }>;
   /** Remove a release key from trusted keys db, by name */
   releaseTrustedKeyRemove(keyName: string, dnpNameSuffix?: string): Promise<void>;
   /** Delete the saved trusted keys list and restore defaults */
