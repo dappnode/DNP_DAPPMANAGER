@@ -31,7 +31,7 @@
     "@dappnode/toolkit": "workspace:^0.1.0",
     "@dappnode/types": "workspace:^0.1.0",
     "@dappnode/utils": "workspace:^0.1.0",
-    "deepmerge": "2.2.1",
+    "deepmerge": "4.3.1",
     "ethers": "^6.17.0",
     "is-ipfs": "8.0.4",
     "lodash-es": "4.18.1",

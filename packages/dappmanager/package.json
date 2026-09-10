@@ -64,7 +64,7 @@
     "compression": "1.7.4",
     "cookie-session": "^1.4.0",
     "cors": "^2.8.6",
-    "deepmerge": "^2.2.1",
+    "deepmerge": "^4.3.1",
     "ethers": "^6.17.0",
     "express": "^4.22.2",
     "express-fileupload": "^1.4.0",
