@@ -10,6 +10,7 @@ The **DNP_DAPPMANAGER** handles the Dappnode core DNPs and any user installed DN
 
 - :bust_in_silhouette: For user / usage documentation go to the [user guide](https://docs.dappnode.io/docs/user/getting-started/choose-your-path)
 - :wrench: For developers check the [technical documentation](https://docs.dappnode.io/docs/dev)
+- :books: For repository management system documentation see the [wiki](./wiki/)
 - :speech_balloon: For feedback and reporting problems please [submit an issue](https://github.com/dappnode/dappnode/issues/new) or contact us on [Discord](https://discord.gg/dappnode)
 
 It is an AragonApp whose repo is deployed at this address: [0x0c564ca7b948008fb324268d8baedaeb1bd47bce](https://etherscan.io/address/0x0c564ca7b948008fb324268d8baedaeb1bd47bce) and whose ENS address is: [dappmanager.dnp.dappnode.eth](https://etherscan.io/enslookup?q=dappmanager.dnp.dappnode.eth])
