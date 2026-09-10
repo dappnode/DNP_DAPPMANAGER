@@ -2,7 +2,7 @@ import fs from "fs";
 import * as db from "@dappnode/db";
 import { params } from "@dappnode/params";
 import { logs } from "@dappnode/logger";
-import isIp from "is-ip";
+import { isIP as isIp } from "is-ip";
 import { isNotFoundError } from "@dappnode/utils";
 
 const staticIpPath = params.STATIC_IP_PATH;

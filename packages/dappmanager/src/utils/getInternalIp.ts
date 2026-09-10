@@ -1,4 +1,4 @@
-import isIp from "is-ip";
+import { isIP as isIp } from "is-ip";
 import { shell } from "@dappnode/utils";
 import { getDappmanagerImage } from "@dappnode/dockerapi";
 

@@ -1,4 +1,4 @@
-import isIp from "is-ip";
+import { isIP as isIp } from "is-ip";
 import retry from "async-retry";
 
 const urls = ["https://ns.dappnode.io/myip", "http://ipv4.icanhazip.com", "http://ident.me"];

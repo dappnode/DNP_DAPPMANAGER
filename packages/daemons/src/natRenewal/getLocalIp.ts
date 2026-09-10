@@ -1,5 +1,5 @@
 import { shell } from "@dappnode/utils";
-import isIp from "is-ip";
+import { isIP as isIp } from "is-ip";
 import { logs } from "@dappnode/logger";
 import { getDappmanagerImage } from "@dappnode/dockerapi";
 

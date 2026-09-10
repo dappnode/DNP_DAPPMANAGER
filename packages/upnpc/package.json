@@ -21,7 +21,7 @@
     "@dappnode/dockerapi": "workspace:^0.1.0",
     "@dappnode/types": "workspace:^0.1.0",
     "@dappnode/utils": "workspace:^0.1.0",
-    "is-ip": "3.1.0"
+    "is-ip": "5.0.1"
   },
   "devDependencies": {
     "@types/mocha": "^10",

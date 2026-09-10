@@ -36,6 +36,6 @@
     "@types/mocha": "^10",
     "@types/tar-stream": "2.1.0",
     "mocha": "^12.0.0",
-    "rewiremock": "^3.13.7"
+    "rewiremock": "^3.14.6"
   }
 }

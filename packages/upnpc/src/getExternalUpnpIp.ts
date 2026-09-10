@@ -1,4 +1,4 @@
-import isIp from "is-ip";
+import { isIP as isIp } from "is-ip";
 import upnpcCommand from "./upnpcCommand.js";
 import { parseUpnpErrors } from "./upnpError.js";
 
