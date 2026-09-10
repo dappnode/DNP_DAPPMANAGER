@@ -12,6 +12,7 @@ import { setVersion } from "../utils/dnpUtils.js";
 import { ErrorDappGetDowngrade, ErrorDappGetNotSatisfyRange, ErrorDappGetNoVersions } from "../errors.js";
 import { InstalledPackageData, PackageRequest } from "@dappnode/types";
 import { DappnodeInstaller } from "../../dappnodeInstaller.js";
+import { sanitizeVersions } from "../utils/sanitizeVersions.js";
 
 /**
  * Aggregates all relevant packages and their info given a specific request.
@@ -74,12 +75,18 @@ export default async function aggregate({
   // WARNING: req is a user external input, must verify
   if (req.ver === "latest") req.ver = "*";
 
+  // Determine the latest version first
+  const availableVersions = await dappGetFetcher.versions(dappnodeInstaller, req.name, req.ver).then(sanitizeVersions);
+  if (availableVersions.length === 0) throw new ErrorDappGetNoVersions({ dnpName: req.name, req });
+
+  const latestVersion = availableVersions.sort((a, b) => (valid(a) && valid(b) ? (lt(a, b) ? 1 : -1) : 0))[0];
+
   await aggregateDependencies({
     dappnodeInstaller,
     name: req.name,
-    versionRange: req.ver,
+    versionRange: latestVersion, // Only the latest version
     dnps,
-    dappGetFetcher // #### Injected dependency
+    dappGetFetcher
   });
 
   // Clean up the dnps graph only once after all aggregation is done
