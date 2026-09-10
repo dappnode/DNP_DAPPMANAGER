@@ -24,7 +24,7 @@
     "@dappnode/params": "workspace:^0.1.0",
     "@dappnode/types": "workspace:^0.1.0",
     "@dappnode/utils": "workspace:^0.1.0",
-    "ajv": "6.15.0",
+    "ajv": "8.20.0",
     "memoizee": "0.4.17"
   },
   "devDependencies": {

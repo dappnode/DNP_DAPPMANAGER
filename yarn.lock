@@ -1054,15 +1054,15 @@ __metadata:
     "@types/clipboard": "npm:^2.0.10"
     "@types/jest": "npm:^24.9.1"
     "@types/qrcode.react": "npm:^1.0.5"
-    "@types/react": "npm:^18.3.31"
-    "@types/react-dom": "npm:^18.3.7"
-    "@types/react-redux": "npm:^7.1.34"
+    "@types/react": "npm:18.2.18"
+    "@types/react-dom": "npm:^18.3.0"
+    "@types/react-redux": "npm:^7.1.25"
     "@types/react-router-dom": "npm:^5.3.3"
     "@types/semver": "npm:^7.8.0"
     "@types/socket.io-client": "npm:^3.0.0"
     "@types/styled-components": "npm:^5.1.36"
     "@vitejs/plugin-react": "npm:^4.7.0"
-    ajv: "npm:^6.15.0"
+    ajv: "npm:^8.20.0"
     bootstrap: "npm:^5.3"
     clipboard: "npm:^2.0.11"
     deepmerge: "npm:^2.2.1"
@@ -1211,7 +1211,7 @@ __metadata:
     "@types/semver": "npm:^7.8.0"
     "@types/sinon": "npm:^22.0.0"
     "@types/socket.io": "npm:^3.0.2"
-    ajv: "npm:^6.15.0"
+    ajv: "npm:^8.20.0"
     async-retry: "npm:^1.3.3"
     bcryptjs: "npm:^2.4.3"
     compression: "npm:1.7.4"
@@ -1361,7 +1361,7 @@ __metadata:
     "@dappnode/utils": "workspace:^0.1.0"
     "@types/memoizee": "npm:0.4.12"
     "@types/mocha": "npm:^10"
-    ajv: "npm:6.15.0"
+    ajv: "npm:8.20.0"
     memoizee: "npm:0.4.17"
     mocha: "npm:^12.0.0"
   languageName: unknown
@@ -1572,7 +1572,7 @@ __metadata:
     "@types/lodash-es": "npm:^4.17.12"
     "@types/memoizee": "npm:0.4.12"
     "@types/mocha": "npm:^10"
-    ajv: "npm:^6.15.0"
+    ajv: "npm:^8.20.0"
     async: "npm:^3.2.6"
     async-retry: "npm:^1.3.3"
     is-ip: "npm:^3.1.0"
@@ -5551,7 +5551,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:^18.3.7":
+"@types/react-dom@npm:^18.3.0":
   version: 18.3.7
   resolution: "@types/react-dom@npm:18.3.7"
   peerDependencies:
@@ -5572,7 +5572,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-redux@npm:^7.1.34":
+"@types/react-redux@npm:^7.1.25":
   version: 7.1.34
   resolution: "@types/react-redux@npm:7.1.34"
   dependencies:
@@ -5614,7 +5614,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:*, @types/react@npm:>=16.9.11":
+"@types/react@npm:*, @types/react@npm:18.2.18, @types/react@npm:>=16.9.11":
   version: 18.2.18
   resolution: "@types/react@npm:18.2.18"
   dependencies:
@@ -5622,16 +5622,6 @@ __metadata:
     "@types/scheduler": "npm:*"
     csstype: "npm:^3.0.2"
   checksum: 10c0/2f544da491f7fcfa91ef172945b9b0f3ed9aff48bdf644f557cdfbef363b5891e1b1b06f3510c8f361c72523b835ed72ef0320a0d03cddbdcc37ff198c212900
-  languageName: node
-  linkType: hard
-
-"@types/react@npm:^18.3.31":
-  version: 18.3.31
-  resolution: "@types/react@npm:18.3.31"
-  dependencies:
-    "@types/prop-types": "npm:*"
-    csstype: "npm:^3.2.2"
-  checksum: 10c0/44180549dd045f536ececd39e39aacdf828e76adc1c4a90b132f453e23cc370c4648d9102ae401172ebd8fd8b1977a901a39e214e53ec77171b27514b588c179
   languageName: node
   linkType: hard
 
@@ -6316,15 +6306,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ajv@npm:6.15.0, ajv@npm:^6.14.0, ajv@npm:^6.15.0":
-  version: 6.15.0
-  resolution: "ajv@npm:6.15.0"
+"ajv@npm:8.20.0, ajv@npm:^8.20.0":
+  version: 8.20.0
+  resolution: "ajv@npm:8.20.0"
   dependencies:
-    fast-deep-equal: "npm:^3.1.1"
-    fast-json-stable-stringify: "npm:^2.0.0"
-    json-schema-traverse: "npm:^0.4.1"
-    uri-js: "npm:^4.2.2"
-  checksum: 10c0/67966499dd272ecde1c2e467084411132891523d057487587879d39ac04207f4351b7b2324c83198013967fbfa632c1612adc960114a30770fbe07a0773b32c2
+    fast-deep-equal: "npm:^3.1.3"
+    fast-uri: "npm:^3.0.1"
+    json-schema-traverse: "npm:^1.0.0"
+    require-from-string: "npm:^2.0.2"
+  checksum: 10c0/5df9a1c8f83863cde1bd3a9ddb426f599718f88e3dc9153616c79fb28e0be455335830d7f21d745576519f057b371352daa31047b6a33d7036fe08777d60cf2a
   languageName: node
   linkType: hard
 
@@ -6337,6 +6327,18 @@ __metadata:
     json-schema-traverse: "npm:^0.4.1"
     uri-js: "npm:^4.2.2"
   checksum: 10c0/41e23642cbe545889245b9d2a45854ebba51cda6c778ebced9649420d9205f2efb39cb43dbc41e358409223b1ea43303ae4839db682c848b891e4811da1a5a71
+  languageName: node
+  linkType: hard
+
+"ajv@npm:^6.14.0":
+  version: 6.15.0
+  resolution: "ajv@npm:6.15.0"
+  dependencies:
+    fast-deep-equal: "npm:^3.1.1"
+    fast-json-stable-stringify: "npm:^2.0.0"
+    json-schema-traverse: "npm:^0.4.1"
+    uri-js: "npm:^4.2.2"
+  checksum: 10c0/67966499dd272ecde1c2e467084411132891523d057487587879d39ac04207f4351b7b2324c83198013967fbfa632c1612adc960114a30770fbe07a0773b32c2
   languageName: node
   linkType: hard
 
@@ -6361,18 +6363,6 @@ __metadata:
     json-schema-traverse: "npm:^1.0.0"
     require-from-string: "npm:^2.0.2"
   checksum: 10c0/ec3ba10a573c6b60f94639ffc53526275917a2df6810e4ab5a6b959d87459f9ef3f00d5e7865b82677cb7d21590355b34da14d1d0b9c32d75f95a187e76fff35
-  languageName: node
-  linkType: hard
-
-"ajv@npm:^8.20.0":
-  version: 8.20.0
-  resolution: "ajv@npm:8.20.0"
-  dependencies:
-    fast-deep-equal: "npm:^3.1.3"
-    fast-uri: "npm:^3.0.1"
-    json-schema-traverse: "npm:^1.0.0"
-    require-from-string: "npm:^2.0.2"
-  checksum: 10c0/5df9a1c8f83863cde1bd3a9ddb426f599718f88e3dc9153616c79fb28e0be455335830d7f21d745576519f057b371352daa31047b6a33d7036fe08777d60cf2a
   languageName: node
   linkType: hard
 
