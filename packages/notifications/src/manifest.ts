@@ -95,7 +95,7 @@ export class NotificationsManifest {
       // If no previous version exists, return the new custom endpoint as-is
       if (!oldCustomEndpoint) return newCustomEndpoint;
 
-      // Copy all fields from the new custom endpoint, but preserve old enabled and metric.treshold
+      // Copy all fields from the new custom endpoint, but preserve old enabled and metric.threshold
       const mergedCustomEndpoint: CustomEndpoint = { ...newCustomEndpoint, enabled: oldCustomEndpoint.enabled };
       if (mergedCustomEndpoint.metric && oldCustomEndpoint.metric && oldCustomEndpoint.metric.treshold !== undefined) {
         mergedCustomEndpoint.metric.treshold = oldCustomEndpoint.metric.treshold;
