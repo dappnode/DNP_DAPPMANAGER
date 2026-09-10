@@ -24,12 +24,12 @@
     "@dappnode/params": "workspace:^0.1.0",
     "@dappnode/types": "workspace:^0.1.0",
     "@dappnode/utils": "workspace:^0.1.0",
-    "ajv": "6.10.2",
-    "memoizee": "0.4.14"
+    "ajv": "6.15.0",
+    "memoizee": "0.4.17"
   },
   "devDependencies": {
-    "@types/memoizee": "0.4.4",
+    "@types/memoizee": "0.4.12",
     "@types/mocha": "^10",
-    "mocha": "^10.7.0"
+    "mocha": "^10.8.2"
   }
 }

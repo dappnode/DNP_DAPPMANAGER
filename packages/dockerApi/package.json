@@ -31,7 +31,7 @@
     "tar-stream": "2.1.4"
   },
   "devDependencies": {
-    "@types/dockerode": "^3.3.23",
+    "@types/dockerode": "3.3.23",
     "@types/memoizee": "0.4.4",
     "@types/mocha": "^10",
     "@types/tar-stream": "2.1.0",

@@ -24,20 +24,20 @@
     "generate": "yarn workspace @dappnode/common run generate"
   },
   "devDependencies": {
-    "@eslint/js": "^9.22.0",
-    "@types/chai": "^4.3.11",
-    "@types/mocha": "^10.0.6",
-    "@types/node": "^22.13.9",
-    "chai": "^4.3.10",
+    "@eslint/js": "^9.39.5",
+    "@types/chai": "^4.3.20",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.13.9",
+    "chai": "^4.5.0",
     "depcheck": "^1.4.7",
-    "eslint": "^9.22.0",
-    "mocha": "^10.2.0",
-    "nodemon": "^3.0.2",
-    "prettier": "^3.3.3",
+    "eslint": "^9.39.5",
+    "mocha": "^10.8.2",
+    "nodemon": "^3.1.14",
+    "prettier": "^3.9.6",
     "rimraf": "^3.0.2",
-    "tsx": "^4.17.0",
-    "typescript": "^5.8.2",
-    "typescript-eslint": "^8.26.0"
+    "tsx": "^4.23.13",
+    "typescript": "5.8.2",
+    "typescript-eslint": "^8.70.0"
   },
   "packageManager": "yarn@4.7.0"
 }
