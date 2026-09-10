@@ -10,3 +10,6 @@ export const newFeatureStatus = dbMain.indexedByKey<NewFeatureStatus, NewFeature
 });
 
 export const smoothShown = dbMain.staticKey<boolean>(SMOOTH_SHOWN, false);
+
+const UI_TELEMETRY_CONSENT = "ui-telemetry-consent";
+export const uiTelemetryConsent = dbMain.staticKey<boolean>(UI_TELEMETRY_CONSENT, false);

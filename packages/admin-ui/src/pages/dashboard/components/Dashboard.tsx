@@ -1,33 +1,21 @@
 import React from "react";
 // Own module
-import { title } from "../data";
-import { ChainCards } from "./ChainCard";
-import { HostStats } from "./HostStats";
-import { PackageUpdates } from "./PackageUpdates";
 // Components
-import SubTitle from "components/SubTitle";
 import Title from "components/Title";
+import SystemHealth from "./SystemHealth";
+import NetworkStats from "./NetworkStats";
 import "./dashboard.scss";
 
 export default function Dashboard() {
   return (
-    <>
-      <Title title={title} />
-
-      <div className="dashboard-layout">
-        <div className="dashboard-right">
-          <SubTitle>Package updates</SubTitle>
-          <PackageUpdates />
-        </div>
-
-        <div className="dashboard-left">
-          <SubTitle>Chains</SubTitle>
-          <ChainCards />
-
-          <SubTitle>Machine stats</SubTitle>
-          <HostStats />
-        </div>
+    <div className="dashboard-container">
+      <div className="dashboard-header">
+        <Title title="Welcome back, Node Runner" />
+        <hr />
       </div>
-    </>
+
+      <SystemHealth />
+      <NetworkStats />
+    </div>
   );
 }

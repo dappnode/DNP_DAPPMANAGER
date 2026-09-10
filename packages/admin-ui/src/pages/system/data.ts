@@ -18,10 +18,9 @@ export const subPaths = {
   update: "update",
   ipfs: "ipfs",
   peers: "add-ipfs-peer", // Mantain it for backwards compatibility with the previous IFPS peer links
-  power: "power",
   profile: "profile",
   advanced: "advanced",
-  hardware: "hardware",
+  host: "host",
   app: "app"
 };
 

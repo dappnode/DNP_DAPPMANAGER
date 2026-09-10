@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { useApi } from "api";
 // Own module
 import VolumesGrid from "./VolumesGrid";
-import { HostStats } from "pages/dashboard/components/HostStats";
 // Components
 import SubTitle from "components/SubTitle";
 
@@ -34,9 +33,6 @@ export default function SystemInfo() {
 
   return (
     <>
-      <SubTitle>Machine stats</SubTitle>
-      <HostStats />
-
       <SubTitle>Volumes</SubTitle>
       <VolumesGrid />
     </>

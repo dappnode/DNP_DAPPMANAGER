@@ -13,6 +13,7 @@ describe("Parse and validate manifest labels to be used in the compose", () => {
       avatar: "avatar-url",
       origin: "origin-url",
       chain: "ethereum2-beacon-chain-prysm",
+      categories: undefined,
       isCore: true,
       isMain: true,
       dockerTimeout: 10,
@@ -54,6 +55,7 @@ describe("Parse and validate manifest labels to be used in the compose", () => {
       chain: {
         driver: "ethereum2-beacon-chain-prysm"
       },
+      categories: undefined,
       isCore: true,
       isMain: true,
       dockerTimeout: 10,
@@ -93,6 +95,7 @@ describe("Parse and validate manifest labels to be used in the compose", () => {
       avatar: "avatar-url",
       origin: "origin-url",
       chain: undefined,
+      categories: undefined,
       isCore: true,
       isMain: true,
       dockerTimeout: 10,
@@ -120,5 +123,15 @@ describe("Parse and validate manifest labels to be used in the compose", () => {
 
     // Expect labelValues to be equal to expectedLabels
     expect(labelValues).to.deep.equal(expectedLabels);
+  });
+
+  it("should parse isDev only when the label is present", () => {
+    const labelsRaw: ContainerLabelsRaw = {
+      "dappnode.dnp.isDev": "true"
+    };
+
+    const labelValues = readContainerLabels(labelsRaw);
+
+    expect(labelValues).to.include({ isDev: true });
   });
 });

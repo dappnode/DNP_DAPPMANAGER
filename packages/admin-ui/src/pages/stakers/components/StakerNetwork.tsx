@@ -5,23 +5,27 @@ import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import { api, useApi } from "api";
 import ErrorView from "components/ErrorView";
-import { confirm } from "components/ConfirmDialog";
 import MevBoost from "./columns/MevBoost";
 import RemoteSigner from "./columns/RemoteSigner";
 import ConsensusClient from "./columns/ConsensusClient";
 import ExecutionClient from "./columns/ExecutionClient";
 import Button from "components/Button";
-import { disclaimer } from "../data";
 import Loading from "components/Loading";
 import { Alert } from "react-bootstrap";
 import { AppContext } from "App";
 import { Network } from "@dappnode/types";
-import { useStakerConfig } from "./useStakerConfig";
 import { AlertDismissible } from "components/AlertDismissible";
 import { docsSmooth } from "params";
 import { BsInfoCircleFill } from "react-icons/bs";
 import { CustomAccordion, CustomAccordionItem } from "components/CustomAccordion";
 import { Link } from "react-router-dom";
+import { useStakerConfig } from "hooks/stakers/useStakerConfig";
+import {
+  UpgradeToPremiumModal,
+  ActivateBackupModal,
+  StakerDisclaimerModal
+} from "components/modals/StakersPremiumModals";
+import { useStakerModals } from "hooks/stakers/useStakerModals";
 
 import "./stakers.scss";
 
@@ -48,42 +52,45 @@ export default function StakerNetwork({ network, description }: { network: Netwo
     changes
   } = useStakerConfig(network, currentStakerConfigReq);
 
+  const isExecutionChanged =
+    newExecClient?.dnpName !==
+    currentStakerConfigReq.data?.executionClients.find((ec) => ec.status === "ok" && ec.isSelected)?.dnpName;
+
+  const isSignerSelected = Boolean(newWeb3signer?.isSelected);
+
+  // Configuration flow with modals
+  const {
+    nonPremiumModalShow,
+    nonPremiumModalOnClose,
+    premiumModalShow,
+    premiumModalOnClose,
+    disclaimerModalShow,
+    disclaimerModalOnClose,
+    displayPremiumModals,
+    displayDisclaimerModal
+  } = useStakerModals({
+    network,
+    isExecutionChanged,
+    isSignerSelected
+  });
+
   /**
    * Set new staker config
    */
-  async function setNewConfig(isLaunchpad: boolean) {
+  async function setNewConfig() {
+    let showToast = false;
     try {
       // Make sure there are changes
       if (changes) {
-        // TODO: Ask for removing the previous Execution Client and/or Consensus Client if its different
-        if (!isLaunchpad) {
-          await new Promise((resolve: (confirmOnSetConfig: boolean) => void) => {
-            confirm({
-              title: `Staker configuration`,
-              text: "Are you sure you want to implement this staker configuration?",
-              buttons: [
-                {
-                  label: "Continue",
-                  onClick: () => resolve(true)
-                }
-              ]
-            });
-          });
-          await new Promise((resolve: (confirmOnSetConfig: boolean) => void) => {
-            confirm({
-              title: `Disclaimer`,
-              text: disclaimer,
-              buttons: [
-                {
-                  label: "Continue",
-                  onClick: () => resolve(true)
-                }
-              ]
-            });
-          });
+        // Request user input through all required modals
+        const userApproved = await displayDisclaimerModal();
+        if (!userApproved) {
+          return; // User aborted the flow
         }
 
+        // Apply the configuration changes
         setReqStatus({ loading: true });
+        displayPremiumModals();
         await withToast(
           () =>
             // Omit metadata to be sent back to the backend
@@ -103,38 +110,32 @@ export default function StakerNetwork({ network, description }: { network: Netwo
             onError: `Error setting new staker configuration`
           }
         );
+
         setReqStatus({ result: true });
+        showToast = true;
       }
     } catch (e) {
       setReqStatus({ error: e });
+      showToast = true;
     } finally {
-      setReqStatus({ loading: true });
-      await withToast(() => currentStakerConfigReq.revalidate(), {
-        message: `Getting new ${network} staker configuration`,
-        onSuccess: `Successfully loaded ${network} staker configuration`,
-        onError: `Error new loading ${network} staker configuration`
-      });
-      setReqStatus({ loading: false });
+      if (showToast) {
+        setReqStatus({ loading: true });
+        await withToast(() => currentStakerConfigReq.revalidate(), {
+          message: `Getting new ${network} staker configuration`,
+          onSuccess: `Successfully loaded ${network} staker configuration`,
+          onError: `Error new loading ${network} staker configuration`
+        });
+        setReqStatus({ loading: false });
+      }
     }
   }
 
   return (
     <div className="staker-network-container">
-      {network === Network.Prater && (
-        <AlertDismissible variant="warning">
-          <p>
-            The prater network is deprecated, please migrate to <b>Hoodi</b>.
-          </p>
-        </AlertDismissible>
-      )}
-
-      {network === Network.Holesky && (
-        <AlertDismissible variant="warning">
-          <p>
-            The holesky network is deprecated, please migrate to <b>Hoodi</b>.
-          </p>
-        </AlertDismissible>
-      )}
+      {/* Modals */}
+      <UpgradeToPremiumModal show={nonPremiumModalShow} onClose={nonPremiumModalOnClose} />
+      <ActivateBackupModal show={premiumModalShow} onClose={premiumModalOnClose} network={network} />
+      <StakerDisclaimerModal show={disclaimerModalShow} onClose={disclaimerModalOnClose} />
 
       {(network === Network.Hoodi || network === Network.Mainnet) && (
         <AlertDismissible variant="info">
@@ -201,10 +202,11 @@ export default function StakerNetwork({ network, description }: { network: Netwo
                     executionClient={executionClient}
                     setNewExecClient={setNewExecClient}
                     isSelected={executionClient.dnpName === newExecClient?.dnpName}
+                    isDisabled={reqStatus.loading}
                   />
                 ))}
               </Col>
-              
+
               {/* Only shows consensus clients if data is available */}
               {currentStakerConfigReq.data.consensusClients.length > 0 && (
                 <Col>
@@ -215,6 +217,7 @@ export default function StakerNetwork({ network, description }: { network: Netwo
                       consensusClient={consensusClient}
                       setNewConsClient={setNewConsClient}
                       isSelected={consensusClient.dnpName === newConsClient?.dnpName}
+                      isDisabled={reqStatus.loading}
                     />
                   ))}
                 </Col>
@@ -228,10 +231,11 @@ export default function StakerNetwork({ network, description }: { network: Netwo
                     signer={currentStakerConfigReq.data.web3Signer}
                     setNewWeb3signer={setNewWeb3signer}
                     isSelected={Boolean(newWeb3signer)}
+                    isDisabled={reqStatus.loading}
                   />
                 </Col>
               )}
-              {[Network.Prater, Network.Mainnet, Network.Holesky, Network.Hoodi].includes(network) &&
+              {[Network.Mainnet, Network.Hoodi].includes(network) &&
                 currentStakerConfigReq.data.mevBoost && (
                   <Col>
                     <SubTitle>Mev Boost</SubTitle>
@@ -243,6 +247,7 @@ export default function StakerNetwork({ network, description }: { network: Netwo
                       newRelays={newRelays}
                       setNewRelays={setNewRelays}
                       isSelected={currentStakerConfigReq.data.mevBoost.dnpName === newMevBoost?.dnpName}
+                      isDisabled={reqStatus.loading}
                     />
                   </Col>
                 )}
@@ -253,7 +258,7 @@ export default function StakerNetwork({ network, description }: { network: Netwo
                 <Button
                   variant="dappnode"
                   disabled={!changes.isAllowed || reqStatus.loading}
-                  onClick={() => setNewConfig(false)}
+                  onClick={() => setNewConfig()}
                 >
                   Apply changes
                 </Button>

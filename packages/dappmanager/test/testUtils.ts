@@ -1,7 +1,7 @@
 import path from "path";
 import fs from "fs";
 import { shell } from "@dappnode/utils";
-import { clearCacheDb, clearMainDb } from "@dappnode/db";
+import { clearCacheDb, clearMainDb, clearNexusDb } from "@dappnode/db";
 import { DockerApiSystemDfReturn } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
 import {
@@ -42,6 +42,7 @@ export const getTestMountpoint = (id: string): string => {
 
 export function clearDbs(): void {
   clearCacheDb();
+  clearNexusDb();
   clearMainDb();
 }
 

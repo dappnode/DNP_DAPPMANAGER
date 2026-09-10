@@ -179,12 +179,14 @@ export interface TrustedReleaseKey {
   key: string;
 }
 
-type DistributedFileSource = "ipfs" | "swarm";
+type DistributedFileSource = "ipfs" | "swarm" | "mirror";
 
 interface DistributedFile {
-  hash: string;
+  hash: string; // Individual file CID for "ipfs". Needed for fetching the file from IPFS.
   source: DistributedFileSource;
   size: number;
+  filename?: string; // Required for "mirror": filename within the package dir (e.g. "avatar.png")
+  packageHash?: string; // Required for "mirror": package directory CID; mirror URL is {baseUrl}/{packageHash}/{filename}
 }
 
 /**

@@ -16,16 +16,28 @@ import { apiRoutes } from "api";
 import { FiDownload } from "react-icons/fi";
 import { GoCopy } from "react-icons/go";
 import { FaQrcode } from "react-icons/fa";
-import { WireguardDeviceCredentials } from "@dappnode/types";
 // Utils
 import { urlJoin } from "utils/url";
 import SubTitle from "components/SubTitle";
 
-function WireguardDeviceDetailsLoaded({ id, device }: { id: string; device: WireguardDeviceCredentials }) {
+function WireguardDeviceDetailsLoaded({
+  id,
+  config,
+  showLocalCreds,
+  setShowLocalCreds,
+  isLoadingLocalConfig,
+  localConfigError
+}: {
+  id: string;
+  config: string;
+  showLocalCreds: boolean;
+  setShowLocalCreds: React.Dispatch<React.SetStateAction<boolean>>;
+  isLoadingLocalConfig?: boolean;
+  localConfigError?: Error;
+}) {
   const [showQr, setShowQr] = useState(false);
-  const [showLocalCreds, setShowLocalCreds] = useState(false);
-  const config = showLocalCreds ? device.configLocal : device.configRemote;
-  const configType = showLocalCreds ? "local" : "";
+  const isShowingLocalConfig = showLocalCreds && !isLoadingLocalConfig && !localConfigError;
+  const configType = isShowingLocalConfig ? "local" : "";
 
   useEffect(() => {
     // Activate the copy functionality
@@ -55,7 +67,7 @@ function WireguardDeviceDetailsLoaded({ id, device }: { id: string; device: Wire
         <a
           href={apiRoutes.downloadWireguardConfig({
             device: id,
-            isLocal: showLocalCreds
+            isLocal: isShowingLocalConfig
           })}
         >
           <Button>
@@ -83,6 +95,18 @@ function WireguardDeviceDetailsLoaded({ id, device }: { id: string; device: Wire
         </Button>
       </div>
 
+      {isLoadingLocalConfig && (
+        <div className="alert alert-secondary" role="alert">
+          Loading local credentials. Remote credentials are shown below.
+        </div>
+      )}
+
+      {localConfigError && (
+        <div className="alert alert-warning" role="alert">
+          Local credentials could not be loaded. Use the remote credentials shown below instead.
+        </div>
+      )}
+
       <Form.Group>
         <Form.Label>VPN {configType} credentials</Form.Label>
         <div className="credentials-config">{config}</div>
@@ -97,20 +121,53 @@ function WireguardDeviceDetailsLoaded({ id, device }: { id: string; device: Wire
   );
 }
 
+function WireguardDeviceDetailsWithLocal({
+  id,
+  configRemote,
+  setShowLocalCreds
+}: {
+  id: string;
+  configRemote: string;
+  setShowLocalCreds: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
+  const localConfig = useApi.wireguardDeviceConfigGet({ device: id, isLocal: true });
+
+  return (
+    <WireguardDeviceDetailsLoaded
+      id={id}
+      config={localConfig.data || configRemote}
+      showLocalCreds={true}
+      setShowLocalCreds={setShowLocalCreds}
+      isLoadingLocalConfig={localConfig.isValidating && !localConfig.data && !localConfig.error}
+      localConfigError={localConfig.error}
+    />
+  );
+}
+
 export const WireguardDeviceDetails: React.FC = () => {
   const params = useParams();
   const id = params.id || "";
-  const device = useApi.wireguardDeviceGet(id);
+  const [showLocalCreds, setShowLocalCreds] = useState(false);
+  const config = useApi.wireguardDeviceConfigGet({ device: id, isLocal: false });
 
   return (
     <>
       <SubTitle>{id}</SubTitle>
 
-      {device.data ? (
-        <WireguardDeviceDetailsLoaded id={id} device={device.data} />
-      ) : device.error ? (
-        <ErrorView error={device.error} />
-      ) : device.isValidating ? (
+      {config.data ? (
+        showLocalCreds ? (
+          <WireguardDeviceDetailsWithLocal id={id} configRemote={config.data} setShowLocalCreds={setShowLocalCreds} />
+        ) : (
+          <WireguardDeviceDetailsLoaded
+            id={id}
+            config={config.data}
+            showLocalCreds={showLocalCreds}
+            setShowLocalCreds={setShowLocalCreds}
+          />
+        )
+      ) : config.error ? (
+        <ErrorView error={config.error} />
+      ) : config.isValidating ? (
         <Loading steps={["Loading device credentials"]} />
       ) : null}
     </>

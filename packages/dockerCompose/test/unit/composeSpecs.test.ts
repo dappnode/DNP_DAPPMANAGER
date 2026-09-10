@@ -6,6 +6,7 @@ import { Manifest, Compose } from "@dappnode/types";
 import { yamlParse, yamlDump, isNotFoundError } from "@dappnode/utils";
 import { setDappnodeComposeDefaults, validateCompose, verifyCompose } from "../../src/index.js";
 import { fileURLToPath } from "url";
+import { params } from "@dappnode/params";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -52,7 +53,7 @@ describe("Compose specs, against real DNPs", () => {
       });
 
       it("verifyCompose", () => {
-        verifyCompose(unsafeCompose);
+        verifyCompose(unsafeCompose, manifest.name === params.dappmanagerDnpName);
       });
     });
   }

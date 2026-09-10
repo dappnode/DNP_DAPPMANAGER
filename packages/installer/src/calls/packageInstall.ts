@@ -2,6 +2,7 @@ import { getInstallerPackagesData } from "../installer/getInstallerPackageData.j
 import createVolumeDevicePaths from "../installer/createVolumeDevicePaths.js";
 // Utils
 import {
+  downloadAvatars,
   downloadImages,
   loadImages,
   flagPackagesAreInstalling,
@@ -86,6 +87,7 @@ export async function packageInstall(
       flagPackagesAreInstalling(dnpNames);
 
       await downloadImages(dappnodeInstaller, packagesData, log);
+      await downloadAvatars(dappnodeInstaller, packagesData, log);
       await loadImages(packagesData, log);
 
       await createVolumeDevicePaths(packagesData);

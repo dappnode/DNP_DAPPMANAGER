@@ -5,6 +5,49 @@ import { Compose, Manifest } from "@dappnode/types";
 import { setDappnodeComposeDefaults } from "../../src/index.js";
 
 describe("setDappnodeComposeDefaults", () => {
+  it("Should not add a version to a versionless compose", () => {
+    const compose: Compose = {
+      services: {
+        serviceA: {
+          image: "some.image:1.0.0"
+        }
+      }
+    };
+    const manifest: Manifest = {
+      name: "some.dnp.dappnode.eth",
+      version: "1.0.0",
+      description: "Test package",
+      type: "service",
+      license: "GPL-3.0"
+    };
+
+    const composeWithDefaults = setDappnodeComposeDefaults(compose, manifest);
+
+    expect(composeWithDefaults).to.not.have.property("version");
+  });
+
+  it("Should preserve a legacy compose version", () => {
+    const compose: Compose = {
+      version: "2",
+      services: {
+        serviceA: {
+          image: "some.image:1.0.0"
+        }
+      }
+    };
+    const manifest: Manifest = {
+      name: "some.dnp.dappnode.eth",
+      version: "1.0.0",
+      description: "Test package",
+      type: "service",
+      license: "GPL-3.0"
+    };
+
+    const composeWithDefaults = setDappnodeComposeDefaults(compose, manifest);
+
+    expect(composeWithDefaults.version).to.equal("2");
+  });
+
   it("Should set dappnode defaults to a validated compose from a non-core package", () => {
     const compose: Compose = {
       version: "3.5",
@@ -151,6 +194,40 @@ describe("setDappnodeComposeDefaults", () => {
     const composeWithDefaults = setDappnodeComposeDefaults(compose, manifest);
 
     expect(composeWithDefaults).to.deep.equal(expectedCompose);
+  });
+
+  it("Should override any package-provided logging config", () => {
+    const compose: Compose = {
+      version: "3.5",
+      services: {
+        serviceA: {
+          image: "some.image:1.0.0",
+          logging: {
+            driver: "journald",
+            options: {
+              tag: "do-not-keep"
+            }
+          }
+        }
+      }
+    };
+
+    const manifest: Manifest = {
+      name: "some.dnp.dappnode.eth",
+      version: "1.0.0",
+      description: "Test package",
+      type: "service",
+      architectures: ["linux/amd64"],
+      author: "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
+      license: "GPL-3.0"
+    };
+
+    const composeWithDefaults = setDappnodeComposeDefaults(compose, manifest);
+
+    expect(composeWithDefaults.services.serviceA.logging).to.deep.equal({
+      driver: "json-file",
+      options: { "max-size": "10m", "max-file": "3" }
+    });
   });
 
   it("Should set dappnode defaults to a validated compose from a core package", () => {

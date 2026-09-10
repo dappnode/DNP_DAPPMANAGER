@@ -4,12 +4,12 @@ import { Manifest, Compose } from "@dappnode/types";
 
 describe("files / compose / validateDappnodeCompose", () => {
   const manifest: Manifest = {
-    name: "prysm-prater.dnp.dappnode.eth",
+    name: "prysm.dnp.dappnode.eth",
     version: "1.0.0",
     upstreamVersion: "v2.1.2",
     upstreamRepo: "prysmaticlabs/prysm",
     upstreamArg: "UPSTREAM_VERSION",
-    shortDescription: "Prysm prater ETH2.0 Beacon chain + validator",
+    shortDescription: "Prysm ETH2.0 Beacon chain + validator",
     description:
       "Validate with prysm: a Go implementation of the Ethereum 2.0 Serenity protocol and open source project created by Prysmatic Labs. Beacon node which powers the beacon chain at the core of Ethereum 2.0\n\nIt includes a Grafana dashboard for the [DMS](http://my.dappnode/#/installer/dms.dnp.dappnode.eth) thanks to the amazing work of [metanull-operator](https://github.com/metanull-operator/eth2-grafana)",
     type: "service",
@@ -29,10 +29,10 @@ describe("files / compose / validateDappnodeCompose", () => {
     license: "GPL-3.0",
     repository: {
       type: "git",
-      url: "git+https://github.com/dappnode/DAppNodePackage-prysm-prater.git"
+      url: "git+https://github.com/dappnode/DAppNodePackage-prysm.git"
     },
     bugs: {
-      url: "https://github.com/dappnode/DAppNodePackage-prysm-prater/issues"
+      url: "https://github.com/dappnode/DAppNodePackage-prysm/issues"
     },
     requirements: {
       minimumDappnodeVersion: "0.2.51"
@@ -40,17 +40,17 @@ describe("files / compose / validateDappnodeCompose", () => {
     categories: ["Blockchain", "ETH2.0"],
     warnings: {
       onMajorUpdate:
-        "This is a major update of Prysm Prater, it will start validating with the web3signer. There will be a migration where your keystores will be replaced to another location, pay attention to the update"
+        "This is a major update of Prysm, it will start validating with the web3signer. There will be a migration where your keystores will be replaced to another location, pay attention to the update"
     },
     links: {
-      ui: "http://ui.web3signer-prater.dappnode?signer_url=http://web3signer.web3signer-prater.dappnode:9000",
+      ui: "http://ui.web3signer.dappnode?signer_url=http://web3signer.web3signer.dappnode:9000",
       homepage: "https://prysmaticlabs.com/",
-      readme: "https://github.com/dappnode/DAppNodePackage-prysm-prater",
+      readme: "https://github.com/dappnode/DAppNodePackage-prysm",
       docs: "https://docs.prylabs.network/docs/getting-started"
     },
     dependencies: {
-      "goerli-geth.dnp.dappnode.eth": "latest",
-      "web3signer-prater.dnp.dappnode.eth": "latest"
+      "geth.dnp.dappnode.eth": "latest",
+      "web3signer.dnp.dappnode.eth": "latest"
     }
   };
 
@@ -58,7 +58,7 @@ describe("files / compose / validateDappnodeCompose", () => {
     version: "3.5",
     services: {
       "beacon-chain": {
-        image: "beacon-chain.prysm-prater.dnp.dappnode.eth:1.0.0",
+        image: "beacon-chain.prysm.dnp.dappnode.eth:1.0.0",
         build: {
           context: "beacon-chain",
           args: {
@@ -69,15 +69,15 @@ describe("files / compose / validateDappnodeCompose", () => {
         ports: ["13000", "12000/udp"],
         restart: "unless-stopped",
         environment: {
-          HTTP_WEB3PROVIDER: "http://goerli-geth.dappnode:8545",
+          HTTP_WEB3PROVIDER: "http://geth.dappnode:8545",
           CHECKPOINT_SYNC_URL: "",
-          CORSDOMAIN: "http://prysm-prater.dappnode",
+          CORSDOMAIN: "http://prysm.dappnode",
           WEB3_BACKUP: "",
           EXTRA_OPTS: ""
         }
       },
       validator: {
-        image: "validator.prysm-prater.dnp.dappnode.eth:1.0.0",
+        image: "validator.prysm.dnp.dappnode.eth:1.0.0",
         build: {
           context: "validator",
           dockerfile: "Dockerfile",
@@ -90,8 +90,8 @@ describe("files / compose / validateDappnodeCompose", () => {
         restart: "unless-stopped",
         environment: {
           LOG_TYPE: "INFO",
-          BEACON_RPC_PROVIDER: "beacon-chain.prysm-prater.dappnode:4000",
-          BEACON_RPC_GATEWAY_PROVIDER: "beacon-chain.prysm-prater.dappnode:3500",
+          BEACON_RPC_PROVIDER: "beacon-chain.prysm.dappnode:4000",
+          BEACON_RPC_GATEWAY_PROVIDER: "beacon-chain.prysm.dappnode:3500",
           GRAFFITI: "validating_from_DAppNode",
           EXTRA_OPTS: ""
         }
@@ -105,6 +105,12 @@ describe("files / compose / validateDappnodeCompose", () => {
 
   it("Should validate the compose file", () => {
     validateDappnodeCompose(compose, manifest);
+  });
+
+  it("Should validate a compose file without a version", () => {
+    const composeWithoutVersion = { ...compose };
+    delete composeWithoutVersion.version;
+    validateDappnodeCompose(composeWithoutVersion, manifest);
   });
 
   it("Should throw an error due to unsafe networks", () => {
@@ -166,18 +172,8 @@ service validator volume /var/run/docker.sock:/var/run/docker.sock is a bind-mou
 service validator has key credential_spec that is not allowed. Allowed keys are: cap_add,cap_drop,command,depends_on,devices,entrypoint,environment,expose,extra_hosts,healthcheck,labels,logging,network_mode,networks,ports,privileged,restart,stop_grace_period,stop_signal,user,volumes,working_dir,security_opt,image,build,volumes,environment`);
   });
 
-  it("Should throw an error due to unsafe compose version", () => {
-    expect(() =>
-      validateDappnodeCompose(
-        {
-          ...compose,
-          version: "3.3"
-        },
-        manifest
-      )
-    ).to.throw(`Error validating compose file with dappnode requirements:
-
-Compose version 3.3 is not supported. Minimum version is 3.4`);
+  it("Should validate a compose file with a legacy version", () => {
+    validateDappnodeCompose({ ...compose, version: "2" }, manifest);
   });
 
   it("Should throw an error due to unsafe service networks in string format", () => {
@@ -231,12 +227,12 @@ service validator has the network danger_network with reserved docker alias. Ali
 service validator has a non-whitelisted docker network: other_network. Only docker networks dncore_network,dnpublic_network are allowed`);
   });
 
-  it("Should throw an error due to unsafe compose version and unsafe volumes", () => {
+  it("Should only reject unsafe volumes when a legacy compose version is present", () => {
     expect(() =>
       validateDappnodeCompose(
         {
           ...compose,
-          version: "3.3",
+          version: "2",
           services: {
             ...compose.services,
             validator: {
@@ -249,7 +245,6 @@ service validator has a non-whitelisted docker network: other_network. Only dock
       )
     ).to.throw(`Error validating compose file with dappnode requirements:
 
-Compose version 3.3 is not supported. Minimum version is 3.4
 service validator volume /var/run/docker.sock:/var/run/docker.sock is a bind-mount, only named non-external volumes are allowed`);
   });
 });

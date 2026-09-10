@@ -3,6 +3,7 @@ import { params } from "@dappnode/params";
 import { packageSetEnvironment } from "./packageSetEnvironment.js";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
 import { WireguardDeviceCredentials } from "@dappnode/types";
+import { logs } from "@dappnode/logger";
 
 const { WIREGUARD_API_URL, WIREGUARD_DEVICES_ENVNAME, WIREGUARD_DNP_NAME, WIREGUARD_ISCORE, WIREGUARD_MAIN_SERVICE } =
   params;
@@ -16,7 +17,10 @@ class WireguardClient {
     const service = compose.services()[WIREGUARD_MAIN_SERVICE];
     if (!service) throw Error(`Wireguard service ${WIREGUARD_MAIN_SERVICE} does not exist`);
     const peersCsv = service.getEnvs()[WIREGUARD_DEVICES_ENVNAME] || "";
-    return peersCsv.split(",");
+    return peersCsv
+      .split(",")
+      .map((device) => device.trim())
+      .filter(Boolean);
   }
 
   async addDevice(device: string): Promise<void> {
@@ -53,15 +57,34 @@ class WireguardClient {
   // - local:     '/dappnode_admin?local'
   // - local qr:  '/dappnode_admin?local&qr'
   async getDeviceCredentials(device: string): Promise<WireguardDeviceCredentials> {
-    const url = urlJoin(WIREGUARD_API_URL, device);
-    const remoteConfigUrl = url;
-    const localConfigUrl = `${url}?local=true`;
-    const [configRemote, configLocal] = await Promise.all([
-      fetchWireguardConfigFile(remoteConfigUrl),
-      fetchWireguardConfigFile(localConfigUrl)
-    ]);
+    this.ensureDeviceExists(device);
+
+    const configRemote = await this.fetchRemoteDeviceConfig(device);
+    const configLocal = await this.fetchLocalDeviceConfig(device);
 
     return { configRemote, configLocal };
+  }
+
+  async getDeviceConfig(device: string, isLocal: boolean): Promise<string> {
+    this.ensureDeviceExists(device);
+    return isLocal ? this.fetchLocalDeviceConfig(device) : this.fetchRemoteDeviceConfig(device);
+  }
+
+  private ensureDeviceExists(device: string): void {
+    if (!this.getDevices().includes(device)) throw Error(`Device ${device} is not registered in WireGuard PEERS`);
+  }
+
+  private async fetchRemoteDeviceConfig(device: string): Promise<string> {
+    return fetchWireguardConfigFile(urlJoin(WIREGUARD_API_URL, device));
+  }
+
+  private async fetchLocalDeviceConfig(device: string): Promise<string> {
+    const url = `${urlJoin(WIREGUARD_API_URL, device)}?local=true`;
+
+    return fetchWireguardConfigFile(url).catch((e) => {
+      logs.warn(`Error fetching local WireGuard credentials for ${device}: ${e.message}`);
+      throw e;
+    });
   }
 }
 
@@ -93,6 +116,10 @@ export async function wireguardDeviceRemove(device: string): Promise<void> {
 
 export async function wireguardDeviceGet(device: string): Promise<WireguardDeviceCredentials> {
   return wireguardClient.getDeviceCredentials(device);
+}
+
+export async function wireguardDeviceConfigGet({ device, isLocal }: { device: string; isLocal: boolean }): Promise<string> {
+  return wireguardClient.getDeviceConfig(device, isLocal);
 }
 
 export async function wireguardDevicesGet(): Promise<string[]> {

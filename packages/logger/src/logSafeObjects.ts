@@ -1,7 +1,7 @@
 import { applyRecursivelyToStringValues } from "@dappnode/utils";
 import { maxLength } from "./params.js";
 
-const secretKeyRegex = /(password|passphrase|secret|private)/i;
+const secretKeyRegex = /(password|passphrase|secret|private|api[-_]?key|apikey|token|authorization|bearer)/i;
 
 /**
  * Transform the info object

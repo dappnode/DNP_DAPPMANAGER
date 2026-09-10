@@ -76,6 +76,14 @@
     }
     transition: color 0.15s, background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
 
+    // Disabled state while applying config
+    &.isDisabled {
+      pointer-events: none;
+      cursor: not-allowed;
+      filter: grayscale(60%);
+      opacity: 0.8;
+    }
+
     .avatar {
       --avatar-size: 6rem;
       display: flex;

@@ -13,7 +13,6 @@ import {
   dockerComposeSafeKeys,
   Manifest
 } from "@dappnode/types";
-import { lt } from "semver";
 
 /**
  * Returns the compose file for the given manifest
@@ -25,11 +24,21 @@ export function setDappnodeComposeDefaults(composeUnsafe: Compose, manifest: Man
   const isMonoService = getIsMonoService(composeUnsafe);
 
   return cleanCompose({
-    version: ensureMinimumComposeVersion(composeUnsafe.version),
+    version: composeUnsafe.version,
 
     services: mapValues(composeUnsafe.services, (serviceUnsafe, serviceName) => {
       return sortServiceKeys({
         // OVERRIDABLE VALUES: values that in case of not been set, it will take the following values
+        restart: "unless-stopped",
+
+        // SAFE KEYS: values that are whitelisted
+        ...pick(
+          serviceUnsafe,
+          dockerComposeSafeKeys.filter((safeKey) => safeKey !== "build" && safeKey !== "logging")
+        ),
+
+        // MANDATORY VALUES: values that will be overwritten with dappnode defaults
+        // Force `json-file` and prevent packages from injecting journald logging.
         logging: {
           driver: "json-file",
           options: {
@@ -37,15 +46,6 @@ export function setDappnodeComposeDefaults(composeUnsafe: Compose, manifest: Man
             "max-file": "3"
           }
         },
-        restart: "unless-stopped",
-
-        // SAFE KEYS: values that are whitelisted
-        ...pick(
-          serviceUnsafe,
-          dockerComposeSafeKeys.filter((safeKey) => safeKey !== "build")
-        ),
-
-        // MANDATORY VALUES: values that will be overwritten with dappnode defaults
         container_name: getContainerName({ dnpName, serviceName, isCore }),
         image: getImageTag({ serviceName, dnpName, version }),
         environment: parseEnvironment(serviceUnsafe.environment || {}),
@@ -65,21 +65,6 @@ export function setDappnodeComposeDefaults(composeUnsafe: Compose, manifest: Man
 
     networks: setNetworks(composeUnsafe.networks)
   });
-}
-
-/**
- * TEMPORARY: Ensure the compose version is at least 3.5. This will be eventually removed
- * and the SDK will not allow to build packages with older compose version than 3.5.
- * See https://github.com/dappnode/DAppNodeSDK/issues/241
- *
- * Use of new compose feature "name" only available in version 3.5
- * https://docs.docker.com/compose/compose-file/compose-file-v3/#name-1
- */
-function ensureMinimumComposeVersion(composeFileVersion: string): string {
-  if (lt(composeFileVersion + ".0", params.MINIMUM_COMPOSE_VERSION + ".0"))
-    composeFileVersion = params.MINIMUM_COMPOSE_VERSION;
-
-  return composeFileVersion;
 }
 
 /**

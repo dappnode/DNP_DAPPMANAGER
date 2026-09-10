@@ -25,7 +25,7 @@ export async function writeAndValidateFiles(packagesData: InstallPackageData[], 
     copyIfExists(composePath, composeBackupPath);
 
     // Write and validate new compose
-    const compose = new ComposeEditor(packageData.compose);
+    const compose = new ComposeEditor(packageData.compose, { dnpName });
     compose.writeTo(composePath);
     await dockerComposeConfig(composePath);
 

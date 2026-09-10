@@ -57,7 +57,9 @@ const labelParseFns: {
       return valueParsed as ChainDriver;
     return undefined;
   },
+  "dappnode.dnp.categories": (value) => parseJsonSafe<string[]>(value) || undefined,
   "dappnode.dnp.isCore": parseBool,
+  "dappnode.dnp.isDev": parseBool,
   "dappnode.dnp.isMain": parseBool,
   "dappnode.dnp.dockerTimeout": parseNumber,
   "dappnode.dnp.default.environment": (value) => parseJsonSafe(value),
@@ -79,7 +81,9 @@ const labelStringifyFns: {
     value && chainDriversTypes.includes(value as ChainDriverType)
       ? writeString(value as ChainDriverType)
       : writeJson(value as ChainDriverSpecs),
+  "dappnode.dnp.categories": writeJson,
   "dappnode.dnp.isCore": writeBool,
+  "dappnode.dnp.isDev": writeBool,
   "dappnode.dnp.isMain": writeBool,
   "dappnode.dnp.dockerTimeout": writeNumber,
   "dappnode.dnp.default.environment": writeJson,
@@ -120,7 +124,9 @@ export function readContainerLabels(labelsRaw: ContainerLabelsRaw): Partial<{
   avatar: string;
   origin: string;
   chain: ChainDriver;
+  categories: string[];
   isCore: boolean;
+  isDev: boolean;
   isMain: boolean;
   dockerTimeout: number;
   defaultEnvironment: string[];
@@ -128,6 +134,7 @@ export function readContainerLabels(labelsRaw: ContainerLabelsRaw): Partial<{
   defaultVolumes: string[];
 }> {
   const labelValues = parseContainerLabels(labelsRaw);
+  const isDev = labelValues["dappnode.dnp.isDev"];
   return {
     dnpName: labelValues["dappnode.dnp.dnpName"],
     version: labelValues["dappnode.dnp.version"],
@@ -137,7 +144,9 @@ export function readContainerLabels(labelsRaw: ContainerLabelsRaw): Partial<{
     avatar: labelValues["dappnode.dnp.avatar"],
     origin: labelValues["dappnode.dnp.origin"],
     chain: labelValues["dappnode.dnp.chain"],
+    categories: labelValues["dappnode.dnp.categories"],
     isCore: labelValues["dappnode.dnp.isCore"],
+    ...(isDev === undefined ? {} : { isDev }),
     isMain: labelValues["dappnode.dnp.isMain"],
     dockerTimeout: labelValues["dappnode.dnp.dockerTimeout"],
     defaultEnvironment: labelValues["dappnode.dnp.default.environment"],
@@ -153,8 +162,10 @@ export function writeMetadataToLabels({
   dependencies,
   avatar,
   chain,
+  categories,
   origin,
   isCore,
+  isDev,
   isMain,
   dockerTimeout
 }: {
@@ -164,8 +175,10 @@ export function writeMetadataToLabels({
   dependencies?: Dependencies;
   avatar?: string;
   chain?: ChainDriver;
+  categories?: string[];
   origin?: string;
   isCore?: boolean;
+  isDev?: boolean;
   isMain?: boolean;
   dockerTimeout?: number;
 }): ContainerLabelsRaw {
@@ -177,7 +190,9 @@ export function writeMetadataToLabels({
     "dappnode.dnp.avatar": avatar,
     "dappnode.dnp.origin": origin,
     "dappnode.dnp.chain": chain,
+    "dappnode.dnp.categories": categories,
     "dappnode.dnp.isCore": isCore,
+    "dappnode.dnp.isDev": isDev,
     "dappnode.dnp.isMain": isMain,
     "dappnode.dnp.dockerTimeout": dockerTimeout
   });

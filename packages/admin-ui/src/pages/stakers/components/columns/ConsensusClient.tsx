@@ -14,19 +14,23 @@ export default function ConsensusClient({
   consensusClient,
   setNewConsClient,
   isSelected,
+  isDisabled,
   ...props
 }: {
   consensusClient: StakerItem;
   setNewConsClient: React.Dispatch<React.SetStateAction<StakerItemOk | null>>;
   isSelected: boolean;
+  isDisabled?: boolean;
 }) {
   const navigate = useNavigate();
 
   return (
-    <Card {...props} className={`consensus-client ${joinCssClass({ isSelected })}`} shadow={isSelected}>
+    <Card {...props} className={`consensus-client ${joinCssClass({ isSelected, isDisabled })}`} shadow={isSelected}>
       <div
         onClick={
-          consensusClient.status === "ok"
+          isDisabled
+            ? undefined
+            : consensusClient.status === "ok"
             ? isSelected
               ? () => {
                   setNewConsClient(null);

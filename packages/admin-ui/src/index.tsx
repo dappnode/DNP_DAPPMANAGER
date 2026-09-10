@@ -16,7 +16,14 @@ import "./dappnode_styles.scss";
 import "./dappnode_colors.scss";
 import "./light_dark.scss";
 import "./layout.scss";
+// PWA
 import { PwaInstallProvider } from "pages/system/components/App/PwaInstallContext";
+// Grafana Faro for frontend monitoring and tracing (initialized paused until consent)
+import { initFaro } from "./faro";
+
+initFaro();
+
+// push version using grafana faro
 
 // This process.env. vars will be substituted at build time
 // The VITE_APP_ prefix is mandatory for the substitution to work

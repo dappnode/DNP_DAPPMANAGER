@@ -1,11 +1,9 @@
 import {
   Network,
   SignerGnosis,
-  SignerHolesky,
   SignerHoodi,
   SignerLukso,
   SignerMainnet,
-  SignerPrater,
   SignerSepolia,
   StakerItem,
   UserSettings
@@ -26,14 +24,6 @@ export class Signer extends StakerComponent {
     [Network.Gnosis]: {
       dnpName: SignerGnosis.Web3signer,
       minVersion: "0.1.10"
-    },
-    [Network.Prater]: {
-      dnpName: SignerPrater.Web3signer,
-      minVersion: "0.1.11"
-    },
-    [Network.Holesky]: {
-      dnpName: SignerHolesky.Web3signer,
-      minVersion: "0.1.0"
     },
     [Network.Hoodi]: {
       dnpName: SignerHoodi.Web3signer,

@@ -36,12 +36,14 @@ export function IpfsClient({
   clientTarget: selectedClientTarget,
   gatewayTarget,
   onClientTargetChange,
-  onGatewayTargetChange
+  onGatewayTargetChange,
+  localRequiresInstall = false
 }: {
   clientTarget: IpfsClientTarget | null;
-  gatewayTarget: string | null;
+  gatewayTarget: string[] | null;
   onClientTargetChange: (newTarget: IpfsClientTarget) => void;
-  onGatewayTargetChange: (newTarget: string) => void;
+  onGatewayTargetChange: (newTarget: string[]) => void;
+  localRequiresInstall?: boolean;
 }) {
   return (
     <div className="ipfs-multi-clients">
@@ -49,6 +51,8 @@ export function IpfsClient({
         .filter(({ option }) => option.length > 0)
         .map(({ title, description, option }) => {
           const selected = selectedClientTarget && option === selectedClientTarget;
+
+          const showLocalInstallNotice = option === IpfsClientTarget.local && localRequiresInstall;
 
           return (
             <Card
@@ -65,12 +69,49 @@ export function IpfsClient({
                 <RenderMarkdown source={description} />
               </div>
 
-              {option === "remote" && (
-                <Input
-                  placeholder="https://ipfs-gateway.dappnode.net"
-                  value={gatewayTarget || ""}
-                  onValueChange={onGatewayTargetChange}
-                />
+              {showLocalInstallNotice ? (
+                <div className="description">
+                  IPFS package isn&apos;t installed. Switching to <strong>Local</strong> will install it automatically.
+                </div>
+              ) : null}
+
+              {option === "remote" && gatewayTarget && (
+                <div className="ipfs-gateway-list">
+                  {gatewayTarget.map((gateway, index) => (
+                    <Input
+                      key={index}
+                      placeholder="https://ipfs-gateway.dappnode.net"
+                      value={gateway}
+                      onValueChange={(value) =>
+                        onGatewayTargetChange(
+                          gatewayTarget.map((currentGateway, currentIndex) =>
+                            currentIndex === index ? value : currentGateway
+                          )
+                        )
+                      }
+                      append={
+                        gatewayTarget.length > 1 ? (
+                          <button
+                            type="button"
+                            className="btn btn-outline-secondary"
+                            aria-label={`Remove gateway ${index + 1}`}
+                            onClick={() => onGatewayTargetChange(gatewayTarget.filter((_, i) => i !== index))}
+                          >
+                            Remove
+                          </button>
+                        ) : undefined
+                      }
+                    />
+                  ))}
+                  <button
+                    type="button"
+                    className="btn btn-outline-secondary"
+                    onClick={() => onGatewayTargetChange([...gatewayTarget, ""])}
+                  >
+                    Add gateway
+                  </button>
+                  <div className="description">Gateways are tried from top to bottom.</div>
+                </div>
               )}
             </Card>
           );

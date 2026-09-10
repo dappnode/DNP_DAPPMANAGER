@@ -100,10 +100,6 @@ describe.skip("Dappnode Directory", function () {
     //     featuredIndex: -1,
     //   },
     //   {
-    //     name: "ssv-prater.dnp.dappnode.eth",
-    //     statusName: "Active",
-    //     position: 49000,
-    //     isFeatured: false,
     //     featuredIndex: -1,
     //   },
     //   {

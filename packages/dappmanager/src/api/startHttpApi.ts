@@ -2,7 +2,6 @@ import http from "http";
 import express, { RequestHandler } from "express";
 import bodyParser from "body-parser";
 import compression from "compression";
-import fileUpload from "express-fileupload";
 import { helmetConf } from "./helmet.js";
 import cors from "cors";
 import { Server } from "socket.io";
@@ -17,6 +16,26 @@ import { EventBus } from "@dappnode/eventbus";
 import { subscriptionsFactory } from "@dappnode/common";
 import { RpcPayload, RpcResponse, LoggerMiddleware, Routes } from "@dappnode/types";
 import { getRpcHandler } from "./handler/index.js";
+import {
+  nexusChatCompletions,
+  nexusChatConfirm,
+  nexusChatHistoryClear,
+  nexusChatHistoryDelete,
+  nexusChatHistoryGet,
+  nexusChatHistoryList,
+  nexusChatHistoryUpsert,
+  nexusClearApiKey,
+  nexusListModels,
+  nexusLogin,
+  nexusSetApiKey,
+  nexusStatus
+} from "./routes/nexus.js";
+import { handleMcpRequest } from "../mcp/server.js";
+import { MCP_UPLOAD_CHUNK_BASE64_CHARS } from "../mcp/upload.js";
+import { params as dappnodeParams } from "@dappnode/params";
+import { ensureTempTransferDir } from "../uploads/tempTransfer.js";
+import { parseHttpUploadFile, reserveHttpUploadCapacity } from "../uploads/httpUploadGuard.js";
+import { createIpfsAvatarHandler, GetIpfsFileBytes } from "./avatar.js";
 
 export interface HttpApiParams extends ClientSideCookiesParams, AuthPasswordSessionParams {
   AUTH_IP_ALLOW_LOCAL_IP: boolean;
@@ -61,7 +80,8 @@ export function startHttpApi({
   subscriptionsLogger,
   adminPasswordDb,
   eventBus,
-  isNewDappmanagerVersion
+  isNewDappmanagerVersion,
+  getIpfsFileBytes
 }: {
   params: HttpApiParams;
   logs: Logs;
@@ -75,6 +95,7 @@ export function startHttpApi({
   adminPasswordDb: AdminPasswordDb;
   eventBus: EventBus;
   isNewDappmanagerVersion: () => boolean;
+  getIpfsFileBytes: GetIpfsFileBytes;
 }): http.Server {
   const app = express();
   const server = new http.Server(app);
@@ -90,14 +111,22 @@ export function startHttpApi({
   // Intercept decentralized website requests first
   // TODO: research how to use auth in the proxy
   app.use(ethForwardMiddleware);
-  // default options. ALL CORS + limit fileSize and file count
-  app.use(fileUpload({ limits: { fileSize: 500 * 1024 * 1024, files: 10 } }));
   // CORS config follows https://stackoverflow.com/questions/50614397/value-of-the-access-control-allow-origin-header-in-the-response-must-not-be-th
   app.use(cors({ credentials: true, origin: params.HTTP_CORS_WHITELIST }));
   app.use(compression());
-  app.use(bodyParser.json());
-  app.use(bodyParser.text());
-  app.use(bodyParser.urlencoded({ extended: true }));
+  const skipMcpBodyParser = (handler: RequestHandler): RequestHandler => {
+    return (req, res, next) => {
+      if (req.path === "/mcp" || req.path === "/mcp/") return next();
+      return handler(req, res, next);
+    };
+  };
+  const mcpJsonParser = bodyParser.json({ limit: MCP_UPLOAD_CHUNK_BASE64_CHARS + 256 * 1024 });
+  app.use(skipMcpBodyParser(bodyParser.json()));
+  app.use(skipMcpBodyParser(bodyParser.text()));
+  app.use(skipMcpBodyParser(bodyParser.urlencoded({ extended: true })));
+  // Serve locally-downloaded package avatars (non-core from REPO_DIR, core from DNCORE_DIR)
+  app.use("/avatars", express.static(path.resolve(dappnodeParams.avatarStaticDir), { maxAge: "1d" }));
+  app.use("/avatars", express.static(path.resolve(dappnodeParams.coreAvatarStaticDir), { maxAge: "1d" }));
   // Intercept UI requests. Must go before express.static
   app.use(counterViewsMiddleware);
   // Express uses "ETags" (hashes of the files requested) to know when the file changed
@@ -109,6 +138,11 @@ export function startHttpApi({
 
   // Auth
   const auth = new AuthPasswordSession(sessions, adminPasswordDb, params);
+
+  const ensureTempTransferDirMiddleware: RequestHandler = (_req, _res, next) => {
+    ensureTempTransferDir();
+    next();
+  };
 
   // sessionHandler will mutate socket.handshake attaching .session object
   // Then, onlyAdmin will reject if socket.handshake.session.isAdmin !== true
@@ -154,7 +188,40 @@ export function startHttpApi({
   app.get("/file-download/:containerName", auth.onlyAdmin, routes.fileDownload);
   app.get("/download/:fileId", auth.onlyAdmin, routes.download);
   app.get("/user-action-logs", auth.onlyAdmin, routes.downloadUserActionLogs);
-  app.post("/upload", auth.onlyAdmin, routes.upload);
+  app.get("/avatar/ipfs/:cid", auth.onlyAdmin, createIpfsAvatarHandler(getIpfsFileBytes));
+  // Keep capacity reservation and multipart parsing after authentication so
+  // rejected requests cannot reserve disk or stream temporary files first.
+  app.post(
+    "/upload",
+    auth.onlyAdmin,
+    ensureTempTransferDirMiddleware,
+    reserveHttpUploadCapacity,
+    parseHttpUploadFile,
+    routes.upload
+  );
+
+  // Nexus chat proxy (Nexus API key held server-side).
+  app.get("/nexus/status", auth.onlyAdmin, nexusStatus);
+  app.post("/nexus/auth/login", auth.onlyAdmin, nexusLogin);
+  app.post("/nexus/config", auth.onlyAdmin, nexusSetApiKey);
+  app.delete("/nexus/config", auth.onlyAdmin, nexusClearApiKey);
+  app.get("/nexus/models", auth.onlyAdmin, nexusListModels);
+  app.post("/nexus/chat/completions", auth.onlyAdmin, nexusChatCompletions);
+  app.post("/nexus/chat/confirm", auth.onlyAdmin, nexusChatConfirm);
+  app.get("/nexus/chat/history", auth.onlyAdmin, nexusChatHistoryList);
+  app.delete("/nexus/chat/history", auth.onlyAdmin, nexusChatHistoryClear);
+  app.get("/nexus/chat/history/:id", auth.onlyAdmin, nexusChatHistoryGet);
+  app.put("/nexus/chat/history/:id", auth.onlyAdmin, nexusChatHistoryUpsert);
+  app.delete("/nexus/chat/history/:id", auth.onlyAdmin, nexusChatHistoryDelete);
+
+  // Stateless MCP server for this DAppNode — same tools the embedded chat
+  // uses, also reachable by external MCP clients (Claude Desktop, Cursor, etc.)
+  // and by other DAppNode packages. Authentication: admin session cookie OR
+  // `Authorization: Bearer <generated MCP API key>` from the admin UI at
+  // System > Advanced > MCP API key.
+  // A fresh transport is created per request so a stale client session can
+  // never hold the MCP endpoint lock.
+  app.post("/mcp", auth.onlyAdminOrMcpApiKey, mcpJsonParser, wrapHandler(handleMcpRequest));
 
   // Open endpoints (no auth)
   app.get("/global-envs/:name?", routes.globalEnvs);

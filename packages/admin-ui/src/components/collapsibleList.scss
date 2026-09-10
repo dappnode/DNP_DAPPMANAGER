@@ -1,0 +1,130 @@
+.collapsible-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.collapsible-list-item {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background-color: var(--background-primary);
+  overflow: hidden;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: var(--text-tertiary);
+  }
+
+  &.open {
+    border-color: var(--primary-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+}
+
+.collapsible-list-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: -2px;
+  }
+}
+
+.collapsible-list-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: left;
+  line-height: 1.4;
+}
+
+.collapsible-list-icon {
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+  transition: transform 0.3s ease, color 0.2s ease;
+  flex-shrink: 0;
+  margin-left: 1rem;
+
+  &.rotated {
+    transform: rotate(180deg);
+    color: var(--primary-color);
+  }
+}
+
+.collapsible-list-content {
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+
+  &.collapsed {
+    max-height: 0;
+    opacity: 0;
+    padding: 0 1.25rem;
+  }
+
+  &.expanded {
+    max-height: 2000px;
+    opacity: 1;
+    padding: 0 1.25rem 1rem 1.25rem;
+  }
+}
+
+.collapsible-list-body {
+  color: var(--text-secondary);
+  line-height: 1.7;
+  font-size: 0.95rem;
+
+  p {
+    margin-bottom: 1rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    strong {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+  }
+}
+
+// Dark mode adjustments - for modals rendered outside #dark
+body.dark,
+html.dark {
+  .collapsible-list-item {
+    background-color: var(--color-dark-card);
+    border-color: var(--color-dark-border);
+
+    &:hover {
+      border-color: var(--color-dark-secondarytext);
+    }
+
+    &.open {
+      border-color: var(--color-dark-secondarytext);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+    }
+  }
+
+  .collapsible-list-title {
+    color: var(--color-dark-maintext);
+  }
+
+  .collapsible-list-icon {
+    color: var(--color-dark-secondarytext);
+  }
+
+  .collapsible-list-body {
+    color: var(--color-dark-secondarytext);
+
+    p strong {
+      color: var(--color-dark-maintext);
+    }
+  }
+}

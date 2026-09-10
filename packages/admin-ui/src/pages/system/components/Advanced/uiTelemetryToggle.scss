@@ -1,0 +1,11 @@
+.ui-telemetry-wrapper {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  justify-content: space-between;
+  align-items: center;
+  @media (max-width: 40rem) {
+    flex-direction: column;
+    align-items: center;
+  }
+}

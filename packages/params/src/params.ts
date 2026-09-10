@@ -14,6 +14,7 @@ const DAY = 24 * HOUR;
  * Main persistent folders, linked with docker volumes
  * - No need to prefix or sufix with slashes, path.join() is used in the whole app
  */
+const DAPPNODE_CORE_DIR = process.env.DAPPNODE_CORE_DIR || "/usr/src/dappnode/DNCORE"; // host path
 let DNCORE_DIR = "/usr/src/app/DNCORE"; // Bind volume
 let REPO_DIR = "/usr/src/app/dnp_repo"; // Named volume
 const GLOBAL_ENVS_FILE_NAME = "dnp.dappnode.global.env";
@@ -37,9 +38,11 @@ export const params = {
   userActionLogsFilename: path.join(DNCORE_DIR, "userActionLogs.log"),
   // Static files serve
   avatarStaticDir: path.join(REPO_DIR, "avatars"),
+  coreAvatarStaticDir: path.join(DNCORE_DIR, "avatars"),
   // lowdb requires an absolute path
   DB_MAIN_PATH: path.resolve(DNCORE_DIR, "maindb.json"),
   DB_CACHE_PATH: path.resolve(DNCORE_DIR, "dappmanagerdb.json"),
+  DB_NEXUS_PATH: path.resolve(DNCORE_DIR, "nexusdb.json"),
 
   // File with sole purpose of handling admin password hash. Must be deletable
   ADMIN_RECOVERY_FILE: path.join(DNCORE_DIR, "admin-recovery-token.txt"),
@@ -57,16 +60,16 @@ export const params = {
   // Host script paths
   HOST_SCRIPTS_DIR_FROM_HOST: path.join(HOST_HOME, "DNCORE/scripts/host"),
   HOST_SCRIPTS_DIR: "DNCORE/scripts/host",
-  HOST_SCRIPTS_SOURCE_DIR: process.env.TEST ? "/app/packages/hostScriptsServices/hostScripts" : "hostScripts",
+  HOST_SCRIPTS_SOURCE_DIR: "hostScripts",
   // Host services paths
   HOST_SERVICES_DIR_FROM_HOST: path.join(HOST_HOME, "DNCORE/services/host"),
   HOST_SYSTEMD_DIR_FROM_HOST: "/etc/systemd/system",
   HOST_SERVICES_DIR: "DNCORE/services/host",
-  HOST_SERVICES_SOURCE_DIR: process.env.TEST ? "/app/packages/hostScriptsServices/hostServices" : "hostServices",
+  HOST_SERVICES_SOURCE_DIR: "hostServices",
   // Host timer paths
   HOST_TIMERS_DIR_FROM_HOST: path.join(HOST_HOME, "DNCORE/timers/host"),
   HOST_TIMERS_DIR: "DNCORE/timers/host",
-  HOST_TIMERS_SOURCE_DIR: process.env.TEST ? "/app/packages/hostScriptsServices/hostTimers" : "hostTimers",
+  HOST_TIMERS_SOURCE_DIR: "hostTimers",
   // Local fallback versions, to be able to install and eth client without connecting to remote
   FALLBACK_VERSIONS_PATH: path.join(DNCORE_DIR, "packages-content-hash.csv"),
   // Version data file, created in the docker image build process
@@ -124,10 +127,8 @@ export const params = {
   DOCKER_EXTERNAL_NETWORK_NAME: "dnpublic_network",
   DOCKER_STAKER_NETWORKS: {
     [Network.Mainnet]: "mainnet_network",
-    [Network.Holesky]: "holesky_network",
     [Network.Hoodi]: "hoodi_network",
     [Network.Sepolia]: "sepolia_network",
-    [Network.Prater]: "prater_network",
     [Network.Gnosis]: "gnosis_network",
     [Network.Lukso]: "lukso_network",
     [Network.StarknetMainnet]: "starknet_network",
@@ -154,7 +155,7 @@ export const params = {
   AUTO_UPDATE_INCLUDE_IPFS_VERSIONS: false,
 
   // Install method parameters
-  ALWAYS_DAPPGETBASIC: process.env.ALWAYS_DAPPGETBASIC === 'true',
+  ALWAYS_DAPPGETBASIC: process.env.ALWAYS_DAPPGETBASIC === "true",
   // Watchers
   TEMPERATURE_DAEMON_INTERVAL: 5 * MINUTE,
   AUTO_UPDATE_DAEMON_INTERVAL: 30 * MINUTE,
@@ -169,24 +170,16 @@ export const params = {
   IPFS_LOCAL: "http://ipfs.dappnode:8080",
   IPFS_REMOTE: "https://ipfs-gateway.dappnode.net",
 
+  // Mirror content provider
+  CONTENT_MIRROR_BASE_URL: "https://packages.dappnode.net",
+  CONTENT_MIRROR_TIMEOUT_MS: 30 * MINUTE,
+  CONTENT_MIRROR_MAX_BYTES: 20 * 1024 * 1024 * 1024, // 20 GB
   // Web3 parameters
   ETH_MAINNET_RPC_URL_REMOTE: process.env.ETH_MAINNET_RPC_URL_REMOTE || "https://web3.dappnode.net",
   ETH_MAINNET_CHECKPOINTSYNC_URL_REMOTE: "https://checkpoint-sync.dappnode.net",
 
-  // Prysm legacy specs for: prater, gnosis and mainnet
+  // Prysm legacy specs for: gnosis and mainnet
   prysmLegacySpecs: [
-    //  v0.2.46
-    {
-      prysmDnpName: "prysm-prater.dnp.dappnode.eth",
-      prysmVersion: "0.1.7",
-      web3signerDnpName: "web3signer-prater.dnp.dappnode.eth",
-      incompatibleClientsDnpNames: [
-        "teku-prater.dnp.dappnode.eth",
-        "lighthouse-prater.dnp.dappnode.eth",
-        "nimbus-prater.dnp.dappnode.eth",
-        "lodestar-prater.dnp.dappnode.eth"
-      ]
-    },
     // v0.2.51
     {
       prysmDnpName: "gnosis-beacon-chain-prysm.dnp.dappnode.eth",
@@ -235,7 +228,7 @@ export const params = {
   vpnDataVolume: "dncore_vpndnpdappnodeeth_data",
   wireguardContainerName: "DAppNodeCore-wireguard.wireguard.dnp.dappnode.eth",
   restartContainerName: "DAppNodeTool-restart.dnp.dappnode.eth",
-  restartDnpVolumes: ["/usr/src/dappnode/DNCORE/:/usr/src/app/DNCORE/", "/var/run/docker.sock:/var/run/docker.sock"],
+  restartDnpVolumes: [`${DAPPNODE_CORE_DIR}:${DNCORE_DIR}`, "/var/run/docker.sock:/var/run/docker.sock"], // Important: restart container needs access to the docker socket and the DNCORE_DIR to restart itself
   corePackagesThatMustBeRunning: ["bind.dnp.dappnode.eth", "dappmanager.dnp.dappnode.eth"],
   corePackagesNotAutoupdatable: [
     "core.dnp.dappnode.eth",
@@ -244,12 +237,7 @@ export const params = {
     "ipfs.dnp.dappnode.eth",
     "wifi.dnp.dappnode.eth"
   ],
-  corePackagesNotRemovable: [
-    "bind.dnp.dappnode.eth",
-    "dappmanager.dnp.dappnode.eth",
-    "ipfs.dnp.dappnode.eth",
-    "wifi.dnp.dappnode.eth"
-  ],
+  corePackagesNotRemovable: ["bind.dnp.dappnode.eth", "dappmanager.dnp.dappnode.eth"],
 
   // DYNDNS parameters
   DYNDNS_HOST: "https://ns.dappnode.io",
@@ -294,6 +282,11 @@ export const params = {
 
   // Flags
   DISABLE_UPNP: /true/i.test(process.env.DISABLE_UPNP || ""),
+  /**
+   * Disables host integration features that require Linux host capabilities (systemd, nsenter, dbus, etc).
+   * Useful for running in development environments like macOS + Docker Desktop/Colima.
+   */
+  DISABLE_HOST_SCRIPTS: /true/i.test(process.env.DISABLE_HOST_SCRIPTS || ""),
   AUTH_IP_ALLOW_LOCAL_IP: Boolean(process.env.AUTH_IP_ALLOW_LOCAL_IP),
   TEST: Boolean(process.env.TEST),
 
@@ -390,9 +383,15 @@ export const params = {
     },
     {
       name: "Swarm Team",
-      dnpNameSuffix: ".public.dappnode.eth",
+      dnpNameSuffix: ".dnp.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
-      key: "0xdAD64d07A318476dc48257a0bB53a8e9a26C6B33"
+      key: "0xFE94943bC26289a6682141353dA9bb72f716F5F6"
+    },
+    {
+      name: "Aztec",
+      dnpNameSuffix: ".dnp.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0x8ed550F2C7532541dd8CB5efA250e067EABB1B18"
     },
     {
       name: "Bertho - Nektar Network",
@@ -423,6 +422,18 @@ export const params = {
       dnpNameSuffix: ".public.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
       key: "0x18eE60706Ed150f6E21D020C1Cede55E4267f409"
+    },
+    {
+      name: "Dappnode Association - Luka (dnp)",
+      dnpNameSuffix: ".dnp.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0xF9E77a0537338f8394Aec2Ea9d0273E5Cd4F66dc"
+    },
+    {
+      name: "Dappnode Association - Luka (public)",
+      dnpNameSuffix: ".public.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0xF9E77a0537338f8394Aec2Ea9d0273E5Cd4F66dc"
     },
     {
       name: "Chainnodes",

@@ -13,19 +13,23 @@ export default function ExecutionClient({
   executionClient,
   setNewExecClient,
   isSelected,
+  isDisabled,
   ...props
 }: {
   executionClient: StakerItem;
   setNewExecClient: React.Dispatch<React.SetStateAction<StakerItemOk | null>>;
   isSelected: boolean;
+  isDisabled?: boolean;
 }) {
   const navigate = useNavigate();
   return (
     <Card
       {...props}
-      className={`execution-client ${joinCssClass({ isSelected })}`}
+      className={`execution-client ${joinCssClass({ isSelected, isDisabled })}`}
       onClick={
-        executionClient.status === "ok"
+        isDisabled
+          ? undefined
+          : executionClient.status === "ok"
           ? isSelected
             ? () => setNewExecClient(null)
             : () => setNewExecClient(executionClient)

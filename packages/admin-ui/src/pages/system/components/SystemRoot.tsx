@@ -6,17 +6,18 @@ import Title from "components/Title";
 import AutoUpdates from "./AutoUpdates";
 import App from "./App";
 import Security from "./Security";
-import PowerManagment from "./PowerManagment";
 import SystemUpdate from "./SystemUpdate";
 import Ipfs from "./Ipfs";
 import SystemInfo from "./SystemInfo";
 import Profile from "./Profile";
 import { Network } from "./Network";
 import { Advanced } from "./Advanced";
-import Hardware from "./Hardware";
 import { SectionNavigator } from "components/SectionNavigator";
+import Host from "./Host";
+import { useApi } from "api";
 
 const SystemRoot: React.FC = () => {
+  const disableHostScripts = useApi.disableHostScriptsGet();
   const availableRoutes: RouteType[] = [
     {
       name: "Info",
@@ -37,11 +38,6 @@ const SystemRoot: React.FC = () => {
       name: "Profile",
       subPath: subPaths.profile,
       element: <Profile />
-    },
-    {
-      name: "Power",
-      subPath: subPaths.power,
-      element: <PowerManagment />
     },
     {
       name: "Network",
@@ -69,11 +65,16 @@ const SystemRoot: React.FC = () => {
       subPath: subPaths.security,
       element: <Security />
     },
-    {
-      name: "Hardware",
-      subPath: subPaths.hardware,
-      element: <Hardware />
-    },
+    // Remove host section if host scripts are disabled
+    ...(disableHostScripts.data
+      ? []
+      : [
+          {
+            name: "Host",
+            subPath: subPaths.host,
+            element: <Host />
+          }
+        ]),
     {
       name: "Advanced",
       subPath: subPaths.advanced,

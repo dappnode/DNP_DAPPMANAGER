@@ -516,6 +516,8 @@ export interface PackageContainer {
   // DAppNode package data
   isDnp: boolean;
   isCore: boolean;
+  /** Installed locally for development without IPFS (see packageInstallDev) */
+  isDev?: boolean;
   defaultEnvironment?: PackageEnvs;
   defaultPorts?: PortMapping[];
   defaultVolumes?: VolumeMapping[];
@@ -523,6 +525,7 @@ export interface PackageContainer {
   avatarUrl: string;
   origin?: string;
   chain?: ChainDriver;
+  categories?: string[];
   domainAlias?: string[];
   canBeFullnode?: boolean;
   isMain?: boolean;
@@ -542,10 +545,12 @@ export type InstalledPackageData = Pick<
   | "version"
   | "isDnp"
   | "isCore"
+  | "isDev"
   | "dependencies"
   | "avatarUrl"
   | "origin"
   | "chain"
+  | "categories"
   | "domainAlias"
   | "canBeFullnode"
 > & {
@@ -921,16 +926,19 @@ export interface LocalIpResponse {
  * ====
  */
 
-export type DistributedFileSource = "ipfs" | "swarm";
+export type DistributedFileSource = "ipfs" | "swarm" | "mirror";
 export interface DistributedFile {
-  hash: string;
+  hash: string; // Individual file CID for "ipfs". Needed for fetching the file from IPFS.
   source: DistributedFileSource;
   size: number;
+  filename?: string; // Required for "mirror": filename within the package dir (e.g. "avatar.png")
+  packageHash?: string; // Required for "mirror": package directory CID; mirror URL is {baseUrl}/{packageHash}/{filename}
 }
 
 export interface IpfsRepository {
   ipfsClientTarget: IpfsClientTarget;
-  ipfsGateway: string;
+  /** Remote gateways in priority order. */
+  ipfsGateway: string[];
 }
 
 export enum IpfsClientTarget {
@@ -1002,7 +1010,8 @@ export type NewFeatureId =
   | "system-auto-updates"
   | "enable-ethical-metrics"
   | "change-host-password"
-  | "enable-notifications";
+  | "enable-notifications"
+  | "enable-ui-telemetry";
 
 /**
  * =======

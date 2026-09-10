@@ -243,9 +243,14 @@ export class ComposeServiceEditor {
 
 export class ComposeEditor {
   compose: Compose;
+  allowSubstitution: boolean;
 
-  constructor(compose: Compose) {
+  constructor(
+    compose: Compose,
+    { dnpName, allowSubstitution }: { dnpName?: string; allowSubstitution?: boolean } = {}
+  ) {
     this.compose = compose;
+    this.allowSubstitution = allowSubstitution ?? dnpName === params.dappmanagerDnpName;
   }
 
   static readFrom(composePath: string): Compose {
@@ -284,7 +289,7 @@ export class ComposeEditor {
 
   output(): Compose {
     // Last check to verify compose rules
-    verifyCompose(this.compose);
+    verifyCompose(this.compose, this.allowSubstitution);
 
     /**
      * Critical step to prevent writing faulty docker-compose.yml files
@@ -344,7 +349,7 @@ export class ComposeFileEditor extends ComposeEditor {
   composePath: string;
   constructor(dnpName: string, isCore: boolean) {
     const composePath = ComposeEditor.getComposePath(dnpName, isCore);
-    super(ComposeEditor.readFrom(composePath));
+    super(ComposeEditor.readFrom(composePath), { dnpName });
     this.composePath = composePath;
   }
 
