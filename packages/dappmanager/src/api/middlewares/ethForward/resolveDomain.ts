@@ -1,11 +1,10 @@
 import { ethers } from "ethers";
 import resolverAbi from "./abi/resolverAbi.json" with { type: "json" };
 import ensAbi from "./abi/ens.json" with { type: "json" };
-import { Network, Content, NotFoundError, EnsResolverError } from "./types.js";
+import { Content, NotFoundError, EnsResolverError } from "./types.js";
 import { decodeContentHash, isEmpty, decodeDnsLink, decodeContent } from "./utils/index.js";
 import memoize from "memoizee";
 
-const providerUrlCacheMs = 60 * 1000;
 const domainsCacheMs = 5 * 60 * 1000;
 
 /**
@@ -13,7 +12,7 @@ const domainsCacheMs = 5 * 60 * 1000;
  * Last updated March 2020
  */
 const ensAddress = "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e";
-const ropstenJsonRpc = "http://ropsten.dappnode:8545";
+export const mainnetJsonRpc = "http://execution.mainnet.dncore.dappnode:8545";
 
 const CONTENTHASH_INTERFACE_ID = "0xbc1c58d1";
 const TEXT_INTERFACE_ID = "0x59d1d43c";
@@ -24,34 +23,17 @@ interface InterfacesAvailable {
   [interfaceHash: string]: boolean;
 }
 
-async function getEthersProviderByNetwork(network: Network): Promise<string> {
-  switch (network) {
-    case "mainnet":
-      return "http://execution.mainnet.dncore.dappnode:8545"; 
-    case "ropsten":
-      return ropstenJsonRpc;
-    default:
-      throw Error(`Unsupported network: ${network}`);
-  }
-}
-
 /**
  * Caches obtaining and validating an eth client
  * Caches the domains by domain and provider instance
  */
 export function ResolveDomainWithCache(): (domain: string) => Promise<Content> {
-  const _getEthersProviderByNetwork = memoize(getEthersProviderByNetwork, {
-    promise: true,
-    maxAge: providerUrlCacheMs
-  });
   const _resolveDomain = memoize(resolveDomain, {
     promise: true,
     maxAge: domainsCacheMs
   });
   return async function (domain: string): Promise<Content> {
-    const network = parseNetworkFromDomain(domain);
-    const providerUrl = await _getEthersProviderByNetwork(network);
-    const provider = new ethers.JsonRpcProvider(providerUrl); // TODO: review
+    const provider = new ethers.JsonRpcProvider(mainnetJsonRpc); // TODO: review
     return _resolveDomain(domain, provider);
   };
 }
@@ -59,8 +41,6 @@ export function ResolveDomainWithCache(): (domain: string) => Promise<Content> {
 /**
  * Resolves a request for an ENS domain iterating over various methods
  * - `.eth` domains: Resolve with mainnet
- * - `.test` domains: Resolve with ropsten
- * - If NETOFF error, return no-ropsten.html
  * - else: throw Error
  * @param domain
  * @returns content object
@@ -93,24 +73,6 @@ export async function resolveDomain(domain: string, provider: ethers.Provider): 
   }
 
   throw new NotFoundError("content not configured", { domain });
-}
-
-/**
- * Returns the network to fetch from given an ENS domain
- * @param domain "name.eth" | "name.test"
- */
-function parseNetworkFromDomain(domain: string): Network {
-  if (!domain.includes(".")) throw Error(`domain does not have an TDL`);
-  const parts = domain.split(".");
-  const extension = parts[parts.length - 1];
-  switch (extension) {
-    case "eth":
-      return "mainnet";
-    case "test":
-      return "ropsten";
-    default:
-      throw Error(`TDL not supported ${extension}`);
-  }
 }
 
 // Utils

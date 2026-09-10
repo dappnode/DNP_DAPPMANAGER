@@ -5,7 +5,6 @@ import { params } from "@dappnode/params";
 const adminUiUrl = `http://my.dappnode/`;
 const adminUiInstallUrl = `${adminUiUrl}/installer`;
 const adminUiPackagesUrl = `${adminUiUrl}/packages`;
-const ropstenName = "ropsten.dnp.dappnode.eth";
 const swarmName = "swarm.dnp.dappnode.eth";
 
 const a = (url: string, text?: string): string => `<a href="${url}">${text || url}</a>`;
@@ -22,19 +21,10 @@ export function notFound(e: NotFoundError): string {
 export function noEth(e: Error): string {
   return base(
     "Ethereum node not available",
-    `Your mainnet ethereum node is not available
+    `This feature is only available when running both IPFS and Ethereum nodes.
     <br />
     ${e.message}`,
     e
-  );
-}
-
-export function noRopsten(): string {
-  return base(
-    "Ropsten not installed",
-    `Please install the Ropsten DNP (DAppNode package) to resolve .test domains
-    <br />
-    ${a(`${adminUiInstallUrl}/${ropstenName}`, "Install Ropsten")}`
   );
 }
 
@@ -51,8 +41,19 @@ export function noSwarm(e: Error): string {
 export function noIpfs(e: Error): string {
   return base(
     "IPFS not available",
-    `Make sure your IPFS node is available 
+    `This feature is only available when running both IPFS and Ethereum nodes.
+    <br />
     ${a(`${adminUiPackagesUrl}/${params.ipfsDnpName}`, "IPFS status")}`,
+    e
+  );
+}
+
+export function noEthAndIpfs(e: Error): string {
+  return base(
+    "Ethereum and IPFS not available",
+    `This feature is only available when running both IPFS and Ethereum nodes.
+    <br />
+    ${a(adminUiPackagesUrl, "Check core packages status")}`,
     e
   );
 }
