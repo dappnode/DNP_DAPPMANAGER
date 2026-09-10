@@ -6,6 +6,7 @@ import { getIpfsProxyHandler, ProxyType } from "./ipfsProxy.js";
 import { mainnetJsonRpc, ResolveDomainWithCache } from "./resolveDomain.js";
 import { logs } from "@dappnode/logger";
 import * as views from "./views/index.js";
+import { NodeNotAvailable } from "./types.js";
 
 const ETH_API_URL = mainnetJsonRpc;
 const IPFS_API_URL = getIpfsApiUrl();
@@ -28,9 +29,15 @@ export function getEthForwardMiddleware(): express.RequestHandler {
   // Create a domain resolver with cache
   const resolveDomain = ResolveDomainWithCache();
   // Start ethforward http proxy: Resolves .eth domains
-  const ethForwardHandler = getIpfsProxyHandler<string>(
+  const ethForwardHandler = getIpfsProxyHandler<{ domain: string; isIpfsAvailable: boolean }>(
     ProxyType.ETHFORWARD,
-    async (_req, domain) => await resolveDomain(domain)
+    async (_req, { domain, isIpfsAvailable }) => {
+      const content = await resolveDomain(domain);
+      if (content.location === "ipfs" && !isIpfsAvailable) {
+        throw new NodeNotAvailable(`IPFS API ${IPFS_API_URL} is unavailable`, "ipfs");
+      }
+      return content;
+    }
   );
 
   return (req, res, next): void => {
@@ -39,28 +46,26 @@ export function getEthForwardMiddleware(): express.RequestHandler {
       if (domain !== null) {
         ensureApisAvailability()
           .then((apisAvailability) => {
-            if (!apisAvailability.isEthAvailable || !apisAvailability.isIpfsAvailable) {
+            if (!apisAvailability.isEthAvailable) {
               logs.warn(
                 `ETHFORWARD blocked ${domain}: ETH API up=${apisAvailability.isEthAvailable}, IPFS API up=${apisAvailability.isIpfsAvailable}`
               );
 
               res.writeHead(200, { "Content-Type": "text/html" });
-              if (!apisAvailability.isEthAvailable && !apisAvailability.isIpfsAvailable) {
+              if (!apisAvailability.isIpfsAvailable) {
                 res.write(
                   views.noEthAndIpfs(
                     new Error(`Ethereum API ${ETH_API_URL} and IPFS API ${IPFS_API_URL} are unavailable`)
                   )
                 );
-              } else if (!apisAvailability.isEthAvailable) {
-                res.write(views.noEth(new Error(`Ethereum API ${ETH_API_URL} is unavailable`)));
               } else {
-                res.write(views.noIpfs(new Error(`IPFS API ${IPFS_API_URL} is unavailable`)));
+                res.write(views.noEth(new Error(`Ethereum API ${ETH_API_URL} is unavailable`)));
               }
               res.end();
               return;
             }
 
-            ethForwardHandler(req, res, domain);
+            return ethForwardHandler(req, res, { domain, isIpfsAvailable: apisAvailability.isIpfsAvailable });
           })
           .catch(next);
         return;
@@ -88,13 +93,15 @@ async function ensureApisAvailability(): Promise<ApisAvailability> {
 }
 
 async function isEthApiAvailable(): Promise<boolean> {
+  const provider = new ethers.JsonRpcProvider(ETH_API_URL);
   try {
-    const provider = new ethers.JsonRpcProvider(ETH_API_URL);
     await withTimeout(provider.send("web3_clientVersion", []), APIS_CHECK_TIMEOUT_MS);
     return true;
   } catch (e) {
     logs.debug("ETHFORWARD ETH API check failed", e);
     return false;
+  } finally {
+    provider.destroy();
   }
 }
 
@@ -117,8 +124,7 @@ async function isIpfsApiAvailable(): Promise<boolean> {
 
 function getIpfsApiUrl(): string {
   try {
-    const ipfsUrl = params.IPFS_HOST || params.IPFS_LOCAL;
-    const url = new URL(ipfsUrl);
+    const url = new URL(params.ETHFORWARD_IPFS_REDIRECT);
     url.port = "5001";
     url.pathname = "/";
     url.search = "";
