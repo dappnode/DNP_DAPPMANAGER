@@ -1,4 +1,4 @@
-import { isIP as isIp } from "is-ip";
+import { isIP } from "is-ip";
 import { shell } from "@dappnode/utils";
 import { getDappmanagerImage } from "@dappnode/dockerapi";
 
@@ -12,7 +12,7 @@ export async function getInternalIp(): Promise<string> {
     // TO: 104.248.150.201
     const internalIp = ((output || "").match(/src\s((\d+\.?){4})/) || [])[1];
 
-    if (!isIp(internalIp)) throw Error(`Invalid IP: ${internalIp}`);
+    if (!isIP(internalIp)) throw Error(`Invalid IP: ${internalIp}`);
 
     return internalIp;
   } catch (e) {

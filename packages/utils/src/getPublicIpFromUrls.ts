@@ -1,4 +1,4 @@
-import { isIP as isIp } from "is-ip";
+import { isIP } from "is-ip";
 import retry from "async-retry";
 
 const urls = ["https://ns.dappnode.io/myip", "http://ipv4.icanhazip.com", "http://ident.me"];
@@ -35,7 +35,7 @@ export async function getPublicIpFromUrls(options?: { timeout?: number; retries?
         },
         { retries }
       );
-      if (isIp(ip)) return ip;
+      if (isIP(ip)) return ip;
       else throw new Error(`Invalid IP format: ${ip}`);
     } catch (e) {
       errors.push(`${url}: ${e.message}`);

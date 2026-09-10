@@ -2,7 +2,7 @@ import fs from "fs";
 import * as db from "@dappnode/db";
 import { params } from "@dappnode/params";
 import { logs } from "@dappnode/logger";
-import { isIP as isIp } from "is-ip";
+import { isIP } from "is-ip";
 import { isNotFoundError } from "@dappnode/utils";
 
 const staticIpPath = params.STATIC_IP_PATH;
@@ -14,7 +14,7 @@ const staticIpPath = params.STATIC_IP_PATH;
 function getInstallationStaticIp(): string {
   try {
     const ip = fs.readFileSync(staticIpPath, "utf8").trim();
-    if (!isIp(ip)) return "";
+    if (!isIP(ip)) return "";
     else return ip;
   } catch (e) {
     if (isNotFoundError(e)) {
