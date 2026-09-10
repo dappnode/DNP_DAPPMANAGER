@@ -6,7 +6,7 @@ export type Location = "ipfs" | "swarm";
 /**
  * Network names supported by the ETH FORWARD
  */
-export type Network = "mainnet" | "ropsten";
+export type Network = "mainnet";
 
 /**
  * Content descriptor
