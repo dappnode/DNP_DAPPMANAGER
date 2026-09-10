@@ -46,7 +46,7 @@
     "@types/node-telegram-bot-api": "^0.64.15",
     "@types/semver": "^7.8.0",
     "@types/systeminformation": "^3.54.1",
-    "mocha": "^10.8.2",
+    "mocha": "^12.0.0",
     "rewiremock": "^3.14.6",
     "sinon": "^5.1.1"
   }

@@ -1110,7 +1110,7 @@ __metadata:
     "@dappnode/types": "workspace:^0.1.0"
     "@dappnode/utils": "workspace:^0.1.0"
     "@types/mocha": "npm:^10"
-    mocha: "npm:^10.8.2"
+    mocha: "npm:^12.0.0"
     monero-rpc: "npm:0.5.0"
   languageName: unknown
   linkType: soft
@@ -1125,7 +1125,7 @@ __metadata:
     "@types/node": "npm:^22.13.9"
     ajv: "npm:^8.20.0"
     lodash-es: "npm:^4.18.1"
-    mocha: "npm:^10.8.2"
+    mocha: "npm:^12.0.0"
     typescript-json-schema: "npm:^0.68.0"
   languageName: unknown
   linkType: soft
@@ -1157,7 +1157,7 @@ __metadata:
     "@types/systeminformation": "npm:^3.54.1"
     is-ip: "npm:^3.1.0"
     lodash-es: "npm:^4.18.1"
-    mocha: "npm:^10.8.2"
+    mocha: "npm:^12.0.0"
     node-telegram-bot-api: "npm:^0.67.0"
     rewiremock: "npm:^3.14.6"
     semver: "npm:^7.8.5"
@@ -1230,7 +1230,7 @@ __metadata:
     kubo-rpc-client: "npm:^3.0.4"
     lodash-es: "npm:^4.18.1"
     memoizee: "npm:^0.4.17"
-    mocha: "npm:^10.8.2"
+    mocha: "npm:^12.0.0"
     multicodec: "npm:^3.2.1"
     multiformats: "npm:^11.0.2"
     prettier: "npm:^2.8.8"
@@ -1260,7 +1260,7 @@ __metadata:
     "@types/lodash-es": "npm:^4.17.12"
     "@types/mocha": "npm:^10"
     lodash-es: "npm:^4.18.1"
-    mocha: "npm:^10.8.2"
+    mocha: "npm:^12.0.0"
   languageName: unknown
   linkType: soft
 
@@ -1281,7 +1281,7 @@ __metadata:
     dockerode: "npm:^4.0.0"
     lodash-es: "npm:^4.17.21"
     memoizee: "npm:0.4.14"
-    mocha: "npm:^10.7.0"
+    mocha: "npm:^12.0.0"
     rewiremock: "npm:^3.13.7"
     tar-stream: "npm:2.1.4"
   languageName: unknown
@@ -1296,7 +1296,7 @@ __metadata:
     "@types/lodash-es": "npm:^4.17.12"
     "@types/mocha": "npm:^10"
     lodash-es: "npm:^4.18.1"
-    mocha: "npm:^10.8.2"
+    mocha: "npm:^12.0.0"
   languageName: unknown
   linkType: soft
 
@@ -1309,7 +1309,7 @@ __metadata:
     "@dappnode/params": "workspace:^0.1.0"
     "@types/mocha": "npm:^10"
     ethers: "npm:^6.17.0"
-    mocha: "npm:^10.8.2"
+    mocha: "npm:^12.0.0"
     node-fetch: "npm:^3.3.2"
   languageName: unknown
   linkType: soft
@@ -1319,7 +1319,7 @@ __metadata:
   resolution: "@dappnode/ethicalmetrics@workspace:packages/ethicalMetrics"
   dependencies:
     "@types/mocha": "npm:^10"
-    mocha: "npm:^10.8.2"
+    mocha: "npm:^12.0.0"
   languageName: unknown
   linkType: soft
 
@@ -1331,7 +1331,7 @@ __metadata:
     "@types/lodash-es": "npm:^4.17.12"
     "@types/mocha": "npm:^10"
     lodash-es: "npm:^4.18.1"
-    mocha: "npm:^10.8.2"
+    mocha: "npm:^12.0.0"
   languageName: unknown
   linkType: soft
 
@@ -1345,7 +1345,7 @@ __metadata:
     "@types/memoizee": "npm:0.4.12"
     "@types/mocha": "npm:^10"
     memoizee: "npm:0.4.17"
-    mocha: "npm:^10.8.2"
+    mocha: "npm:^12.0.0"
   languageName: unknown
   linkType: soft
 
@@ -1363,7 +1363,7 @@ __metadata:
     "@types/mocha": "npm:^10"
     ajv: "npm:6.15.0"
     memoizee: "npm:0.4.17"
-    mocha: "npm:^10.8.2"
+    mocha: "npm:^12.0.0"
   languageName: unknown
   linkType: soft
 
@@ -1393,7 +1393,7 @@ __metadata:
     is-ipfs: "npm:8.0.4"
     it-all: "npm:^3.0.11"
     lodash-es: "npm:4.18.1"
-    mocha: "npm:^10.8.2"
+    mocha: "npm:^12.0.0"
     rewiremock: "npm:3.14.6"
     semver: "npm:7.8.5"
     sinon: "npm:5.1.1"
@@ -1411,7 +1411,7 @@ __metadata:
     "@dappnode/utils": "workspace:^0.1.0"
     "@types/mocha": "npm:^10"
     "@types/stack-trace": "npm:0.0.33"
-    mocha: "npm:^10.8.2"
+    mocha: "npm:^12.0.0"
     stack-trace: "npm:0.0.10"
   languageName: unknown
   linkType: soft
@@ -1437,7 +1437,7 @@ __metadata:
     "@types/mocha": "npm:^10"
     "@types/semver": "npm:^7.8.0"
     lodash-es: "npm:^4.18.1"
-    mocha: "npm:^10.8.2"
+    mocha: "npm:^12.0.0"
     semver: "npm:^7.8.5"
   languageName: unknown
   linkType: soft
@@ -1448,7 +1448,7 @@ __metadata:
   dependencies:
     "@dappnode/types": "workspace:^0.1.0"
     "@types/mocha": "npm:^10"
-    mocha: "npm:^10.8.2"
+    mocha: "npm:^12.0.0"
   languageName: unknown
   linkType: soft
 
@@ -1461,7 +1461,7 @@ __metadata:
     "@dappnode/types": "workspace:^0.1.0"
     "@dappnode/utils": "workspace:^0.1.0"
     "@types/mocha": "npm:^10"
-    mocha: "npm:^10.8.2"
+    mocha: "npm:^12.0.0"
   languageName: unknown
   linkType: soft
 
@@ -1494,7 +1494,7 @@ __metadata:
     "@dappnode/types": "npm:^0.1.40"
     "@types/mocha": "npm:^10"
     ajv: "npm:^8.20.0"
-    mocha: "npm:^10.8.2"
+    mocha: "npm:^12.0.0"
   languageName: unknown
   linkType: soft
 
@@ -1530,7 +1530,7 @@ __metadata:
     ipfs-unixfs-exporter: "npm:^13.7.3"
     is-ipfs: "npm:^8.0.4"
     kubo-rpc-client: "npm:^5.4.1"
-    mocha: "npm:^10.8.2"
+    mocha: "npm:^12.0.0"
     multiformats: "npm:^13.4.2"
     rimraf: "npm:^5.0.10"
     semver: "npm:^7.8.5"
@@ -1556,7 +1556,7 @@ __metadata:
     "@dappnode/utils": "workspace:^0.1.0"
     "@types/mocha": "npm:^10"
     is-ip: "npm:3.1.0"
-    mocha: "npm:^10.8.2"
+    mocha: "npm:^12.0.0"
   languageName: unknown
   linkType: soft
 
@@ -1579,7 +1579,7 @@ __metadata:
     js-yaml: "npm:^4.3.2"
     lodash-es: "npm:^4.18.1"
     memoizee: "npm:0.4.17"
-    mocha: "npm:^10.8.2"
+    mocha: "npm:^12.0.0"
   languageName: unknown
   linkType: soft
 
@@ -6392,13 +6392,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ansi-colors@npm:^4.1.3":
-  version: 4.1.3
-  resolution: "ansi-colors@npm:4.1.3"
-  checksum: 10c0/ec87a2f59902f74e61eada7f6e6fe20094a628dab765cfdbd03c3477599368768cffccdb5d3bb19a1b6c99126783a143b1fee31aab729b31ffe5836c7e5e28b9
-  languageName: node
-  linkType: hard
-
 "ansi-regex@npm:^2.0.0":
   version: 2.1.1
   resolution: "ansi-regex@npm:2.1.1"
@@ -7804,25 +7797,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chokidar@npm:^3.5.3":
-  version: 3.6.0
-  resolution: "chokidar@npm:3.6.0"
-  dependencies:
-    anymatch: "npm:~3.1.2"
-    braces: "npm:~3.0.2"
-    fsevents: "npm:~2.3.2"
-    glob-parent: "npm:~5.1.2"
-    is-binary-path: "npm:~2.1.0"
-    is-glob: "npm:~4.0.1"
-    normalize-path: "npm:~3.0.0"
-    readdirp: "npm:~3.6.0"
-  dependenciesMeta:
-    fsevents:
-      optional: true
-  checksum: 10c0/8361dcd013f2ddbe260eacb1f3cb2f2c6f2b0ad118708a343a5ed8158941a39cb8fb1d272e0f389712e74ee90ce8ba864eece9e0e62b9705cb468a2f6d917462
-  languageName: node
-  linkType: hard
-
 "chokidar@npm:^5.0.0":
   version: 5.0.0
   resolution: "chokidar@npm:5.0.0"
@@ -8912,10 +8886,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"diff@npm:^5.2.0":
-  version: 5.2.0
-  resolution: "diff@npm:5.2.0"
-  checksum: 10c0/aed0941f206fe261ecb258dc8d0ceea8abbde3ace5827518ff8d302f0fc9cc81ce116c4d8f379151171336caf0516b79e01abdc1ed1201b6440d895a66689eb4
+"diff@npm:^9.0.0":
+  version: 9.0.0
+  resolution: "diff@npm:9.0.0"
+  checksum: 10c0/a971cc88f66071a33bd3942db2f51b57d484e9856265ae45cf44fb28ab2fde91f132d9c26d8be0fb6082d2be94d29e1295c1adb251b7461935d6a2dd304cd161
   languageName: node
   linkType: hard
 
@@ -11186,7 +11160,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"glob@npm:^13.0.6":
+"glob@npm:^13.0.0, glob@npm:^13.0.6":
   version: 13.0.6
   resolution: "glob@npm:13.0.6"
   dependencies:
@@ -11208,19 +11182,6 @@ __metadata:
     once: "npm:^1.3.0"
     path-is-absolute: "npm:^1.0.0"
   checksum: 10c0/65676153e2b0c9095100fe7f25a778bf45608eeb32c6048cf307f579649bcc30353277b3b898a3792602c65764e5baa4f643714dfbdfd64ea271d210c7a425fe
-  languageName: node
-  linkType: hard
-
-"glob@npm:^8.1.0":
-  version: 8.1.0
-  resolution: "glob@npm:8.1.0"
-  dependencies:
-    fs.realpath: "npm:^1.0.0"
-    inflight: "npm:^1.0.4"
-    inherits: "npm:2"
-    minimatch: "npm:^5.0.1"
-    once: "npm:^1.3.0"
-  checksum: 10c0/cb0b5cab17a59c57299376abe5646c7070f8acb89df5595b492dba3bfb43d301a46c01e5695f01154e6553168207cb60d4eaf07d3be4bc3eb9b0457c5c561d0f
   languageName: node
   linkType: hard
 
@@ -11583,7 +11544,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"he@npm:1.2.0, he@npm:^1.2.0":
+"he@npm:1.2.0":
   version: 1.2.0
   resolution: "he@npm:1.2.0"
   bin:
@@ -12419,6 +12380,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"is-path-inside@npm:^3.0.3":
+  version: 3.0.3
+  resolution: "is-path-inside@npm:3.0.3"
+  checksum: 10c0/cf7d4ac35fb96bab6a1d2c3598fe5ebb29aafb52c0aaa482b5a3ed9d8ba3edc11631e3ec2637660c44b3ce0e61a08d54946e8af30dec0b60a7c27296c68ffd05
+  languageName: node
+  linkType: hard
+
 "is-plain-obj@npm:^2.1.0":
   version: 2.1.0
   resolution: "is-plain-obj@npm:2.1.0"
@@ -12985,6 +12953,17 @@ __metadata:
   bin:
     js-yaml: bin/js-yaml.js
   checksum: 10c0/dedd34c2e8fef1d504687f1bc94ed0ee1311a1f78770fa2800352c6d59c635ccf555009d74e9afe529ae62199da2b1ccef30e53dc84dcd8d2d8187c22574bc97
+  languageName: node
+  linkType: hard
+
+"js-yaml@npm:^5.0.0":
+  version: 5.4.1
+  resolution: "js-yaml@npm:5.4.1"
+  dependencies:
+    argparse: "npm:^2.0.1"
+  bin:
+    js-yaml: bin/js-yaml.mjs
+  checksum: 10c0/efe9dfaf222809694d375ad5ecca825561d2432eb55bc0f628911c0dfa4dbce98a71dcbc3252f630208bbdf5f4e9ac363847e4a7f49845b577ae2548b8fcf147
   languageName: node
   linkType: hard
 
@@ -13605,7 +13584,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"log-symbols@npm:4.1.0, log-symbols@npm:^4.1.0":
+"log-symbols@npm:4.1.0":
   version: 4.1.0
   resolution: "log-symbols@npm:4.1.0"
   dependencies:
@@ -14635,15 +14614,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"minimatch@npm:^5.0.1, minimatch@npm:^5.1.6":
-  version: 5.1.6
-  resolution: "minimatch@npm:5.1.6"
-  dependencies:
-    brace-expansion: "npm:^2.0.1"
-  checksum: 10c0/3defdfd230914f22a8da203747c42ee3c405c39d4d37ffda284dac5e45b7e1f6c49aa8be606509002898e73091ff2a3bbfc59c2c6c71d4660609f63aa92f98e3
-  languageName: node
-  linkType: hard
-
 "minimatch@npm:^7.4.6":
   version: 7.4.6
   resolution: "minimatch@npm:7.4.6"
@@ -14879,34 +14849,29 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mocha@npm:^10.7.0, mocha@npm:^10.8.2":
-  version: 10.8.2
-  resolution: "mocha@npm:10.8.2"
+"mocha@npm:^12.0.0":
+  version: 12.0.0
+  resolution: "mocha@npm:12.0.0"
   dependencies:
-    ansi-colors: "npm:^4.1.3"
     browser-stdout: "npm:^1.3.1"
-    chokidar: "npm:^3.5.3"
+    chokidar: "npm:^5.0.0"
     debug: "npm:^4.3.5"
-    diff: "npm:^5.2.0"
-    escape-string-regexp: "npm:^4.0.0"
+    diff: "npm:^9.0.0"
     find-up: "npm:^5.0.0"
-    glob: "npm:^8.1.0"
-    he: "npm:^1.2.0"
-    js-yaml: "npm:^4.1.0"
-    log-symbols: "npm:^4.1.0"
-    minimatch: "npm:^5.1.6"
+    glob: "npm:^13.0.0"
+    is-path-inside: "npm:^3.0.3"
+    is-unicode-supported: "npm:^0.1.0"
+    js-yaml: "npm:^5.0.0"
+    minimatch: "npm:^10.2.2"
     ms: "npm:^2.1.3"
-    serialize-javascript: "npm:^6.0.2"
-    strip-json-comments: "npm:^3.1.1"
+    picocolors: "npm:^1.1.1"
+    serialize-javascript: "npm:^7.0.2"
+    strip-json-comments: "npm:^5.0.3"
     supports-color: "npm:^8.1.1"
-    workerpool: "npm:^6.5.1"
-    yargs: "npm:^16.2.0"
-    yargs-parser: "npm:^20.2.9"
-    yargs-unparser: "npm:^2.0.0"
+    workerpool: "npm:^10.0.0"
   bin:
-    _mocha: bin/_mocha
     mocha: bin/mocha.js
-  checksum: 10c0/1f786290a32a1c234f66afe2bfcc68aa50fe9c7356506bd39cca267efb0b4714a63a0cb333815578d63785ba2fba058bf576c2512db73997c0cae0d659a88beb
+  checksum: 10c0/d8b747da804d17db2a53cce0dc496b520ff1526fb41691bf5e751399a28a9ce105ffaf9580e2f594077c9dd56a1ebb1695ada26a6b4ca51e14e26beb1d172ed5
   languageName: node
   linkType: hard
 
@@ -17834,7 +17799,7 @@ __metadata:
     chai: "npm:^4.5.0"
     depcheck: "npm:^1.4.7"
     eslint: "npm:^9.39.5"
-    mocha: "npm:^10.8.2"
+    mocha: "npm:^12.0.0"
     nodemon: "npm:^3.1.14"
     prettier: "npm:^3.9.6"
     rimraf: "npm:^3.0.2"
@@ -18117,12 +18082,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"serialize-javascript@npm:^6.0.2":
-  version: 6.0.2
-  resolution: "serialize-javascript@npm:6.0.2"
-  dependencies:
-    randombytes: "npm:^2.1.0"
-  checksum: 10c0/2dd09ef4b65a1289ba24a788b1423a035581bef60817bea1f01eda8e3bda623f86357665fe7ac1b50f6d4f583f97db9615b3f07b2a2e8cbcb75033965f771dd2
+"serialize-javascript@npm:^7.0.2":
+  version: 7.1.1
+  resolution: "serialize-javascript@npm:7.1.1"
+  checksum: 10c0/a9209f0c3e946cc4421b705cfa502a28a7a5fed65eee22cb66b4200f374b2c3b8c9d0fadb6a00c75d7c0cd09c2780d1e0f390c75dce9d6dfb171f0b63c85014a
   languageName: node
   linkType: hard
 
@@ -18949,6 +18912,13 @@ __metadata:
   version: 3.1.1
   resolution: "strip-json-comments@npm:3.1.1"
   checksum: 10c0/9681a6257b925a7fa0f285851c0e613cc934a50661fa7bb41ca9cbbff89686bb4a0ee366e6ecedc4daafd01e83eee0720111ab294366fe7c185e935475ebcecd
+  languageName: node
+  linkType: hard
+
+"strip-json-comments@npm:^5.0.3":
+  version: 5.0.3
+  resolution: "strip-json-comments@npm:5.0.3"
+  checksum: 10c0/daaf20b29f69fb51112698f4a9a662490dbb78d5baf6127c75a0a83c2ac6c078a8c0f74b389ad5e0519d6fc359c4a57cb9971b1ae201aef62ce45a13247791e0
   languageName: node
   linkType: hard
 
@@ -20997,10 +20967,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"workerpool@npm:^6.5.1":
-  version: 6.5.1
-  resolution: "workerpool@npm:6.5.1"
-  checksum: 10c0/58e8e969782292cb3a7bfba823f1179a7615250a0cefb4841d5166234db1880a3d0fe83a31dd8d648329ec92c2d0cd1890ad9ec9e53674bb36ca43e9753cdeac
+"workerpool@npm:^10.0.0":
+  version: 10.0.3
+  resolution: "workerpool@npm:10.0.3"
+  checksum: 10c0/a20a274ac9afc6c329f5b1661914a8ebd160320cfbd816b723b6ef385e41b186ef0bf2d6d82a77556fc33599ce14e40c7fdfd44a2a4daff488257cdd396fa9e9
   languageName: node
   linkType: hard
 
@@ -21308,7 +21278,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yargs-parser@npm:^20.2.2, yargs-parser@npm:^20.2.9":
+"yargs-parser@npm:^20.2.2":
   version: 20.2.9
   resolution: "yargs-parser@npm:20.2.9"
   checksum: 10c0/0685a8e58bbfb57fab6aefe03c6da904a59769bd803a722bb098bd5b0f29d274a1357762c7258fb487512811b8063fb5d2824a3415a0a4540598335b3b086c72
@@ -21329,7 +21299,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yargs-unparser@npm:2.0.0, yargs-unparser@npm:^2.0.0":
+"yargs-unparser@npm:2.0.0":
   version: 2.0.0
   resolution: "yargs-unparser@npm:2.0.0"
   dependencies:

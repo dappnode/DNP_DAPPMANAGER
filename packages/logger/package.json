@@ -27,6 +27,6 @@
   "devDependencies": {
     "@types/mocha": "^10",
     "@types/stack-trace": "0.0.33",
-    "mocha": "^10.8.2"
+    "mocha": "^12.0.0"
   }
 }
