@@ -1,4 +1,5 @@
 import { params } from "@dappnode/params";
+import { logs } from "@dappnode/logger";
 import { DappnodeRepository } from "@dappnode/toolkit";
 import * as db from "@dappnode/db";
 import {
@@ -32,32 +33,46 @@ import { JsonRpcApiProvider } from "ethers";
 /**
  * Returns the ipfsUrl to initialize the ipfs instance
  */
-export function getIpfsUrl(): string {
+export function getIpfsUrls(): string[] {
   // Fort testing
-  if (params.IPFS_HOST) return params.IPFS_HOST;
+  if (params.IPFS_HOST) return [params.IPFS_HOST];
 
   const ipfsClientTarget = db.ipfsClientTarget.get();
   if (!ipfsClientTarget) throw Error("Ipfs client target is not set");
   // local
-  if (ipfsClientTarget === IpfsClientTarget.local) return params.IPFS_LOCAL;
+  if (ipfsClientTarget === IpfsClientTarget.local) return [params.IPFS_LOCAL];
   // remote
-  return db.ipfsGateway.get();
+  return db.getIpfsGateways();
 }
 
 export class DappnodeInstaller extends DappnodeRepository {
-  constructor(ipfsUrl: string, provider: JsonRpcApiProvider) {
+  constructor(ipfsUrl: string | string[], provider: JsonRpcApiProvider) {
     super(
       ipfsUrl,
       provider,
-      { baseUrl: params.CONTENT_MIRROR_BASE_URL, timeoutMs: params.CONTENT_MIRROR_TIMEOUT_MS, maxBytes: params.CONTENT_MIRROR_MAX_BYTES },
-      () => db.mirrorProviderEnabled.get()
+      {
+        baseUrl: params.CONTENT_MIRROR_BASE_URL,
+        timeoutMs: params.CONTENT_MIRROR_TIMEOUT_MS,
+        maxBytes: params.CONTENT_MIRROR_MAX_BYTES
+      },
+      () => db.mirrorProviderEnabled.get(),
+      (level, message) => logs[level](message)
     );
   }
 
   private async updateProviders(): Promise<void> {
-    const newIpfsUrl = getIpfsUrl();
+    const newIpfsUrl = getIpfsUrls();
     // super.changeEthProvider();
     super.changeIpfsGatewayUrl(newIpfsUrl);
+  }
+
+  /**
+   * Resolve a small IPFS file using the currently selected gateway target.
+   * Used by DAppManager's content-addressed avatar endpoint.
+   */
+  public async getIpfsFileBytes(hash: string, maxLength: number): Promise<Uint8Array> {
+    await this.updateProviders();
+    return super.writeFileToBytes(hash, maxLength, params.IPFS_TIMEOUT);
   }
 
   /**

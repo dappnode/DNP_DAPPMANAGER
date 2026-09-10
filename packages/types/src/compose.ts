@@ -124,7 +124,8 @@ export interface ComposeNetwork {
 }
 
 export interface Compose {
-  version: string; // "3.4"
+  /** Obsolete in the Compose Specification, but accepted for backwards compatibility. */
+  version?: string; // "3.4"
   // dnpName: "dappmanager.dnp.dappnode.eth"
   services: {
     [dnpName: string]: ComposeService;

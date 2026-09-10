@@ -76,7 +76,7 @@ describe("parseUserSettings", () => {
           ports: ["4001:4001", "9090:9090", "32764:6000"],
           volumes: ["/dev1/custom-path:/usr/data0", "moredata:/usr/data1", `${bitcoinVolumeNameNew}:/usr/data2`],
           networks: {
-            holesky_network: {
+            hoodi_network: {
               aliases: ["mock-dnp"]
             }
           }
@@ -94,7 +94,7 @@ describe("parseUserSettings", () => {
         }
       },
       networks: {
-        holesky_network: {
+        hoodi_network: {
           external: true
         }
       }
@@ -122,13 +122,13 @@ describe("parseUserSettings", () => {
       },
       networks: {
         rootNetworks: {
-          holesky_network: {
+          hoodi_network: {
             external: true
           }
         },
         serviceNetworks: {
           [mockDnpName]: {
-            holesky_network: {
+            hoodi_network: {
               aliases: ["mock-dnp"]
             }
           }

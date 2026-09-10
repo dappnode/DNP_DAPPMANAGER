@@ -17,15 +17,9 @@ export const GLOBAL_ENVS = {
   CONSENSUS_CLIENT_GNOSIS: "_DAPPNODE_GLOBAL_CONSENSUS_CLIENT_GNOSIS", // "teku-gnosis.dnp.dappnode.eth"
   EXECUTION_CLIENT_GNOSIS: "_DAPPNODE_GLOBAL_EXECUTION_CLIENT_GNOSIS", // "nethermind-xdai.dnp.dappnode.eth"
   MEVBOOST_GNOSIS: "_DAPPNODE_GLOBAL_MEVBOOST_GNOSIS", // "mevboost-gnosis.dnp
-  CONSENSUS_CLIENT_PRATER: "_DAPPNODE_GLOBAL_CONSENSUS_CLIENT_PRATER", // "prysm-prater.dnp.dappnode.eth"
-  EXECUTION_CLIENT_PRATER: "_DAPPNODE_GLOBAL_EXECUTION_CLIENT_PRATER", // "goerli-geth.dnp.dappnode.eth"
-  MEVBOOST_PRATER: "_DAPPNODE_GLOBAL_MEVBOOST_PRATER", // "mevboost-prater.dnp.dappnode.eth"
   CONSENSUS_CLIENT_LUKSO: "_DAPPNODE_GLOBAL_CONSENSUS_CLIENT_LUKSO", // "prysm-lukso.dnp.dappnode.eth"
   EXECUTION_CLIENT_LUKSO: "_DAPPNODE_GLOBAL_EXECUTION_CLIENT_LUKSO", // "lukso-geth.dnp.dappnode.eth",
   MEVBOOST_LUKSO: "_DAPPNODE_GLOBAL_MEVBOOST_LUKSO", // "mevboost-lukso.dnp.dappnode.eth"
-  CONSENSUS_CLIENT_HOLESKY: "_DAPPNODE_GLOBAL_CONSENSUS_CLIENT_HOLESKY", // "prysm-holesky.dnp.dappnode.eth"
-  EXECUTION_CLIENT_HOLESKY: "_DAPPNODE_GLOBAL_EXECUTION_CLIENT_HOLESKY", // "holesky-geth.dnp.dappnode.eth"
-  MEVBOOST_HOLESKY: "_DAPPNODE_GLOBAL_MEVBOOST_HOLESKY", // "mevboost-holesky.dnp.dappnode.eth"
   CONSENSUS_CLIENT_HOODI: "_DAPPNODE_GLOBAL_CONSENSUS_CLIENT_HOODI", // "prysm-hoodi.dnp.dappnode.eth"
   EXECUTION_CLIENT_HOODI: "_DAPPNODE_GLOBAL_EXECUTION_CLIENT_HOODI", // "hoodi-geth.dnp.dappnode.eth"
   MEVBOOST_HOODI: "_DAPPNODE_GLOBAL_MEVBOOST_HOODI", // "mevboost-hoodi.dnp.dappnode.eth"

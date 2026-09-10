@@ -42,7 +42,7 @@ import {
   InstalledPackageData
 } from "./calls.js";
 import { PackageEnvs } from "./compose.js";
-import { PackageBackup } from "./manifest.js";
+import { PackageBackup, Manifest } from "./manifest.js";
 import {
   CustomEndpoint,
   GatusEndpoint,
@@ -73,8 +73,9 @@ export interface Routes {
    * Edits the auto-update settings
    * @param id = "my-packages", "system-packages" or "bitcoin.dnp.dappnode.eth"
    * @param enabled Auto update is enabled for ID
+   * @param applyToAll Clear package overrides when editing "my-packages"
    */
-  autoUpdateSettingsEdit: (kwargs: { id: string; enabled: boolean }) => Promise<void>;
+  autoUpdateSettingsEdit: (kwargs: { id: string; enabled: boolean; applyToAll?: boolean }) => Promise<void>;
 
   /**
    * Generates a backup of a package and sends it to the client for download.
@@ -537,6 +538,46 @@ export interface Routes {
   }) => Promise<void>;
 
   /**
+   * Installs a DAppNode Package locally for development, without IPFS.
+   * The package image must already have been uploaded as a `docker save` tarball
+   * via the `/upload` endpoint, which returns a `fileId`. That `imageFileId` is
+   * resolved here to the host file path and loaded into Docker.
+   * The package is tagged as a custom package and shown under the "My custom packages" tab.
+   * @param manifest Package manifest (dappnode_package.json content)
+   * @param compose Package docker-compose.yml content (as a YAML string)
+   * @param imageFileId File ID returned by `/upload` for the `docker save` tarball
+   * @param setupWizard Optional setup-wizard.yml content (as a YAML string)
+   */
+  packageInstallDev: (kwargs: {
+    manifest: Manifest;
+    compose: string;
+    imageFileId: string;
+    setupWizard?: string;
+  }) => Promise<void>;
+
+  /**
+   * Get whether an MCP API bearer key has been generated, plus the external
+   * MCP mutating-tools setting. The raw key is only returned when generated.
+   */
+  mcpApiKeyGet: () => Promise<{ hasApiKey: boolean; mutatingToolsEnabled: boolean }>;
+
+  /**
+   * Generate a new MCP API bearer key. Invalidates any previously generated key.
+   */
+  mcpApiKeyGenerate: () => Promise<{ apiKey: string }>;
+
+  /**
+   * Remove the in-app MCP API bearer key. Bearer auth is disabled until the
+   * admin generates a new key.
+   */
+  mcpApiKeyRemove: () => Promise<{ ok: true }>;
+
+  /**
+   * Enable or disable mutating tools for external MCP clients.
+   */
+  mcpMutatingToolsSet: (kwargs: { enabled: boolean }) => Promise<{ enabled: boolean }>;
+
+  /**
    * Get package detail information
    */
   packageGet: (kwargs: { dnpName: string }) => Promise<InstalledPackageDetailData>;
@@ -737,9 +778,11 @@ export interface Routes {
   /** Add a release key to trusted keys db */
   releaseTrustedKeyAdd(newTrustedKey: TrustedReleaseKey): Promise<void>;
   /** List all keys from trusted keys db */
-  releaseTrustedKeyList(): Promise<TrustedReleaseKey[]>;
+  releaseTrustedKeyList(): Promise<{ keys: TrustedReleaseKey[]; isDefault: boolean }>;
   /** Remove a release key from trusted keys db, by name */
-  releaseTrustedKeyRemove(keyName: string): Promise<void>;
+  releaseTrustedKeyRemove(keyName: string, dnpNameSuffix?: string): Promise<void>;
+  /** Delete the saved trusted keys list and restore defaults */
+  releaseTrustedKeyReset(): Promise<void>;
 
   /**
    * Returns weather or not should show the smooth modal
@@ -885,6 +928,9 @@ export interface Routes {
   /** Get credentials for a single Wireguard device */
   wireguardDeviceGet(device: string): Promise<WireguardDeviceCredentials>;
 
+  /** Get a remote or local config for a single Wireguard device */
+  wireguardDeviceConfigGet(options: { device: string; isLocal: boolean }): Promise<string>;
+
   /** Get URLs to a single Wireguard credentials */
   wireguardDevicesGet(): Promise<string[]>;
 }
@@ -977,6 +1023,11 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   optimismConfigGet: {},
   optimismConfigSet: { log: true },
   packageInstall: { log: true },
+  packageInstallDev: { log: true },
+  mcpApiKeyGet: {},
+  mcpApiKeyGenerate: {},
+  mcpApiKeyRemove: { log: true },
+  mcpMutatingToolsSet: { log: true },
   packageGet: {},
   packagesGet: {},
   packageGettingStartedToggle: {},
@@ -995,20 +1046,21 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   portsUpnpStatusGet: {},
   portsApiStatusGet: {},
   premiumPkgStatus: {},
-  premiumSetLicenseKey: { log: true },
-  premiumGetLicenseKey: { log: true },
+  premiumSetLicenseKey: {},
+  premiumGetLicenseKey: {},
   premiumActivateLicense: { log: true },
   premiumDeactivateLicense: { log: true },
-  premiumIsLicenseActive: { log: true },
+  premiumIsLicenseActive: {},
   premiumBeaconBackupActivate: { log: true },
   premiumBeaconBackupDeactivate: { log: true },
-  premiumBeaconBackupStatus: { log: true },
+  premiumBeaconBackupStatus: {},
   pwaUrlGet: {},
   pwaRequirementsGet: {},
   rebootHost: { log: true },
   releaseTrustedKeyAdd: { log: true },
   releaseTrustedKeyList: {},
   releaseTrustedKeyRemove: { log: true },
+  releaseTrustedKeyReset: { log: true },
   setShouldShownSmooth: {},
   getShouldShowSmooth: {},
   signerByNetworkGet: {},
@@ -1040,6 +1092,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   wireguardDeviceAdd: { log: true },
   wireguardDeviceRemove: { log: true },
   wireguardDeviceGet: {},
+  wireguardDeviceConfigGet: {},
   wireguardDevicesGet: {}
 };
 

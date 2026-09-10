@@ -16,6 +16,7 @@ export function AutoUpdateRowItem({
   displayName,
   enabled,
   feedback,
+  isCustomized,
   isInstalling,
   isSinglePackage,
   // Actions
@@ -26,6 +27,7 @@ export function AutoUpdateRowItem({
   enabled: boolean;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   feedback: any;
+  isCustomized: boolean;
   isInstalling: boolean;
   isSinglePackage: boolean;
   setUpdateSettings: (id: string, enable: boolean) => void;
@@ -72,9 +74,11 @@ export function AutoUpdateRowItem({
         <span className="content">{enabled ? "on" : "off"}</span>
       </span>
 
-      <span className="name">
-        {isSinglePackage && <li className="bullet" />}
-        {displayName}
+      <span className={`name ${isSinglePackage ? "nested" : ""}`}>
+        <span className="auto-update-name">
+          <span>{displayName}</span>
+          {isSinglePackage && <small>{isCustomized ? "Customized" : "Using default"}</small>}
+        </span>
       </span>
 
       <span className="last-update">
@@ -92,7 +96,7 @@ export function AutoUpdateRowItem({
         ) : null}
       </span>
 
-      <Switch checked={enabled ? true : false} onToggle={() => setUpdateSettings(id, !enabled)} label="" />
+      <Switch checked={enabled} onToggle={(checked) => setUpdateSettings(id, checked)} label="" />
 
       {!collapsed && <div className="extra-info">{errorMessage}</div>}
 

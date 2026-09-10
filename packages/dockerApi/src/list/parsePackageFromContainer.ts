@@ -16,6 +16,7 @@ export function groupPackagesFromContainers(containers: PackageContainer[]): Ins
           "version",
           "isDnp",
           "isCore",
+          "isDev",
           "dependencies",
           "avatarUrl",
           "origin",

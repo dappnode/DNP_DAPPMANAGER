@@ -1,11 +1,9 @@
 import {
   ExecutionClientGnosis,
-  ExecutionClientHolesky,
   ExecutionClientHoodi,
   ExecutionClientSepolia,
   ExecutionClientLukso,
   ExecutionClientMainnet,
-  ExecutionClientPrater,
   StarknetExecutionMainnet,
   StarknetExecutionSepolia,
   Network,
@@ -32,8 +30,6 @@ export class Execution extends StakerComponent {
   > = {
       [Network.Mainnet]: db.executionClientMainnet,
       [Network.Gnosis]: db.executionClientGnosis,
-      [Network.Prater]: db.executionClientPrater,
-      [Network.Holesky]: db.executionClientHolesky,
       [Network.Sepolia]: db.executionClientSepolia,
       [Network.Hoodi]: db.executionClientHoodi,
       [Network.Lukso]: db.executionClientLukso,
@@ -54,19 +50,6 @@ export class Execution extends StakerComponent {
       { dnpName: ExecutionClientGnosis.Erigon, minVersion: "0.1.0" },
       { dnpName: ExecutionClientGnosis.Geth, minVersion: "0.1.0" },
       { dnpName: ExecutionClientGnosis.Reth, minVersion: "0.1.0" }
-    ],
-    [Network.Prater]: [
-      { dnpName: ExecutionClientPrater.Geth, minVersion: "0.4.26" },
-      { dnpName: ExecutionClientPrater.Erigon, minVersion: "0.1.0" },
-      { dnpName: ExecutionClientPrater.Nethermind, minVersion: "1.0.1" },
-      { dnpName: ExecutionClientPrater.Besu, minVersion: "0.1.0" }
-    ],
-    [Network.Holesky]: [
-      { dnpName: ExecutionClientHolesky.Reth, minVersion: "0.1.0" },
-      { dnpName: ExecutionClientHolesky.Geth, minVersion: "0.1.0" },
-      { dnpName: ExecutionClientHolesky.Erigon, minVersion: "0.1.0" },
-      { dnpName: ExecutionClientHolesky.Nethermind, minVersion: "0.1.0" },
-      { dnpName: ExecutionClientHolesky.Besu, minVersion: "0.1.0" }
     ],
     [Network.Hoodi]: [
       { dnpName: ExecutionClientHoodi.Reth, minVersion: "0.1.0" },

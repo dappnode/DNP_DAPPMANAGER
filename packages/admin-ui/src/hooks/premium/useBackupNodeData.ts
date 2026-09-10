@@ -1,6 +1,7 @@
-import { BackupConsensusInfo, Network, ParsedNetworkBackupData } from "@dappnode/types";
-import { useApi } from "api";
+import { BackupConsensusInfo, BeaconBackupNetworkStatus, Network, ParsedNetworkBackupData } from "@dappnode/types";
+import { api, useApi } from "api";
 import { useEffect, useMemo, useState } from "react";
+import useSWR from "swr";
 
 export const availableNetworks: Network[] = [Network.Mainnet, Network.Gnosis, Network.Hoodi];
 
@@ -18,7 +19,12 @@ export function useBackupNodeData({
 
   const validatorsFilterActiveReq = useApi.validatorsFilterActiveByNetwork({ networks: availableNetworks });
   const currentConsensusReq = useApi.consensusClientsGetByNetworks({ networks: availableNetworks });
-  const backupStatusReq = useApi.premiumBeaconBackupStatus(hashedLicense);
+  const shouldFetchBackupStatus = isPremiumActivated && Boolean(hashedLicense);
+  const backupStatusReq = useSWR<Partial<Record<Network, BeaconBackupNetworkStatus>>, Error>(
+    shouldFetchBackupStatus ? ["premiumBeaconBackupStatus", hashedLicense] : null,
+    () => api.premiumBeaconBackupStatus(hashedLicense),
+    { revalidateOnFocus: false }
+  );
 
   const consensusLoading = currentConsensusReq.isValidating;
   const backupStatusLoading = isPremiumActivated ? backupStatusReq.isValidating : false;

@@ -5,7 +5,11 @@ const devicesState = new Set<string>(initialDevices);
 
 export const wireguard: Pick<
   Routes,
-  "wireguardDeviceAdd" | "wireguardDeviceGet" | "wireguardDeviceRemove" | "wireguardDevicesGet"
+  | "wireguardDeviceAdd"
+  | "wireguardDeviceConfigGet"
+  | "wireguardDeviceGet"
+  | "wireguardDeviceRemove"
+  | "wireguardDevicesGet"
 > = {
   wireguardDeviceAdd: async (id) => {
     devicesState.add(id);
@@ -14,7 +18,7 @@ export const wireguard: Pick<
     devicesState.delete(id);
   },
   wireguardDevicesGet: async () => Array.from(devicesState.values()),
-  wireguardDeviceGet: async (id) => {
+  wireguardDeviceConfigGet: async ({ device: id, isLocal }) => {
     if (!devicesState.has(id)) throw Error(`No device id ${id}`);
     const configRemote = `[Interface]
 Address = 172.34.1.2
@@ -37,6 +41,11 @@ PublicKey = AAAAABBBBBAAAAABBBBBAAAAABBBBBAAAAABBBBBAAA=
 Endpoint = 192.168.1.45:51820
 AllowedIPs = 172.33.0.0/16`;
 
+    return isLocal ? configLocal : configRemote;
+  },
+  wireguardDeviceGet: async (id) => {
+    const configRemote = await wireguard.wireguardDeviceConfigGet({ device: id, isLocal: false });
+    const configLocal = await wireguard.wireguardDeviceConfigGet({ device: id, isLocal: true });
     return { configRemote, configLocal };
   }
 };

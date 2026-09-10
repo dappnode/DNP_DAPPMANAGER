@@ -7,6 +7,7 @@ import { ClearMainDb } from "./ClearMainDb";
 import { ContentProviderSelector } from "./ContentProviderSelector";
 import { ReleaseTrustedKeysEditor } from "./ReleaseTrustedKeysEditor";
 import { UiTelemetryToggle } from "./UiTelemetryToggle";
+import { McpApiKey } from "./McpApiKey";
 
 export function Advanced() {
   return (
@@ -35,6 +36,9 @@ export function Advanced() {
       <Card spacing>
         <UiTelemetryToggle />
       </Card>
+
+      <SubTitle>MCP API key</SubTitle>
+      <McpApiKey />
     </>
   );
 }

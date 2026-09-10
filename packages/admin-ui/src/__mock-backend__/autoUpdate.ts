@@ -3,12 +3,26 @@ import { pause } from "./utils/pause";
 
 export const autoUpdate: Pick<Routes, "autoUpdateDataGet" | "autoUpdateSettingsEdit"> = {
   autoUpdateDataGet: async () => autoUpdateData,
-  autoUpdateSettingsEdit: async ({ id, enabled }) => {
+  autoUpdateSettingsEdit: async ({ id, enabled, applyToAll }) => {
     await pause(500);
-    if (autoUpdateData.settings[id]) autoUpdateData.settings[id].enabled = enabled;
+    const isSinglePackage = id !== "system-packages" && id !== "my-packages";
+    const defaultEnabled = Boolean(autoUpdateData.settings["my-packages"]?.enabled);
+    if (isSinglePackage && enabled === defaultEnabled) delete autoUpdateData.settings[id];
+    else autoUpdateData.settings[id] = { enabled };
+
+    if (id === "my-packages" && applyToAll !== false) {
+      for (const settingId of Object.keys(autoUpdateData.settings)) {
+        if (settingId !== "system-packages" && settingId !== "my-packages") delete autoUpdateData.settings[settingId];
+      }
+    }
 
     for (const dnp of autoUpdateData.dnpsToShow) {
-      if (dnp.id === id) dnp.enabled = enabled;
+      const usesDefault = dnp.id !== "system-packages" && dnp.id !== "my-packages" && !autoUpdateData.settings[dnp.id];
+      if (
+        dnp.id === id ||
+        (id === "my-packages" && dnp.id !== "system-packages" && (applyToAll !== false || usesDefault))
+      )
+        dnp.enabled = enabled;
     }
   }
 };

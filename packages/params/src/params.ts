@@ -42,6 +42,7 @@ export const params = {
   // lowdb requires an absolute path
   DB_MAIN_PATH: path.resolve(DNCORE_DIR, "maindb.json"),
   DB_CACHE_PATH: path.resolve(DNCORE_DIR, "dappmanagerdb.json"),
+  DB_NEXUS_PATH: path.resolve(DNCORE_DIR, "nexusdb.json"),
 
   // File with sole purpose of handling admin password hash. Must be deletable
   ADMIN_RECOVERY_FILE: path.join(DNCORE_DIR, "admin-recovery-token.txt"),
@@ -126,10 +127,8 @@ export const params = {
   DOCKER_EXTERNAL_NETWORK_NAME: "dnpublic_network",
   DOCKER_STAKER_NETWORKS: {
     [Network.Mainnet]: "mainnet_network",
-    [Network.Holesky]: "holesky_network",
     [Network.Hoodi]: "hoodi_network",
     [Network.Sepolia]: "sepolia_network",
-    [Network.Prater]: "prater_network",
     [Network.Gnosis]: "gnosis_network",
     [Network.Lukso]: "lukso_network",
     [Network.StarknetMainnet]: "starknet_network",
@@ -179,20 +178,8 @@ export const params = {
   ETH_MAINNET_RPC_URL_REMOTE: process.env.ETH_MAINNET_RPC_URL_REMOTE || "https://web3.dappnode.net",
   ETH_MAINNET_CHECKPOINTSYNC_URL_REMOTE: "https://checkpoint-sync.dappnode.net",
 
-  // Prysm legacy specs for: prater, gnosis and mainnet
+  // Prysm legacy specs for: gnosis and mainnet
   prysmLegacySpecs: [
-    //  v0.2.46
-    {
-      prysmDnpName: "prysm-prater.dnp.dappnode.eth",
-      prysmVersion: "0.1.7",
-      web3signerDnpName: "web3signer-prater.dnp.dappnode.eth",
-      incompatibleClientsDnpNames: [
-        "teku-prater.dnp.dappnode.eth",
-        "lighthouse-prater.dnp.dappnode.eth",
-        "nimbus-prater.dnp.dappnode.eth",
-        "lodestar-prater.dnp.dappnode.eth"
-      ]
-    },
     // v0.2.51
     {
       prysmDnpName: "gnosis-beacon-chain-prysm.dnp.dappnode.eth",
@@ -435,6 +422,18 @@ export const params = {
       dnpNameSuffix: ".public.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
       key: "0x18eE60706Ed150f6E21D020C1Cede55E4267f409"
+    },
+    {
+      name: "Dappnode Association - Luka (dnp)",
+      dnpNameSuffix: ".dnp.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0xF9E77a0537338f8394Aec2Ea9d0273E5Cd4F66dc"
+    },
+    {
+      name: "Dappnode Association - Luka (public)",
+      dnpNameSuffix: ".public.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0xF9E77a0537338f8394Aec2Ea9d0273E5Cd4F66dc"
     },
     {
       name: "Chainnodes",

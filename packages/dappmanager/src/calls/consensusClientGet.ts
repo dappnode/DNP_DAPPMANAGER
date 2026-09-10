@@ -1,10 +1,8 @@
 import {
   consensusClientGnosis,
-  consensusClientHolesky,
   consensusClientHoodi,
   consensusClientLukso,
   consensusClientMainnet,
-  consensusClientPrater,
   consensusClientSepolia
 } from "@dappnode/db";
 import { Network } from "@dappnode/types";
@@ -14,8 +12,6 @@ const consensusClientMap: { [key in Network]: () => string | null | undefined } 
   mainnet: () => consensusClientMainnet.get(),
   gnosis: () => consensusClientGnosis.get(),
   hoodi: () => consensusClientHoodi.get(),
-  prater: () => consensusClientPrater.get(),
-  holesky: () => consensusClientHolesky.get(),
   lukso: () => consensusClientLukso.get(),
   sepolia: () => consensusClientSepolia.get(),
   starknet: () => null,

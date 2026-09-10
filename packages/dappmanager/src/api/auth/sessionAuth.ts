@@ -1,5 +1,6 @@
 import { Request } from "express";
 import { PlainTextFileDb } from "@dappnode/utils";
+import * as db from "@dappnode/db";
 import { getRandomAlphanumericToken } from "./token.js";
 import { wrapHandler } from "../utils.js";
 import { SessionData, SessionsManager } from "../sessions/index.js";
@@ -13,6 +14,7 @@ import {
   WrongCredentialsError
 } from "./errors.js";
 import { AdminPasswordDb } from "./adminPasswordDb.js";
+import { verifyMcpApiKey } from "./mcpApiKeyHash.js";
 
 // Password & sessions auth
 // ========================
@@ -33,6 +35,39 @@ export interface AuthPasswordSessionParams {
 }
 
 const recoveryTokenLength = 20;
+const maxAuthHeaderLength = 8192;
+
+function isAsciiWhitespace(char: string): boolean {
+  const code = char.charCodeAt(0);
+  return code === 9 || code === 10 || code === 11 || code === 12 || code === 13 || code === 32;
+}
+
+function containsAsciiWhitespace(value: string): boolean {
+  for (let i = 0; i < value.length; i++) {
+    if (isAsciiWhitespace(value[i])) return true;
+  }
+  return false;
+}
+
+export function parseMcpBearerToken(authHeader: string | undefined): string | null {
+  if (!authHeader || authHeader.length > maxAuthHeaderLength) return null;
+
+  const schemeEnd = authHeader.indexOf(" ");
+  const tabSchemeEnd = authHeader.indexOf("\t");
+  const firstSeparator =
+    schemeEnd === -1 ? tabSchemeEnd : tabSchemeEnd === -1 ? schemeEnd : Math.min(schemeEnd, tabSchemeEnd);
+  if (firstSeparator <= 0) return null;
+
+  if (authHeader.slice(0, firstSeparator).toLowerCase() !== "bearer") return null;
+
+  let tokenStart = firstSeparator;
+  while (tokenStart < authHeader.length && isAsciiWhitespace(authHeader[tokenStart])) tokenStart++;
+  if (tokenStart === authHeader.length) return null;
+
+  const token = authHeader.slice(tokenStart);
+  if (containsAsciiWhitespace(token)) return null;
+  return token;
+}
 
 export class AuthPasswordSession {
   sessions: SessionsManager;
@@ -60,6 +95,16 @@ export class AuthPasswordSession {
    * - Some user registered invalid session >> NotLoggedInError
    * - Some user registered no cookie in req >> NotLoggedInNoCookieError
    */
+  private isMcpApiKeyValid(req: Request): boolean {
+    const configuredValue = db.mcpApiKey.get();
+    if (!configuredValue) return false;
+
+    const providedKey = parseMcpBearerToken(req.headers.authorization);
+    if (!providedKey) return false;
+
+    return verifyMcpApiKey(providedKey, configuredValue);
+  }
+
   private assertOnlyAdmin(req: Request): SessionData {
     if (!this.adminPasswordDb.hasSomePassword()) throw new NotRegisteredError();
 
@@ -187,9 +232,25 @@ export class AuthPasswordSession {
   });
 
   /**
-   * Middleware to protect routes only for admin sessions
+   * Middleware to protect routes only for admin browser sessions.
    */
   onlyAdmin = wrapHandler((req, _, next) => {
+    this.assertOnlyAdmin(req);
+    next();
+  });
+
+  /**
+   * Middleware for routes that intentionally accept either an admin session
+   * cookie or the scoped MCP bearer key.
+   *
+   * Keep this opt-in: the MCP key is for MCP-compatible agent endpoints, not a
+   * replacement for the full admin session across every HTTP/RPC route.
+   */
+  onlyAdminOrMcpApiKey = wrapHandler((req, _, next) => {
+    if (this.isMcpApiKeyValid(req)) {
+      next();
+      return;
+    }
     this.assertOnlyAdmin(req);
     next();
   });

@@ -20,7 +20,7 @@ export default function IpfsNode({
 }) {
   const ipfsRepository = useApi.ipfsClientTargetGet();
   const [ipfsClientTarget, setIpfsClientTarget] = useState<IpfsClientTarget | null>(null);
-  const [ipfsGatewayTarget, setIpfsGatewayTarget] = useState<string | null>(null);
+  const [ipfsGatewayTarget, setIpfsGatewayTarget] = useState<string[] | null>(null);
 
   useEffect(() => {
     if (ipfsRepository.data) setIpfsClientTarget(ipfsRepository.data.ipfsClientTarget);
@@ -28,7 +28,7 @@ export default function IpfsNode({
   }, [ipfsRepository.data]);
 
   async function changeIpfsClient() {
-    if (!ipfsClientTarget || !ipfsGatewayTarget) return;
+    if (!ipfsClientTarget || !ipfsGatewayTarget || ipfsGatewayTarget.every((gateway) => !gateway.trim())) return;
 
     const switchingFromRemoteToLocal =
       ipfsRepository.data?.ipfsClientTarget === IpfsClientTarget.remote && ipfsClientTarget === IpfsClientTarget.local;
@@ -61,7 +61,7 @@ export default function IpfsNode({
         api.ipfsClientTargetSet({
           ipfsRepository: {
             ipfsClientTarget: ipfsClientTarget,
-            ipfsGateway: ipfsGatewayTarget
+            ipfsGateway: ipfsGatewayTarget.map((gateway) => gateway.trim()).filter(Boolean)
           }
         }),
       {
@@ -104,7 +104,7 @@ export default function IpfsNode({
                 disabled={
                   !ipfsClientTarget ||
                   (ipfsRepository.data.ipfsClientTarget === ipfsClientTarget &&
-                    ipfsRepository.data.ipfsGateway === ipfsGatewayTarget)
+                    JSON.stringify(ipfsRepository.data.ipfsGateway) === JSON.stringify(ipfsGatewayTarget))
                 }
               >
                 Change

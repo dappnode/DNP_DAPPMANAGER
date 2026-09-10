@@ -12,12 +12,13 @@ import { mevBoost, execution, consensus } from "../../index.js";
  * Collect the metrics:
  *   - IPFS node local or remote
  *   - Ethereum node local or remote
- *   - Which clients running on Ethereum, Gnosis, Lukso, Prater, Holesky
+ *   - Which clients running on Ethereum, Gnosis, Lukso
  *   - Which is the favourite connectivity method: Wifi, VPN, Wireguard, local
  *   - Auto-updates enabled
  *   - Fallback enabled
  *   - Dappnode graffiti or other
  *   - User sessions
+ *   - UI telemetry enabled
  */
 export const metrics = wrapHandler(async (_, res) => {
   // Return all metrics the Prometheus exposition format
@@ -69,7 +70,7 @@ register.registerMetric(
         return 0;
       }
 
-      for (const network of ["mainnet", "prater", "gnosis", "lukso", "holesky", "hoodi", "sepolia"] as Network[]) {
+      for (const network of ["mainnet", "gnosis", "lukso", "hoodi", "sepolia"] as Network[]) {
         const isMevBoostSelected = mevBoost.DbHandlers[network].get();
         const executionClient = execution.DbHandlers[network].get();
         const consensusClient = consensus.DbHandlers[network].get();
@@ -215,6 +216,17 @@ register.registerMetric(
     collect() {
       const enabled = db.mirrorProviderEnabled.get();
       this.set({ mirrorContentProvider: "enabled" }, enabled ? 1 : 0);
+    }
+  })
+);
+
+// UI telemetry enabled or disabled
+register.registerMetric(
+  new client.Gauge({
+    name: "dappmanager_ui_telemetry_enabled",
+    help: "Whether UI telemetry is enabled (1) or disabled (0)",
+    collect() {
+      this.set(db.uiTelemetryConsent.get() ? 1 : 0);
     }
   })
 );

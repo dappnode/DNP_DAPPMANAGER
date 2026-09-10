@@ -1,10 +1,8 @@
 import {
   executionClientGnosis,
-  executionClientHolesky,
   executionClientHoodi,
   executionClientLukso,
   executionClientMainnet,
-  executionClientPrater,
   executionClientSepolia
 } from "@dappnode/db";
 import { Network } from "@dappnode/types";
@@ -14,8 +12,6 @@ const executionClientMap: { [key in Network]: () => string | null | undefined } 
   mainnet: () => executionClientMainnet.get(),
   gnosis: () => executionClientGnosis.get(),
   hoodi: () => executionClientHoodi.get(),
-  prater: () => executionClientPrater.get(),
-  holesky: () => executionClientHolesky.get(),
   lukso: () => executionClientLukso.get(),
   sepolia: () => executionClientSepolia.get(),
   starknet: () => null,

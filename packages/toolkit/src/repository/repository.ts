@@ -1,6 +1,8 @@
 import * as isIPFS from "is-ipfs";
 import { CID, IPFSEntry } from "kubo-rpc-client";
 import { CarReader } from "@ipld/car";
+import * as dagPb from "@ipld/dag-pb";
+import { sha256 } from "multiformats/hashes/sha2";
 import { recursive as exporter } from "ipfs-unixfs-exporter";
 import { Version } from "multiformats";
 import path from "path";
@@ -30,8 +32,11 @@ import { isEnsDomain } from "../isEnsDomain.js";
 import { dappnodeRegistry } from "./params.js";
 import { JsonRpcApiProvider } from "ethers";
 import { MirrorOptions, MirrorFileEntry, HttpMirrorProvider } from "./contentProvider/index.js";
+import { IpfsGatewayClient } from "./ipfsGatewayClient.js";
+import type { IpfsGatewayLog } from "./ipfsGatewayClient.js";
 
 const source = "ipfs" as const;
+const MAX_CAR_OVERHEAD_BYTES = 1024 * 1024;
 
 /** Discriminated union returned by listWithIpfsFallback. Avoids placeholder CIDs in the mirror path. */
 type ListResult =
@@ -50,12 +55,12 @@ type ListResult =
  *
  * Provider priority (easy to swap — search for "Provider 1" and "Provider 2"):
  *   1. Mirror HTTP (if isMirrorEnabled())
- *   2. IPFS fallback (dag-json listing + CAR downloads)
+ *   2. IPFS fallback (DAG-PB listing + CAR downloads)
  *
  * @extends ApmRepository
  */
 export class DappnodeRepository extends ApmRepository {
-  protected gatewayUrl: string;
+  private readonly ipfsGatewayClient: IpfsGatewayClient;
   protected localIpfsUrl = "http://ipfs.dappnode:5001";
   private readonly mirrorProvider: HttpMirrorProvider;
   private readonly isMirrorEnabled: () => boolean;
@@ -67,9 +72,15 @@ export class DappnodeRepository extends ApmRepository {
    * @param mirrorOptions - Mirror HTTP provider configuration (baseUrl, timeouts, size limits).
    * @param isMirrorEnabled - Called before each operation to decide whether to use the mirror.
    */
-  constructor(ipfsUrl: string, provider: JsonRpcApiProvider, mirrorOptions: MirrorOptions, isMirrorEnabled: () => boolean) {
+  constructor(
+    ipfsUrl: string | string[],
+    provider: JsonRpcApiProvider,
+    mirrorOptions: MirrorOptions,
+    isMirrorEnabled: () => boolean,
+    ipfsGatewayLog?: IpfsGatewayLog
+  ) {
     super(provider);
-    this.gatewayUrl = ipfsUrl.replace(/\/?$/, "");
+    this.ipfsGatewayClient = new IpfsGatewayClient(ipfsUrl, ipfsGatewayLog);
     this.mirrorProvider = new HttpMirrorProvider(mirrorOptions);
     this.isMirrorEnabled = isMirrorEnabled;
   }
@@ -78,8 +89,8 @@ export class DappnodeRepository extends ApmRepository {
    * Changes the IPFS provider and target.
    * @param ipfsUrl - The new URL of the IPFS network node.
    */
-  public changeIpfsGatewayUrl(ipfsUrl: string): void {
-    this.gatewayUrl = ipfsUrl.replace(/\/?$/, "");
+  public changeIpfsGatewayUrl(ipfsUrl: string | string[]): void {
+    this.ipfsGatewayClient.setGatewayUrls(ipfsUrl);
   }
 
   /**
@@ -180,7 +191,7 @@ export class DappnodeRepository extends ApmRepository {
     const compose = await this.getPkgAsset<Compose>(releaseFilesToDownload.compose, listResult);
     if (!compose) throw Error(`Invalid pkg release ${contentUri}, compose not found`);
 
-    // Signature verification requires individual file CIDs from IPFS dag-json listing.
+    // Signature verification requires individual file CIDs from IPFS DAG-PB listing.
     // Mirror listings have no individual CIDs, so verification is skipped.
     // Packages sourced from the mirror are trusted by the mirror operator (signedSafe = true).
     const signature: ReleaseSignature | undefined =
@@ -201,16 +212,20 @@ export class DappnodeRepository extends ApmRepository {
         : { status: ReleaseSignatureStatusCode.notSigned };
 
     const signedSafe =
-      listResult.source === "mirror"
-        ? true
-        : signatureStatus.status === ReleaseSignatureStatusCode.signedByKnownKey;
+      listResult.source === "mirror" ? true : signatureStatus.status === ReleaseSignatureStatusCode.signedByKnownKey;
 
     // Avatar: look up by filename regex; source drives which DistributedFile shape to use
     let avatarFile: DistributedFile | undefined;
     if (listResult.source === "mirror") {
       const entry = listResult.files.find((f) => releaseFiles.avatar.regex.test(f.name));
       if (entry)
-        avatarFile = { hash: listResult.packageCidStr, size: entry.size, source: "mirror", filename: entry.name, packageHash: listResult.packageCidStr };
+        avatarFile = {
+          hash: listResult.packageCidStr,
+          size: entry.size,
+          source: "mirror",
+          filename: entry.name,
+          packageHash: listResult.packageCidStr
+        };
     } else {
       const entry = listResult.entries.find((e) => releaseFiles.avatar.regex.test(e.name));
       if (entry) avatarFile = { hash: entry.cid.toString(), size: entry.size, source };
@@ -275,18 +290,23 @@ export class DappnodeRepository extends ApmRepository {
   }
 
   /**
-   * Fetches an IPFS file by CID into memory. Used ONLY by ipfsTest method to verify IPFS connectivity.
+   * Fetches a size-bounded IPFS file by CID into memory as bytes.
    * Does not attempt mirror routing — use downloadReleaseAsset for release files.
    */
-  public async writeFileToMemory(hash: string, maxLength?: number): Promise<string> {
+  public async writeFileToBytes(hash: string, maxLength?: number, gatewayTimeoutMs?: number): Promise<Uint8Array> {
     const cidStr = this.sanitizeIpfsPath(hash);
     const chunks: Uint8Array[] = [];
-    const { carReader, root } = await this.getAndVerifyContentFromGateway(cidStr);
-    const content = await this.unpackCarReader(carReader, root);
-    for await (const chunk of content) chunks.push(chunk);
-
+    const maxCarBytes = maxLength === undefined ? undefined : maxLength + MAX_CAR_OVERHEAD_BYTES;
+    const content = await this.getVerifiedContentFromGateway(cidStr, maxCarBytes, gatewayTimeoutMs);
     let totalLength = 0;
-    chunks.forEach((chunk) => (totalLength += chunk.length));
+    for await (const chunk of content) {
+      totalLength += chunk.length;
+      if (maxLength !== undefined && totalLength > maxLength) {
+        throw Error(`Maximum size ${maxLength} bytes exceeded`);
+      }
+      chunks.push(chunk);
+    }
+
     const buffer = new Uint8Array(totalLength);
     let offset = 0;
     chunks.forEach((chunk) => {
@@ -294,8 +314,15 @@ export class DappnodeRepository extends ApmRepository {
       offset += chunk.length;
     });
 
-    if (maxLength && buffer.length >= maxLength) throw Error(`Maximum size ${maxLength} bytes exceeded`);
-    return new TextDecoder("utf-8").decode(buffer);
+    return buffer;
+  }
+
+  /**
+   * Fetches an IPFS file by CID into memory as UTF-8 text. Used ONLY by
+   * ipfsTest to verify IPFS connectivity.
+   */
+  public async writeFileToMemory(hash: string, maxLength?: number): Promise<string> {
+    return new TextDecoder("utf-8").decode(await this.writeFileToBytes(hash, maxLength));
   }
 
   /**
@@ -307,7 +334,12 @@ export class DappnodeRepository extends ApmRepository {
    * @param fileCid - Individual file CID. Available for IPFS-listed packages only; absent for mirror-listed packages.
    * @param maxLength - Maximum file size in bytes.
    */
-  private async downloadReleaseAsset(filename: string, packageCidStr: string, fileCid?: string, maxLength?: number): Promise<string> {
+  private async downloadReleaseAsset(
+    filename: string,
+    packageCidStr: string,
+    fileCid?: string,
+    maxLength?: number
+  ): Promise<string> {
     // Provider 1: Mirror — try first if configured
     if (this.isMirrorEnabled()) {
       const mirrorCid = this.sanitizeIpfsPath(packageCidStr);
@@ -322,8 +354,7 @@ export class DappnodeRepository extends ApmRepository {
 
     const cidStr = this.sanitizeIpfsPath(fileCid);
     const chunks: Uint8Array[] = [];
-    const { carReader, root } = await this.getAndVerifyContentFromGateway(cidStr);
-    const content = await this.unpackCarReader(carReader, root);
+    const content = await this.getVerifiedContentFromGateway(cidStr);
     for await (const chunk of content) chunks.push(chunk);
 
     // Concatenate the chunks into a single Uint8Array
@@ -390,8 +421,7 @@ export class DappnodeRepository extends ApmRepository {
     }
 
     // Provider 2: IPFS CAR — fallback (or primary when mirror is not configured)
-    const { carReader, root } = await this.getAndVerifyContentFromGateway(cidStr);
-    const readable = await this.unpackCarReader(carReader, root);
+    const readable = await this.getVerifiedContentFromGateway(cidStr, undefined, timeout);
 
     return new Promise((resolve, reject) => {
       async function handleDownload(): Promise<void> {
@@ -453,7 +483,7 @@ export class DappnodeRepository extends ApmRepository {
   }
 
   /**
-   * Lists the contents of a directory pointed by the given hash using IPFS dag-json.
+   * Lists the contents of a directory pointed by the given hash using IPFS DAG-PB.
    * Returns entries with individual file CIDs (required for signature verification).
    *
    * TODO: research why the size is different, i.e for the hash QmWcJrobqhHF7GWpqEbxdv2cWCCXbACmq85Hh7aJ1eu8rn Tsize is 64461521 and size is 64446140
@@ -464,38 +494,33 @@ export class DappnodeRepository extends ApmRepository {
    */
   public async list(hash: string): Promise<IPFSEntry[]> {
     const cidStr = this.sanitizeIpfsPath(hash.toString());
-    const url = `${this.gatewayUrl}/ipfs/${cidStr}?format=dag-json`;
-    const res = await fetch(url, {
-      headers: { Accept: "application/vnd.ipld.dag-json" }
-    });
-    if (!res.ok) {
-      throw new Error(`Failed to list directory ${cidStr}: ${res.status} ${res.statusText}`);
+    const cid = CID.parse(cidStr);
+    if (cid.code !== dagPb.code || cid.multihash.code !== sha256.code) {
+      throw new Error(`Unsupported IPFS directory CID ${cidStr}`);
     }
-
-    const dagJson = (await res.json()) as {
-      Links?: Array<{
-        Name: string;
-        Hash: { "/": string };
-        Tsize: number;
-      }>;
-    };
-
-    if (!dagJson.Links) {
-      throw new Error(`Invalid IPFS directory CID ${cidStr}`);
-    }
-
-    return dagJson.Links.map((link) => ({
-      type: "file",
-      cid: CID.parse(this.sanitizeIpfsPath(link.Hash["/"])),
-      name: link.Name,
-      path: `${link.Hash["/"]}/${link.Name}`,
-      size: link.Tsize
-    }));
+    return this.ipfsGatewayClient.fetch(
+      `/ipfs/${cidStr}?format=raw`,
+      { headers: { Accept: "application/vnd.ipld.raw" } },
+      async (res) => {
+        // Decode locally: newer gateways reject DAG-PB to DAG-JSON conversion.
+        const bytes = new Uint8Array(await res.arrayBuffer());
+        const actualCid = CID.create(cid.version, dagPb.code, await sha256.digest(bytes));
+        if (!actualCid.equals(cid)) throw new Error(`UNTRUSTED CONTENT: expected directory ${cidStr}`);
+        const directory = dagPb.decode(bytes);
+        return directory.Links.map((link) => ({
+          type: "file" as const,
+          cid: CID.parse(link.Hash.toString()),
+          name: link.Name ?? "",
+          path: `${link.Hash}/${link.Name ?? ""}`,
+          size: link.Tsize ?? 0
+        }));
+      }
+    );
   }
 
   /**
    * Provider 1: Mirror JSON listing — fast, real filenames, no individual file CIDs.
-   * Provider 2: IPFS dag-json listing — real individual file CIDs (required for signature verification).
+   * Provider 2: IPFS DAG-PB listing — real individual file CIDs (required for signature verification).
    *
    * Returns a discriminated union so callers never deal with placeholder CIDs.
    * When source is "mirror", signature verification is skipped and signedSafe = true
@@ -514,7 +539,7 @@ export class DappnodeRepository extends ApmRepository {
       }
     }
 
-    // Provider 2: IPFS dag-json — has real individual file CIDs
+    // Provider 2: IPFS DAG-PB — has real individual file CIDs
     const entries = await this.list(hash);
     return { source: "ipfs", entries, packageCidStr };
   }
@@ -523,32 +548,38 @@ export class DappnodeRepository extends ApmRepository {
    * Gets the content from an IPFS gateway using the given hash and verifies its integrity.
    *
    * @param hash - The content identifier (CID) of the content to get and verify.
-   * @returns The content as a CAR reader and the root CID.
-   * @throws Error when the root CID does not match the provided hash (content is untrusted).
+   * @returns The verified UnixFS content.
+   * @throws Error when the CAR is incomplete or its root CID does not match the requested hash.
    */
-  private async getAndVerifyContentFromGateway(hash: string): Promise<{
-    carReader: CarReader;
-    root: CID;
-  }> {
+  private async getVerifiedContentFromGateway(
+    hash: string,
+    maxResponseBytes?: number,
+    gatewayTimeoutMs?: number
+  ): Promise<AsyncIterable<Uint8Array>> {
     // 1. Download the CAR
-    const url = `${this.gatewayUrl}/ipfs/${hash}?format=car`;
-    const res = await fetch(url, {
-      headers: { Accept: "application/vnd.ipld.car" }
-    });
-    if (!res.ok) throw new Error(`Gateway error: ${res.status} ${res.statusText}`);
-
-    // 2. Parse into a CarReader
-    const bytes = new Uint8Array(await res.arrayBuffer());
-    const carReader = await CarReader.fromBytes(bytes);
-
-    // 3. Verify the root CID
-    const roots = await carReader.getRoots();
-    const root = roots[0];
-    if (roots.length !== 1 || root.toString() !== CID.parse(hash).toString()) {
-      throw new Error(`UNTRUSTED CONTENT: expected root ${hash}, got ${roots}`);
-    }
-
-    return { carReader, root };
+    return this.ipfsGatewayClient.fetch(
+      `/ipfs/${hash}?format=car`,
+      { headers: { Accept: "application/vnd.ipld.car" } },
+      async (res) => {
+        // Parse and verify inside the retry boundary. Truncated or untrusted
+        // responses are discarded before trying the next gateway.
+        const bytes = await readResponseBytes(res, maxResponseBytes);
+        const carReader = await CarReader.fromBytes(bytes);
+        const roots = await carReader.getRoots();
+        const root = roots[0];
+        if (roots.length !== 1 || root.toString() !== CID.parse(hash).toString()) {
+          throw new Error(`UNTRUSTED CONTENT: expected root ${hash}, got ${roots}`);
+        }
+        // Consume the UnixFS file inside the retry boundary. Incomplete CAR
+        // responses can contain the expected root but omit a referenced block.
+        // Treat those as a failure of the gateway that supplied the response.
+        const content = await this.unpackCarReader(carReader, root);
+        const chunks: Uint8Array[] = [];
+        for await (const chunk of content) chunks.push(chunk);
+        return chunksToAsyncIterable(chunks);
+      },
+      { timeoutMs: gatewayTimeoutMs }
+    );
   }
 
   /**
@@ -610,7 +641,9 @@ export class DappnodeRepository extends ApmRepository {
     const missingImageError = (): Error =>
       Error(
         `No image for architecture '${nodeArch}'. ${
-          manifest.architectures && manifest.architectures.includes(arch) ? `image for ${arch} is missing in release` : undefined
+          manifest.architectures && manifest.architectures.includes(arch)
+            ? `image for ${arch} is missing in release`
+            : undefined
         }`
       );
 
@@ -728,4 +761,46 @@ export class DappnodeRepository extends ApmRepository {
    * @returns Arch tag in the format <os>-<arch>
    */
   private getArchTag = (arch: Architecture): string => arch.replace(/\//g, "-");
+}
+
+async function readResponseBytes(response: Response, maxBytes?: number): Promise<Uint8Array> {
+  const contentLength = response.headers.get("content-length");
+  if (maxBytes !== undefined && contentLength !== null && Number(contentLength) > maxBytes) {
+    throw Error(`Maximum gateway response size ${maxBytes} bytes exceeded`);
+  }
+
+  if (!response.body) {
+    const bytes = new Uint8Array(await response.arrayBuffer());
+    if (maxBytes !== undefined && bytes.length > maxBytes) {
+      throw Error(`Maximum gateway response size ${maxBytes} bytes exceeded`);
+    }
+    return bytes;
+  }
+
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let totalLength = 0;
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    totalLength += value.length;
+    if (maxBytes !== undefined && totalLength > maxBytes) {
+      await reader.cancel();
+      throw Error(`Maximum gateway response size ${maxBytes} bytes exceeded`);
+    }
+    chunks.push(value);
+  }
+
+  const bytes = new Uint8Array(totalLength);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.length;
+  }
+  return bytes;
+}
+
+async function* chunksToAsyncIterable(chunks: Uint8Array[]): AsyncIterable<Uint8Array> {
+  yield* chunks;
 }

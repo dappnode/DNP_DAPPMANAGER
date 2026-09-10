@@ -1,8 +1,6 @@
 import {
-  MevBoostHolesky,
   MevBoostHoodi,
   MevBoostMainnet,
-  MevBoostPrater,
   Network,
   StakerItem,
   UserSettings
@@ -18,8 +16,6 @@ export class MevBoost extends StakerComponent {
   readonly DbHandlers: Record<Network, { get: () => boolean; set: (globEnvValue: boolean) => Promise<void> }> = {
     [Network.Mainnet]: db.mevBoostMainnet,
     [Network.Gnosis]: db.mevBoostGnosis,
-    [Network.Prater]: db.mevBoostPrater,
-    [Network.Holesky]: db.mevBoostHolesky,
     [Network.Sepolia]: db.mevBoostSepolia,
     [Network.Hoodi]: db.mevBoostHoodi,
     [Network.Lukso]: db.mevBoostLukso,
@@ -33,14 +29,6 @@ export class MevBoost extends StakerComponent {
       minVersion: "0.1.0"
     },
     [Network.Gnosis]: null,
-    [Network.Prater]: {
-      dnpName: MevBoostPrater.Mevboost,
-      minVersion: "0.1.0"
-    },
-    [Network.Holesky]: {
-      dnpName: MevBoostHolesky.Mevboost,
-      minVersion: "0.1.0"
-    },
     [Network.Hoodi]: {
       dnpName: MevBoostHoodi.Mevboost,
       minVersion: "0.1.0"

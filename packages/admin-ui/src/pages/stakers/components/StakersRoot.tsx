@@ -32,22 +32,12 @@ const availableRoutes: RouteType[] = [
     )
   },
   {
-    subPath: "holesky",
-    name: "Holesky",
-    element: (
-      <StakerNetwork
-        network={Network.Holesky}
-        description="Holesky is one Ethereum testnet which has replaced Goerli as a staking, infrastructure, and protocol-developer testnet. This network is primarily focused on testing the Ethereum protocol in a Post-Merged environment, best reflecting the latest iteration of the Ethereum Mainnet chain."
-      />
-    )
-  },
-  {
     subPath: "hoodi",
     name: "Hoodi",
     element: (
       <StakerNetwork
         network={Network.Hoodi}
-        description="Hoodi is the latest public Ethereum testnet introduced to support the Pectra upgrade, addressing challenges faced on Holesky and Sepolia. This network focuses on testing Ethereum Improvement Proposals (EIPs), staking mechanisms, and wallet interactions in a post-merge environment, ensuring a smooth transition for future mainnet updates. It is the preferred choice for users looking to test staking configurations before deploying validators and using real ETH on the mainnet."
+        description="Hoodi is the latest public Ethereum testnet introduced to support the Pectra upgrade, replacing the previous Holesky testnet. This network focuses on testing Ethereum Improvement Proposals (EIPs), staking mechanisms, and wallet interactions in a post-merge environment, ensuring a smooth transition for future mainnet updates. It is the preferred choice for users looking to test staking configurations before deploying validators and using real ETH on the mainnet."
       />
     )
   },
@@ -57,17 +47,7 @@ const availableRoutes: RouteType[] = [
     element: (
       <StakerNetwork
         network={Network.Sepolia}
-        description="Sepolia is a public Ethereum testnet designed for developers who want to test their applications in a pre-production environment. Different from the Holesky/Hoodi testnets, Sepolia is run by a small set of centrally permissioned validators, making it more stable and reliable for testing purposes. While its not a network for testing staking, it is still a valuable resource for developers looking to test their applications before deploying them on the Ethereum mainnet."
-      />
-    )
-  },
-  {
-    subPath: "prater",
-    name: "Prater",
-    element: (
-      <StakerNetwork
-        network={Network.Prater}
-        description="Göerli, the proper name for the resulting testnet created from the Prater and Göerli merge, is the long-standing Ethereum testnet. Node operators can use it to test their node setups and app developers to test their stack before deploying to the Mainnet.  It has since been replaced by the Holesky Testnet that was launched in a merged state and did not need to merge EL and CL layers as was done in Göerli"
+        description="Sepolia is a public Ethereum testnet designed for developers who want to test their applications in a pre-production environment. Different from the Hoodi testnet, Sepolia is run by a small set of centrally permissioned validators, making it more stable and reliable for testing purposes. While its not a network for testing staking, it is still a valuable resource for developers looking to test their applications before deploying them on the Ethereum mainnet."
       />
     )
   },

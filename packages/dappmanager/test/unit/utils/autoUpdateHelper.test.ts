@@ -13,7 +13,8 @@ import {
   updateDelay,
   isCoreUpdateEnabled,
   isDnpUpdateEnabled,
-  isUpdateDelayCompleted
+  isUpdateDelayCompleted,
+  MY_PACKAGES
 } from "@dappnode/daemons";
 
 const coreDnpName = params.coreDnpName;
@@ -58,10 +59,39 @@ describe("Util: autoUpdateHelper", () => {
       editDnpSetting(true, dnpName);
       expect(check()).to.equal(true, `After enabling ${dnpName}`);
 
+      // Enabling my-packages must clear a disabled package override
+      editDnpSetting(false, dnpName);
+      editDnpSetting(true);
+      expect(check()).to.equal(true, `After enabling all packages`);
+      expect(db.autoUpdateSettings.get()).to.deep.equal({
+        [MY_PACKAGES]: { enabled: true }
+      });
+
       // Disable my-packages
       editDnpSetting(false);
       expect(check()).to.equal(false, "After disabling");
       expect(check()).to.equal(false, `After disabling ${dnpName} final`);
+    });
+
+    it("Should preserve package overrides when changing the default", () => {
+      editDnpSetting(false);
+      editDnpSetting(true, dnpName);
+
+      editDnpSetting(true, MY_PACKAGES, false);
+      expect(isDnpUpdateEnabled(dnpName)).to.equal(true);
+      expect(db.autoUpdateSettings.get()).to.deep.equal({
+        [MY_PACKAGES]: { enabled: true },
+        [dnpName]: { enabled: true }
+      });
+
+      editDnpSetting(false, MY_PACKAGES, false);
+      expect(isDnpUpdateEnabled(dnpName)).to.equal(true);
+
+      // Setting a customized package to the default removes its override.
+      editDnpSetting(false, dnpName);
+      expect(db.autoUpdateSettings.get()).to.deep.equal({
+        [MY_PACKAGES]: { enabled: false }
+      });
     });
 
     it("Should set active for system packages", () => {

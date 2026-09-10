@@ -16,12 +16,15 @@ export const packageManifest = wrapHandler<Params>(async (req, res) => {
   const manifest = readManifestIfExists(dnpName);
   if (!manifest) return res.status(404).send("Manifest not found");
 
-  // This is a temporary fix to get the avatarUrl from the package list
-  // Intaller now sets avatarUrl in the manifest. See `dappnodeInstaller` > `joinFilesInManifest`
-  // TODO: This setter should be removed once users have updated their packages
-  if(!manifest.avatarUrl) 
-    manifest.avatarUrl = (await listPackage({dnpName})).avatarUrl
-  
+  // Prefer the installed package URL. It points to the locally downloaded
+  // avatar and carries the current avatar reference as a cache-busting version.
+  // Keep the manifest URL as a fallback for old or temporarily stopped packages.
+  try {
+    const installedAvatarUrl = (await listPackage({ dnpName })).avatarUrl;
+    if (installedAvatarUrl) manifest.avatarUrl = installedAvatarUrl;
+  } catch {
+    // The persisted manifest is still useful when Docker package data is unavailable.
+  }
 
   // Filter manifest manually to not send new private properties
   const filteredManifest = pick(manifest, [

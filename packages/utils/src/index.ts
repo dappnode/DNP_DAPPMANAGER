@@ -14,7 +14,7 @@ export { getPrivateNetworkAliases } from "./getPrivateNetworkAliases.js";
 export { getIsCore } from "./getIsCore.js";
 export { shell, shellHost, ShellError } from "./shell.js";
 export { normalizeHash } from "./normalizeHash.js";
-export { fileToGatewayUrl } from "./fileToGatewayUrl.js";
+export { fileToGatewayUrl, IPFS_AVATAR_ROUTE } from "./fileToGatewayUrl.js";
 export { packageInstalledHasPid } from "./packageInstalledHasPid.js";
 export { parseEnvironment, stringifyEnvironment, mergeEnvs } from "./environment.js";
 export { writeEnvFile, createGlobalEnvsEnvFile } from "./globalEnvs.js";

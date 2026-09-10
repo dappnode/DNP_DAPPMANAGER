@@ -3,14 +3,12 @@ import * as db from "@dappnode/db";
 import { logs } from "@dappnode/logger";
 import { DappnodeInstaller, packagePickItemData } from "@dappnode/installer";
 import { memoizeDebounce } from "@dappnode/utils";
-import { MevBoostHolesky, MevBoostHoodi, MevBoostMainnet, MevBoostPrater } from "@dappnode/types";
+import { MevBoostHoodi, MevBoostMainnet } from "@dappnode/types";
 
 async function updateMevBoostOnDb({ dnpNames, removed }: { dnpNames: string[]; removed?: boolean }): Promise<void> {
   try {
     if (!removed) return;
     if (dnpNames.includes(MevBoostMainnet.Mevboost)) await db.mevBoostMainnet.set(false);
-    if (dnpNames.includes(MevBoostPrater.Mevboost)) await db.mevBoostPrater.set(false);
-    if (dnpNames.includes(MevBoostHolesky.Mevboost)) await db.mevBoostHolesky.set(false);
     if (dnpNames.includes(MevBoostHoodi.Mevboost)) await db.mevBoostHoodi.set(false);
   } catch (e) {
     logs.error("Error updating mev boost on db", e);

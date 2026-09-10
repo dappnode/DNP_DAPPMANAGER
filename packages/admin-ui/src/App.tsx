@@ -19,6 +19,10 @@ import { AppContextIface, Theme } from "types";
 import Smooth from "components/Smooth";
 import { PwaPermissionsAlert, PwaPermissionsModal } from "components/PwaPermissions";
 import { LocalProxyBanner } from "pages/wifi/components/localProxying/LocalProxyBanner";
+import { FloatingChatLauncher } from "pages/nexus/components/FloatingChatLauncher";
+import { NexusChatProvider } from "pages/nexus/components/ChatPanel";
+import NexusAuthCallback from "pages/nexus/components/NexusAuthCallback";
+import { NEXUS_AUTH_CALLBACK_PATH } from "pages/nexus/auth";
 // Grafana Faro for frontend monitoring and tracing
 import { FaroRoutes } from "@grafana/faro-react";
 import { useUiTelemetryConsent } from "hooks/useUiTelemetryConsent";
@@ -72,6 +76,7 @@ function MainApp({ username }: { username: string }) {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [screenLocation.pathname]);
+  const isNexusPage = screenLocation.pathname === "/nexus" || screenLocation.pathname.startsWith("/nexus/");
 
   const appContext: AppContextIface = {
     theme,
@@ -91,40 +96,43 @@ function MainApp({ username }: { username: string }) {
 
   return (
     <AppContext.Provider value={appContext}>
-      <div className="body" id={theme}>
-        <SideBar screenWidth={screenWidth} />
-        <TopBar username={username} appContext={appContext} />
-        <div id="main">
-          <ErrorBoundary>
-            <LocalProxyBanner />
-            <NotificationsMain />
-          </ErrorBoundary>
-          <PwaPermissionsAlert />
-          <FaroRoutes>
-            {/** Provide the app context only to the dashboard (where the modules switch is handled) */}
-            {Object.values(pages).map(({ RootComponent, rootPath }) => (
-              <Route
-                key={rootPath}
-                path={rootPath}
-                element={
-                  <ErrorBoundary>
-                    <RootComponent />
-                  </ErrorBoundary>
-                }
-              />
-            ))}
-            {/* Redirection for routes with hashes */}
-            {/* 404 routes redirect to dashboard or default page */}
-            <Route path="*" element={<DefaultRedirect />} />
-          </FaroRoutes>
-        </div>
+      <NexusChatProvider>
+        <div className="body" id={theme}>
+          <SideBar screenWidth={screenWidth} />
+          <TopBar username={username} appContext={appContext} />
+          <div id="main" className={isNexusPage ? "main-no-floating-chat-clearance" : undefined}>
+            <ErrorBoundary>
+              <LocalProxyBanner />
+              <NotificationsMain />
+            </ErrorBoundary>
+            <PwaPermissionsAlert />
+            <FaroRoutes>
+              {/** Provide the app context only to the dashboard (where the modules switch is handled) */}
+              {Object.values(pages).map(({ RootComponent, rootPath }) => (
+                <Route
+                  key={rootPath}
+                  path={rootPath}
+                  element={
+                    <ErrorBoundary>
+                      <RootComponent />
+                    </ErrorBoundary>
+                  }
+                />
+              ))}
+              {/* Redirection for routes with hashes */}
+              {/* 404 routes redirect to dashboard or default page */}
+              <Route path="*" element={<DefaultRedirect />} />
+            </FaroRoutes>
+          </div>
 
-        {/* Place here non-page components */}
-        <Welcome />
-        <Smooth />
-        <PwaPermissionsModal />
-        <ToastContainer />
-      </div>
+          {/* Place here non-page components */}
+          <Welcome />
+          <Smooth />
+          <PwaPermissionsModal />
+          <ToastContainer />
+          <FloatingChatLauncher />
+        </div>
+      </NexusChatProvider>
     </AppContext.Provider>
   );
 }
@@ -143,6 +151,12 @@ function DefaultRedirect() {
 }
 
 export default function App() {
+  const location = useLocation();
+  if (location.pathname === NEXUS_AUTH_CALLBACK_PATH) return <NexusAuthCallback />;
+  return <AuthenticatedApp />;
+}
+
+function AuthenticatedApp() {
   const [loginStatus, setLoginStatus] = useState<LoginStatus>();
   // Handles the login, register and connecting logic. Nothing else will render
   // Until the app has been logged in

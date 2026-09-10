@@ -6,7 +6,9 @@ export * from "./ethicalMetrics.js";
 export * from "./ipfsClient.js";
 export * from "./mirrorProvider.js";
 export * from "./fileTransferPath.js";
+export * from "./mcp.js";
 export * from "./network.js";
+export * from "./nexus.js";
 export * from "./notification.js";
 export * from "./optimismConfig.js";
 export * from "./package.js";
@@ -19,11 +21,13 @@ export * from "./upnp.js";
 export * from "./vpn.js";
 export * from "./stakerConfig.js";
 // Additional low levels methods
-import { dbCache, dbMain } from "./dbFactory.js";
+import { dbCache, dbMain, dbNexus } from "./dbFactory.js";
 // Additional envs methods
 export { computeGlobalEnvsFromDb, writeGlobalEnvsToEnvFile } from "./globalEnvs.js";
 
 /** WARNING! Only clear cache DB if necessary */
 export const clearCacheDb = dbCache.clearDb;
+/** WARNING! Clears Nexus chat history and any future Nexus-scoped data */
+export const clearNexusDb = dbNexus.clearDb;
 /** DANGER! Calling this method will loose user data */
 export const clearMainDb = dbMain.clearDb;

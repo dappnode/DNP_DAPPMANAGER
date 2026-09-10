@@ -516,6 +516,8 @@ export interface PackageContainer {
   // DAppNode package data
   isDnp: boolean;
   isCore: boolean;
+  /** Installed locally for development without IPFS (see packageInstallDev) */
+  isDev?: boolean;
   defaultEnvironment?: PackageEnvs;
   defaultPorts?: PortMapping[];
   defaultVolumes?: VolumeMapping[];
@@ -543,6 +545,7 @@ export type InstalledPackageData = Pick<
   | "version"
   | "isDnp"
   | "isCore"
+  | "isDev"
   | "dependencies"
   | "avatarUrl"
   | "origin"
@@ -934,7 +937,8 @@ export interface DistributedFile {
 
 export interface IpfsRepository {
   ipfsClientTarget: IpfsClientTarget;
-  ipfsGateway: string;
+  /** Remote gateways in priority order. */
+  ipfsGateway: string[];
 }
 
 export enum IpfsClientTarget {
