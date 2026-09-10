@@ -4,9 +4,23 @@ import { eventBus } from "@dappnode/eventbus";
 import { params } from "@dappnode/params";
 import { getServicesSharingPid } from "@dappnode/utils";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
-import { PackageContainer } from "@dappnode/types";
+import { InstalledPackageData, PackageContainer } from "@dappnode/types";
 
-const dnpsAllowedToStop = [params.ipfsDnpName, params.wifiDnpName, params.HTTPS_PORTAL_DNPNAME, params.notificationsDnpName];
+const dnpsAllowedToStop = [
+  params.ipfsDnpName,
+  params.wifiDnpName,
+  params.HTTPS_PORTAL_DNPNAME,
+  params.notificationsDnpName,
+  params.nexusProofsDnpName
+];
+
+/**
+ * Core packages and the dappmanager can only be stopped when whitelisted
+ */
+export function isAllowedToStop(dnp: Pick<InstalledPackageData, "dnpName" | "isCore">): boolean {
+  if (!dnp.isCore && dnp.dnpName !== params.dappmanagerDnpName) return true;
+  return dnpsAllowedToStop.includes(dnp.dnpName);
+}
 
 /**
  * Stops or starts a package containers
@@ -24,13 +38,7 @@ export async function packageStartStop({
   const dnp = await listPackage({ dnpName });
   const { compose } = new ComposeFileEditor(dnp.dnpName, dnp.isCore);
 
-  if (dnp.isCore || dnp.dnpName === params.dappmanagerDnpName) {
-    if (dnpsAllowedToStop.includes(dnp.dnpName)) {
-      // whitelisted, ok to stop
-    } else {
-      throw Error("Core packages cannot be stopped");
-    }
-  }
+  if (!isAllowedToStop(dnp)) throw Error("Core packages cannot be stopped");
 
   const targetContainers = dnp.containers.filter((c) => !serviceNames || serviceNames.includes(c.serviceName));
 

@@ -225,6 +225,7 @@ export const params = {
   ipfsDnpName: "ipfs.dnp.dappnode.eth",
   ipfsContainerName: "DAppNodeCore-ipfs.dnp.dappnode.eth",
   notificationsDnpName: "notifications.dnp.dappnode.eth",
+  nexusProofsDnpName: "nexus-proofs.dnp.dappnode.eth",
   vpnDataVolume: "dncore_vpndnpdappnodeeth_data",
   wireguardContainerName: "DAppNodeCore-wireguard.wireguard.dnp.dappnode.eth",
   restartContainerName: "DAppNodeTool-restart.dnp.dappnode.eth",

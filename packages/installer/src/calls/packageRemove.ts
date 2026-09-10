@@ -1,14 +1,24 @@
 import fs from "fs";
 import { eventBus } from "@dappnode/eventbus";
 import { params } from "@dappnode/params";
-import { getRepoDirPath, getDockerComposePath, getAvatarPath, shell } from "@dappnode/utils";
+import {
+  getRepoDirPath,
+  getDockerComposePath,
+  getManifestPath,
+  getEnvFilePath,
+  getAvatarPath,
+  shell
+} from "@dappnode/utils";
 import { logs } from "@dappnode/logger";
 import {
   getDockerTimeoutMax,
   dockerContainerRemove,
   dockerContainerStop,
   dockerComposeDown,
-  listPackage
+  dockerVolumesList,
+  getContainersAndVolumesToRemove,
+  listPackage,
+  removeNamedVolume
 } from "@dappnode/dockerapi";
 import { httpsPortal } from "@dappnode/httpsportal";
 import { ethicalMetricsDnpName, unregister } from "@dappnode/ethicalmetrics";
@@ -56,9 +66,8 @@ export async function packageRemove({
     }
   }
 
-  // Only no-cores reach this block
-  const composePath = getDockerComposePath(dnp.dnpName, false);
-  const packageRepoDir = getRepoDirPath(dnp.dnpName, false);
+  // Removable core packages keep their compose file in DNCORE_DIR, not in a per-package repo dir
+  const composePath = getDockerComposePath(dnp.dnpName, dnp.isCore);
 
   // [NOTE] Not necessary to close the ports since they will just
   // not be renewed in the next interval
@@ -92,13 +101,19 @@ export async function packageRemove({
         await dockerContainerRemove(containerName, { volumes: deleteVolumes });
       })
     );
+
+    // `docker rm -v` only deletes anonymous volumes, so named volumes are removed explicitly
+    if (deleteVolumes) {
+      const { volumesToRemove } = getContainersAndVolumesToRemove(dnp, undefined, await dockerVolumesList());
+      for (const volumeName of new Set(volumesToRemove)) await removeNamedVolume(volumeName);
+    }
   }
 
   // Remove DNP folder and files
-  if (fs.existsSync(packageRepoDir)) await shell(`rm -r ${packageRepoDir}`);
+  await removePackageFiles(dnp.dnpName, dnp.isCore);
 
   // Remove cached avatar:
-  // If we get here, the container and repo are already removed, so even if this fails 
+  // If we get here, the container and repo are already removed, so even if this fails
   // the package is effectively removed.
   try {
     const avatarPath = getAvatarPath(dnp.dnpName, dnp.isCore);
@@ -110,4 +125,23 @@ export async function packageRemove({
   // Emit packages update
   eventBus.requestPackages.emit();
   eventBus.packagesModified.emit({ dnpNames: [dnp.dnpName], removed: true });
+}
+
+/**
+ * Deletes a package's files from disk. DNCORE_DIR is shared by every core package,
+ * so for a core package only its own files are removed and never the directory.
+ */
+export async function removePackageFiles(dnpName: string, isCore: boolean): Promise<void> {
+  if (isCore) {
+    for (const filePath of [
+      getDockerComposePath(dnpName, true),
+      getManifestPath(dnpName, true),
+      getEnvFilePath(dnpName, true)
+    ]) {
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    }
+  } else {
+    const packageRepoDir = getRepoDirPath(dnpName, false);
+    if (fs.existsSync(packageRepoDir)) await shell(`rm -r ${packageRepoDir}`);
+  }
 }
