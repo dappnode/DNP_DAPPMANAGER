@@ -1,4 +1,4 @@
-import Ajv from "ajv";
+import { Ajv } from "ajv";
 import crypto from "crypto";
 import querystring from "querystring";
 import { urlJoin } from "@dappnode/utils";

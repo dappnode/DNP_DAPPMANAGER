@@ -1,4 +1,4 @@
-import Ajv from "ajv";
+import { Ajv, ErrorObject } from "ajv";
 import { routesArgumentsSchema } from "@dappnode/common";
 import { LoggerMiddleware, RpcPayload, Routes, RpcResponse } from "@dappnode/types";
 
@@ -67,7 +67,7 @@ function tryToParseRpcRequest(body: any): { method?: string; params?: any[] } {
   }
 }
 
-function formatErrors(errors: Array<Ajv.ErrorObject> | null | undefined, method: string): string {
+function formatErrors(errors: Array<ErrorObject> | null | undefined, method: string): string {
   const dataVar = `root_prop`;
   const toReplace = `${dataVar}.${method}`;
   const errorsText = ajv.errorsText(errors, { separator: "\n", dataVar });
