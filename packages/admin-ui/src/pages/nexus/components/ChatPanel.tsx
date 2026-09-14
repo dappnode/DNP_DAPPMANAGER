@@ -1202,8 +1202,8 @@ function ApiKeyEditor({
           {logoutStep.kind === "manual" && (
             <>
               <p className="nexus-key-editor-text">
-                The Nexus API key was removed from this Dappnode, but it can still be used wherever else you saved it.
-                If you no longer need it, disable it in{" "}
+                The Nexus API key was removed from this Dappnode. It still works in Nexus, so if you no longer need it,
+                disable it in{" "}
                 <a href={`${nexusExternalUrl}/api-keys`} target="_blank" rel="noopener noreferrer">
                   your Nexus API keys
                 </a>
@@ -1304,7 +1304,7 @@ function ApiKeyEditor({
                 <a href={`${nexusExternalUrl}/api-keys`} target="_blank" rel="noopener noreferrer">
                   create a Nexus API key
                 </a>{" "}
-                yourself and paste it below. The key is stored only on this Dappnode.
+                yourself and paste it below. It is saved on this Dappnode.
               </p>
             )}
 
