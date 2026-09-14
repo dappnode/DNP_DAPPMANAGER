@@ -27,31 +27,38 @@ export async function releaseTrustedKeyAdd(newTrustedKey: TrustedReleaseKey): Pr
     throw Error(`Already added a key with name ${newTrustedKey.name}`);
   }
 
-  // Safe to push, key is checked to be unique
-  trustedKeys.push(newTrustedKey);
-  db.releaseKeysTrusted.set(trustedKeys);
+  // Preserve the default list when saving the first customization.
+  db.releaseKeysTrusted.set([...trustedKeys, newTrustedKey]);
 }
 
 /**
  * Remove a release key from trusted keys db, by name
  */
-export async function releaseTrustedKeyRemove(keyName: string): Promise<void> {
+export async function releaseTrustedKeyRemove(keyName: string, dnpNameSuffix?: string): Promise<void> {
   const trustedKeys = db.releaseKeysTrusted.get();
-  const existingKeyNames = new Set(trustedKeys.map((k) => k.name));
+  const matchesKey = (key: TrustedReleaseKey): boolean =>
+    key.name === keyName && (dnpNameSuffix === undefined || key.dnpNameSuffix === dnpNameSuffix);
 
-  if (!existingKeyNames.has(keyName)) {
+  if (!trustedKeys.some(matchesKey)) {
     throw Error(`No key with name ${keyName}`);
   }
 
-  trustedKeys.filter((key) => key.name !== keyName);
-  db.releaseKeysTrusted.set(trustedKeys);
+  db.releaseKeysTrusted.set(trustedKeys.filter((key) => !matchesKey(key)));
 }
 
 /**
  * List all keys from trusted keys db
  */
-export async function releaseTrustedKeyList(): Promise<TrustedReleaseKey[]> {
-  return db.releaseKeysTrusted.get();
+export async function releaseTrustedKeyList(): Promise<{ keys: TrustedReleaseKey[]; isDefault: boolean }> {
+  return {
+    keys: db.releaseKeysTrusted.get(),
+    isDefault: !db.releaseKeysTrusted.has()
+  };
+}
+
+/** Restore defaults by deleting the saved trusted keys list. */
+export async function releaseTrustedKeyReset(): Promise<void> {
+  db.releaseKeysTrusted.remove();
 }
 
 function getKeyId(key: TrustedReleaseKey): string {

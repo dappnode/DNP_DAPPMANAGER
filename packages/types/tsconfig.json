@@ -6,6 +6,7 @@
 
     /* Emit */
     "outDir": "dist",
+    "rootDir": "src",
 
     /* Language and Environment */
     "lib": ["DOM", "ESNext"]

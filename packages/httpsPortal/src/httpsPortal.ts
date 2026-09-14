@@ -13,6 +13,7 @@ import { HttpsPortalApiClient } from "./apiClient.js";
 import { ComposeEditor, ComposeFileEditor } from "@dappnode/dockercompose";
 import { prettyDnpName } from "@dappnode/utils";
 import { Log, logs } from "@dappnode/logger";
+import { hasApiMappingForContainer, hasExactApiMapping } from "./apiMappings.js";
 export { HttpsPortalApiClient };
 export { getExposableServices } from "./exposable/index.js";
 
@@ -66,7 +67,7 @@ export class HttpsPortal {
       });
     }
 
-    if (!(await this.hasApiMapping(mapping.dnpName, mapping.serviceName))) {
+    if (!(await this.hasExactApiMapping(mapping))) {
       logs.info(`Adding HTTPS portal mapping for ${mapping.dnpName}:${mapping.port}...`);
       // Call Http Portal API to add the mapping
       await this.httpsPortalApiClient.add({
@@ -174,7 +175,7 @@ export class HttpsPortal {
     for (const container of containers) {
       if (
         pkg.dnpName === params.HTTPS_PORTAL_DNPNAME ||
-        (await this.hasApiMapping(pkg.dnpName, container.serviceName))
+        (await this.hasApiMappingForContainer(pkg.dnpName, container.serviceName))
       ) {
         const alias = getExternalNetworkAlias({
           serviceName: container.serviceName,
@@ -286,22 +287,28 @@ export class HttpsPortal {
     }
   }
 
-  /**
-   * Returns weather a container has assigned or not a mapping to the https-portal API
-   */
-  private async hasApiMapping(dnpName: string, serviceName: string): Promise<boolean> {
+  /** Returns whether this exact source and target mapping exists in the HTTPS Portal API. */
+  private async hasExactApiMapping(mapping: HttpsPortalMapping): Promise<boolean> {
     const entries = await this.httpsPortalApiClient.list();
-    const mappingAlias = getExternalNetworkAlias({ serviceName, dnpName });
-    for (const { toHost } of entries) {
-      // toHost format: someDomain:80
-      const alias = toHost.split(":")[0];
-      if (alias === mappingAlias) {
-        logs.info(`Found API mapping for ${dnpName} ${serviceName}`);
-        return true;
-      }
+    const hasMapping = hasExactApiMapping(entries, mapping);
+
+    if (hasMapping) {
+      logs.info(
+        `Found API mapping for ${mapping.fromSubdomain} -> ${mapping.dnpName} ${mapping.serviceName}:${mapping.port}`
+      );
+    } else {
+      logs.info(
+        `No API mapping found for ${mapping.fromSubdomain} -> ${mapping.dnpName} ${mapping.serviceName}:${mapping.port}`
+      );
     }
-    logs.info(`No API mapping found for ${dnpName} ${serviceName}`);
-    return false;
+
+    return hasMapping;
+  }
+
+  /** Returns whether a container has at least one mapping in the HTTPS Portal API. */
+  private async hasApiMappingForContainer(dnpName: string, serviceName: string): Promise<boolean> {
+    const entries = await this.httpsPortalApiClient.list();
+    return hasApiMappingForContainer(entries, dnpName, serviceName);
   }
 
   /**

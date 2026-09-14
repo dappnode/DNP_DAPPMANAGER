@@ -69,4 +69,29 @@ describe("IpfsGatewayClient", () => {
       expect((error as Error).message).to.include("https://second.example: 502 Bad Gateway");
     }
   });
+
+  it("logs every gateway attempt and failure with the requested IPFS path", async () => {
+    const logEntries: { level: string; message: string }[] = [];
+    let requestCount = 0;
+    globalThis.fetch = async () => {
+      requestCount += 1;
+      return requestCount === 1
+        ? new Response("unavailable", { status: 503, statusText: "Service Unavailable" })
+        : new Response("ok", { status: 200 });
+    };
+
+    const client = new IpfsGatewayClient(["https://first.example", "https://second.example"], (level, message) =>
+      logEntries.push({ level, message })
+    );
+    await client.fetch("/ipfs/cid?format=car", {}, async (response) => response.text());
+
+    expect(logEntries).to.deep.equal([
+      { level: "info", message: "Trying IPFS gateway https://first.example/ipfs/cid?format=car" },
+      {
+        level: "warn",
+        message: "IPFS gateway failed https://first.example/ipfs/cid?format=car: 503 Service Unavailable"
+      },
+      { level: "info", message: "Trying IPFS gateway https://second.example/ipfs/cid?format=car" }
+    ]);
+  });
 });
