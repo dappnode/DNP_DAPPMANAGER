@@ -1157,9 +1157,9 @@ function ApiKeyEditor({
     setError(null);
     try {
       await onLoginWithNexus();
-      // Stay open while there is still a proofs change to save.
-      if (privateModeChanged) setBusyAction(null);
-      else onClose();
+      // Stay open: right after connecting is when the operator decides on
+      // confidentiality proofs.
+      setBusyAction(null);
     } catch (err) {
       setError((err as Error).message || "Failed to connect to Dappnode Nexus");
       setBusyAction(null);
