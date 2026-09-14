@@ -155,12 +155,25 @@ export class NexusApi {
   /**
    * Turn private mode on or off. Takes effect on the next request: the gateway
    * URL is read per call, so no restart is needed.
+   *
+   * Private mode fails closed, so it can only be turned on once Nexus Proofs
+   * has verified the Gateway. Turning it off always works.
    */
-  setPrivateMode(rawEnabled: unknown): NexusStatus {
+  async setPrivateMode(rawEnabled: unknown): Promise<NexusStatus> {
     if (typeof rawEnabled !== "boolean")
       throw NexusApiError.json(400, "invalid_request", "privateMode must be a boolean");
     if (!this.deps.privateModeStore)
-      throw NexusApiError.json(501, "not_supported", "private mode is not available on this DAppNode");
+      throw NexusApiError.json(501, "not_supported", "private mode is not available on this Dappnode");
+    if (rawEnabled && !this.isPrivateMode()) {
+      const probe = await this.probeLocalProxy();
+      if (!probe.verified) {
+        throw NexusApiError.json(
+          409,
+          "nexus_proofs_unavailable",
+          `Confidentiality proofs need Nexus Proofs to verify Nexus first: ${probe.reason ?? "it is not verified"}`
+        );
+      }
+    }
     this.deps.privateModeStore.set(rawEnabled);
     return this.readStatus();
   }

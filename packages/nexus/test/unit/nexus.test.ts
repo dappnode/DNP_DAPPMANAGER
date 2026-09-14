@@ -96,20 +96,68 @@ describe("nexus / api", () => {
     expect(requested).to.equal("https://staging.example/v1/models");
   });
 
-  it("persists a private mode change and reflects it in status", () => {
-    const { service, state } = makeService({ apiKey: "secret", gatewayUrl: null });
+  it("turns private mode on once Nexus Proofs has verified Nexus", async () => {
+    const { service, state } = makeService({
+      apiKey: "secret",
+      gatewayUrl: null,
+      fetch: async () => jsonResponse({ status: "verified", current: { checks: [1] } })
+    });
 
     expect(service.readStatus().privateMode).to.equal(false);
-    const status = service.setPrivateMode(true);
+    const status = await service.setPrivateMode(true);
 
     expect(state.privateMode).to.equal(true);
     expect(status.privateMode).to.equal(true);
     expect(status.gatewayUrl).to.equal("http://nexus-proofs.dappnode.private:3301/v1");
   });
 
-  it("rejects a non-boolean private mode", () => {
+  it("refuses to turn private mode on while Nexus Proofs is missing", async () => {
+    const { service, state } = makeService({
+      apiKey: "secret",
+      gatewayUrl: null,
+      fetch: async () => {
+        throw new Error("getaddrinfo ENOTFOUND nexus-proofs.dappnode.private");
+      }
+    });
+
+    let error: unknown;
+    try {
+      await service.setPrivateMode(true);
+    } catch (err) {
+      error = err;
+    }
+
+    expect((error as NexusApiError).code).to.equal("nexus_proofs_unavailable");
+    expect(state.privateMode).to.equal(false);
+  });
+
+  it("always turns private mode off, even without Nexus Proofs", async () => {
+    let fetched = false;
+    const { service, state } = makeService({
+      apiKey: "secret",
+      privateMode: true,
+      fetch: async () => {
+        fetched = true;
+        throw new Error("unreachable");
+      }
+    });
+
+    const status = await service.setPrivateMode(false);
+
+    expect(status.privateMode).to.equal(false);
+    expect(state.privateMode).to.equal(false);
+    expect(fetched).to.equal(false);
+  });
+
+  it("rejects a non-boolean private mode", async () => {
     const { service } = makeService({ apiKey: "secret" });
-    expect(() => service.setPrivateMode("yes")).to.throw();
+    let error: unknown;
+    try {
+      await service.setPrivateMode("yes");
+    } catch (err) {
+      error = err;
+    }
+    expect((error as NexusApiError).code).to.equal("invalid_request");
   });
 
   it("reports a verified Nexus Proofs", async () => {

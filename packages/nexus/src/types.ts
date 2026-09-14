@@ -52,8 +52,12 @@ export interface NexusStatus {
  * everything else reads its answer.
  */
 export interface NexusProxyProbe {
-  /** Whether Nexus Proofs answered at all. False means not installed. */
+  /** Whether Nexus Proofs answered at all. */
   reachable: boolean;
+  /** Whether the Nexus Proofs package is installed, when the caller can tell. */
+  installed?: boolean;
+  /** Whether its container is running, when the caller can tell. */
+  running?: boolean;
   /** Whether it has currently verified the Gateway. */
   verified: boolean;
   /** The proxy's own status string, when it answered. */

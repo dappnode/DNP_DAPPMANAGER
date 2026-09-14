@@ -3,8 +3,6 @@ import Button from "components/Button";
 import { confirm } from "components/ConfirmDialog";
 import Select from "components/Select";
 import NexusMarkdown from "./NexusMarkdown";
-import { Link } from "react-router-dom";
-import { getInstallerPath } from "pages/installer";
 import Dropdown from "react-bootstrap/Dropdown";
 import { MdChatBubbleOutline, MdHistory } from "react-icons/md";
 import {
@@ -23,11 +21,16 @@ import { nexusExternalUrl } from "../data";
 import { disconnectDappnodeNexus, loginWithDappnodeNexus } from "../auth";
 import "./nexus.scss";
 import {
+  ConfidentialityProofsField,
+  ProofsPausedBanner,
+  useNexusProofs,
+  useProofsPaused
+} from "./ConfidentialityProofs";
+import {
   ChatError,
   ChatHistorySummary,
   ChatMessage,
   NexusModel,
-  NexusProxyProbe,
   NexusStatus,
   clearChatHistory,
   clearNexusApiKey,
@@ -36,7 +39,6 @@ import {
   listChatHistory,
   listNexusModels,
   loadConversation,
-  probeNexusPrivateMode,
   saveConversation,
   setNexusApiKey,
   setNexusPrivateMode,
@@ -44,9 +46,6 @@ import {
   streamChat,
   submitChatConfirmation
 } from "../api";
-
-const NEXUS_PROOFS_DNP_NAME = "nexus-proofs.dnp.dappnode.eth";
-const NEXUS_MODELS_DOC_URL = "https://nexus.dappnode.com/docs/sdk/private-vs-anonymous-models";
 
 const SELECTED_MODEL_STORAGE_KEY = "nexus-chat-selected-model";
 
@@ -424,6 +423,7 @@ export function ChatPanel({ variant = "page", onOpenFullScreen, onOpenFloating }
   useEffect(() => {
     initialize();
   }, [initialize]);
+  const proofsPaused = useProofsPaused(status?.privateMode === true, streamError);
 
   if (!status && !statusError) {
     return (
@@ -481,15 +481,17 @@ export function ChatPanel({ variant = "page", onOpenFullScreen, onOpenFloating }
         <ApiKeyEditor
           status={status}
           onClose={() => setShowKeyEditor(false)}
-          onSave={async (key) => {
-            const next = await setNexusApiKey(key);
+          onSave={async ({ apiKey, privateMode }) => {
+            // The key is validated before the route changes, so a new key is
+            // never checked through a Nexus Proofs that is still coming up.
+            let next = apiKey ? await setNexusApiKey(apiKey) : status;
+            if (privateMode !== next.privateMode) next = await setNexusPrivateMode(privateMode);
             await applyStatus(next);
             setShowKeyEditor(false);
           }}
           onLoginWithNexus={async () => {
             const { status: nextStatus } = await loginWithDappnodeNexus();
             await applyStatus(nextStatus);
-            setShowKeyEditor(false);
           }}
           onClear={async () => {
             const next =
@@ -497,12 +499,10 @@ export function ChatPanel({ variant = "page", onOpenFullScreen, onOpenFloating }
             await applyStatus(next);
             setShowKeyEditor(false);
           }}
-          onTogglePrivateMode={async (enabled) => {
-            const next = await setNexusPrivateMode(enabled);
-            await applyStatus(next);
-          }}
         />
       )}
+
+      {proofsPaused && !showKeyEditor && <ProofsPausedBanner onFix={() => setShowKeyEditor(true)} />}
 
       <div className="nexus-chat-body">
         {messages.length === 0 ? (
@@ -1120,38 +1120,27 @@ function ApiKeyEditor({
   onSave,
   onLoginWithNexus,
   onClear,
-  onClose,
-  onTogglePrivateMode
+  onClose
 }: {
   status: NexusStatus;
-  onSave: (key: string) => Promise<void>;
+  onSave: (changes: { apiKey: string | null; privateMode: boolean }) => Promise<void>;
   onLoginWithNexus: () => Promise<void>;
   onClear: () => Promise<void>;
   onClose: () => void;
-  onTogglePrivateMode: (enabled: boolean) => Promise<void>;
 }) {
   const [value, setValue] = useState("");
   const [show, setShow] = useState(false);
-  const [busyAction, setBusyAction] = useState<"login" | "save" | "clear" | "privateMode" | null>(null);
+  const [busyAction, setBusyAction] = useState<"login" | "save" | "clear" | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [probe, setProbe] = useState<NexusProxyProbe | null>(null);
+  const [draftPrivateMode, setDraftPrivateMode] = useState(status.privateMode);
   const busy = busyAction !== null;
-
-  // Private mode fails closed, so the operator should be able to see whether
-  // the proxy is there and verified before switching over, and afterwards.
-  useEffect(() => {
-    let cancelled = false;
-    probeNexusPrivateMode()
-      .then((result) => {
-        if (!cancelled) setProbe(result);
-      })
-      .catch(() => {
-        if (!cancelled) setProbe({ reachable: false, verified: false, reason: "could not reach Nexus Proofs" });
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  const proofs = useNexusProofs(draftPrivateMode, draftPrivateMode && !status.privateMode);
+  const privateModeChanged = draftPrivateMode !== status.privateMode;
+  const keyEntered = value.trim().length > 0;
+  // Saving waits for Nexus Proofs: with proofs on, the chat only works once it
+  // has verified Nexus, so there is nothing useful to save before that.
+  const proofsBlockSave = draftPrivateMode && proofs.phase !== "ready";
+  const canSave = !busy && (keyEntered || privateModeChanged) && !proofsBlockSave;
 
   const login = async () => {
     if (busy) return;
@@ -1159,6 +1148,9 @@ function ApiKeyEditor({
     setError(null);
     try {
       await onLoginWithNexus();
+      // Stay open while there is still a proofs change to save.
+      if (privateModeChanged) setBusyAction(null);
+      else onClose();
     } catch (err) {
       setError((err as Error).message || "Failed to connect to Dappnode Nexus");
       setBusyAction(null);
@@ -1166,29 +1158,15 @@ function ApiKeyEditor({
   };
 
   const submit = async () => {
-    const key = value.trim();
-    if (!key || busy) return;
+    if (!canSave) return;
     setBusyAction("save");
     setError(null);
     try {
-      await onSave(key);
+      await onSave({ apiKey: value.trim() || null, privateMode: draftPrivateMode });
     } catch (err) {
       setError((err as Error).message || "Failed to save the API key");
       setBusyAction(null);
     }
-  };
-
-  const togglePrivateMode = async (enabled: boolean) => {
-    if (busy) return;
-    setBusyAction("privateMode");
-    setError(null);
-    try {
-      await onTogglePrivateMode(enabled);
-      setProbe(await probeNexusPrivateMode());
-    } catch (err) {
-      setError((err as Error).message || "Failed to change private mode");
-    }
-    setBusyAction(null);
   };
 
   const clear = async () => {
@@ -1263,46 +1241,13 @@ function ApiKeyEditor({
           </button>
         </div>
 
-        <div className="nexus-key-editor-private-mode">
-          <label className="nexus-private-mode-row">
-            <input
-              type="checkbox"
-              checked={status.privateMode}
-              disabled={busy}
-              onChange={(e) => togglePrivateMode(e.target.checked)}
-            />
-            <span>Nexus confidentiality proofs</span>
-          </label>
-          {probe && !probe.reachable && (
-            <p className="nexus-private-mode-status nexus-private-mode-status-bad">
-              Install{" "}
-              <Link to={`${getInstallerPath(NEXUS_PROOFS_DNP_NAME)}/${NEXUS_PROOFS_DNP_NAME}`} onClick={onClose}>
-                Nexus Proofs
-              </Link>{" "}
-              to get confidentiality proofs.
-            </p>
-          )}
-          {probe && probe.reachable && !probe.verified && (
-            <p className="nexus-private-mode-status nexus-private-mode-status-bad">
-              <strong>Nexus Proofs could not verify Nexus.</strong> {probe.reason}
-            </p>
-          )}
-          {probe && probe.verified && (
-            <p className="nexus-private-mode-status nexus-private-mode-status-ok">
-              <strong>Verified.</strong> Your prompts are running in confidential infrastructure.{" "}
-              <a href={status.verificationUrl} target="_blank" rel="noopener noreferrer">
-                See proofs
-              </a>
-            </p>
-          )}
-          <p className="nexus-key-editor-text nexus-private-mode-help">
-            Nexus runs in a TEE (Trusted Execution Environment) that proves your prompts stay confidential. Turn this on
-            to receive the proofs in Nexus Proofs. For end-to-end confidentiality, use Private models.{" "}
-            <a href={NEXUS_MODELS_DOC_URL} target="_blank" rel="noopener noreferrer">
-              Anonymous vs. Private models
-            </a>
-          </p>
-        </div>
+        <ConfidentialityProofsField
+          checked={draftPrivateMode}
+          disabled={busy}
+          proofs={proofs}
+          verificationUrl={status.verificationUrl}
+          onChange={setDraftPrivateMode}
+        />
 
         {error && <div className="nexus-key-editor-error">{error}</div>}
 
@@ -1324,7 +1269,7 @@ function ApiKeyEditor({
             <Button variant="outline-secondary" onClick={onClose} disabled={busy}>
               Cancel
             </Button>
-            <Button variant="dappnode" onClick={submit} disabled={busy || !value.trim()}>
+            <Button variant="dappnode" onClick={submit} disabled={!canSave}>
               {busyAction === "save" ? "Saving..." : status.configured ? "Save" : "Save & connect"}
             </Button>
           </div>

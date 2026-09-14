@@ -86,6 +86,10 @@ export function clearNexusApiKey(): Promise<NexusStatus> {
 /** What Nexus Proofs reports about its own verification of the Gateway. */
 export interface NexusProxyProbe {
   reachable: boolean;
+  /** Whether the Nexus Proofs package is installed on this Dappnode. */
+  installed?: boolean;
+  /** Whether its container is running. */
+  running?: boolean;
   verified: boolean;
   status?: string;
   gateway?: string | null;

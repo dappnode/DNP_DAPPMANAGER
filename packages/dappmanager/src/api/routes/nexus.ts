@@ -1,6 +1,7 @@
 import type { Request, Response as ExpressResponse } from "express";
 import * as db from "@dappnode/db";
-import { listPackages } from "@dappnode/dockerapi";
+import { listPackageNoThrow, listPackages } from "@dappnode/dockerapi";
+import { params } from "@dappnode/params";
 import { logs } from "@dappnode/logger";
 import { NexusApi, NexusApiError } from "@dappnode/nexus";
 import { wrapHandler } from "../utils.js";
@@ -111,7 +112,7 @@ export const nexusLogin = wrapHandler(async (req: Request, res: ExpressResponse)
 /** POST /nexus/private-mode - route Nexus through Nexus Proofs. */
 export const nexusSetPrivateMode = wrapHandler(async (req: Request, res: ExpressResponse) => {
   try {
-    res.status(200).json(nexus.setPrivateMode((req.body as { privateMode?: unknown } | undefined)?.privateMode));
+    res.status(200).json(await nexus.setPrivateMode((req.body as { privateMode?: unknown } | undefined)?.privateMode));
   } catch (err) {
     sendNexusError(res, err);
   }
@@ -120,7 +121,17 @@ export const nexusSetPrivateMode = wrapHandler(async (req: Request, res: Express
 /** GET /nexus/private-mode/probe - is Nexus Proofs installed and verified? */
 export const nexusProbePrivateMode = wrapHandler(async (_req: Request, res: ExpressResponse) => {
   try {
-    res.status(200).json(await nexus.probeLocalProxy());
+    // The proxy can only say whether it answered; Docker says whether the
+    // package is there to install or start.
+    const [probe, pkg] = await Promise.all([
+      nexus.probeLocalProxy(),
+      listPackageNoThrow({ dnpName: params.nexusProofsDnpName })
+    ]);
+    res.status(200).json({
+      ...probe,
+      installed: Boolean(pkg),
+      running: Boolean(pkg?.containers.some((container) => container.running))
+    });
   } catch (err) {
     sendNexusError(res, err);
   }
