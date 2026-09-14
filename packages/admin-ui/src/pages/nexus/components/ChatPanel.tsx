@@ -1263,7 +1263,7 @@ function ApiKeyEditor({
               disabled={busy}
               onChange={(e) => togglePrivateMode(e.target.checked)}
             />
-            <span>Private mode — route through the attested local proxy</span>
+            <span>Private mode — route through Nexus Proofs</span>
           </label>
           {probe && !probe.reachable && (
             <p className="nexus-private-mode-status nexus-private-mode-status-bad">
@@ -1286,7 +1286,7 @@ function ApiKeyEditor({
           <p className="nexus-key-editor-text nexus-private-mode-help">
             {status.privateMode ? (
               <>
-                Prompts go through <strong>nexus-local-proxy</strong> on this DAppNode, which verifies the Gateway is
+                Prompts go through <strong>Nexus Proofs</strong> on this DAppNode, which verifies the Gateway is
                 the expected code running inside an AWS Nitro Enclave and encrypts prompts and completions so Cloudflare
                 cannot read them. The proxy <strong>fails closed</strong>: if it cannot verify the Gateway, chat stops
                 working rather than silently falling back.{" "}

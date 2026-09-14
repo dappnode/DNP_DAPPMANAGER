@@ -16,7 +16,7 @@ import { collapseWhitespace, trimAsciiWhitespace, trimTrailingSlashes } from "./
 
 const DEFAULT_GATEWAY_URL = "https://nexus-api.dappnode.com/v1";
 
-// Private mode routes through nexus-local-proxy on this DAppNode, which
+// Private mode routes through Nexus Proofs on this DAppNode, which
 // verifies the gateway's AWS Nitro attestation against measurements it takes
 // from cosign-signed Gateway releases, and encrypts request and response
 // bodies with EHBP. The direct URL terminates TLS at Cloudflare, where prompts
@@ -25,12 +25,12 @@ const DEFAULT_GATEWAY_URL = "https://nexus-api.dappnode.com/v1";
 // The proxy is OpenAI-compatible on both endpoints this client uses --
 // /chat/completions over the attested channel and /models passed through --
 // so nothing else here has to change.
-const NEXUS_PROXY_GATEWAY_URL = "http://nexus-local-proxy.dappnode.private:3301/v1";
-const NEXUS_PROXY_VERIFICATION_URL = "http://nexus-local-proxy.dappnode.private:3301/verification";
+const NEXUS_PROOFS_GATEWAY_URL = "http://nexus-proofs.dappnode.private:3301/v1";
+const NEXUS_PROOFS_VERIFICATION_URL = "http://nexus-proofs.dappnode.private:3301/verification";
 // The machine-readable form of the page above, used to tell the operator
 // whether turning private mode on will actually work before they turn it on.
-const NEXUS_PROXY_VERIFICATION_API = "http://nexus-local-proxy.dappnode.private:3301/v1/verification";
-const NEXUS_PROXY_PROBE_TIMEOUT_MS = 5_000;
+const NEXUS_PROOFS_VERIFICATION_API = "http://nexus-proofs.dappnode.private:3301/v1/verification";
+const NEXUS_PROOFS_PROBE_TIMEOUT_MS = 5_000;
 const DEFAULT_MODEL = "nexus/auto";
 const MAX_HISTORY_ENTRIES = 50;
 const MAX_TITLE_LENGTH = 80;
@@ -145,7 +145,7 @@ export class NexusApi {
       keySource: configured ? (this.deps.apiKeyStore.getSource?.() ?? "manual") : "none",
       accountLabel: configured ? (this.deps.apiKeyStore.getAccountLabel?.() ?? null) : null,
       privateMode: this.isPrivateMode(),
-      verificationUrl: NEXUS_PROXY_VERIFICATION_URL
+      verificationUrl: NEXUS_PROOFS_VERIFICATION_URL
     };
   }
 
@@ -172,9 +172,9 @@ export class NexusApi {
   async probeLocalProxy(): Promise<NexusProxyProbe> {
     let upstream: Awaited<ReturnType<FetchLike>>;
     try {
-      upstream = await this.fetchImpl(NEXUS_PROXY_VERIFICATION_API, {
+      upstream = await this.fetchImpl(NEXUS_PROOFS_VERIFICATION_API, {
         headers: { accept: "application/json" },
-        signal: AbortSignal.timeout(NEXUS_PROXY_PROBE_TIMEOUT_MS)
+        signal: AbortSignal.timeout(NEXUS_PROOFS_PROBE_TIMEOUT_MS)
       });
     } catch {
       return { reachable: false, verified: false, reason: "nexus-local-proxy is not installed or not running" };
@@ -305,13 +305,13 @@ export class NexusApi {
       });
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to reach Nexus gateway";
-      this.deps.logger.warn(`nexus proxy: models fetch failed: ${message}`);
+      this.deps.logger.warn(`nexus proofs: models fetch failed: ${message}`);
       throw NexusApiError.json(502, "upstream_unreachable", message);
     }
 
     if (!upstream.ok) {
       const text = await upstream.text().catch(() => "");
-      this.deps.logger.warn(`nexus proxy: models upstream ${upstream.status}: ${text.slice(0, 200)}`);
+      this.deps.logger.warn(`nexus proofs: models upstream ${upstream.status}: ${text.slice(0, 200)}`);
       throw NexusApiError.raw(
         upstream.status || 502,
         text || JSON.stringify({ error: { code: "upstream_error", message: upstream.statusText } }),
@@ -383,7 +383,7 @@ export class NexusApi {
     } catch (err) {
       if (!signal.aborted && !writer.writableEnded) {
         const message = err instanceof Error ? err.message : "stream error";
-        this.deps.logger.warn(`nexus proxy: ${message}`);
+        this.deps.logger.warn(`nexus proofs: ${message}`);
         try {
           writer.write(`data: ${JSON.stringify({ error: { code: "stream_error", message } })}\n\n`);
           writer.write("data: [DONE]\n\n");
@@ -440,7 +440,7 @@ export class NexusApi {
 
       if (!upstream.ok || !upstream.body) {
         const text = await upstream.text().catch(() => "");
-        this.deps.logger.warn(`nexus proxy: upstream ${upstream.status}: ${text.slice(0, 200)}`);
+        this.deps.logger.warn(`nexus proofs: upstream ${upstream.status}: ${text.slice(0, 200)}`);
         writeStreamError(writer, `upstream_${upstream.status || 502}`, readUpstreamErrorMessage(text, upstream.status));
         break;
       }
@@ -541,10 +541,10 @@ export class NexusApi {
 
   private getGatewayUrl(): string {
     // An explicit NEXUS_GATEWAY_URL still wins, so a developer pointing at a
-    // staging gateway is not silently redirected to the local proxy.
+    // staging gateway is not silently redirected to Nexus Proofs.
     const override = this.deps.getGatewayUrl?.();
     if (override) return trimTrailingSlashes(override);
-    if (this.isPrivateMode()) return NEXUS_PROXY_GATEWAY_URL;
+    if (this.isPrivateMode()) return NEXUS_PROOFS_GATEWAY_URL;
     return DEFAULT_GATEWAY_URL;
   }
 

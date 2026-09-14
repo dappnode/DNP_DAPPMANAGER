@@ -37,12 +37,12 @@ describe("nexus / api", () => {
       keySource: "manual",
       accountLabel: null,
       privateMode: false,
-      verificationUrl: "http://nexus-local-proxy.dappnode.private:3301/verification"
+      verificationUrl: "http://nexus-proofs.dappnode.private:3301/verification"
     });
     expect(JSON.stringify(status)).to.not.include("secret-key");
   });
 
-  it("routes through the attested local proxy when private mode is on", async () => {
+  it("routes through Nexus Proofs when private mode is on", async () => {
     let requested = "";
     const { service } = makeService({
       apiKey: "secret",
@@ -56,7 +56,7 @@ describe("nexus / api", () => {
 
     await service.listModels();
 
-    expect(requested).to.equal("http://nexus-local-proxy.dappnode.private:3301/v1/models");
+    expect(requested).to.equal("http://nexus-proofs.dappnode.private:3301/v1/models");
     expect(service.readStatus().privateMode).to.equal(true);
   });
 
@@ -78,7 +78,7 @@ describe("nexus / api", () => {
   });
 
   // A developer pointing at a staging gateway must not be silently redirected
-  // to the local proxy.
+  // to Nexus Proofs.
   it("lets an explicit gateway URL win over private mode", async () => {
     let requested = "";
     const { service } = makeService({
@@ -104,7 +104,7 @@ describe("nexus / api", () => {
 
     expect(state.privateMode).to.equal(true);
     expect(status.privateMode).to.equal(true);
-    expect(status.gatewayUrl).to.equal("http://nexus-local-proxy.dappnode.private:3301/v1");
+    expect(status.gatewayUrl).to.equal("http://nexus-proofs.dappnode.private:3301/v1");
   });
 
   it("rejects a non-boolean private mode", () => {

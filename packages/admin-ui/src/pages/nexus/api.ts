@@ -19,7 +19,7 @@ export interface NexusStatus {
   /** Whether the active key was pasted manually, created through Nexus login, or is unset. */
   keySource: "manual" | "nexus" | "none";
   accountLabel: string | null;
-  /** True when traffic is routed through the attested local proxy. */
+  /** True when traffic is routed through Nexus Proofs. */
   privateMode: boolean;
   /** Where the operator can inspect the attestation evidence. */
   verificationUrl: string;

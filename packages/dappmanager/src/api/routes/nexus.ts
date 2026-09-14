@@ -108,7 +108,7 @@ export const nexusLogin = wrapHandler(async (req: Request, res: ExpressResponse)
   }
 });
 
-/** POST /nexus/private-mode - route Nexus through the attested local proxy. */
+/** POST /nexus/private-mode - route Nexus through Nexus Proofs. */
 export const nexusSetPrivateMode = wrapHandler(async (req: Request, res: ExpressResponse) => {
   try {
     res.status(200).json(nexus.setPrivateMode((req.body as { privateMode?: unknown } | undefined)?.privateMode));

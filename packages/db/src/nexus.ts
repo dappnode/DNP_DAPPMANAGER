@@ -40,7 +40,7 @@ export const nexusManagedApiKey = dbMain.staticKey<NexusManagedApiKey | null>(ne
 const nexusPrivateModeDbKey = "nexus-private-mode";
 
 /**
- * Whether Nexus traffic is routed through the attested nexus-local-proxy on
+ * Whether Nexus traffic is routed through the Nexus Proofs package on
  * this DAppNode instead of straight to the gateway. Off by default: the proxy
  * fails closed, so opting in is a deliberate choice.
  */
