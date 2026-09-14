@@ -479,7 +479,6 @@ export function ChatPanel({ variant = "page", onOpenFullScreen, onOpenFloating }
           onLoginWithNexus={async () => {
             const { status: nextStatus } = await loginWithDappnodeNexus();
             await applyStatus(nextStatus);
-            setShowKeyEditor(false);
           }}
           onLogout={async () => {
             const { status: nextStatus, disconnectedKey } = await logoutNexus();
@@ -1130,6 +1129,9 @@ function ApiKeyEditor({
     setError(null);
     try {
       await onLoginWithNexus();
+      // Stay open and show the connected account, so the operator sees the
+      // login worked and can finish setting up before closing.
+      setBusyAction(null);
     } catch (err) {
       setError((err as Error).message || "Failed to connect to Dappnode Nexus");
       setBusyAction(null);
