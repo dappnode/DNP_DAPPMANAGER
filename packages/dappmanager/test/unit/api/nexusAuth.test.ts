@@ -2,6 +2,7 @@ import { expect } from "chai";
 import { createLocalJWKSet, exportJWK, generateKeyPair, SignJWT, type JWTVerifyGetKey } from "jose";
 import {
   completeNexusAuth,
+  forgetNexusAccount,
   type NexusAuthKeyStore,
   type NexusManagedApiKey
 } from "../../../src/api/routes/nexusAuth.js";
@@ -123,6 +124,35 @@ describe("nexus auth", () => {
       url: "https://nexus-cp.dappnode.com/user/apikeys/managed-key",
       method: "DELETE"
     });
+  });
+
+  it("forgets a managed key locally without contacting Nexus", async () => {
+    const managedApiKey = { id: "key-id", accountSub: "lost-user", accountLabel: "lost@example.com" };
+    const state = makeKeyStore("sk-managed", managedApiKey);
+    const { fetchImpl, calls } = installFetchResponses([]);
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = fetchImpl;
+    let result: ReturnType<typeof forgetNexusAccount>;
+    try {
+      result = forgetNexusAccount(state.store);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+
+    expect(result).to.deep.equal({
+      status: { configured: false, keySource: "none", accountLabel: null },
+      accountLabel: null
+    });
+    expect(state.rawKey).to.equal("");
+    expect(state.managedApiKey).to.equal(null);
+    expect(calls).to.deep.equal([]);
+  });
+
+  it("refuses to forget a key that Nexus login did not create", () => {
+    const state = makeKeyStore("sk-manual");
+
+    expect(() => forgetNexusAccount(state.store)).to.throw("No Nexus-managed API key is configured.");
+    expect(state.rawKey).to.equal("sk-manual");
   });
 
   it("rejects an ID token with an invalid signature before creating a key", async () => {

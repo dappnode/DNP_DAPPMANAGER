@@ -25,6 +25,7 @@ import {
   nexusChatHistoryList,
   nexusChatHistoryUpsert,
   nexusClearApiKey,
+  nexusForgetAccount,
   nexusListModels,
   nexusLogin,
   nexusSetApiKey,
@@ -203,6 +204,7 @@ export function startHttpApi({
   // Nexus chat proxy (Nexus API key held server-side).
   app.get("/nexus/status", auth.onlyAdmin, nexusStatus);
   app.post("/nexus/auth/login", auth.onlyAdmin, nexusLogin);
+  app.post("/nexus/auth/forget", auth.onlyAdmin, nexusForgetAccount);
   app.post("/nexus/config", auth.onlyAdmin, nexusSetApiKey);
   app.delete("/nexus/config", auth.onlyAdmin, nexusClearApiKey);
   app.get("/nexus/models", auth.onlyAdmin, nexusListModels);

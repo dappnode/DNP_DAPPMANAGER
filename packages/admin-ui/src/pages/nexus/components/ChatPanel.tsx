@@ -28,6 +28,7 @@ import {
   NexusStatus,
   clearChatHistory,
   clearNexusApiKey,
+  forgetNexusAccount,
   deleteConversation,
   getNexusStatus,
   listChatHistory,
@@ -484,6 +485,10 @@ export function ChatPanel({ variant = "page", onOpenFullScreen, onOpenFloating }
             const next =
               status.keySource === "nexus" ? (await disconnectDappnodeNexus()).status : await clearNexusApiKey();
             await applyStatus(next);
+            setShowKeyEditor(false);
+          }}
+          onForget={async () => {
+            await applyStatus(await forgetNexusAccount());
             setShowKeyEditor(false);
           }}
         />
@@ -1105,17 +1110,19 @@ function ApiKeyEditor({
   onSave,
   onLoginWithNexus,
   onClear,
+  onForget,
   onClose
 }: {
   status: NexusStatus;
   onSave: (key: string) => Promise<void>;
   onLoginWithNexus: () => Promise<void>;
   onClear: () => Promise<void>;
+  onForget: () => Promise<void>;
   onClose: () => void;
 }) {
   const [value, setValue] = useState("");
   const [show, setShow] = useState(false);
-  const [busyAction, setBusyAction] = useState<"login" | "save" | "clear" | null>(null);
+  const [busyAction, setBusyAction] = useState<"login" | "save" | "clear" | "forget" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const busy = busyAction !== null;
 
@@ -1154,6 +1161,30 @@ function ApiKeyEditor({
       setError((err as Error).message || "Failed to clear the API key");
       setBusyAction(null);
     }
+  };
+
+  // Disconnecting needs the account that owns the key. When that account is
+  // gone, this is the only way to free the chat for another key.
+  const forget = () => {
+    if (busy) return;
+    confirm({
+      title: "Forget this Nexus account?",
+      text: `This removes the key${status.accountLabel ? ` for ${status.accountLabel}` : ""} from this Dappnode so you can log in with another account or paste a key. The key stays active in that Nexus account until it is revoked there.`,
+      label: "Forget account",
+      variant: "danger",
+      onClick: () => {
+        void (async () => {
+          setBusyAction("forget");
+          setError(null);
+          try {
+            await onForget();
+          } catch (err) {
+            setError((err as Error).message || "Failed to forget the Nexus account");
+            setBusyAction(null);
+          }
+        })();
+      }
+    });
   };
 
   return (
@@ -1230,6 +1261,11 @@ function ApiKeyEditor({
                     ? "Disconnect Nexus"
                     : "Remove key"}
               </Button>
+            )}
+            {status.keySource === "nexus" && (
+              <button type="button" className="nexus-key-editor-forget" onClick={forget} disabled={busy}>
+                {busyAction === "forget" ? "Forgetting..." : "Can't log in to this account?"}
+              </button>
             )}
           </div>
           <div className="d-flex gap-2">

@@ -154,6 +154,25 @@ export async function completeNexusAuth<T>(
   }
 }
 
+/**
+ * Forget a Nexus-managed API key on this Dappnode without logging in.
+ *
+ * Disconnecting revokes the key in Nexus, which needs the owning account. When
+ * that account is no longer reachable the key would otherwise lock the chat, so
+ * this only removes the key and its owner here. The key stays active in Nexus
+ * until it is revoked from that account.
+ */
+export function forgetNexusAccount<T>(
+  keyStore: Pick<NexusAuthKeyStore<T>, "getManagedApiKey" | "setManagedApiKey" | "clearApiKey" | "readStatus">
+): { status: T; accountLabel: null } {
+  if (!keyStore.getManagedApiKey()) {
+    throw new NexusAuthError("No Nexus-managed API key is configured.", 409, "nexus_key_not_managed");
+  }
+  keyStore.clearApiKey();
+  keyStore.setManagedApiKey(null);
+  return { status: keyStore.readStatus(), accountLabel: null };
+}
+
 export async function verifyIdToken(
   idToken: string,
   nonce: string,

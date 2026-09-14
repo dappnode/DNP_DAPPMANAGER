@@ -23,6 +23,7 @@ export interface NexusStatus {
 
 const STATUS_URL = "/nexus/status";
 const CONFIG_URL = "/nexus/config";
+const FORGET_URL = "/nexus/auth/forget";
 const MODELS_URL = "/nexus/models";
 const CHAT_URL = "/nexus/chat/completions";
 const CONFIRM_URL = "/nexus/chat/confirm";
@@ -73,6 +74,11 @@ export function setNexusApiKey(apiKey: string): Promise<NexusStatus> {
 /** Clears the in-app Nexus API key. */
 export function clearNexusApiKey(): Promise<NexusStatus> {
   return fetchJson<NexusStatus>(CONFIG_URL, { method: "DELETE" });
+}
+
+/** Removes a Nexus-managed key from this Dappnode without logging in to its account. */
+export function forgetNexusAccount(): Promise<NexusStatus> {
+  return fetchJson<{ status: NexusStatus }>(FORGET_URL, { method: "POST" }).then((res) => res.status);
 }
 
 export async function listNexusModels(): Promise<NexusModel[]> {

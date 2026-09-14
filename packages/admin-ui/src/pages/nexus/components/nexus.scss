@@ -903,6 +903,28 @@
   align-items: center;
   margin-top: 1.25rem;
   gap: 0.75rem;
+
+  > div:first-child {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+  }
+}
+
+.nexus-key-editor-forget {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-text-secondary, inherit);
+  font-size: 0.8rem;
+  text-decoration: underline;
+  cursor: pointer;
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.6;
+  }
 }
 
 @media (max-width: 55rem) {

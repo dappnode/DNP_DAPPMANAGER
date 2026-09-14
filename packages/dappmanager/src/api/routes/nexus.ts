@@ -8,7 +8,7 @@ import { dappnodeToolList } from "../../mcp/tools.js";
 import { dispatchTool, getOpenAITools } from "../../mcp/dispatch.js";
 import { createPendingConfirmation, resolveConfirmation } from "../../mcp/confirmation.js";
 import { startDocsWarmup } from "../../mcp/docs.js";
-import { completeNexusAuth, NexusAuthError } from "./nexusAuth.js";
+import { completeNexusAuth, forgetNexusAccount, NexusAuthError } from "./nexusAuth.js";
 
 /**
  * Thin Express adapter for the route-neutral Nexus backend module.
@@ -101,6 +101,29 @@ export const nexusLogin = wrapHandler(async (req: Request, res: ExpressResponse)
     const message = err instanceof Error ? err.message : "Nexus login failed";
     logs.warn(`nexus auth: ${message}`);
     res.status(502).json({ error: { code: "nexus_login_failed", message } });
+  }
+});
+
+/**
+ * POST /nexus/auth/forget - remove a Nexus-managed key from this Dappnode
+ * without logging in, for when its account is no longer reachable.
+ */
+export const nexusForgetAccount = wrapHandler(async (_req: Request, res: ExpressResponse) => {
+  try {
+    res.status(200).json(
+      forgetNexusAccount({
+        getManagedApiKey: () => db.nexusManagedApiKey.get(),
+        setManagedApiKey: (value) => db.nexusManagedApiKey.set(value),
+        clearApiKey: () => nexus.clearApiKey(),
+        readStatus: () => nexus.readStatus()
+      })
+    );
+  } catch (err) {
+    if (err instanceof NexusAuthError) {
+      res.status(err.statusCode).json({ error: { code: err.code, message: err.message } });
+      return;
+    }
+    sendNexusError(res, err);
   }
 });
 
