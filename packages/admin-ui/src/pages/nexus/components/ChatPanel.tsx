@@ -473,6 +473,7 @@ export function ChatPanel({ variant = "page", onOpenFullScreen, onOpenFloating }
         onDeleteConversation={removeHistoryConversation}
         onClearHistory={confirmClearHistory}
         onManageKey={() => setShowKeyEditor(true)}
+        paused={proofsPaused}
         onOpenFullScreen={onOpenFullScreen}
         onOpenFloating={onOpenFloating}
       />
@@ -531,7 +532,8 @@ export function ChatPanel({ variant = "page", onOpenFullScreen, onOpenFloating }
           onCancel={cancel}
           isRunning={isRunning}
           error={streamError}
-          disabled={!selectedModel}
+          disabled={!selectedModel || proofsPaused}
+          placeholder={proofsPaused ? "Chat is paused until Nexus Proofs is ready" : undefined}
         />
       )}
     </div>
@@ -585,6 +587,7 @@ function ChatHeader({
   onDeleteConversation,
   onClearHistory,
   onManageKey,
+  paused = false,
   onOpenFullScreen,
   onOpenFloating
 }: {
@@ -600,6 +603,8 @@ function ChatHeader({
   onDeleteConversation: (id: string) => void;
   onClearHistory: () => void;
   onManageKey: () => void;
+  /** Proofs are on but Nexus Proofs is not ready. */
+  paused?: boolean;
   onOpenFullScreen?: () => void;
   onOpenFloating?: () => void;
 }) {
@@ -607,10 +612,12 @@ function ChatHeader({
     return [...models].sort(sortModelCompare).map((m) => m.id);
   }, [models]);
 
-  const statusLabel = status.configured ? (
-    <span className="nexus-status-dot online" />
-  ) : (
+  const statusLabel = !status.configured ? (
     <span className="nexus-status-dot offline" />
+  ) : paused ? (
+    <span className="nexus-status-dot paused" title="Paused until Nexus Proofs is ready" />
+  ) : (
+    <span className="nexus-status-dot online" />
   );
 
   return (
@@ -1021,7 +1028,8 @@ function Composer({
   onCancel,
   isRunning,
   error,
-  disabled
+  disabled,
+  placeholder = "Send a message…"
 }: {
   draft: string;
   onDraftChange: (v: string) => void;
@@ -1030,6 +1038,7 @@ function Composer({
   isRunning: boolean;
   error: string | null;
   disabled?: boolean;
+  placeholder?: string;
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -1064,7 +1073,7 @@ function Composer({
           }}
           onKeyDown={onKeyDown}
           rows={1}
-          placeholder="Send a message…"
+          placeholder={placeholder}
           className="form-control nexus-composer-input"
           disabled={disabled}
         />

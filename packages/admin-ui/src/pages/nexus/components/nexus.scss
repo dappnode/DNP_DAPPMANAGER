@@ -165,6 +165,11 @@
     box-shadow: 0 0 0 3px rgba(52, 168, 83, 0.2);
   }
 
+  &.paused {
+    background: #f5a524;
+    box-shadow: 0 0 0 3px rgba(245, 165, 36, 0.2);
+  }
+
   &.offline {
     background: var(--dappnode-gray-main-color);
   }
