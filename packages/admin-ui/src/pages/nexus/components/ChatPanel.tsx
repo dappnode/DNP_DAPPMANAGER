@@ -1144,7 +1144,7 @@ function ApiKeyEditor({
     try {
       await onSave(key);
     } catch (err) {
-      setError((err as Error).message || "Failed to save the API key");
+      setError((err as Error).message || "Failed to save the Nexus API key");
       setBusyAction(null);
     }
   };
@@ -1189,7 +1189,11 @@ function ApiKeyEditor({
       <div className="nexus-key-editor-overlay" onClick={busy ? undefined : onClose}>
         <div className="nexus-key-editor-card" onClick={(e) => e.stopPropagation()}>
           <div className="nexus-key-editor-header">
-            <h5>{logoutStep.kind === "managed" && logoutStep.phase === "revoked" ? "Key disabled" : "Logged out"}</h5>
+            <h5>
+              {logoutStep.kind === "managed" && logoutStep.phase === "revoked"
+                ? "Nexus API key disabled"
+                : "Logged out of Nexus"}
+            </h5>
             <button type="button" className="nexus-key-editor-close" onClick={onClose} disabled={busy}>
               ×
             </button>
@@ -1198,9 +1202,10 @@ function ApiKeyEditor({
           {logoutStep.kind === "manual" && (
             <>
               <p className="nexus-key-editor-text">
-                The API key was removed from this Dappnode. It still works in Nexus, and you can disable it from{" "}
+                The Nexus API key was removed from this Dappnode, but it can still be used wherever else you saved it.
+                If you no longer need it, disable it in{" "}
                 <a href={`${nexusExternalUrl}/api-keys`} target="_blank" rel="noopener noreferrer">
-                  your API keys
+                  your Nexus API keys
                 </a>
                 .
               </p>
@@ -1215,7 +1220,8 @@ function ApiKeyEditor({
           {logoutStep.kind === "managed" && logoutStep.phase === "revoked" && (
             <>
               <p className="nexus-key-editor-text">
-                The API key this Dappnode used can no longer be used{owner ? ` in ${owner}` : ""}.
+                The Nexus API key this Dappnode used{owner ? ` in ${owner}` : ""} can no longer be used by anyone. Log
+                in again whenever you want to reconnect.
               </p>
               <div className="nexus-key-editor-actions nexus-key-editor-actions-end">
                 <Button variant="dappnode" onClick={onClose}>
@@ -1228,26 +1234,26 @@ function ApiKeyEditor({
           {logoutStep.kind === "managed" && logoutStep.phase !== "revoked" && (
             <>
               <p className="nexus-key-editor-text">
-                The API key this Dappnode used still works in your Nexus account
+                This Dappnode no longer uses your Nexus account, but the Nexus API key it created is still active
                 {owner ? (
                   <>
                     {" "}
-                    <strong>{owner}</strong>
+                    in <strong>{owner}</strong>
                   </>
                 ) : null}
-                . Disable it too? You will be asked to log in to that account.
+                . Disable it so it can't be used again? You'll log in to that account to confirm.
               </p>
               {logoutStep.error && <div className="nexus-key-editor-error">{logoutStep.error}</div>}
               <div className="nexus-key-editor-actions nexus-key-editor-actions-end">
                 <Button variant="outline-secondary" onClick={onClose} disabled={busy}>
-                  Keep key
+                  Keep API key
                 </Button>
                 <Button variant="danger" onClick={disableKey} disabled={busy}>
                   {logoutStep.phase === "revoking"
                     ? "Waiting for Nexus login..."
                     : logoutStep.error
                       ? "Try again"
-                      : "Disable key"}
+                      : "Disable API key"}
                 </Button>
               </div>
             </>
@@ -1282,9 +1288,9 @@ function ApiKeyEditor({
 
         {status.keySource === "manual" && (
           <div className="nexus-key-editor-connected">
-            <span>Using an API key you pasted</span>
+            <span>Connected with a Nexus API key you pasted</span>
             <Button variant="outline-danger" onClick={logout} disabled={busy}>
-              {busyAction === "logout" ? "Removing..." : "Remove key"}
+              {busyAction === "logout" ? "Removing..." : "Remove API key"}
             </Button>
           </div>
         )}
@@ -1293,11 +1299,12 @@ function ApiKeyEditor({
           <>
             {status.keySource === "none" && (
               <p className="nexus-key-editor-text">
-                Log in to create a key automatically, or{" "}
+                The chat connects to Nexus with a Nexus API key. Log in to create one for this Dappnode automatically,
+                or{" "}
                 <a href={`${nexusExternalUrl}/api-keys`} target="_blank" rel="noopener noreferrer">
-                  create one in Nexus
+                  create a Nexus API key
                 </a>{" "}
-                and paste it below. The key is stored on this Dappnode.
+                yourself and paste it below. The key is stored only on this Dappnode.
               </p>
             )}
 
@@ -1305,10 +1312,13 @@ function ApiKeyEditor({
               <Button variant="dappnode" onClick={login} disabled={busy} fullwidth Icon={FiLogIn}>
                 {busyAction === "login" ? "Waiting for Nexus login..." : "Log in with Dappnode Nexus"}
               </Button>
+              <small>Creates a Nexus API key named Dappmanager Chat in your account.</small>
             </div>
 
             <div className="nexus-key-editor-divider">
-              <span>{status.keySource === "manual" ? "or replace the key" : "or paste an API key"}</span>
+              <span>
+                {status.keySource === "manual" ? "or paste a different Nexus API key" : "or paste a Nexus API key"}
+              </span>
             </div>
 
             <div className="nexus-key-editor-input-group">
