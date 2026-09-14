@@ -2,7 +2,8 @@ import { expect } from "chai";
 import { createLocalJWKSet, exportJWK, generateKeyPair, SignJWT, type JWTVerifyGetKey } from "jose";
 import {
   completeNexusAuth,
-  forgetNexusAccount,
+  completeNexusKeyRevocation,
+  logoutNexusAccount,
   type NexusAuthKeyStore,
   type NexusManagedApiKey
 } from "../../../src/api/routes/nexusAuth.js";
@@ -107,52 +108,67 @@ describe("nexus auth", () => {
     });
   });
 
-  it("reauthenticates before revoking a managed key on disconnect", async () => {
-    const managed = { id: "managed-key", accountSub: "user-id", accountLabel: "user@example.com" };
+  it("logs out locally without contacting Nexus and hands back the managed key", async () => {
+    const managed = { id: "managed-key", accountSub: "lost-user", accountLabel: "lost@example.com" };
     const state = makeKeyStore("sk-managed", managed);
-    const { fetchImpl, calls } = installFetchResponses([
-      jsonResponse({ access_token: "access-token", id_token: await makeIdToken() }),
-      new Response(null, { status: 204 })
-    ]);
-
-    const result = await completeNexusAuth({ ...input, action: "disconnect" }, state.store, { fetch: fetchImpl, jwks });
-
-    expect(result.status).to.deep.equal({ configured: false, keySource: "none", accountLabel: null });
-    expect(state.rawKey).to.equal("");
-    expect(state.managedApiKey).to.equal(null);
-    expect(calls.at(-1)).to.deep.include({
-      url: "https://nexus-cp.dappnode.com/user/apikeys/managed-key",
-      method: "DELETE"
-    });
-  });
-
-  it("forgets a managed key locally without contacting Nexus", async () => {
-    const managedApiKey = { id: "key-id", accountSub: "lost-user", accountLabel: "lost@example.com" };
-    const state = makeKeyStore("sk-managed", managedApiKey);
     const { fetchImpl, calls } = installFetchResponses([]);
     const originalFetch = globalThis.fetch;
     globalThis.fetch = fetchImpl;
-    let result: ReturnType<typeof forgetNexusAccount>;
+    let result: ReturnType<typeof logoutNexusAccount>;
     try {
-      result = forgetNexusAccount(state.store);
+      result = logoutNexusAccount(state.store);
     } finally {
       globalThis.fetch = originalFetch;
     }
 
     expect(result).to.deep.equal({
       status: { configured: false, keySource: "none", accountLabel: null },
-      accountLabel: null
+      disconnectedKey: managed
     });
     expect(state.rawKey).to.equal("");
     expect(state.managedApiKey).to.equal(null);
     expect(calls).to.deep.equal([]);
   });
 
-  it("refuses to forget a key that Nexus login did not create", () => {
+  it("logs out of a pasted key with nothing to disable", () => {
     const state = makeKeyStore("sk-manual");
 
-    expect(() => forgetNexusAccount(state.store)).to.throw("No Nexus-managed API key is configured.");
-    expect(state.rawKey).to.equal("sk-manual");
+    const result = logoutNexusAccount(state.store);
+
+    expect(result.disconnectedKey).to.equal(null);
+    expect(state.rawKey).to.equal("");
+  });
+
+  it("disables a logged-out key after logging in as its owner", async () => {
+    const key = { id: "old-key", accountSub: "user-id", accountLabel: "user@example.com" };
+    const { fetchImpl, calls } = installFetchResponses([
+      jsonResponse({ access_token: "access-token", id_token: await makeIdToken(), refresh_token: "refresh-token" }),
+      new Response(null, { status: 204 }),
+      new Response(null, { status: 200 })
+    ]);
+
+    const result = await completeNexusKeyRevocation({ ...input, action: "revoke", key }, { fetch: fetchImpl, jwks });
+
+    expect(result).to.deep.equal({ revoked: true });
+    expect(calls[1]).to.deep.include({ url: "https://nexus-cp.dappnode.com/user/apikeys/old-key", method: "DELETE" });
+    expect(calls.at(-1)?.url).to.equal("https://nexus-auth.dappnode.com/oauth2/revoke");
+  });
+
+  it("refuses to disable a key when another account logs in", async () => {
+    const key = { id: "old-key", accountSub: "someone-else", accountLabel: "owner@example.com" };
+    const { fetchImpl, calls } = installFetchResponses([
+      jsonResponse({ access_token: "access-token", id_token: await makeIdToken() })
+    ]);
+
+    let error: unknown;
+    try {
+      await completeNexusKeyRevocation({ ...input, action: "revoke", key }, { fetch: fetchImpl, jwks });
+    } catch (err) {
+      error = err;
+    }
+
+    expect((error as Error).message).to.include("owner@example.com");
+    expect(calls.map(({ method }) => method)).to.deep.equal(["POST"]);
   });
 
   it("rejects an ID token with an invalid signature before creating a key", async () => {

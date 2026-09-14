@@ -13,7 +13,7 @@ const authgearJwks = createRemoteJWKSet(new URL(AUTHGEAR_JWKS_URL), {
   timeoutDuration: REQUEST_TIMEOUT_MS
 });
 
-type NexusAuthAction = "login" | "disconnect";
+type NexusAuthAction = "login" | "revoke";
 
 interface NexusAuthInput {
   action?: unknown;
@@ -22,6 +22,8 @@ interface NexusAuthInput {
   codeVerifier?: unknown;
   nonce?: unknown;
   redirectUri?: unknown;
+  /** For "revoke": the key to disable, as returned by logout. */
+  key?: unknown;
 }
 
 interface ParsedNexusAuthInput {
@@ -31,6 +33,7 @@ interface ParsedNexusAuthInput {
   codeVerifier: string;
   nonce: string;
   redirectUri: string;
+  key: NexusManagedApiKey | null;
 }
 
 interface AuthgearTokenResponse {
@@ -86,11 +89,8 @@ export async function completeNexusAuth<T>(
   dependencies: NexusAuthDependencies = {}
 ): Promise<{ status: T; accountLabel: string | null }> {
   const request = parseAuthInput(input);
+  if (request.action !== "login") throw invalidRequest("Nexus login returned an invalid action.");
   const managedApiKey = keyStore.getManagedApiKey();
-
-  if (request.action === "disconnect" && !managedApiKey) {
-    throw new NexusAuthError("No Nexus-managed API key is configured.", 409, "nexus_key_not_managed");
-  }
 
   const fetchImpl = dependencies.fetch ?? globalThis.fetch;
   const token = await exchangeAuthorizationCode(request, fetchImpl);
@@ -100,19 +100,13 @@ export async function completeNexusAuth<T>(
 
     if (managedApiKey && managedApiKey.accountSub !== accountSub) {
       throw new NexusAuthError(
-        "This key belongs to another Nexus account. Log in with that account to disconnect it first.",
+        "Log out of Nexus before logging in with another account.",
         409,
         "nexus_account_mismatch"
       );
     }
 
     const accessToken = String(token.access_token);
-    if (request.action === "disconnect") {
-      await deleteApiKey(accessToken, managedApiKey!.id, fetchImpl);
-      keyStore.clearApiKey();
-      keyStore.setManagedApiKey(null);
-      return { status: keyStore.readStatus(), accountLabel: null };
-    }
 
     const userInfo = await fetchUserInfo(accessToken, fetchImpl);
     if (typeof userInfo.sub === "string" && userInfo.sub !== accountSub) {
@@ -155,22 +149,54 @@ export async function completeNexusAuth<T>(
 }
 
 /**
- * Forget a Nexus-managed API key on this Dappnode without logging in.
+ * Log out of Nexus on this Dappnode. Always works and never contacts Nexus, so
+ * losing access to the account can't lock the chat.
  *
- * Disconnecting revokes the key in Nexus, which needs the owning account. When
- * that account is no longer reachable the key would otherwise lock the chat, so
- * this only removes the key and its owner here. The key stays active in Nexus
- * until it is revoked from that account.
+ * A key created by Nexus login stays active in that account, so it is returned
+ * for the caller to offer disabling it with {@link completeNexusKeyRevocation}.
  */
-export function forgetNexusAccount<T>(
+export function logoutNexusAccount<T>(
   keyStore: Pick<NexusAuthKeyStore<T>, "getManagedApiKey" | "setManagedApiKey" | "clearApiKey" | "readStatus">
-): { status: T; accountLabel: null } {
-  if (!keyStore.getManagedApiKey()) {
-    throw new NexusAuthError("No Nexus-managed API key is configured.", 409, "nexus_key_not_managed");
-  }
+): { status: T; disconnectedKey: NexusManagedApiKey | null } {
+  const disconnectedKey = keyStore.getManagedApiKey();
   keyStore.clearApiKey();
   keyStore.setManagedApiKey(null);
-  return { status: keyStore.readStatus(), accountLabel: null };
+  return { status: keyStore.readStatus(), disconnectedKey };
+}
+
+/**
+ * Disable a key in Nexus after logging out. Requires logging in again as the
+ * account that owns it; local state is not touched.
+ */
+export async function completeNexusKeyRevocation(
+  input: NexusAuthInput | undefined,
+  dependencies: NexusAuthDependencies = {}
+): Promise<{ revoked: true }> {
+  const request = parseAuthInput(input);
+  if (request.action !== "revoke" || !request.key) {
+    throw invalidRequest("Nexus key revocation is missing the key to disable.");
+  }
+  const key = request.key;
+
+  const fetchImpl = dependencies.fetch ?? globalThis.fetch;
+  const token = await exchangeAuthorizationCode(request, fetchImpl);
+  try {
+    const claims = await verifyIdToken(String(token.id_token), request.nonce, dependencies.jwks ?? authgearJwks);
+    if (String(claims.sub) !== key.accountSub) {
+      const owner = key.accountLabel ? ` (${key.accountLabel})` : "";
+      throw new NexusAuthError(
+        `This key belongs to another Nexus account${owner}. Log in with that account to disable it.`,
+        409,
+        "nexus_account_mismatch"
+      );
+    }
+    await deleteApiKey(String(token.access_token), key.id, fetchImpl);
+    return { revoked: true };
+  } finally {
+    if (typeof token.refresh_token === "string" && token.refresh_token) {
+      await revokeRefreshToken(token.refresh_token, fetchImpl).catch(() => undefined);
+    }
+  }
 }
 
 export async function verifyIdToken(
@@ -195,7 +221,7 @@ export async function verifyIdToken(
 
 function parseAuthInput(input: NexusAuthInput | undefined): ParsedNexusAuthInput {
   const action = input?.action;
-  if (action !== "login" && action !== "disconnect") {
+  if (action !== "login" && action !== "revoke") {
     throw new NexusAuthError("Nexus login returned an invalid action.", 400, "nexus_invalid_request");
   }
 
@@ -210,7 +236,20 @@ function parseAuthInput(input: NexusAuthInput | undefined): ParsedNexusAuthInput
   if (codeVerifier.length < 43 || codeVerifier.length > 128) {
     throw invalidRequest("Nexus login returned an invalid verifier.");
   }
-  return { action, clientId, code, codeVerifier, nonce, redirectUri };
+  return { action, clientId, code, codeVerifier, nonce, redirectUri, key: parseKey(input?.key) };
+}
+
+function parseKey(value: unknown): NexusManagedApiKey | null {
+  if (value === undefined || value === null) return null;
+  const record = value as { id?: unknown; accountSub?: unknown; accountLabel?: unknown };
+  if (typeof value !== "object" || typeof record.id !== "string" || typeof record.accountSub !== "string") {
+    throw invalidRequest("Nexus key revocation has an invalid key.");
+  }
+  return {
+    id: record.id,
+    accountSub: record.accountSub,
+    accountLabel: typeof record.accountLabel === "string" ? record.accountLabel : null
+  };
 }
 
 async function exchangeAuthorizationCode(

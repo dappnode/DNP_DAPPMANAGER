@@ -8,7 +8,13 @@ import { dappnodeToolList } from "../../mcp/tools.js";
 import { dispatchTool, getOpenAITools } from "../../mcp/dispatch.js";
 import { createPendingConfirmation, resolveConfirmation } from "../../mcp/confirmation.js";
 import { startDocsWarmup } from "../../mcp/docs.js";
-import { completeNexusAuth, forgetNexusAccount, NexusAuthError } from "./nexusAuth.js";
+import {
+  completeNexusAuth,
+  completeNexusKeyRevocation,
+  logoutNexusAccount,
+  NexusAuthError,
+  type NexusManagedApiKey
+} from "./nexusAuth.js";
 
 /**
  * Thin Express adapter for the route-neutral Nexus backend module.
@@ -45,6 +51,13 @@ const nexus = new NexusApi({
   startDocsWarmup
 });
 
+const nexusKeyStore = {
+  getManagedApiKey: () => db.nexusManagedApiKey.get(),
+  setManagedApiKey: (value: NexusManagedApiKey | null) => db.nexusManagedApiKey.set(value),
+  clearApiKey: () => nexus.clearApiKey(),
+  readStatus: () => nexus.readStatus()
+};
+
 /** GET /nexus/status - surfaces config for the UI. */
 export const nexusStatus = wrapHandler(async (_req: Request, res: ExpressResponse) => {
   res.status(200).json(nexus.readStatus());
@@ -57,7 +70,7 @@ export const nexusSetApiKey = wrapHandler(async (req: Request, res: ExpressRespo
       res.status(409).json({
         error: {
           code: "nexus_key_managed",
-          message: "Disconnect the Nexus account before replacing its managed API key."
+          message: "Log out of Nexus before using a different API key."
         }
       });
       return;
@@ -71,9 +84,13 @@ export const nexusSetApiKey = wrapHandler(async (req: Request, res: ExpressRespo
   }
 });
 
-/** POST /nexus/auth/login - complete a Nexus login or authenticated disconnect. */
+/** POST /nexus/auth/login - complete a Nexus login, or disable a key after logging out. */
 export const nexusLogin = wrapHandler(async (req: Request, res: ExpressResponse) => {
   try {
+    if ((req.body as { action?: unknown } | undefined)?.action === "revoke") {
+      res.status(200).json(await completeNexusKeyRevocation(req.body));
+      return;
+    }
     const result = await completeNexusAuth(req.body, {
       getApiKey: () => db.nexusApiKey.get(),
       saveApiKey: async (rawKey) => {
@@ -105,43 +122,17 @@ export const nexusLogin = wrapHandler(async (req: Request, res: ExpressResponse)
 });
 
 /**
- * POST /nexus/auth/forget - remove a Nexus-managed key from this Dappnode
- * without logging in, for when its account is no longer reachable.
+ * POST /nexus/auth/logout - remove the Nexus key from this Dappnode. Never
+ * contacts Nexus; returns the key when Nexus login created it, so the operator
+ * can choose to disable it.
  */
-export const nexusForgetAccount = wrapHandler(async (_req: Request, res: ExpressResponse) => {
-  try {
-    res.status(200).json(
-      forgetNexusAccount({
-        getManagedApiKey: () => db.nexusManagedApiKey.get(),
-        setManagedApiKey: (value) => db.nexusManagedApiKey.set(value),
-        clearApiKey: () => nexus.clearApiKey(),
-        readStatus: () => nexus.readStatus()
-      })
-    );
-  } catch (err) {
-    if (err instanceof NexusAuthError) {
-      res.status(err.statusCode).json({ error: { code: err.code, message: err.message } });
-      return;
-    }
-    sendNexusError(res, err);
-  }
+export const nexusLogout = wrapHandler(async (_req: Request, res: ExpressResponse) => {
+  res.status(200).json(logoutNexusAccount(nexusKeyStore));
 });
 
 /** DELETE /nexus/config - clear the stored Nexus API key. */
 export const nexusClearApiKey = wrapHandler(async (_req: Request, res: ExpressResponse) => {
-  if (db.nexusManagedApiKey.get() && db.nexusApiKey.get()) {
-    res.status(409).json({
-      error: {
-        code: "nexus_key_managed",
-        message: "Use Disconnect Nexus to revoke this managed API key."
-      }
-    });
-    return;
-  }
-
-  nexus.clearApiKey();
-  db.nexusManagedApiKey.set(null);
-  res.status(200).json(nexus.readStatus());
+  res.status(200).json(logoutNexusAccount(nexusKeyStore).status);
 });
 
 /** GET /nexus/models - list chat-capable Nexus gateway models. */

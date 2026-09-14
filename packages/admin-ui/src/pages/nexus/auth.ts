@@ -1,4 +1,4 @@
-import type { NexusStatus } from "./api";
+import type { NexusManagedApiKey, NexusStatus } from "./api";
 
 export const NEXUS_AUTH_CALLBACK_PATH = "/nexus/auth/callback";
 export const NEXUS_AUTH_CALLBACK_MESSAGE_TYPE = "dappnode:nexus-auth-callback";
@@ -19,6 +19,7 @@ const NEXUS_AUTH_CLIENT_ID =
 
 interface AuthRequest {
   action: NexusAuthAction;
+  key?: NexusManagedApiKey;
   authorizationUrl: string;
   codeVerifier: string;
   nonce: string;
@@ -26,7 +27,7 @@ interface AuthRequest {
   state: string;
 }
 
-type NexusAuthAction = "login" | "disconnect";
+type NexusAuthAction = "login" | "revoke";
 
 export interface NexusAuthCallbackMessage {
   type: typeof NEXUS_AUTH_CALLBACK_MESSAGE_TYPE;
@@ -42,19 +43,29 @@ export interface DappnodeNexusLoginResult {
 }
 
 export async function loginWithDappnodeNexus(): Promise<DappnodeNexusLoginResult> {
-  return runDappnodeNexusAuth("login");
+  const json = await runDappnodeNexusAuth("login");
+  if (!isRecord(json) || !isRecord(json.status)) throw new Error("Nexus login returned an invalid response.");
+  return {
+    status: json.status as unknown as NexusStatus,
+    accountLabel: typeof json.accountLabel === "string" ? json.accountLabel : null
+  };
 }
 
-export async function disconnectDappnodeNexus(): Promise<DappnodeNexusLoginResult> {
-  return runDappnodeNexusAuth("disconnect");
+/**
+ * Disable a key that stayed active in Nexus after logging out. Asks the
+ * operator to log in again as the account that owns it.
+ */
+export async function revokeDappnodeNexusKey(key: NexusManagedApiKey): Promise<void> {
+  const json = await runDappnodeNexusAuth("revoke", key);
+  if (!isRecord(json) || json.revoked !== true) throw new Error("Nexus did not confirm the key was disabled.");
 }
 
-async function runDappnodeNexusAuth(action: NexusAuthAction): Promise<DappnodeNexusLoginResult> {
+async function runDappnodeNexusAuth(action: NexusAuthAction, key?: NexusManagedApiKey): Promise<unknown> {
   const popup = window.open("about:blank", "dappnode-nexus-auth", buildPopupFeatures());
   if (!popup) throw new Error("The Nexus login popup was blocked. Allow popups for this site and try again.");
 
   try {
-    const request = await createAuthRequest(action);
+    const request = { ...(await createAuthRequest(action)), key };
     const callbackPromise = waitForAuthCallback(popup, request.state, new URL(request.redirectUri).origin);
     popup.location.href = request.authorizationUrl;
     popup.focus();
@@ -63,7 +74,7 @@ async function runDappnodeNexusAuth(action: NexusAuthAction): Promise<DappnodeNe
     if (callback.error) throw new Error(formatAuthDeniedError(callback));
     if (!callback.code) throw new Error("Nexus login returned without an authorization code.");
 
-    return await finishDappnodeNexusLogin(callback.code, request);
+    return await finishDappnodeNexusAuth(callback.code, request);
   } catch (err) {
     if (!popup.closed) popup.close();
     throw err;
@@ -115,7 +126,8 @@ async function createAuthRequest(action: NexusAuthAction): Promise<AuthRequest> 
   url.searchParams.set("response_type", "code");
   url.searchParams.set("scope", NEXUS_AUTH_SCOPE);
   url.searchParams.set("state", state);
-  if (action === "disconnect") url.searchParams.set("prompt", "login");
+  // Disabling a key must prove ownership again, so never reuse a signed-in session.
+  if (action === "revoke") url.searchParams.set("prompt", "login");
 
   return {
     action,
@@ -174,7 +186,7 @@ function waitForAuthCallback(
   });
 }
 
-async function finishDappnodeNexusLogin(code: string, request: AuthRequest): Promise<DappnodeNexusLoginResult> {
+async function finishDappnodeNexusAuth(code: string, request: AuthRequest): Promise<unknown> {
   const { res, json } = await postNexusAuthRequest(code, request);
 
   if (!res.ok) {
@@ -184,11 +196,7 @@ async function finishDappnodeNexusLogin(code: string, request: AuthRequest): Pro
         : `${res.status} ${res.statusText}`;
     throw new Error(message);
   }
-  if (!isRecord(json) || !isRecord(json.status)) throw new Error("Nexus login returned an invalid response.");
-  return {
-    status: json.status as unknown as NexusStatus,
-    accountLabel: typeof json.accountLabel === "string" ? json.accountLabel : null
-  };
+  return json;
 }
 
 async function postNexusAuthRequest(code: string, request: AuthRequest): Promise<{ res: Response; json: unknown }> {
@@ -205,7 +213,8 @@ async function postNexusAuthRequest(code: string, request: AuthRequest): Promise
         code,
         codeVerifier: request.codeVerifier,
         nonce: request.nonce,
-        redirectUri: request.redirectUri
+        redirectUri: request.redirectUri,
+        ...(request.key ? { key: request.key } : {})
       }),
       signal: controller.signal
     });

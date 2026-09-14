@@ -18,21 +18,21 @@ import {
   FiLogIn
 } from "react-icons/fi";
 import { nexusExternalUrl } from "../data";
-import { disconnectDappnodeNexus, loginWithDappnodeNexus } from "../auth";
+import { loginWithDappnodeNexus, revokeDappnodeNexusKey } from "../auth";
 import "./nexus.scss";
 import {
   ChatError,
   ChatHistorySummary,
   ChatMessage,
+  NexusManagedApiKey,
   NexusModel,
   NexusStatus,
   clearChatHistory,
-  clearNexusApiKey,
-  forgetNexusAccount,
   deleteConversation,
   getNexusStatus,
   listChatHistory,
   listNexusModels,
+  logoutNexus,
   loadConversation,
   saveConversation,
   setNexusApiKey,
@@ -481,15 +481,10 @@ export function ChatPanel({ variant = "page", onOpenFullScreen, onOpenFloating }
             await applyStatus(nextStatus);
             setShowKeyEditor(false);
           }}
-          onClear={async () => {
-            const next =
-              status.keySource === "nexus" ? (await disconnectDappnodeNexus()).status : await clearNexusApiKey();
-            await applyStatus(next);
-            setShowKeyEditor(false);
-          }}
-          onForget={async () => {
-            await applyStatus(await forgetNexusAccount());
-            setShowKeyEditor(false);
+          onLogout={async () => {
+            const { status: nextStatus, disconnectedKey } = await logoutNexus();
+            await applyStatus(nextStatus);
+            return disconnectedKey;
           }}
         />
       )}
@@ -1105,26 +1100,29 @@ function NotConfigured({ onConfigure }: { onConfigure: () => void }) {
 
 /* ── API-key editor ────────────────────────────────────────────────── */
 
+type LogoutStep =
+  | { kind: "managed"; key: NexusManagedApiKey; phase: "ask" | "revoking" | "revoked"; error: string | null }
+  | { kind: "manual" };
+
 function ApiKeyEditor({
   status,
   onSave,
   onLoginWithNexus,
-  onClear,
-  onForget,
+  onLogout,
   onClose
 }: {
   status: NexusStatus;
   onSave: (key: string) => Promise<void>;
   onLoginWithNexus: () => Promise<void>;
-  onClear: () => Promise<void>;
-  onForget: () => Promise<void>;
+  onLogout: () => Promise<NexusManagedApiKey | null>;
   onClose: () => void;
 }) {
   const [value, setValue] = useState("");
   const [show, setShow] = useState(false);
-  const [busyAction, setBusyAction] = useState<"login" | "save" | "clear" | "forget" | null>(null);
+  const [busyAction, setBusyAction] = useState<"login" | "save" | "logout" | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const busy = busyAction !== null;
+  const [logoutStep, setLogoutStep] = useState<LogoutStep | null>(null);
+  const busy = busyAction !== null || (logoutStep?.kind === "managed" && logoutStep.phase === "revoking");
 
   const login = async () => {
     if (busy) return;
@@ -1151,131 +1149,212 @@ function ApiKeyEditor({
     }
   };
 
-  const clear = async () => {
+  // Logging out never needs the Nexus account, so it always works. Disabling
+  // the key in Nexus is offered afterwards, because that does need the account.
+  const logout = async () => {
     if (busy) return;
-    setBusyAction("clear");
+    const wasManaged = status.keySource === "nexus";
+    setBusyAction("logout");
     setError(null);
     try {
-      await onClear();
+      const key = await onLogout();
+      setValue("");
+      setLogoutStep(wasManaged && key ? { kind: "managed", key, phase: "ask", error: null } : { kind: "manual" });
     } catch (err) {
-      setError((err as Error).message || "Failed to clear the API key");
-      setBusyAction(null);
+      setError((err as Error).message || "Failed to log out of Nexus");
+    }
+    setBusyAction(null);
+  };
+
+  const disableKey = async () => {
+    if (logoutStep?.kind !== "managed") return;
+    const { key } = logoutStep;
+    setLogoutStep({ kind: "managed", key, phase: "revoking", error: null });
+    try {
+      await revokeDappnodeNexusKey(key);
+      setLogoutStep({ kind: "managed", key, phase: "revoked", error: null });
+    } catch (err) {
+      setLogoutStep({
+        kind: "managed",
+        key,
+        phase: "ask",
+        error: (err as Error).message || "Failed to disable the key"
+      });
     }
   };
 
-  // Disconnecting needs the account that owns the key. When that account is
-  // gone, this is the only way to free the chat for another key.
-  const forget = () => {
-    if (busy) return;
-    confirm({
-      title: "Forget this Nexus account?",
-      text: `This removes the key${status.accountLabel ? ` for ${status.accountLabel}` : ""} from this Dappnode so you can log in with another account or paste a key. The key stays active in that Nexus account until it is revoked there.`,
-      label: "Forget account",
-      variant: "danger",
-      onClick: () => {
-        void (async () => {
-          setBusyAction("forget");
-          setError(null);
-          try {
-            await onForget();
-          } catch (err) {
-            setError((err as Error).message || "Failed to forget the Nexus account");
-            setBusyAction(null);
-          }
-        })();
-      }
-    });
-  };
+  if (logoutStep) {
+    const owner = logoutStep.kind === "managed" ? logoutStep.key.accountLabel : null;
+    return (
+      <div className="nexus-key-editor-overlay" onClick={busy ? undefined : onClose}>
+        <div className="nexus-key-editor-card" onClick={(e) => e.stopPropagation()}>
+          <div className="nexus-key-editor-header">
+            <h5>{logoutStep.kind === "managed" && logoutStep.phase === "revoked" ? "Key disabled" : "Logged out"}</h5>
+            <button type="button" className="nexus-key-editor-close" onClick={onClose} disabled={busy}>
+              ×
+            </button>
+          </div>
+
+          {logoutStep.kind === "manual" && (
+            <>
+              <p className="nexus-key-editor-text">
+                The API key was removed from this Dappnode. It still works in Nexus, and you can disable it from{" "}
+                <a href={`${nexusExternalUrl}/api-keys`} target="_blank" rel="noopener noreferrer">
+                  your API keys
+                </a>
+                .
+              </p>
+              <div className="nexus-key-editor-actions nexus-key-editor-actions-end">
+                <Button variant="dappnode" onClick={onClose}>
+                  Done
+                </Button>
+              </div>
+            </>
+          )}
+
+          {logoutStep.kind === "managed" && logoutStep.phase === "revoked" && (
+            <>
+              <p className="nexus-key-editor-text">
+                The API key this Dappnode used can no longer be used{owner ? ` in ${owner}` : ""}.
+              </p>
+              <div className="nexus-key-editor-actions nexus-key-editor-actions-end">
+                <Button variant="dappnode" onClick={onClose}>
+                  Done
+                </Button>
+              </div>
+            </>
+          )}
+
+          {logoutStep.kind === "managed" && logoutStep.phase !== "revoked" && (
+            <>
+              <p className="nexus-key-editor-text">
+                The API key this Dappnode used still works in your Nexus account
+                {owner ? (
+                  <>
+                    {" "}
+                    <strong>{owner}</strong>
+                  </>
+                ) : null}
+                . Disable it too? You will be asked to log in to that account.
+              </p>
+              {logoutStep.error && <div className="nexus-key-editor-error">{logoutStep.error}</div>}
+              <div className="nexus-key-editor-actions nexus-key-editor-actions-end">
+                <Button variant="outline-secondary" onClick={onClose} disabled={busy}>
+                  Keep key
+                </Button>
+                <Button variant="danger" onClick={disableKey} disabled={busy}>
+                  {logoutStep.phase === "revoking"
+                    ? "Waiting for Nexus login..."
+                    : logoutStep.error
+                      ? "Try again"
+                      : "Disable key"}
+                </Button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  const connected = status.keySource !== "none";
 
   return (
-    <div className="nexus-key-editor-overlay" onClick={onClose}>
+    <div className="nexus-key-editor-overlay" onClick={busy ? undefined : onClose}>
       <div className="nexus-key-editor-card" onClick={(e) => e.stopPropagation()}>
         <div className="nexus-key-editor-header">
-          <h5>{status.configured ? "Update Nexus API key" : "Set Nexus API key"}</h5>
+          <h5>{connected ? "Nexus account" : "Connect to Nexus"}</h5>
           <button type="button" className="nexus-key-editor-close" onClick={onClose} disabled={busy}>
             ×
           </button>
         </div>
 
-        <p className="nexus-key-editor-text">
-          The key is stored on this DAppNode and used to talk to Nexus. Log in to create one automatically, or{" "}
-          <a href={nexusExternalUrl} target="_blank" rel="noopener noreferrer">
-            generate one in the Nexus user portal
-          </a>{" "}
-          and paste it below.
-        </p>
+        {status.keySource === "nexus" && (
+          <div className="nexus-key-editor-connected">
+            <span>
+              Logged in as <strong>{status.accountLabel ?? "your Nexus account"}</strong>
+            </span>
+            <Button variant="outline-danger" onClick={logout} disabled={busy}>
+              {busyAction === "logout" ? "Logging out..." : "Log out"}
+            </Button>
+          </div>
+        )}
 
-        <div className="nexus-key-editor-login">
-          <Button variant="dappnode" onClick={login} disabled={busy} fullwidth Icon={FiLogIn}>
-            {busyAction === "login" ? "Connecting..." : "Login with Dappnode Nexus"}
-          </Button>
-          {status.keySource === "nexus" && status.accountLabel ? (
-            <small className="nexus-key-editor-account">
-              Already logged in as <strong>{status.accountLabel}</strong>.
-            </small>
-          ) : (
-            <small>Creates a Dappmanager Chat key in Nexus and saves it on this DAppNode.</small>
-          )}
-        </div>
+        {status.keySource === "manual" && (
+          <div className="nexus-key-editor-connected">
+            <span>Using an API key you pasted</span>
+            <Button variant="outline-danger" onClick={logout} disabled={busy}>
+              {busyAction === "logout" ? "Removing..." : "Remove key"}
+            </Button>
+          </div>
+        )}
 
-        <div className="nexus-key-editor-divider">
-          <span>or paste an API key</span>
-        </div>
+        {status.keySource !== "nexus" && (
+          <>
+            {status.keySource === "none" && (
+              <p className="nexus-key-editor-text">
+                Log in to create a key automatically, or{" "}
+                <a href={`${nexusExternalUrl}/api-keys`} target="_blank" rel="noopener noreferrer">
+                  create one in Nexus
+                </a>{" "}
+                and paste it below. The key is stored on this Dappnode.
+              </p>
+            )}
 
-        <div className="nexus-key-editor-input-group">
-          <input
-            type={show ? "text" : "password"}
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            onKeyPress={(e) => {
-              if (e.key === "Enter") submit();
-            }}
-            placeholder="sk-…"
-            autoFocus
-            autoComplete="off"
-            disabled={busy}
-            className="form-control nexus-key-editor-input"
-          />
-          <button
-            type="button"
-            className="nexus-key-editor-toggle"
-            onClick={() => setShow((s) => !s)}
-            disabled={busy}
-            title={show ? "Hide key" : "Show key"}
-          >
-            {show ? <FiEyeOff /> : <FiEye />}
-          </button>
-        </div>
+            <div className="nexus-key-editor-login">
+              <Button variant="dappnode" onClick={login} disabled={busy} fullwidth Icon={FiLogIn}>
+                {busyAction === "login" ? "Waiting for Nexus login..." : "Log in with Dappnode Nexus"}
+              </Button>
+            </div>
+
+            <div className="nexus-key-editor-divider">
+              <span>{status.keySource === "manual" ? "or replace the key" : "or paste an API key"}</span>
+            </div>
+
+            <div className="nexus-key-editor-input-group">
+              <input
+                type={show ? "text" : "password"}
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter") submit();
+                }}
+                placeholder="sk-…"
+                autoFocus
+                autoComplete="off"
+                disabled={busy}
+                className="form-control nexus-key-editor-input"
+              />
+              <button
+                type="button"
+                className="nexus-key-editor-toggle"
+                onClick={() => setShow((s) => !s)}
+                disabled={busy}
+                title={show ? "Hide key" : "Show key"}
+              >
+                {show ? <FiEyeOff /> : <FiEye />}
+              </button>
+            </div>
+          </>
+        )}
 
         {error && <div className="nexus-key-editor-error">{error}</div>}
 
-        <div className="nexus-key-editor-actions">
-          <div>
-            {status.keySource !== "none" && (
-              <Button variant="outline-danger" onClick={clear} disabled={busy}>
-                {busyAction === "clear"
-                  ? status.keySource === "nexus"
-                    ? "Disconnecting..."
-                    : "Removing..."
-                  : status.keySource === "nexus"
-                    ? "Disconnect Nexus"
-                    : "Remove key"}
+        <div className="nexus-key-editor-actions nexus-key-editor-actions-end">
+          {status.keySource === "nexus" ? (
+            <Button variant="dappnode" onClick={onClose} disabled={busy}>
+              Done
+            </Button>
+          ) : (
+            <>
+              <Button variant="outline-secondary" onClick={onClose} disabled={busy}>
+                Cancel
               </Button>
-            )}
-            {status.keySource === "nexus" && (
-              <button type="button" className="nexus-key-editor-forget" onClick={forget} disabled={busy}>
-                {busyAction === "forget" ? "Forgetting..." : "Can't log in to this account?"}
-              </button>
-            )}
-          </div>
-          <div className="d-flex gap-2">
-            <Button variant="outline-secondary" onClick={onClose} disabled={busy}>
-              Cancel
-            </Button>
-            <Button variant="dappnode" onClick={submit} disabled={busy || !value.trim()}>
-              {busyAction === "save" ? "Saving..." : status.configured ? "Save" : "Save & connect"}
-            </Button>
-          </div>
+              <Button variant="dappnode" onClick={submit} disabled={busy || !value.trim()}>
+                {busyAction === "save" ? "Saving..." : "Save"}
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </div>
