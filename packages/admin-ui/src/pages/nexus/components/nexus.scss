@@ -849,10 +849,13 @@
   }
 }
 
-.nexus-key-editor-input {
+// Doubled class so the group's border stays the only one over Bootstrap's
+// .form-control border.
+.nexus-key-editor-input.nexus-key-editor-input {
   flex: 1;
   border: none;
   background: transparent;
+  box-shadow: none;
   padding: 0;
 
   &:focus {
@@ -924,6 +927,11 @@
   strong {
     font-weight: 600;
     word-break: break-word;
+  }
+
+  .btn {
+    flex: none;
+    white-space: nowrap;
   }
 }
 

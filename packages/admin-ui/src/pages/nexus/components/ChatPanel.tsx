@@ -1190,9 +1190,11 @@ function ApiKeyEditor({
         <div className="nexus-key-editor-card" onClick={(e) => e.stopPropagation()}>
           <div className="nexus-key-editor-header">
             <h5>
-              {logoutStep.kind === "managed" && logoutStep.phase === "revoked"
-                ? "Nexus API key disabled"
-                : "Logged out of Nexus"}
+              {logoutStep.kind === "manual"
+                ? "Nexus API key removed"
+                : logoutStep.phase === "revoked"
+                  ? "Nexus API key disabled"
+                  : "Logged out of Nexus"}
             </h5>
             <button type="button" className="nexus-key-editor-close" onClick={onClose} disabled={busy}>
               ×
