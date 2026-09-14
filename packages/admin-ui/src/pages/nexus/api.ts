@@ -19,10 +19,16 @@ export interface NexusStatus {
   /** Whether the active key was pasted manually, created through Nexus login, or is unset. */
   keySource: "manual" | "nexus" | "none";
   accountLabel: string | null;
+  /** True when traffic is routed through Nexus Proofs. */
+  privateMode: boolean;
+  /** Where the operator can inspect the attestation evidence. */
+  verificationUrl: string;
 }
 
 const STATUS_URL = "/nexus/status";
 const CONFIG_URL = "/nexus/config";
+const PRIVATE_MODE_URL = "/nexus/private-mode";
+const PRIVATE_MODE_PROBE_URL = "/nexus/private-mode/probe";
 const MODELS_URL = "/nexus/models";
 const CHAT_URL = "/nexus/chat/completions";
 const CONFIRM_URL = "/nexus/chat/confirm";
@@ -37,6 +43,8 @@ export interface NexusModel {
   max_output_tokens?: number;
   input_price_per_1m_tokens_cents?: number;
   output_price_per_1m_tokens_cents?: number;
+  /** How the model proves confidentiality; "none" for Anonymous models. */
+  proof_mode?: string;
 }
 
 async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
@@ -73,6 +81,33 @@ export function setNexusApiKey(apiKey: string): Promise<NexusStatus> {
 /** Clears the in-app Nexus API key. */
 export function clearNexusApiKey(): Promise<NexusStatus> {
   return fetchJson<NexusStatus>(CONFIG_URL, { method: "DELETE" });
+}
+
+/** What Nexus Proofs reports about its own verification of the Gateway. */
+export interface NexusProxyProbe {
+  reachable: boolean;
+  /** Whether the Nexus Proofs package is installed on this Dappnode. */
+  installed?: boolean;
+  /** Whether its container is running. */
+  running?: boolean;
+  verified: boolean;
+  status?: string;
+  gateway?: string | null;
+  sourceRevision?: string | null;
+  checks?: number;
+  reason?: string;
+}
+
+export function probeNexusPrivateMode(): Promise<NexusProxyProbe> {
+  return fetchJson<NexusProxyProbe>(PRIVATE_MODE_PROBE_URL);
+}
+
+export function setNexusPrivateMode(privateMode: boolean): Promise<NexusStatus> {
+  return fetchJson<NexusStatus>(PRIVATE_MODE_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ privateMode })
+  });
 }
 
 export async function listNexusModels(): Promise<NexusModel[]> {

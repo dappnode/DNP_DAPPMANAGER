@@ -27,7 +27,9 @@ import {
   nexusClearApiKey,
   nexusListModels,
   nexusLogin,
+  nexusProbePrivateMode,
   nexusSetApiKey,
+  nexusSetPrivateMode,
   nexusStatus
 } from "./routes/nexus.js";
 import { handleMcpRequest } from "../mcp/server.js";
@@ -205,6 +207,8 @@ export function startHttpApi({
   app.post("/nexus/auth/login", auth.onlyAdmin, nexusLogin);
   app.post("/nexus/config", auth.onlyAdmin, nexusSetApiKey);
   app.delete("/nexus/config", auth.onlyAdmin, nexusClearApiKey);
+  app.post("/nexus/private-mode", auth.onlyAdmin, nexusSetPrivateMode);
+  app.get("/nexus/private-mode/probe", auth.onlyAdmin, nexusProbePrivateMode);
   app.get("/nexus/models", auth.onlyAdmin, nexusListModels);
   app.post("/nexus/chat/completions", auth.onlyAdmin, nexusChatCompletions);
   app.post("/nexus/chat/confirm", auth.onlyAdmin, nexusChatConfirm);

@@ -5,6 +5,7 @@ import type {
   HistorySummary,
   NexusRawResponse,
   NexusApiDeps,
+  NexusProxyProbe,
   NexusStatus,
   NexusStoredChatMessage,
   NexusStoredConversation,
@@ -14,7 +15,26 @@ import type {
 import { collapseWhitespace, trimAsciiWhitespace, trimTrailingSlashes } from "./utils.js";
 
 const DEFAULT_GATEWAY_URL = "https://nexus-api.dappnode.com/v1";
-const DEFAULT_MODEL = "nexus/auto";
+
+// Private mode routes through Nexus Proofs on this DAppNode, which
+// verifies the gateway's AWS Nitro attestation against measurements it takes
+// from cosign-signed Gateway releases, and encrypts request and response
+// bodies with EHBP. The direct URL terminates TLS at Cloudflare, where prompts
+// are readable.
+//
+// The proxy is OpenAI-compatible on both endpoints this client uses --
+// /chat/completions over the attested channel and /models passed through --
+// so nothing else here has to change.
+const NEXUS_PROOFS_GATEWAY_URL = "http://nexus-proofs.dappnode.private:3301/v1";
+const NEXUS_PROOFS_VERIFICATION_URL = "http://nexus-proofs.dappnode.private:3301/verification";
+// The machine-readable form of the page above, used to tell the operator
+// whether turning private mode on will actually work before they turn it on.
+const NEXUS_PROOFS_VERIFICATION_API = "http://nexus-proofs.dappnode.private:3301/v1/verification";
+const NEXUS_PROOFS_PROBE_TIMEOUT_MS = 5_000;
+// The auto router is not available on the TEE endpoint, so private mode
+// hides it and lets the operator pick a model directly.
+const AUTO_ROUTER_MODEL = "nexus/auto";
+const DEFAULT_MODEL = AUTO_ROUTER_MODEL;
 const MAX_HISTORY_ENTRIES = 50;
 const MAX_TITLE_LENGTH = 80;
 const MAX_TOOL_ITERATIONS = 8;
@@ -126,8 +146,82 @@ export class NexusApi {
       gatewayUrl: this.getGatewayUrl(),
       defaultModel: this.getDefaultModel(),
       keySource: configured ? (this.deps.apiKeyStore.getSource?.() ?? "manual") : "none",
-      accountLabel: configured ? (this.deps.apiKeyStore.getAccountLabel?.() ?? null) : null
+      accountLabel: configured ? (this.deps.apiKeyStore.getAccountLabel?.() ?? null) : null,
+      privateMode: this.isPrivateMode(),
+      verificationUrl: NEXUS_PROOFS_VERIFICATION_URL
     };
+  }
+
+  /**
+   * Turn private mode on or off. Takes effect on the next request: the gateway
+   * URL is read per call, so no restart is needed.
+   *
+   * Private mode fails closed, so it can only be turned on once Nexus Proofs
+   * has verified the Gateway. Turning it off always works.
+   */
+  async setPrivateMode(rawEnabled: unknown): Promise<NexusStatus> {
+    if (typeof rawEnabled !== "boolean")
+      throw NexusApiError.json(400, "invalid_request", "privateMode must be a boolean");
+    if (!this.deps.privateModeStore)
+      throw NexusApiError.json(501, "not_supported", "private mode is not available on this Dappnode");
+    if (rawEnabled && !this.isPrivateMode()) {
+      const probe = await this.probeLocalProxy();
+      if (!probe.verified) {
+        throw NexusApiError.json(
+          409,
+          "nexus_proofs_unavailable",
+          `Confidentiality proofs need Nexus Proofs to verify Nexus first: ${probe.reason ?? "it is not verified"}`
+        );
+      }
+    }
+    this.deps.privateModeStore.set(rawEnabled);
+    return this.readStatus();
+  }
+
+  /**
+   * Ask Nexus Proofs whether it is installed and has verified the Gateway.
+   *
+   * Private mode fails closed, so without this the first sign that the proxy
+   * is missing is a chat message that does not send. Probing turns that into
+   * something the operator can act on before switching over.
+   */
+  async probeLocalProxy(): Promise<NexusProxyProbe> {
+    let upstream: Awaited<ReturnType<FetchLike>>;
+    try {
+      upstream = await this.fetchImpl(NEXUS_PROOFS_VERIFICATION_API, {
+        headers: { accept: "application/json" },
+        signal: AbortSignal.timeout(NEXUS_PROOFS_PROBE_TIMEOUT_MS)
+      });
+    } catch {
+      return { reachable: false, verified: false, reason: "Nexus Proofs is not installed or not running" };
+    }
+    if (!upstream.ok) {
+      return { reachable: true, verified: false, reason: `Nexus Proofs returned HTTP ${upstream.status}` };
+    }
+    try {
+      const payload = (await upstream.json()) as {
+        status?: string;
+        gateway?: string;
+        current?: { source_revision?: string; checks?: unknown[] };
+      };
+      const current = payload.current ?? {};
+      return {
+        reachable: true,
+        verified: payload.status === "verified",
+        status: payload.status ?? "unknown",
+        gateway: payload.gateway ?? null,
+        sourceRevision: current.source_revision ?? null,
+        checks: Array.isArray(current.checks) ? current.checks.length : 0,
+        reason:
+          payload.status === "verified" ? undefined : `Nexus Proofs reports status "${payload.status ?? "unknown"}"`
+      };
+    } catch {
+      return { reachable: true, verified: false, reason: "Nexus Proofs returned a response this Dappnode cannot read" };
+    }
+  }
+
+  private isPrivateMode(): boolean {
+    return this.deps.privateModeStore?.get() === true;
   }
 
   async setApiKey(rawApiKey: unknown): Promise<NexusStatus> {
@@ -228,13 +322,13 @@ export class NexusApi {
       });
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to reach Nexus gateway";
-      this.deps.logger.warn(`nexus proxy: models fetch failed: ${message}`);
+      this.deps.logger.warn(`nexus proofs: models fetch failed: ${message}`);
       throw NexusApiError.json(502, "upstream_unreachable", message);
     }
 
     if (!upstream.ok) {
       const text = await upstream.text().catch(() => "");
-      this.deps.logger.warn(`nexus proxy: models upstream ${upstream.status}: ${text.slice(0, 200)}`);
+      this.deps.logger.warn(`nexus proofs: models upstream ${upstream.status}: ${text.slice(0, 200)}`);
       throw NexusApiError.raw(
         upstream.status || 502,
         text || JSON.stringify({ error: { code: "upstream_error", message: upstream.statusText } }),
@@ -245,9 +339,12 @@ export class NexusApi {
 
     const payload = (await upstream.json()) as { data?: GatewayModel[] };
     const all = Array.isArray(payload.data) ? payload.data : [];
+    const privateMode = this.isPrivateMode();
     return all.filter(
       (model) =>
-        Array.isArray(model.endpoints) && model.endpoints.some((endpoint) => endpoint.endsWith("chat/completions"))
+        Array.isArray(model.endpoints) &&
+        model.endpoints.some((endpoint) => endpoint.endsWith("chat/completions")) &&
+        !(privateMode && model.id === AUTO_ROUTER_MODEL)
     );
   }
 
@@ -306,7 +403,7 @@ export class NexusApi {
     } catch (err) {
       if (!signal.aborted && !writer.writableEnded) {
         const message = err instanceof Error ? err.message : "stream error";
-        this.deps.logger.warn(`nexus proxy: ${message}`);
+        this.deps.logger.warn(`nexus proofs: ${message}`);
         try {
           writer.write(`data: ${JSON.stringify({ error: { code: "stream_error", message } })}\n\n`);
           writer.write("data: [DONE]\n\n");
@@ -363,7 +460,7 @@ export class NexusApi {
 
       if (!upstream.ok || !upstream.body) {
         const text = await upstream.text().catch(() => "");
-        this.deps.logger.warn(`nexus proxy: upstream ${upstream.status}: ${text.slice(0, 200)}`);
+        this.deps.logger.warn(`nexus proofs: upstream ${upstream.status}: ${text.slice(0, 200)}`);
         writeStreamError(writer, `upstream_${upstream.status || 502}`, readUpstreamErrorMessage(text, upstream.status));
         break;
       }
@@ -463,8 +560,12 @@ export class NexusApi {
   }
 
   private getGatewayUrl(): string {
-    const raw = this.deps.getGatewayUrl?.() || DEFAULT_GATEWAY_URL;
-    return trimTrailingSlashes(raw);
+    // An explicit NEXUS_GATEWAY_URL still wins, so a developer pointing at a
+    // staging gateway is not silently redirected to Nexus Proofs.
+    const override = this.deps.getGatewayUrl?.();
+    if (override) return trimTrailingSlashes(override);
+    if (this.isPrivateMode()) return NEXUS_PROOFS_GATEWAY_URL;
+    return DEFAULT_GATEWAY_URL;
   }
 
   private getDefaultModel(): string {
