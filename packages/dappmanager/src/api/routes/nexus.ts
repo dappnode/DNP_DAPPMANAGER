@@ -117,7 +117,7 @@ export const nexusSetPrivateMode = wrapHandler(async (req: Request, res: Express
   }
 });
 
-/** GET /nexus/private-mode/probe - is the local proxy installed and verified? */
+/** GET /nexus/private-mode/probe - is Nexus Proofs installed and verified? */
 export const nexusProbePrivateMode = wrapHandler(async (_req: Request, res: ExpressResponse) => {
   try {
     res.status(200).json(await nexus.probeLocalProxy());

@@ -47,12 +47,12 @@ export interface NexusStatus {
 }
 
 /**
- * What the local proxy reports about its own verification of the Gateway.
+ * What Nexus Proofs reports about its own verification of the Gateway.
  * Read from the proxy rather than attested here: one verifier on the node,
  * everything else reads its answer.
  */
 export interface NexusProxyProbe {
-  /** Whether nexus-local-proxy answered at all. False means not installed. */
+  /** Whether Nexus Proofs answered at all. False means not installed. */
   reachable: boolean;
   /** Whether it has currently verified the Gateway. */
   verified: boolean;
@@ -79,6 +79,8 @@ export interface GatewayModel {
   max_output_tokens?: number;
   input_price_per_1m_tokens_cents?: number;
   output_price_per_1m_tokens_cents?: number;
+  /** How the model proves confidentiality; "none" for Anonymous models. */
+  proof_mode?: string;
 }
 
 export interface HistorySummary {

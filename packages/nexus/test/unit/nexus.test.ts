@@ -112,7 +112,7 @@ describe("nexus / api", () => {
     expect(() => service.setPrivateMode("yes")).to.throw();
   });
 
-  it("reports a verified local proxy", async () => {
+  it("reports a verified Nexus Proofs", async () => {
     const { service } = makeService({
       apiKey: "secret",
       fetch: async () =>
@@ -133,7 +133,7 @@ describe("nexus / api", () => {
 
   // Private mode fails closed, so a missing proxy has to be reported as such
   // rather than surfacing later as a chat message that will not send.
-  it("reports an absent local proxy as unreachable", async () => {
+  it("reports an absent Nexus Proofs as unreachable", async () => {
     const { service } = makeService({
       apiKey: "secret",
       fetch: async () => {
@@ -148,7 +148,7 @@ describe("nexus / api", () => {
     expect(probe.reason).to.include("not installed");
   });
 
-  it("reports a running but unverified local proxy", async () => {
+  it("reports a running but unverified Nexus Proofs", async () => {
     const { service } = makeService({
       apiKey: "secret",
       fetch: async () => jsonResponse({ status: "starting", current: null })
@@ -161,7 +161,7 @@ describe("nexus / api", () => {
     expect(probe.status).to.equal("starting");
   });
 
-  it("reports an unreadable local proxy response as unverified", async () => {
+  it("reports an unreadable Nexus Proofs response as unverified", async () => {
     const { service } = makeService({
       apiKey: "secret",
       fetch: async () => textResponse("not json", 200)
@@ -189,6 +189,26 @@ describe("nexus / api", () => {
     const models = await service.listModels();
 
     expect(models.map((model) => model.id)).to.deep.equal(["chat", "legacy-chat"]);
+  });
+
+  // The auto router is not available on the TEE endpoint.
+  it("hides the auto router in private mode only", async () => {
+    const catalog = {
+      data: [
+        { id: "nexus/auto", endpoints: ["chat/completions"] },
+        { id: "private/model", endpoints: ["chat/completions"], proof_mode: "tinfoil_attested_transport" }
+      ]
+    };
+    const direct = makeService({ apiKey: "secret", gatewayUrl: null, fetch: async () => jsonResponse(catalog) });
+    const proofs = makeService({
+      apiKey: "secret",
+      gatewayUrl: null,
+      privateMode: true,
+      fetch: async () => jsonResponse(catalog)
+    });
+
+    expect((await direct.service.listModels()).map((model) => model.id)).to.deep.equal(["nexus/auto", "private/model"]);
+    expect((await proofs.service.listModels()).map((model) => model.id)).to.deep.equal(["private/model"]);
   });
 
   it("upserts, lists, deletes, clears, and prunes chat history", () => {

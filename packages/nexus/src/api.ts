@@ -31,7 +31,10 @@ const NEXUS_PROOFS_VERIFICATION_URL = "http://nexus-proofs.dappnode.private:3301
 // whether turning private mode on will actually work before they turn it on.
 const NEXUS_PROOFS_VERIFICATION_API = "http://nexus-proofs.dappnode.private:3301/v1/verification";
 const NEXUS_PROOFS_PROBE_TIMEOUT_MS = 5_000;
-const DEFAULT_MODEL = "nexus/auto";
+// The auto router is not available on the TEE endpoint, so private mode
+// hides it and lets the operator pick a model directly.
+const AUTO_ROUTER_MODEL = "nexus/auto";
+const DEFAULT_MODEL = AUTO_ROUTER_MODEL;
 const MAX_HISTORY_ENTRIES = 50;
 const MAX_TITLE_LENGTH = 80;
 const MAX_TOOL_ITERATIONS = 8;
@@ -163,7 +166,7 @@ export class NexusApi {
   }
 
   /**
-   * Ask the local proxy whether it is installed and has verified the Gateway.
+   * Ask Nexus Proofs whether it is installed and has verified the Gateway.
    *
    * Private mode fails closed, so without this the first sign that the proxy
    * is missing is a chat message that does not send. Probing turns that into
@@ -177,10 +180,10 @@ export class NexusApi {
         signal: AbortSignal.timeout(NEXUS_PROOFS_PROBE_TIMEOUT_MS)
       });
     } catch {
-      return { reachable: false, verified: false, reason: "nexus-local-proxy is not installed or not running" };
+      return { reachable: false, verified: false, reason: "Nexus Proofs is not installed or not running" };
     }
     if (!upstream.ok) {
-      return { reachable: true, verified: false, reason: `the proxy returned HTTP ${upstream.status}` };
+      return { reachable: true, verified: false, reason: `Nexus Proofs returned HTTP ${upstream.status}` };
     }
     try {
       const payload = (await upstream.json()) as {
@@ -196,10 +199,11 @@ export class NexusApi {
         gateway: payload.gateway ?? null,
         sourceRevision: current.source_revision ?? null,
         checks: Array.isArray(current.checks) ? current.checks.length : 0,
-        reason: payload.status === "verified" ? undefined : `the proxy reports status "${payload.status ?? "unknown"}"`
+        reason:
+          payload.status === "verified" ? undefined : `Nexus Proofs reports status "${payload.status ?? "unknown"}"`
       };
     } catch {
-      return { reachable: true, verified: false, reason: "the proxy returned a response this DAppNode cannot read" };
+      return { reachable: true, verified: false, reason: "Nexus Proofs returned a response this Dappnode cannot read" };
     }
   }
 
@@ -322,9 +326,12 @@ export class NexusApi {
 
     const payload = (await upstream.json()) as { data?: GatewayModel[] };
     const all = Array.isArray(payload.data) ? payload.data : [];
+    const privateMode = this.isPrivateMode();
     return all.filter(
       (model) =>
-        Array.isArray(model.endpoints) && model.endpoints.some((endpoint) => endpoint.endsWith("chat/completions"))
+        Array.isArray(model.endpoints) &&
+        model.endpoints.some((endpoint) => endpoint.endsWith("chat/completions")) &&
+        !(privateMode && model.id === AUTO_ROUTER_MODEL)
     );
   }
 

@@ -43,6 +43,8 @@ export interface NexusModel {
   max_output_tokens?: number;
   input_price_per_1m_tokens_cents?: number;
   output_price_per_1m_tokens_cents?: number;
+  /** How the model proves confidentiality; "none" for Anonymous models. */
+  proof_mode?: string;
 }
 
 async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
@@ -81,7 +83,7 @@ export function clearNexusApiKey(): Promise<NexusStatus> {
   return fetchJson<NexusStatus>(CONFIG_URL, { method: "DELETE" });
 }
 
-/** What the local proxy reports about its own verification of the Gateway. */
+/** What Nexus Proofs reports about its own verification of the Gateway. */
 export interface NexusProxyProbe {
   reachable: boolean;
   verified: boolean;

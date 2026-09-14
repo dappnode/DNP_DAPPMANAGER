@@ -3,6 +3,8 @@ import Button from "components/Button";
 import { confirm } from "components/ConfirmDialog";
 import Select from "components/Select";
 import NexusMarkdown from "./NexusMarkdown";
+import { Link } from "react-router-dom";
+import { getInstallerPath } from "pages/installer";
 import Dropdown from "react-bootstrap/Dropdown";
 import { MdChatBubbleOutline, MdHistory } from "react-icons/md";
 import {
@@ -42,6 +44,9 @@ import {
   streamChat,
   submitChatConfirmation
 } from "../api";
+
+const NEXUS_PROOFS_DNP_NAME = "nexus-proofs.dnp.dappnode.eth";
+const NEXUS_MODELS_DOC_URL = "https://nexus.dappnode.com/docs/sdk/private-vs-anonymous-models";
 
 const SELECTED_MODEL_STORAGE_KEY = "nexus-chat-selected-model";
 
@@ -146,7 +151,10 @@ function useNexusChatState(): NexusChatContextValue {
       const remembered = readRememberedModel();
       setSelectedModel((prev) => {
         const preferred = [prev, remembered, s.defaultModel].find((id) => id && list.some((m) => m.id === id));
-        return preferred || list[0]?.id || "";
+        // Private mode hides the auto router, so fall back to a Private model
+        // rather than whichever model happens to be listed first.
+        const privateModel = s.privateMode ? list.find((m) => m.proof_mode && m.proof_mode !== "none")?.id : undefined;
+        return preferred || privateModel || list[0]?.id || "";
       });
     } catch (err) {
       setModelsError((err as Error).message);
@@ -1138,7 +1146,7 @@ function ApiKeyEditor({
         if (!cancelled) setProbe(result);
       })
       .catch(() => {
-        if (!cancelled) setProbe({ reachable: false, verified: false, reason: "could not reach the local proxy" });
+        if (!cancelled) setProbe({ reachable: false, verified: false, reason: "could not reach Nexus Proofs" });
       });
     return () => {
       cancelled = true;
@@ -1263,44 +1271,36 @@ function ApiKeyEditor({
               disabled={busy}
               onChange={(e) => togglePrivateMode(e.target.checked)}
             />
-            <span>Private mode — route through Nexus Proofs</span>
+            <span>Nexus confidentiality proofs</span>
           </label>
           {probe && !probe.reachable && (
             <p className="nexus-private-mode-status nexus-private-mode-status-bad">
-              <strong>Nexus Local Proxy is not installed.</strong> Install the <strong>Nexus Local Proxy</strong>{" "}
-              package on this DAppNode before turning private mode on — without it, chat will stop working.
+              Install{" "}
+              <Link to={`${getInstallerPath(NEXUS_PROOFS_DNP_NAME)}/${NEXUS_PROOFS_DNP_NAME}`} onClick={onClose}>
+                Nexus Proofs
+              </Link>{" "}
+              to get confidentiality proofs.
             </p>
           )}
           {probe && probe.reachable && !probe.verified && (
             <p className="nexus-private-mode-status nexus-private-mode-status-bad">
-              <strong>The proxy has not verified the Gateway.</strong>{" "}
-              {probe.reason ?? "It reports an unverified state."} It will not carry prompts until it can verify.
+              <strong>Nexus Proofs could not verify Nexus.</strong> {probe.reason}
             </p>
           )}
           {probe && probe.verified && (
             <p className="nexus-private-mode-status nexus-private-mode-status-ok">
-              <strong>Gateway verified.</strong> The proxy performed {probe.checks ?? 0} checks and confirmed release{" "}
-              <code>{(probe.sourceRevision ?? "unknown").slice(0, 12)}</code> is running inside an AWS Nitro Enclave.
+              <strong>Verified.</strong> Your prompts are running in confidential infrastructure.{" "}
+              <a href={status.verificationUrl} target="_blank" rel="noopener noreferrer">
+                See proofs
+              </a>
             </p>
           )}
           <p className="nexus-key-editor-text nexus-private-mode-help">
-            {status.privateMode ? (
-              <>
-                Prompts go through <strong>Nexus Proofs</strong> on this DAppNode, which verifies the Gateway is
-                the expected code running inside an AWS Nitro Enclave and encrypts prompts and completions so Cloudflare
-                cannot read them. The proxy <strong>fails closed</strong>: if it cannot verify the Gateway, chat stops
-                working rather than silently falling back.{" "}
-                <a href={status.verificationUrl} target="_blank" rel="noopener noreferrer">
-                  See the verification evidence
-                </a>
-                .
-              </>
-            ) : (
-              <>
-                Prompts travel to Nexus over ordinary HTTPS, which is decrypted at Cloudflare before it reaches the
-                Gateway. Turn this on to route them through the attested proxy on this DAppNode instead.
-              </>
-            )}
+            Nexus runs in a TEE (Trusted Execution Environment) that proves your prompts stay confidential. Turn this on
+            to receive the proofs in Nexus Proofs. For end-to-end confidentiality, use Private models.{" "}
+            <a href={NEXUS_MODELS_DOC_URL} target="_blank" rel="noopener noreferrer">
+              Anonymous vs. Private models
+            </a>
           </p>
         </div>
 
