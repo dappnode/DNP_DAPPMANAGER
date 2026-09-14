@@ -17,20 +17,19 @@ export type ProofsPhase =
 export interface NexusProofsState {
   phase: ProofsPhase | null;
   error: string | null;
-  /** Install Nexus Proofs, start it if stopped, or check again. */
+  /** Install or start Nexus Proofs when it is missing or stopped; otherwise check again. */
   fix: () => void;
 }
 
 /**
- * Walks Nexus Proofs to a verified state while confidentiality proofs are
- * wanted: checks it, installs or starts it when `autoFix` is set, and waits for
- * it to verify Nexus.
+ * Tracks whether Nexus Proofs is ready while confidentiality proofs are wanted,
+ * and waits for it to verify Nexus.
  *
- * `autoFix` is for the operator turning proofs on. When proofs are already on
- * and Nexus Proofs went away, the fix waits for an explicit click instead of
- * installing something the moment the editor opens.
+ * Installing or starting a package is never implied by ticking a checkbox: a
+ * missing or stopped Nexus Proofs stops at "missing"/"stopped" until the
+ * operator confirms with {@link NexusProofsState.fix}.
  */
-export function useNexusProofs(wanted: boolean, autoFix: boolean): NexusProofsState {
+export function useNexusProofs(wanted: boolean): NexusProofsState {
   const [phase, setPhase] = useState<ProofsPhase | null>(null);
   const [error, setError] = useState<string | null>(null);
   const run = useRef(0);
@@ -91,7 +90,7 @@ export function useNexusProofs(wanted: boolean, autoFix: boolean): NexusProofsSt
       setError(null);
       return;
     }
-    void check(autoFix);
+    void check(false);
     // Only a change of intent restarts the walk; retries go through `fix`.
   }, [wanted]);
 
@@ -102,7 +101,9 @@ export function useNexusProofs(wanted: boolean, autoFix: boolean): NexusProofsSt
     []
   );
 
-  return { phase, error, fix: () => void check(true) };
+  // Only an explicit Install/Start click may change packages; Try again after a
+  // failure re-checks, so it shows the Install prompt again rather than installing.
+  return { phase, error, fix: () => void check(phase === "missing" || phase === "stopped") };
 }
 
 /**
@@ -145,12 +146,15 @@ export function ProofsPausedBanner({ onFix }: { onFix: () => void }) {
 
 export function ConfidentialityProofsField({
   checked,
+  active,
   disabled,
   proofs,
   verificationUrl,
   onChange
 }: {
   checked: boolean;
+  /** Proofs are currently saved on, so a missing Nexus Proofs pauses the chat. */
+  active: boolean;
   disabled: boolean;
   proofs: NexusProofsState;
   verificationUrl: string;
@@ -169,13 +173,12 @@ export function ConfidentialityProofsField({
       </label>
 
       {checked && proofs.phase && (
-        <ProofsStatus proofs={proofs} installStep={installStep} verificationUrl={verificationUrl} />
+        <ProofsStatus proofs={proofs} active={active} installStep={installStep} verificationUrl={verificationUrl} />
       )}
 
       <p className="nexus-key-editor-text nexus-private-mode-help">
         Nexus runs in a TEE (Trusted Execution Environment) that proves your prompts stay confidential. Turn this on to
-        receive the proofs in Nexus Proofs, which is installed for you if needed. For end-to-end confidentiality, use
-        Private models.{" "}
+        receive the proofs in the Nexus Proofs package. For end-to-end confidentiality, use Private models.{" "}
         <a href={NEXUS_MODELS_DOC_URL} target="_blank" rel="noopener noreferrer">
           Anonymous vs. Private models
         </a>
@@ -186,10 +189,12 @@ export function ConfidentialityProofsField({
 
 function ProofsStatus({
   proofs,
+  active,
   installStep,
   verificationUrl
 }: {
   proofs: NexusProofsState;
+  active: boolean;
   installStep: string | undefined;
   verificationUrl: string;
 }) {
@@ -218,14 +223,18 @@ function ProofsStatus({
       );
     case "missing":
       return (
-        <Problem action="Install Nexus Proofs" onAction={proofs.fix}>
-          Nexus Proofs is not installed, so the chat is paused.
+        <Problem action="Install Nexus Proofs" onAction={proofs.fix} offer={!active}>
+          {active
+            ? "Nexus Proofs is not installed, so the chat is paused."
+            : "Confidentiality proofs use the Nexus Proofs package. Install it to continue."}
         </Problem>
       );
     case "stopped":
       return (
-        <Problem action="Start Nexus Proofs" onAction={proofs.fix}>
-          Nexus Proofs is stopped, so the chat is paused.
+        <Problem action="Start Nexus Proofs" onAction={proofs.fix} offer={!active}>
+          {active
+            ? "Nexus Proofs is stopped, so the chat is paused."
+            : "Nexus Proofs is installed but stopped. Start it to continue."}
         </Problem>
       );
     case "failed":
@@ -248,9 +257,26 @@ function Pending({ children }: { children: React.ReactNode }) {
   );
 }
 
-function Problem({ children, action, onAction }: { children: React.ReactNode; action: string; onAction: () => void }) {
+/**
+ * A status that needs the operator to act. `offer` is for a step they are
+ * choosing to take (installing to turn proofs on), not something that broke.
+ */
+function Problem({
+  children,
+  action,
+  onAction,
+  offer = false
+}: {
+  children: React.ReactNode;
+  action: string;
+  onAction: () => void;
+  offer?: boolean;
+}) {
   return (
-    <div className="nexus-private-mode-status nexus-private-mode-status-bad" role="alert">
+    <div
+      className={`nexus-private-mode-status nexus-private-mode-status-${offer ? "offer" : "bad"}`}
+      role={offer ? "status" : "alert"}
+    >
       <span>{children}</span>
       <button type="button" className="nexus-private-mode-action" onClick={onAction}>
         {action}

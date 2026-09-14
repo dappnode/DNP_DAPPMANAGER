@@ -1365,6 +1365,15 @@
   gap: 0.75rem;
 }
 
+.nexus-private-mode-status-offer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  background: rgba(0, 177, 244, 0.08);
+  border: 1px solid rgba(0, 177, 244, 0.25);
+}
+
 .nexus-private-mode-status-pending {
   display: flex;
   align-items: center;

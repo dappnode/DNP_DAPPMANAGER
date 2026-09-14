@@ -1143,7 +1143,7 @@ function ApiKeyEditor({
   const [error, setError] = useState<string | null>(null);
   const [draftPrivateMode, setDraftPrivateMode] = useState(status.privateMode);
   const busy = busyAction !== null;
-  const proofs = useNexusProofs(draftPrivateMode, draftPrivateMode && !status.privateMode);
+  const proofs = useNexusProofs(draftPrivateMode);
   const privateModeChanged = draftPrivateMode !== status.privateMode;
   const keyEntered = value.trim().length > 0;
   // Saving waits for Nexus Proofs: with proofs on, the chat only works once it
@@ -1252,6 +1252,7 @@ function ApiKeyEditor({
 
         <ConfidentialityProofsField
           checked={draftPrivateMode}
+          active={status.privateMode}
           disabled={busy}
           proofs={proofs}
           verificationUrl={status.verificationUrl}
