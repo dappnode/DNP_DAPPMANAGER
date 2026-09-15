@@ -236,9 +236,14 @@ export function applyUserSettings(
     );
     // ##### </DEPRECATED>
 
+    const existingLabels = service.labels || {};
+    const newDefaultLabels = writeDefaultsToLabels(pick(service, ["environment", "ports", "volumes"]));
     const nextLabels = {
-      ...(service.labels || {}),
-      ...writeDefaultsToLabels(pick(service, ["environment", "ports", "volumes"]))
+      // New defaults as base layer (only matters on first install when no labels exist)
+      ...newDefaultLabels,
+      // Existing labels take precedence, preserving original package defaults
+      // and preventing label drift when the daemon re-applies user settings
+      ...existingLabels
     };
 
     return {
