@@ -4,9 +4,24 @@ import { eventBus } from "@dappnode/eventbus";
 import { params } from "@dappnode/params";
 import { getServicesSharingPid } from "@dappnode/utils";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
-import { PackageContainer } from "@dappnode/types";
+import { InstalledPackageData, PackageContainer } from "@dappnode/types";
 
 const dnpsAllowedToStop = [params.ipfsDnpName, params.wifiDnpName, params.HTTPS_PORTAL_DNPNAME, params.notificationsDnpName];
+
+/**
+ * Only stopping is restricted: core packages and the dappmanager can be
+ * stopped when whitelisted, but a stopped one can always be started again.
+ * Checking before knowing the action also refused starts, so a core package
+ * that went down (docker stop, crash) could not be brought back from the UI.
+ */
+export function assertStartStopAllowed(
+  dnp: Pick<InstalledPackageData, "dnpName" | "isCore">,
+  action: "start" | "stop"
+): void {
+  if (action === "start") return;
+  const isProtected = dnp.isCore || dnp.dnpName === params.dappmanagerDnpName;
+  if (isProtected && !dnpsAllowedToStop.includes(dnp.dnpName)) throw Error("Core packages cannot be stopped");
+}
 
 /**
  * Stops or starts a package containers
@@ -24,20 +39,15 @@ export async function packageStartStop({
   const dnp = await listPackage({ dnpName });
   const { compose } = new ComposeFileEditor(dnp.dnpName, dnp.isCore);
 
-  if (dnp.isCore || dnp.dnpName === params.dappmanagerDnpName) {
-    if (dnpsAllowedToStop.includes(dnp.dnpName)) {
-      // whitelisted, ok to stop
-    } else {
-      throw Error("Core packages cannot be stopped");
-    }
-  }
-
   const targetContainers = dnp.containers.filter((c) => !serviceNames || serviceNames.includes(c.serviceName));
 
   if (targetContainers.length === 0) {
     const queryId = [dnpName, ...(serviceNames || [])].join(", ");
     throw Error(`No targetContainers found for ${queryId}`);
   }
+
+  const action = targetContainers.every((container) => container.running) ? "stop" : "start";
+  assertStartStopAllowed(dnp, action);
 
   const servicesSharingPid = getServicesSharingPid(compose, targetContainers);
 
@@ -49,7 +59,7 @@ export async function packageStartStop({
       servicesSharingPid.dependantPidServices.includes(c.serviceName)
     );
 
-    if (targetContainers.every((container) => container.running)) {
+    if (action === "stop") {
       // STOP: first stop dependatPid containers (pid must exist), second stop targetPid containers
       await containersStop(dependantContainersPid);
       await containersStop(targetContainersPid);
@@ -59,7 +69,7 @@ export async function packageStartStop({
       await containersStart(dependantContainersPid);
     }
   } else {
-    if (targetContainers.every((container) => container.running)) {
+    if (action === "stop") {
       await containersStop(targetContainers);
     } else {
       await containersStart(targetContainers);
