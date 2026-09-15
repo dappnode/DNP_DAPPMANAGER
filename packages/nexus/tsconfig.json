@@ -3,6 +3,7 @@
   "compilerOptions": {
     "types": ["node", "mocha"],
     "outDir": "dist",
+    "rootDir": "src",
     "lib": ["ES2020", "ESNext", "ESNext.Promise", "DOM"]
   },
   "include": ["src/**/*"],

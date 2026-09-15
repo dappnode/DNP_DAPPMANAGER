@@ -1,6 +1,6 @@
 import { mapValues, isEmpty } from "lodash-es";
 import deepmerge from "deepmerge";
-import Ajv from "ajv";
+import { Ajv } from "ajv";
 import { UserSettingsAllDnps, UserSettings, SetupWizardAllDnps } from "@dappnode/types";
 import { SetupWizardFormDataReturn } from "../types";
 import { SetupSchema } from "@dappnode/types";

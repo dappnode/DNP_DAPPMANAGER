@@ -165,6 +165,11 @@
     box-shadow: 0 0 0 3px rgba(52, 168, 83, 0.2);
   }
 
+  &.paused {
+    background: #f5a524;
+    box-shadow: 0 0 0 3px rgba(245, 165, 36, 0.2);
+  }
+
   &.offline {
     background: var(--dappnode-gray-main-color);
   }
@@ -1300,4 +1305,139 @@
 
 #dark .nexus-history-clear:hover:not(:disabled) {
   background: rgba(239, 68, 68, 0.15);
+}
+
+.nexus-key-editor-private-mode {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-color, rgba(128, 128, 128, 0.25));
+}
+
+.nexus-private-mode-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: normal;
+  margin-bottom: 0.35rem;
+  cursor: pointer;
+
+  input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+  }
+}
+
+.nexus-private-mode-help {
+  margin-bottom: 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+// What Nexus Proofs reports about itself. Shown whether private mode is on
+// or off: before, it says whether turning it on will work; after, it says
+// whether it still does.
+.nexus-private-mode-status {
+  margin: 0.5rem 0 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  line-height: 1.5;
+
+  code {
+    font-size: 0.95em;
+  }
+}
+
+.nexus-private-mode-status-ok {
+  background: rgba(52, 211, 153, 0.1);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+.nexus-private-mode-status-bad {
+  background: rgba(248, 113, 113, 0.1);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+}
+
+.nexus-private-mode-status-bad {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.nexus-private-mode-status-offer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  background: rgba(0, 177, 244, 0.08);
+  border: 1px solid rgba(0, 177, 244, 0.25);
+}
+
+.nexus-private-mode-status-pending {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(0, 177, 244, 0.08);
+  border: 1px solid rgba(0, 177, 244, 0.25);
+
+  > span:last-child {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+// The installer's latest step, so a long install visibly moves.
+.nexus-private-mode-step {
+  opacity: 0.7;
+  font-size: 0.78rem;
+  word-break: break-word;
+}
+
+.nexus-private-mode-spinner {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  opacity: 0.6;
+  animation: nexus-private-mode-spin 0.8s linear infinite;
+}
+
+@keyframes nexus-private-mode-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.nexus-private-mode-action {
+  flex: none;
+  padding: 0.25rem 0.65rem;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+}
+
+// Shown above the conversation when proofs are on but Nexus Proofs is not.
+.nexus-proofs-paused {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0.5rem 0.75rem 0;
+  padding: 0.55rem 0.8rem;
+  border-radius: 8px;
+  background: rgba(248, 113, 113, 0.1);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  font-size: 0.85rem;
 }

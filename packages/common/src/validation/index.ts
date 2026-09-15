@@ -1,4 +1,4 @@
-import Ajv from "ajv";
+import { Ajv } from "ajv";
 import routesArgumentsSchema from "./schemas/RoutesArguments.schema.json" with { type: "json" };
 import routesReturnSchema from "./schemas/RoutesReturn.schema.json" with { type: "json" };
 import subscriptionsArgumentsSchema from "./schemas/SubscriptionsArguments.schema.json" with { type: "json" };

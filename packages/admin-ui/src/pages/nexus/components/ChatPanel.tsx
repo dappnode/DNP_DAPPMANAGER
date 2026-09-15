@@ -21,6 +21,12 @@ import { nexusExternalUrl } from "../data";
 import { disconnectDappnodeNexus, loginWithDappnodeNexus } from "../auth";
 import "./nexus.scss";
 import {
+  ConfidentialityProofsField,
+  ProofsPausedBanner,
+  useNexusProofs,
+  useProofsPaused
+} from "./ConfidentialityProofs";
+import {
   ChatError,
   ChatHistorySummary,
   ChatMessage,
@@ -35,6 +41,7 @@ import {
   loadConversation,
   saveConversation,
   setNexusApiKey,
+  setNexusPrivateMode,
   smoothStream,
   streamChat,
   submitChatConfirmation
@@ -143,7 +150,10 @@ function useNexusChatState(): NexusChatContextValue {
       const remembered = readRememberedModel();
       setSelectedModel((prev) => {
         const preferred = [prev, remembered, s.defaultModel].find((id) => id && list.some((m) => m.id === id));
-        return preferred || list[0]?.id || "";
+        // Private mode hides the auto router, so fall back to a Private model
+        // rather than whichever model happens to be listed first.
+        const privateModel = s.privateMode ? list.find((m) => m.proof_mode && m.proof_mode !== "none")?.id : undefined;
+        return preferred || privateModel || list[0]?.id || "";
       });
     } catch (err) {
       setModelsError((err as Error).message);
@@ -413,6 +423,7 @@ export function ChatPanel({ variant = "page", onOpenFullScreen, onOpenFloating }
   useEffect(() => {
     initialize();
   }, [initialize]);
+  const proofsPaused = useProofsPaused(status?.privateMode === true, streamError);
 
   if (!status && !statusError) {
     return (
@@ -462,6 +473,7 @@ export function ChatPanel({ variant = "page", onOpenFullScreen, onOpenFloating }
         onDeleteConversation={removeHistoryConversation}
         onClearHistory={confirmClearHistory}
         onManageKey={() => setShowKeyEditor(true)}
+        paused={proofsPaused}
         onOpenFullScreen={onOpenFullScreen}
         onOpenFloating={onOpenFloating}
       />
@@ -470,15 +482,17 @@ export function ChatPanel({ variant = "page", onOpenFullScreen, onOpenFloating }
         <ApiKeyEditor
           status={status}
           onClose={() => setShowKeyEditor(false)}
-          onSave={async (key) => {
-            const next = await setNexusApiKey(key);
+          onSave={async ({ apiKey, privateMode }) => {
+            // The key is validated before the route changes, so a new key is
+            // never checked through a Nexus Proofs that is still coming up.
+            let next = apiKey ? await setNexusApiKey(apiKey) : status;
+            if (privateMode !== next.privateMode) next = await setNexusPrivateMode(privateMode);
             await applyStatus(next);
             setShowKeyEditor(false);
           }}
           onLoginWithNexus={async () => {
             const { status: nextStatus } = await loginWithDappnodeNexus();
             await applyStatus(nextStatus);
-            setShowKeyEditor(false);
           }}
           onClear={async () => {
             const next =
@@ -488,6 +502,8 @@ export function ChatPanel({ variant = "page", onOpenFullScreen, onOpenFloating }
           }}
         />
       )}
+
+      {proofsPaused && !showKeyEditor && <ProofsPausedBanner onFix={() => setShowKeyEditor(true)} />}
 
       <div className="nexus-chat-body">
         {messages.length === 0 ? (
@@ -516,7 +532,8 @@ export function ChatPanel({ variant = "page", onOpenFullScreen, onOpenFloating }
           onCancel={cancel}
           isRunning={isRunning}
           error={streamError}
-          disabled={!selectedModel}
+          disabled={!selectedModel || proofsPaused}
+          placeholder={proofsPaused ? "Chat is paused until Nexus Proofs is ready" : undefined}
         />
       )}
     </div>
@@ -570,6 +587,7 @@ function ChatHeader({
   onDeleteConversation,
   onClearHistory,
   onManageKey,
+  paused = false,
   onOpenFullScreen,
   onOpenFloating
 }: {
@@ -585,6 +603,8 @@ function ChatHeader({
   onDeleteConversation: (id: string) => void;
   onClearHistory: () => void;
   onManageKey: () => void;
+  /** Proofs are on but Nexus Proofs is not ready. */
+  paused?: boolean;
   onOpenFullScreen?: () => void;
   onOpenFloating?: () => void;
 }) {
@@ -592,10 +612,12 @@ function ChatHeader({
     return [...models].sort(sortModelCompare).map((m) => m.id);
   }, [models]);
 
-  const statusLabel = status.configured ? (
-    <span className="nexus-status-dot online" />
-  ) : (
+  const statusLabel = !status.configured ? (
     <span className="nexus-status-dot offline" />
+  ) : paused ? (
+    <span className="nexus-status-dot paused" title="Paused until Nexus Proofs is ready" />
+  ) : (
+    <span className="nexus-status-dot online" />
   );
 
   return (
@@ -1006,7 +1028,8 @@ function Composer({
   onCancel,
   isRunning,
   error,
-  disabled
+  disabled,
+  placeholder = "Send a message…"
 }: {
   draft: string;
   onDraftChange: (v: string) => void;
@@ -1015,6 +1038,7 @@ function Composer({
   isRunning: boolean;
   error: string | null;
   disabled?: boolean;
+  placeholder?: string;
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -1049,7 +1073,7 @@ function Composer({
           }}
           onKeyDown={onKeyDown}
           rows={1}
-          placeholder="Send a message…"
+          placeholder={placeholder}
           className="form-control nexus-composer-input"
           disabled={disabled}
         />
@@ -1108,7 +1132,7 @@ function ApiKeyEditor({
   onClose
 }: {
   status: NexusStatus;
-  onSave: (key: string) => Promise<void>;
+  onSave: (changes: { apiKey: string | null; privateMode: boolean }) => Promise<void>;
   onLoginWithNexus: () => Promise<void>;
   onClear: () => Promise<void>;
   onClose: () => void;
@@ -1117,7 +1141,15 @@ function ApiKeyEditor({
   const [show, setShow] = useState(false);
   const [busyAction, setBusyAction] = useState<"login" | "save" | "clear" | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [draftPrivateMode, setDraftPrivateMode] = useState(status.privateMode);
   const busy = busyAction !== null;
+  const proofs = useNexusProofs(draftPrivateMode);
+  const privateModeChanged = draftPrivateMode !== status.privateMode;
+  const keyEntered = value.trim().length > 0;
+  // Saving waits for Nexus Proofs: with proofs on, the chat only works once it
+  // has verified Nexus, so there is nothing useful to save before that.
+  const proofsBlockSave = draftPrivateMode && proofs.phase !== "ready";
+  const canSave = !busy && (keyEntered || privateModeChanged) && !proofsBlockSave;
 
   const login = async () => {
     if (busy) return;
@@ -1125,6 +1157,9 @@ function ApiKeyEditor({
     setError(null);
     try {
       await onLoginWithNexus();
+      // Stay open: right after connecting is when the operator decides on
+      // confidentiality proofs.
+      setBusyAction(null);
     } catch (err) {
       setError((err as Error).message || "Failed to connect to Dappnode Nexus");
       setBusyAction(null);
@@ -1132,12 +1167,11 @@ function ApiKeyEditor({
   };
 
   const submit = async () => {
-    const key = value.trim();
-    if (!key || busy) return;
+    if (!canSave) return;
     setBusyAction("save");
     setError(null);
     try {
-      await onSave(key);
+      await onSave({ apiKey: value.trim() || null, privateMode: draftPrivateMode });
     } catch (err) {
       setError((err as Error).message || "Failed to save the API key");
       setBusyAction(null);
@@ -1216,6 +1250,15 @@ function ApiKeyEditor({
           </button>
         </div>
 
+        <ConfidentialityProofsField
+          checked={draftPrivateMode}
+          active={status.privateMode}
+          disabled={busy}
+          proofs={proofs}
+          verificationUrl={status.verificationUrl}
+          onChange={setDraftPrivateMode}
+        />
+
         {error && <div className="nexus-key-editor-error">{error}</div>}
 
         <div className="nexus-key-editor-actions">
@@ -1236,7 +1279,7 @@ function ApiKeyEditor({
             <Button variant="outline-secondary" onClick={onClose} disabled={busy}>
               Cancel
             </Button>
-            <Button variant="dappnode" onClick={submit} disabled={busy || !value.trim()}>
+            <Button variant="dappnode" onClick={submit} disabled={!canSave}>
               {busyAction === "save" ? "Saving..." : status.configured ? "Save" : "Save & connect"}
             </Button>
           </div>
