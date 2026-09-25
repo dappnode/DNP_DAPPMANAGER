@@ -1063,6 +1063,7 @@ __metadata:
     "@types/styled-components": "npm:^5.1.36"
     "@vitejs/plugin-react": "npm:^4.7.0"
     ajv: "npm:^8.20.0"
+    ajv-formats: "npm:^3.0.1"
     bootstrap: "npm:^5.3"
     clipboard: "npm:^2.0.11"
     deepmerge: "npm:^4.3.1"

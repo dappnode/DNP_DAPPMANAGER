@@ -1,12 +1,16 @@
 import { mapValues, isEmpty } from "lodash-es";
 import deepmerge from "deepmerge";
 import { Ajv } from "ajv";
+import addFormats from "ajv-formats";
 import { UserSettingsAllDnps, UserSettings, SetupWizardAllDnps } from "@dappnode/types";
 import { SetupWizardFormDataReturn } from "../types";
 import { SetupSchema } from "@dappnode/types";
 import { SetupTargetAllDnps } from "types";
 
-const ajv = new Ajv({ allErrors: true });
+// `field.if` schemas are written by package developers. Ajv 8 strict mode throws on unknown
+// keywords, which would silently hide the field (see filterActiveSetupWizard), so keep Ajv 6 leniency
+const ajv = new Ajv({ allErrors: true, strict: false });
+addFormats(ajv);
 
 /**
  * Extract setup target objects from the setupWizard

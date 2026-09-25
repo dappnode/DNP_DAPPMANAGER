@@ -33,6 +33,7 @@
     "@types/styled-components": "^5.1.36",
     "@vitejs/plugin-react": "^4.7.0",
     "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
     "bootstrap": "^5.3",
     "clipboard": "^2.0.11",
     "deepmerge": "^4.3.1",
