@@ -5,12 +5,15 @@ import "./nexusMarkdown.scss";
 
 export default function NexusMarkdown({ source }: { source: string }) {
   return (
-    <ReactMarkdown
-      className="nexus-markdown"
-      remarkPlugins={[remarkGfm]}
-      linkTarget="_blank"
-    >
-      {source}
-    </ReactMarkdown>
+    <div className="nexus-markdown">
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        components={{
+          a: ({ node: _node, ...props }) => <a {...props} target="_blank" rel="noopener noreferrer" />
+        }}
+      >
+        {source}
+      </ReactMarkdown>
+    </div>
   );
 }
