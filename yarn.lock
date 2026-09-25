@@ -19209,22 +19209,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"systeminformation@npm:*":
-  version: 5.21.24
-  resolution: "systeminformation@npm:5.21.24"
+"systeminformation@npm:*, systeminformation@npm:^5.33.10":
+  version: 5.33.13
+  resolution: "systeminformation@npm:5.33.13"
   bin:
     systeminformation: lib/cli.js
-  checksum: 10c0/395ea78d7d3028d42a55cd33b8b8fe73df246b84110f84b2ca801dd487af91bb35d1ae70ddfb738d37f6d7dbd56a7cca5a0b46575b21c6a34ab11a551115125c
-  conditions: (os=darwin | os=linux | os=win32 | os=freebsd | os=openbsd | os=netbsd | os=sunos | os=android)
-  languageName: node
-  linkType: hard
-
-"systeminformation@npm:^5.33.10":
-  version: 5.33.10
-  resolution: "systeminformation@npm:5.33.10"
-  bin:
-    systeminformation: lib/cli.js
-  checksum: 10c0/32f2aa1f7f42a8ab101b160ccb7eeb4ec4b031737ee481bdbc5b3a7784437e2b288a826d96aaa66f4f64b18cf59b997942edb67d07487b69c17ac10fe5615116
+  checksum: 10c0/477d501a058182116cb488f9d869532be0176763e5430d9495d5a72b045e377a2c33ab827d599caa928fc7aed5543ca5541dd8e46fcd061896694d9f1e5f1840
   conditions: (os=darwin | os=linux | os=win32 | os=freebsd | os=openbsd | os=netbsd | os=sunos | os=android)
   languageName: node
   linkType: hard
