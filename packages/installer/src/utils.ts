@@ -39,9 +39,11 @@ export function parseTimeoutSeconds(timeout: number | string | undefined): numbe
       return timeout;
     }
     case "string": {
-      if (!timeout) undefined;
+      if (!timeout) return undefined;
+      // A bare number is already in seconds. timestring >= 7 would parse it as milliseconds ("5" -> 0.005)
+      if (/^\d+$/.test(timeout.trim())) return parseInt(timeout);
       // Timestring returns in seconds
-      const parsedString = timestring(timeout) || parseInt(timeout);
+      const parsedString = timestring(timeout);
       if (!parsedString) throw Error(`Error parsing timeout: ${timeout}`);
       return parsedString;
     }
