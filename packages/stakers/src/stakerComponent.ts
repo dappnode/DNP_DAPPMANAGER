@@ -3,9 +3,10 @@ import { ComposeFileEditor } from "@dappnode/dockercompose";
 import { DappnodeInstaller, packageGetData, packageInstall } from "@dappnode/installer";
 import { logs } from "@dappnode/logger";
 import { InstalledPackageData, StakerItem, UserSettings, Network } from "@dappnode/types";
-import { getIsInstalled, getIsUpdated, getIsRunning, fileToGatewayUrl } from "@dappnode/utils";
+import { getIsInstalled, getIsUpdated, getIsRunning, fileToGatewayUrl, getDockerComposePathSmart } from "@dappnode/utils";
 import { lt } from "semver";
 import { params } from "@dappnode/params";
+import fs from "fs";
 
 export class StakerComponent {
   protected dappnodeInstaller: DappnodeInstaller;
@@ -95,18 +96,17 @@ protected async getAll({
     }
 
     if (!newStakerDnpName) return;
+
     // set staker config
     await this.setStakerPkgConfig({
       dnpName: newStakerDnpName,
-      isInstalled: Boolean(await listPackageNoThrow({ dnpName: newStakerDnpName })),
+      pkg: await listPackageNoThrow({ dnpName: newStakerDnpName }),
       userSettings
     });
   }
 
   protected async isPackageInstalled(dnpName: string): Promise<boolean> {
-    const dnp = await listPackageNoThrow({ dnpName });
-
-    return Boolean(dnp);
+    return Boolean(await listPackageNoThrow({ dnpName }));
   }
 
   protected getComposeRootNetworks(network: Network): NonNullable<UserSettings["networks"]>["rootNetworks"] {
@@ -129,15 +129,15 @@ protected async getAll({
    */
   protected async setStakerPkgConfig({
     dnpName,
-    isInstalled,
+    pkg,
     userSettings
   }: {
     dnpName: string;
-    isInstalled: boolean;
+    pkg: InstalledPackageData | null;
     userSettings: UserSettings;
   }): Promise<void> {
-    if (isInstalled) {
-      await this.setInstalledStakerPkgConfig({ dnpName, userSettings });
+    if (pkg) {
+      await this.setInstalledStakerPkgConfig({ dnpName, pkg, userSettings });
     } else {
       await packageInstall(this.dappnodeInstaller, {
         name: dnpName,
@@ -148,25 +148,38 @@ protected async getAll({
 
   private async setInstalledStakerPkgConfig({
     dnpName,
+    pkg,
     userSettings
   }: {
     dnpName: string;
+    pkg: InstalledPackageData;
     userSettings: UserSettings;
   }): Promise<void> {
     if (userSettings) {
-      const composeEditor = new ComposeFileEditor(dnpName, false);
+      const composePath = getDockerComposePathSmart(dnpName);
+      const composeBefore = fs.existsSync(composePath) ? fs.readFileSync(composePath, "utf-8") : "";
 
+      const composeEditor = new ComposeFileEditor(dnpName, false);
       composeEditor.applyUserSettings(userSettings, { dnpName });
-      // it must be called write after applying user settings otherwise the new settings will be lost and therefore the compose up will not have effect
       composeEditor.write();
+
+      const composeAfter = fs.readFileSync(composePath, "utf-8");
+      if (composeBefore !== composeAfter) {
+        logs.warn(`setInstalledStakerPkgConfig: compose file changed for ${dnpName}`);
+      }
     }
 
-    // start all containers
-    await dockerComposeUpPackage({
-      composeArgs: { dnpName },
-      upAll: true
-      // dockerComposeUpOptions: { noRecreate: true }
-    });
+    // Only start containers if at least one is not running.
+    // Calling docker compose up unconditionally can cause unnecessary container
+    // recreation when compose normalization produces non-meaningful file diffs
+    // (e.g. key reordering, quote changes) that Docker interprets as config changes.
+    if (pkg.containers.some((c) => !c.running)) {
+      logs.info(`At least one container of ${dnpName} is not running, recreating containers to apply changes`);
+      await dockerComposeUpPackage({
+        composeArgs: { dnpName },
+        upAll: true
+      });
+    }
   }
 
   /**

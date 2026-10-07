@@ -78,7 +78,7 @@ export class MevBoost extends StakerComponent {
 
       await this.setStakerPkgConfig({
         dnpName: mevBoostDnpName,
-        isInstalled: true,
+        pkg: mevBoostDnp,
         userSettings
       });
 
