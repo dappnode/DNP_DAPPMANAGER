@@ -87,7 +87,14 @@ export function RemovePackage({ dnp }: { dnp: InstalledPackageDetailData }) {
         message: `Removing ${name} ${deleteVolumes ? " and volumes" : ""}...`,
         onSuccess: `Removed ${name}`
       });
-      navigate("/" + packagesRelativePath);
+
+      // Navigate to "/packages/my" only if user located in current unistalling package tab
+      const currentPath = location.pathname
+        .split("/")
+        .slice(0, -1)
+        .join("/");
+      currentPath === "/" + packagesRelativePath + "/" + dnpName &&
+        navigate("/" + packagesRelativePath);
     } catch (e) {
       console.error(e);
     }
