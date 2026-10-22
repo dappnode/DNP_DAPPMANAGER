@@ -131,6 +131,26 @@ describe("MEV-Boost builder handoff", () => {
     expect(enabled).to.equal(true);
   });
 
+  it("maps the configured Hoodi relay URLs with their real public keys to ordered preset IDs", async () => {
+    const relays = [
+      "https://0x98f0ef62f00780cf8eb06701a7d22725b9437d4768bb19b363e882ae87129945ec206ec2dc16933f31d983f8225772b6@hoodi.aestus.live",
+      "https://0xaa58208899c6105603b74396734a6263cc7d947f444f396a90f7b7d3e65d102aec7e5e5291b27e08d02c50a050825c2f@hoodi.titanrelay.xyz",
+      "https://0xafa4c6985aa049fb79dd37010438cfebeb0f2bd42b115b89dd678dab0670c1de38da0c4e9138c9290a398ecd9a0b3110@boost-relay-hoodi.flashbots.net"
+    ].join(",");
+    composes[MevBoostHoodi.Mevboost].services()["mev-boost"].mergeEnvs({ RELAYS: relays });
+
+    await run(deps);
+
+    expect(writes).to.deep.equal([
+      {
+        dnpName: SignerHoodi.Web3signer,
+        environmentByService: { brain: { BUILDER_IDS: "aestus,titan,flashbots" } }
+      }
+    ]);
+    expect(composes[MevBoostHoodi.Mevboost].services()["mev-boost"].getEnvs().RELAYS).to.equal(relays);
+    expect(warnings).to.deep.equal([]);
+  });
+
   it("skips disabled MEV-Boost and unsupported networks", async () => {
     enabled = false;
     await run(deps);
