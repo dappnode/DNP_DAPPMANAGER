@@ -15,9 +15,10 @@ and requires every URL to match a supported Hoodi endpoint. Unsupported or mixed
 selections are logged and skipped; other networks currently have no mapping.
 MEV-Boost, bid limits, and validator client options are left intact.
 
-Startup migrations run every time and are not awaited by daemons. The handoff
-serializes startup and `packagesModified` retries, skips missing/installing
-packages, and preserves nonempty staged IDs without another recreation. No
+Startup migrations run every time and are not awaited by daemons. The migration
+registers its own `packagesModified` listener before its initial attempt, with no
+changes to the staking daemon. It serializes startup and lifecycle retries,
+skips missing/installing packages, and preserves nonempty staged IDs without another recreation. No
 signer is provisioned. The installer preserves staged IDs across signer updates,
 including intermediate releases without the variable. Brain alone imports
 settings for existing validators and manages its database and completion marker;
@@ -30,6 +31,7 @@ defaults into a new validator database.
 
 ## Testing
 
+- Unit tests: `yarn test`
 - Integration tests: `yarn test:int`
 
 ## Todo

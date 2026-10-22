@@ -1,11 +1,10 @@
 import { expect } from "chai";
 import { eventBus } from "@dappnode/eventbus";
-import { afterInstall, DappnodeInstaller, flagPackagesAreInstalling, packageIsInstalling } from "@dappnode/installer";
+import { afterInstall, flagPackagesAreInstalling, packageIsInstalling } from "@dappnode/installer";
 import { MevBoostHoodi, Network, SignerHoodi, SignerMainnet, UserSettings } from "@dappnode/types";
-import { migrateMevBoostRelays } from "@dappnode/stakers";
-import { startStakerDaemon } from "../../src/stakerConfig/index.js";
+import { migrateMevBoostRelays, startMevBoostRelayMigration } from "../../src/migrateMevBoostRelays.js";
 
-describe("staker package lifecycle builder import", () => {
+describe("migration package lifecycle builder import", () => {
   it("retries a missing signer after installation and stops recreating after staging", async () => {
     let signerInstalled = false;
     let staged: string | undefined;
@@ -32,13 +31,14 @@ describe("staker package lifecycle builder import", () => {
       });
     };
 
-    await importRelays(Network.Hoodi); // Startup migration with no installed signer.
+    await startMevBoostRelayMigration(Network.Hoodi, importRelays);
     expect(staged).to.equal(undefined);
-    startStakerDaemon({} as DappnodeInstaller, importRelays);
+    // Repeated startup calls must not register duplicate event listeners.
+    await startMevBoostRelayMigration(Network.Hoodi, importRelays);
     eventBus.packagesModified.emit({ dnpNames: [SignerMainnet.Web3signer] });
     eventBus.packagesModified.emit({ dnpNames: [SignerHoodi.Web3signer], removed: true });
     await new Promise<void>((resolve) => setImmediate(resolve));
-    expect(attempts).to.deep.equal([Network.Hoodi]);
+    expect(attempts).to.deep.equal([Network.Hoodi, Network.Hoodi]);
     expect(staged).to.equal(undefined);
 
     signerInstalled = true;
@@ -49,8 +49,8 @@ describe("staker package lifecycle builder import", () => {
     await new Promise<void>((resolve) => setImmediate(resolve));
     expect(staged).to.equal("aestus");
     expect(recreations).to.equal(1);
-    // Startup, Hoodi installation, and our own event. Mainnet events are ignored.
-    expect(attempts).to.deep.equal([Network.Hoodi, Network.Hoodi, Network.Hoodi]);
+    // Two startup calls, Hoodi installation, and our own event. Mainnet events are ignored.
+    expect(attempts).to.deep.equal([Network.Hoodi, Network.Hoodi, Network.Hoodi, Network.Hoodi]);
 
     eventBus.packagesModified.emit({ dnpNames: [SignerHoodi.Web3signer] });
     eventBus.packagesModified.emit({ dnpNames: [MevBoostHoodi.Mevboost] });

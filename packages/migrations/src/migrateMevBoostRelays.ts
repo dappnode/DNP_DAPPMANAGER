@@ -1,4 +1,5 @@
 import * as db from "@dappnode/db";
+import { eventBus } from "@dappnode/eventbus";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
 import { packageIsInstalling, packageSetEnvironment } from "@dappnode/installer";
@@ -60,7 +61,26 @@ const dependencies = {
   }
 };
 
-// Migrations and daemons start independently. Serialize their attempts, including
+const retryNetworks = new Set<Network>();
+
+/** Register lifecycle retries before attempting the startup handoff. */
+export async function startMevBoostRelayMigration(
+  network: Network,
+  migrate: (network: Network) => Promise<void> = migrateMevBoostRelays
+): Promise<void> {
+  const config = handoffs[network];
+  if (!config) return;
+  if (!retryNetworks.has(network)) {
+    retryNetworks.add(network);
+    eventBus.packagesModified.on(({ dnpNames, removed }) => {
+      if (!removed && dnpNames.some((name) => name === config.signer || name === config.mevBoost))
+        migrate(network).catch((e) => logs.error(`Error staging ${network} MEV-Boost builder import`, e));
+    });
+  }
+  await migrate(network);
+}
+
+// Startup and package lifecycle events can overlap. Serialize attempts, including
 // the packagesModified event emitted by packageSetEnvironment itself.
 let pendingHandoff: Promise<void> = Promise.resolve();
 

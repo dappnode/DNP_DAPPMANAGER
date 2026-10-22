@@ -4,7 +4,7 @@ import { pruneUserActionLogs } from "./pruneUserActionLogs.js";
 import { recreateContainersIfLegacyDns } from "./recreateContainersIfLegacyDns.js";
 import { ensureCoreComposesHardcodedIpsRange } from "./ensureCoreComposesHardcodedIpsRange.js";
 import { determineIsDappnodeAws } from "./determineIsDappnodeAws.js";
-import { migrateMevBoostRelays } from "@dappnode/stakers";
+import { startMevBoostRelayMigration } from "./migrateMevBoostRelays.js";
 import { Network } from "@dappnode/types";
 
 class MigrationError extends Error {
@@ -60,7 +60,7 @@ export async function executeMigrations(): Promise<void> {
       coreVersion: "0.2.94"
     },
     {
-      fn: () => migrateMevBoostRelays(Network.Hoodi),
+      fn: () => startMevBoostRelayMigration(Network.Hoodi),
       migration: "stage existing Hoodi MEV-Boost relay choices for Brain",
       coreVersion: "0.2.71"
     }

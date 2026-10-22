@@ -3,8 +3,7 @@ import * as db from "@dappnode/db";
 import { logs } from "@dappnode/logger";
 import { DappnodeInstaller, packagePickItemData } from "@dappnode/installer";
 import { memoizeDebounce } from "@dappnode/utils";
-import { MevBoostHoodi, MevBoostMainnet, Network, SignerHoodi } from "@dappnode/types";
-import { migrateMevBoostRelays } from "@dappnode/stakers";
+import { MevBoostHoodi, MevBoostMainnet } from "@dappnode/types";
 
 async function updateMevBoostOnDb({ dnpNames, removed }: { dnpNames: string[]; removed?: boolean }): Promise<void> {
   try {
@@ -48,19 +47,12 @@ const memoizeDebouncedCacheUpdate = memoizeDebounce(
  * StakerConfig daemon.
  * Makes sure the staker config cache is executed maximum 1 per 30 mins
  */
-export function startStakerDaemon(
-  dappnodeInstaller: DappnodeInstaller,
-  importMevBoostRelays: (network: Network) => Promise<void> = migrateMevBoostRelays
-): void {
+export function startStakerDaemon(dappnodeInstaller: DappnodeInstaller): void {
   eventBus.runStakerCacheUpdate.on(({ dnpName }) => {
     memoizeDebouncedCacheUpdate({ dappnodeInstaller, dnpName });
   });
 
-  eventBus.packagesModified.on(({ dnpNames, removed }) => {
-    updateMevBoostOnDb({ dnpNames, removed });
-    if (removed) return;
-    if (dnpNames.some((name) => name === SignerHoodi.Web3signer || name === MevBoostHoodi.Mevboost)) {
-      importMevBoostRelays(Network.Hoodi).catch((e) => logs.error("Error staging Hoodi MEV-Boost builder import", e));
-    }
+  eventBus.packagesModified.on((dnpNames) => {
+    updateMevBoostOnDb(dnpNames);
   });
 }

@@ -1510,7 +1510,6 @@ __metadata:
     "@dappnode/utils": "workspace:^0.1.0"
     "@types/semver": "npm:7.8.0"
     lodash-es: "npm:^4.18.1"
-    mocha: "npm:^12.0.0"
     semver: "npm:7.8.5"
   languageName: unknown
   linkType: soft
