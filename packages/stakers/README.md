@@ -11,7 +11,7 @@ This package includes all the logic related with the stakers UI, includiing the 
 
 ## Testing
 
-❌ No testing yet
+Run focused unit tests with `yarn workspace @dappnode/stakers test`.
 
 ## Todo
 
