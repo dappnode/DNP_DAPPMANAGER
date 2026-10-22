@@ -447,6 +447,18 @@ export const params = {
       dnpNameSuffix: ".public.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
       key: "0x174ebad9bcd1B431e32c488064d30737427b982A"
+    },
+    {
+      name: "Chuy Garcia",
+      dnpNameSuffix: ".dnp.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0xB22981bA3FE1De2325935c91a3B717168fB86714"
+    },
+    {
+      name: "Chuy Garcia",
+      dnpNameSuffix: ".public.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0xB22981bA3FE1De2325935c91a3B717168fB86714"
     }
   ]
 };
