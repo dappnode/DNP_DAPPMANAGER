@@ -42,7 +42,7 @@
     "@dappnode/types": "workspace:^0.1.0",
     "@dappnode/upnpc": "workspace:^0.1.0",
     "@dappnode/utils": "workspace:^0.1.0",
-    "@modelcontextprotocol/sdk": "^1.30.0",
+    "@modelcontextprotocol/sdk": "^1.32.0",
     "@types/async-retry": "^1.4.9",
     "@types/bcryptjs": "^2.4.6",
     "@types/compression": "1.7.2",
