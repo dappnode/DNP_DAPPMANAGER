@@ -7,6 +7,43 @@ const CLIENT_TIMEOUT_MS = 5_000;
 const ecBaseUrl = (network: DashboardSupportedNetwork) => `http://execution.${network}.dncore.dappnode:8545`;
 const ccBaseUrl = (network: DashboardSupportedNetwork) => `http://beacon-chain.${network}.dncore.dappnode:3500`;
 
+/** Besu serves Prometheus metrics from the same container as its JSON-RPC */
+const BESU_METRICS_PORT = 9545;
+/** Blocks of tolerance between the head and Besu's snap sync pivot before the node is considered behind */
+const BESU_PIVOT_TOLERANCE_BLOCKS = 128;
+
+const ecMetricsUrl = (network: DashboardSupportedNetwork) =>
+  `http://execution.${network}.dncore.dappnode:${BESU_METRICS_PORT}/metrics`;
+
+/** Reads one value from Prometheus text format. `name` must include the labels if the metric has any */
+const readMetric = (metrics: string, name: string): number | null => {
+  const line = metrics.split("\n").find((l) => l.startsWith(`${name} `));
+  if (!line) return null;
+  const value = parseFloat(line.slice(name.length + 1));
+  return Number.isFinite(value) ? value : null;
+};
+
+/**
+ * Besu reports eth_syncing === false during snap sync, so its real state is read from its metrics.
+ * Returns null if the metrics are unavailable, so the caller falls back to the eth_syncing result.
+ */
+const getBesuSnapSyncState = async (network: DashboardSupportedNetwork) => {
+  try {
+    const response = await fetch(ecMetricsUrl(network), { signal: AbortSignal.timeout(2_000) });
+    if (!response.ok) return null;
+    const metrics = await response.text();
+    const pivotBlock = readMetric(metrics, "besu_synchronizer_fast_sync_pivot_block_current");
+    const worldStateCompleted = readMetric(
+      metrics,
+      'besu_synchronizer_sync_duration_count{name="SNAP_INITIAL_WORLD_STATE_DOWNLOAD_DURATION"}'
+    );
+    if (pivotBlock === null || worldStateCompleted === null) return null;
+    return { pivotBlock, isWorldStateDownloaded: worldStateCompleted > 0 };
+  } catch {
+    return null;
+  }
+};
+
 const getEcName = async (network: DashboardSupportedNetwork) => {
   const versionResponse = await fetch(ecBaseUrl(network), {
     method: "POST",
@@ -30,7 +67,7 @@ const getEcName = async (network: DashboardSupportedNetwork) => {
   return { name: clientName };
 };
 
-const getEcSyncStatus = async (network: DashboardSupportedNetwork) => {
+const getEcSyncStatus = async (network: DashboardSupportedNetwork, clientName: string) => {
   const syncResponse = await fetch(`${ecBaseUrl(network)}`, {
     method: "POST",
     headers: {
@@ -77,6 +114,19 @@ const getEcSyncStatus = async (network: DashboardSupportedNetwork) => {
     startingBlock = currentBlock;
     highestBlock = currentBlock;
     progress = 100;
+
+    // Besu reports false during snap sync, so its metrics tell whether it is really synced
+    if (clientName.toLowerCase().includes("besu")) {
+      const snap = await getBesuSnapSyncState(network);
+      if (snap && snap.pivotBlock > 0) {
+        const blocksBehindPivot = snap.pivotBlock - currentBlock;
+        if (blocksBehindPivot > BESU_PIVOT_TOLERANCE_BLOCKS || !snap.isWorldStateDownloaded) {
+          isSynced = false;
+          // Capped at 99 so the bar never reads 100% while the node is still syncing
+          progress = Math.max(0, Math.min(99, Math.floor((currentBlock / snap.pivotBlock) * 100)));
+        }
+      }
+    }
   } else {
     // Node is syncing
     isSynced = false;
@@ -184,7 +234,7 @@ const getCcSyncStatus = async (network: DashboardSupportedNetwork) => {
 };
 const getEcData = async (network: DashboardSupportedNetwork): Promise<ClientResult> => {
   const ecName = await getEcName(network);
-  const ecSync = await getEcSyncStatus(network);
+  const ecSync = await getEcSyncStatus(network, ecName.name);
   const ecPeers = await getEcPeers(network);
 
   return {
