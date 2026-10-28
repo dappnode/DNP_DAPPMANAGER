@@ -423,12 +423,12 @@ export interface Routes {
   ipfsClientTargetGet(): Promise<IpfsRepository>;
 
   /**
-   * Gets the mirror content provider enabled status
+   * @deprecated Returns disabled; plain HTTP mirrors cannot authenticate releases.
    */
   mirrorProviderGet(): Promise<{ enabled: boolean }>;
 
   /**
-   * Enables or disables the mirror content provider
+   * @deprecated Enabling plain HTTP mirrors is rejected.
    */
   mirrorProviderSet(kwargs: { enabled: boolean }): Promise<void>;
 

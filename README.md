@@ -14,6 +14,19 @@ The **DNP_DAPPMANAGER** handles the Dappnode core DNPs and any user installed DN
 
 It is an AragonApp whose repo is deployed at this address: [0x0c564ca7b948008fb324268d8baedaeb1bd47bce](https://etherscan.io/address/0x0c564ca7b948008fb324268d8baedaeb1bd47bce) and whose ENS address is: [dappmanager.dnp.dappnode.eth](https://etherscan.io/enslookup?q=dappmanager.dnp.dappnode.eth])
 
+## Package download integrity
+
+Release directories and files are authenticated against their IPFS CIDs. Every CAR
+block consumed by UnixFS is hashed before decoding. Image downloads are staged on
+disk and replace the destination only after verification succeeds. Cached CARs are
+verified again on reuse; a cached tarball alone is never trusted.
+
+The former plain HTTP content-mirror protocol is deprecated because it supplied no
+proof that its files belonged to the requested CID. Existing mirror settings are
+ignored and migrated to disabled. Packages use the configured local or remote IPFS
+gateways, which must support raw DAG-PB and CAR responses. Publisher signature
+checks apply regardless of where the bytes are downloaded.
+
 ## Getting Started
 
 This repo is a single piece of Dappnode. To install and use Dappnode go to the [installation guide](https://docs.dappnode.io/docs/user/install/overview).

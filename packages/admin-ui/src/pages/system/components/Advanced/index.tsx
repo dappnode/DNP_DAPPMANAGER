@@ -4,7 +4,6 @@ import React from "react";
 import { ChangeDappnodeWebName } from "./ChangeDappnodeWebName";
 import { ClearCacheDb } from "./ClearCacheDb";
 import { ClearMainDb } from "./ClearMainDb";
-import { ContentProviderSelector } from "./ContentProviderSelector";
 import { ReleaseTrustedKeysEditor } from "./ReleaseTrustedKeysEditor";
 import { UiTelemetryToggle } from "./UiTelemetryToggle";
 import { McpApiKey } from "./McpApiKey";
@@ -19,9 +18,6 @@ export function Advanced() {
         </div>
         <ChangeDappnodeWebName />
       </Card>
-
-      <SubTitle>Dappnode Content Provider</SubTitle>
-      <ContentProviderSelector />
 
       <SubTitle>Release trusted keys</SubTitle>
       <ReleaseTrustedKeysEditor />

@@ -61,12 +61,12 @@ async function car(roots: CID[], blocks: Block[]): Promise<ArrayBuffer> {
   return collected;
 }
 
-function repository(gateways = ["https://first.example"]): DappnodeRepository {
+function repository(gateways = ["https://first.example"], mirrorEnabled = false): DappnodeRepository {
   return new DappnodeRepository(
     gateways,
     new JsonRpcProvider(),
     { baseUrl: "https://mirror.example", timeoutMs: 1000, maxBytes: 1024 * 1024 },
-    () => false
+    () => mirrorEnabled
   );
 }
 
@@ -189,6 +189,65 @@ describe("IPFS downloaded content integrity", () => {
       }
       assert.equal(await fs.readFile(existing, "utf8"), "original file");
       await assert.rejects(fs.stat(missing), { code: "ENOENT" });
+    } finally {
+      await fs.rm(directory, { recursive: true, force: true });
+    }
+  });
+
+  it("revalidates cached CARs and replaces poisoned extracted images", async () => {
+    const directory = await fs.mkdtemp(path.join(os.tmpdir(), "dappnode-car-cache-"));
+    try {
+      const expected = await fileBlock("verified image");
+      const changed = await fileBlock("changed image!");
+      const authentic = await car([expected.cid], [expected]);
+      let downloads = 0;
+      globalThis.fetch = async () => {
+        downloads++;
+        return new Response(authentic);
+      };
+      const destination = path.join(directory, "image.txz");
+      const args = { hash: expected.cid.toString(), path: destination };
+      await repository().writeFileToFs(args);
+      await fs.writeFile(destination, "poisoned cached archive");
+      await repository().writeFileToFs(args);
+      assert.equal(await fs.readFile(destination, "utf8"), "verified image");
+      assert.equal(downloads, 1);
+
+      await fs.writeFile(
+        `${destination}.car`,
+        Buffer.from(await car([expected.cid], [{ cid: expected.cid, bytes: changed.bytes }]))
+      );
+      await repository().writeFileToFs(args);
+      assert.equal(await fs.readFile(destination, "utf8"), "verified image");
+      assert.equal(downloads, 2);
+      assert.deepEqual((await fs.readdir(directory)).sort(), ["image.txz", "image.txz.car"]);
+    } finally {
+      await fs.rm(directory, { recursive: true, force: true });
+    }
+  });
+
+  it("retries corrupt image CARs and never uses a plain mirror even when enabled", async () => {
+    const directory = await fs.mkdtemp(path.join(os.tmpdir(), "dappnode-image-retry-"));
+    try {
+      const expected = await fileBlock("verified image");
+      const changed = await fileBlock("modified image");
+      const corrupt = await car([expected.cid], [{ cid: expected.cid, bytes: changed.bytes }]);
+      const authentic = await car([expected.cid], [expected]);
+      const requests: string[] = [];
+      globalThis.fetch = async (input) => {
+        requests.push(input.toString());
+        assert(!input.toString().includes("mirror.example"));
+        return new Response(requests.length === 1 ? corrupt : authentic);
+      };
+      const destination = path.join(directory, "image.txz");
+      await repository(["https://first.example", "https://second.example"], true).writeFileToFs({
+        hash: expected.cid.toString(),
+        path: destination,
+        filename: "image.txz",
+        packageHash: expected.cid.toString()
+      });
+      assert.equal(requests.length, 2);
+      assert.equal(await fs.readFile(destination, "utf8"), "verified image");
     } finally {
       await fs.rm(directory, { recursive: true, force: true });
     }

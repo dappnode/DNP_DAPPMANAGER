@@ -34,6 +34,9 @@ function returnNullIfError(fn: () => Promise<string>, silent?: boolean): () => P
  * - Trigger a dyndns loop
  */
 export async function initializeDb(): Promise<void> {
+  // Retire the old mirror setting even for nodes that previously enabled it.
+  db.mirrorProviderEnabled.set(false);
+
   /**
    * ipfsClientTarget
    * Check if the IPFS package container exists. If it does not,

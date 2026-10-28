@@ -214,8 +214,7 @@ register.registerMetric(
     help: "Whether the Dappnode mirror content provider is enabled (1) or disabled (0)",
     labelNames: ["mirrorContentProvider"],
     collect() {
-      const enabled = db.mirrorProviderEnabled.get();
-      this.set({ mirrorContentProvider: "enabled" }, enabled ? 1 : 0);
+      this.set({ mirrorContentProvider: "enabled" }, 0);
     }
   })
 );
