@@ -25,6 +25,7 @@ export async function postInstallClean(packagesData: InstallPackageDataPaths[], 
     unlinkIfExists(manifestBackupPath);
     unlinkIfExists(imagePath);
     unlinkFilesWithExt(path.parse(imagePath).dir, ".tar.xz"); // Previous images
+    unlinkFilesWithExt(path.parse(imagePath).dir, ".tar.xz.car"); // Verified retry caches
 
     log(dnpName, "Cleaning previous images...");
     try {

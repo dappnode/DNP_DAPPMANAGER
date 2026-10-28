@@ -68,6 +68,8 @@ export async function packageInstall(
         throw Error(`Package ${release.dnpName} can only be installed as signed`);
     }
 
+    await dappnodeInstaller.assertVerifiedReleases(releases);
+
     // Gather all data necessary for the install
     const packagesData = await getInstallerPackagesData({
       releases,
@@ -88,6 +90,8 @@ export async function packageInstall(
 
       await downloadImages(dappnodeInstaller, packagesData, log);
       await downloadAvatars(dappnodeInstaller, packagesData, log);
+      // Downloads may take time; recheck authorization and finality before loading any image.
+      await dappnodeInstaller.assertVerifiedReleases(releases);
       await loadImages(packagesData, log);
 
       await createVolumeDevicePaths(packagesData);

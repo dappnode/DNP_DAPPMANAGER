@@ -73,6 +73,10 @@ export interface ReleaseWarnings {
 }
 
 export interface PackageRelease extends DirectoryFiles {
+  /** Authenticated release directory CID, available on downloaded releases. */
+  releaseCid?: string;
+  /** Populated only by the installer after a proof-backed registry lookup. */
+  registryVerification?: RegistryVerification;
   dnpName: string;
   reqVersion: string; // origin or semver: "/ipfs/Qm611" | "0.2.3"
   semVersion: string; // Always a semver: "0.2.3"
@@ -87,6 +91,18 @@ export interface PackageRelease extends DirectoryFiles {
   /** Release is from safe origin OR has trusted signature */
   signedSafe: boolean;
   signatureStatus: ReleaseSignatureStatus;
+}
+
+export interface RegistryVerification {
+  chainId: 1;
+  packageName: string;
+  version: string;
+  cid: string;
+  repositoryAddress: string;
+  blockHash: string;
+  blockNumber: number;
+  stateRoot: string;
+  blockTimestamp: number;
 }
 
 export type DirectoryFiles = {

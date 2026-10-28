@@ -1,3 +1,5 @@
+import path from "node:path";
+import { UpdateLightClient } from "./updateLightClient.js";
 import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
 import { initializeDb } from "./initializeDb.js";
@@ -23,7 +25,12 @@ import { getLimiter, getViewsCounterMiddleware, getEthForwardMiddleware } from "
 import { AdminPasswordDb } from "./api/auth/adminPasswordDb.js";
 import { DeviceCalls } from "./calls/device/index.js";
 import { startHttpApi } from "./api/startHttpApi.js";
-import { DappNodeDirectory, DappNodeRegistry, MultiUrlJsonRpcProvider } from "@dappnode/toolkit";
+import {
+  DappNodeDirectory,
+  DappNodeRegistry,
+  MultiUrlJsonRpcProvider,
+  VerifiedRegistryClient
+} from "@dappnode/toolkit";
 import { Consensus, Execution, MevBoost, Signer } from "@dappnode/stakers";
 
 const controller = new AbortController();
@@ -36,10 +43,17 @@ process.on("uncaughtException", (err) => {
 });
 
 // Graceful shutdown
-process.on("SIGINT", () => {
+async function shutdown(): Promise<void> {
   controller.abort();
   server.close();
+  await updateLightClient.stop();
   process.exit(0);
+}
+process.once("SIGINT", () => {
+  void shutdown();
+});
+process.once("SIGTERM", () => {
+  void shutdown();
 });
 
 // Initialize DB must be the first step so the db has the required values
@@ -75,7 +89,19 @@ const providers = new MultiUrlJsonRpcProvider(
 
 // Required db to be initialized
 export const directory = new DappNodeDirectory(providers);
-export const dappnodeInstaller = new DappnodeInstaller(ipfsUrls, providers);
+const updateLightClient = new UpdateLightClient({
+  binary: params.UPDATE_CHAIN_BINARY,
+  dataDir: path.resolve(params.REPO_DIR, "update-light-client"),
+  checkpoint: params.UPDATE_CHAIN_CHECKPOINT,
+  executionRpc: params.UPDATE_CHAIN_EXECUTION_RPC_URL,
+  consensusRpc: params.UPDATE_CHAIN_CONSENSUS_RPC_URL,
+  log: (level, message) => logs[level](message)
+});
+export const dappnodeInstaller = new DappnodeInstaller(
+  ipfsUrls,
+  providers,
+  new VerifiedRegistryClient(updateLightClient)
+);
 
 export const publicRegistry = new DappNodeRegistry("public");
 

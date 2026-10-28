@@ -2,6 +2,23 @@
 ARG BASE_IMAGE=node:24.22.1-alpine3.23
 ARG BUILDPLATFORM
 
+# The verifier is built from a fixed source revision for the target architecture.
+FROM rust:1.94.0-alpine3.23 AS update-light-client
+RUN apk add --no-cache build-base curl perl openssl-dev openssl-libs-static cmake git
+WORKDIR /src
+RUN curl -fsSL https://github.com/a16z/helios/archive/2af9b41887e069144ee56cd710f3ddca195473f8.tar.gz -o helios.tar.gz && \
+    echo "d6059d531efa60c6a3da8157a8fe59182f21049efa5b2ac6659d8f47d67e3cd1  helios.tar.gz" | sha256sum -c - && \
+    tar -xzf helios.tar.gz --strip-components=1 && rm helios.tar.gz
+ENV OPENSSL_STATIC=1
+RUN cargo build --locked --release --package helios-cli && strip target/release/helios
+
+# Offline cryptographic regressions, invoked explicitly by CI.
+FROM update-light-client AS update-light-client-tests
+COPY test/update-light-client-proof.rs core/tests/dappnode_proof.rs
+RUN cargo test --locked --package helios-consensus-core --lib --test sync && \
+    cargo test --locked --package helios-core --lib execution::proof && \
+    cargo test --locked --package helios-core --test dappnode_proof
+
 # Initial stage to gather git data
 FROM ${BASE_IMAGE} AS git-data
 WORKDIR /usr/src/app
@@ -41,7 +58,9 @@ ENV COMPOSE_HTTP_TIMEOUT=300 \
   GIT_DATA_PATH=.git-data.json 
 
 # Install necessary packages
-RUN apk add --no-cache docker curl docker-cli-compose xz zip unzip libltdl bind bind-dev bind-tools avahi-tools dbus miniupnpc
+RUN apk add --no-cache ca-certificates docker curl docker-cli-compose xz zip unzip libltdl bind bind-dev bind-tools avahi-tools dbus miniupnpc
+
+COPY --from=update-light-client /src/target/release/helios /usr/local/bin/helios
 
 # Copy git data
 COPY --from=git-data /usr/src/app/.git-data.json $GIT_DATA_PATH

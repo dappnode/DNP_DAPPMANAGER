@@ -180,6 +180,7 @@ export class DappnodeRepository extends ApmRepository {
       : undefined;
 
     return {
+      releaseCid: this.sanitizeIpfsPath(contentUri),
       dnpName,
       reqVersion: origin || manifest.version,
       semVersion: manifest.version,

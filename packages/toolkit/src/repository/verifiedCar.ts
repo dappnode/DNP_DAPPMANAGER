@@ -21,7 +21,7 @@ export async function verifiedFile(
     throw new Error(`UNTRUSTED CONTENT: expected root ${expected}, got ${roots}`);
   }
   let content: AsyncIterable<Uint8Array> | undefined;
-  for await (const entry of exporter(expected, {
+  for await (const entry of exporter(roots[0], {
     async get(cid) {
       if (cid.multihash.code !== sha256.code) throw new Error(`Unsupported IPFS block hash ${cid.multihash.code}`);
       const block = await reader.get(cid);

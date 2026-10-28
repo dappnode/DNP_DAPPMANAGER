@@ -11,7 +11,6 @@ import { isUpdateDelayCompleted } from "./isUpdateDelayCompleted.js";
 import { flagCompletedUpdate } from "./flagCompletedUpdate.js";
 import { isDnpUpdateEnabled } from "./isDnpUpdateEnabled.js";
 
-const contractAddressMap = new Map<string, string>();
 const contentUriMap = new Map<string, string>();
 
 /**
@@ -30,16 +29,8 @@ export async function checkNewPackagesVersion(dappnodeInstaller: DappnodeInstall
       // - non-valid versions (semver.lte will throw)
       if (!dnpName || !valid(currentVersion) || params.corePackagesNotAutoupdatable.includes(dnpName)) continue;
 
-      await updateContractAddress(dappnodeInstaller, dnpName);
-      const contractAddress = contractAddressMap.get(dnpName);
-      if (!contractAddress) {
-        logs.warn(`No contract address found for ${dnpName}, skipping version check`);
-        continue;
-      }
-
       const { version: newVersion, contentUri: newContentUri } = await dappnodeInstaller.getVersionAndIpfsHash({
-        dnpNameOrHash: dnpName,
-        contractAddress
+        dnpNameOrHash: dnpName
       });
 
       // This version is not an update
@@ -48,8 +39,7 @@ export async function checkNewPackagesVersion(dappnodeInstaller: DappnodeInstall
       if (!contentUriMap.get(dnpName)) {
         const { contentUri: oldContentUri } = await dappnodeInstaller.getVersionAndIpfsHash({
           dnpNameOrHash: dnpName,
-          version: currentVersion,
-          contractAddress
+          version: currentVersion
         });
         contentUriMap.set(dnpName, oldContentUri);
       }
@@ -86,20 +76,6 @@ async function pinAndUnpinContentNotThrow(
     await dappnodeInstaller
       .pinRmLocal(oldContentUri)
       .catch((e) => logs.info(`Could not unpin old content for ${dnpName}`, e));
-  }
-}
-
-/**
- * updateContractAddress
- */
-async function updateContractAddress(dappnodeInstaller: DappnodeInstaller, dnpName: string): Promise<void> {
-  // MUST exist an APM repo with the package dnpName
-  if (!contractAddressMap.get(dnpName)) {
-    const repoContract = await dappnodeInstaller.getRepoContract(dnpName);
-    if (typeof repoContract.target === "string") {
-      logs.info(`Caching contract info for ${dnpName}`);
-      contractAddressMap.set(dnpName, repoContract.target);
-    }
   }
 }
 
