@@ -549,7 +549,7 @@ export class DappnodeRepository extends ApmRepository {
    *
    * @param hash - The content identifier (CID) of the content to get and verify.
    * @returns The verified UnixFS content.
-   * @throws Error when the CAR is incomplete or its root CID does not match the requested hash.
+   * @throws Error when the CAR is incomplete, its root CID differs, or a block fails hash verification.
    */
   private async getVerifiedContentFromGateway(
     hash: string,
@@ -597,9 +597,18 @@ export class DappnodeRepository extends ApmRepository {
 
     const entries = exporter(root, {
       async get(cid) {
+        if (cid.multihash.code !== sha256.code) {
+          throw new Error(`Unsupported IPFS block hash ${cid.multihash.code} for ${cid}`);
+        }
         // TODO: remove below type casting
         const block = await carReader.get(cid as CID);
         if (!block) throw Error(`Could not get block ${cid}`);
+        // CAR block labels are supplied by the gateway. Authenticate every
+        // block before UnixFS decodes it, including linked nodes and raw leaves.
+        const actualCid = CID.create(cid.version, cid.code, await sha256.digest(block.bytes));
+        if (!actualCid.equals(cid)) {
+          throw new Error(`UNTRUSTED CONTENT: expected block ${cid}, got ${actualCid}`);
+        }
         return block.bytes;
       }
     });
