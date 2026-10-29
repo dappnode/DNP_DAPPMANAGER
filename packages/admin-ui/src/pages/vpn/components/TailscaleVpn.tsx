@@ -7,6 +7,7 @@ import { NoDnpInstalled } from "pages/packages/components/NoDnpInstalled";
 import ErrorView from "components/ErrorView";
 import { Config } from "pages/packages/components/Config";
 import { VpnDocsGuide } from "./VpnDocsGuide";
+import { TailscaleStatusPanel } from "./TailscaleStatusPanel";
 
 export function TailscaleVpn() {
   const dnpRequest = useApi.packageGet({ dnpName: tailscaleDnpName });
@@ -32,6 +33,7 @@ export function TailscaleVpn() {
   return (
     <div className="section-spacing">
       <VpnDocsGuide variant="tailscale" />
+      <TailscaleStatusPanel dnp={dnp} unavailable={Boolean(dnpRequest.error) || dnpRequest.isValidating} />
       <Config dnpName={dnp.dnpName} {...{ userSettings, setupWizard }} />
     </div>
   );

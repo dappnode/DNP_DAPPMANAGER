@@ -13,6 +13,7 @@ import { wireguard } from "./wireguard";
 import { prysm } from "./prysm";
 import { geth } from "./geth";
 import { web3signer } from "./web3signer";
+import { tailscale } from "./tailscale";
 
 export const mockDnps: MockDnp[] = [
   bitcoin,
@@ -26,6 +27,7 @@ export const mockDnps: MockDnp[] = [
   trustlines,
   wifi,
   wireguard,
+  tailscale,
   prysm,
   geth,
   web3signer
