@@ -1,7 +1,7 @@
 import { mapValues, omit } from "lodash-es";
 import { valid, gt } from "semver";
 import { params } from "@dappnode/params";
-import deepmerge from "deepmerge";
+import { deepmergeCustom } from "deepmerge-ts";
 import { fileToGatewayUrl, getIsUpdated, getIsInstalled } from "@dappnode/utils";
 import { dappnodeInstaller } from "../index.js";
 import { dockerInfoArchive, listPackages, getDockerVersion } from "@dappnode/dockerapi";
@@ -20,6 +20,8 @@ import {
 import { Manifest, SetupWizardField } from "@dappnode/types";
 import { logs } from "@dappnode/logger";
 import { notifications } from "@dappnode/notifications";
+
+const deepmerge = deepmergeCustom({ filterValues: false });
 
 export async function fetchDnpRequest({ id, version }: { id: string; version?: string }): Promise<RequestedDnp> {
   const mainRelease = await dappnodeInstaller.getRelease(id, version);
@@ -149,9 +151,9 @@ async function getRequiresDockerUpdate({ manifest }: { manifest: Manifest }): Pr
   const currentDockerVersion = await getDockerVersion();
   return Boolean(
     minDockerVersion &&
-      valid(minDockerVersion) &&
-      valid(currentDockerVersion) &&
-      gt(minDockerVersion, currentDockerVersion)
+    valid(minDockerVersion) &&
+    valid(currentDockerVersion) &&
+    gt(minDockerVersion, currentDockerVersion)
   );
 }
 

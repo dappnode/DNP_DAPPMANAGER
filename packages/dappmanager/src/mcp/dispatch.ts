@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { zodToJsonSchema } from "zod-to-json-schema";
 import { logs } from "@dappnode/logger";
 import { dappnodeTools, dappnodeToolList, type DappnodeTool } from "./tools.js";
 
@@ -21,9 +20,9 @@ export interface OpenAITool {
 /** Converts a tool's Zod schema to the OpenAI function-calling format. */
 export function toOpenAIFormat(tool: DappnodeTool): OpenAITool {
   const objectSchema = z.object(tool.schema);
-  const jsonSchema = zodToJsonSchema(objectSchema, {
-    $refStrategy: "none",
-    target: "openApi3"
+  const jsonSchema = z.toJSONSchema(objectSchema, {
+    io: "input",
+    target: "draft-7"
   }) as Record<string, unknown>;
   // OpenAI tolerates plain JSON Schema; strip any top-level $schema.
   delete jsonSchema.$schema;
@@ -50,10 +49,7 @@ export interface ToolDispatchResult {
 }
 
 /** Looks up the tool by name, validates its args, and runs `execute()`. */
-export async function dispatchTool(
-  name: string,
-  rawArgs: unknown
-): Promise<ToolDispatchResult> {
+export async function dispatchTool(name: string, rawArgs: unknown): Promise<ToolDispatchResult> {
   const tool = dappnodeTools[name];
   if (!tool) return { ok: false, error: `Unknown tool: ${name}` };
 

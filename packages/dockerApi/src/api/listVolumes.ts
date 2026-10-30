@@ -1,7 +1,7 @@
 import { docker } from "./docker.js";
 
 export async function dockerVolumesList(options?: DockerApiListVolumesOptions): Promise<DockerVolumeListItem[]> {
-  const { Volumes } = await docker.listVolumes({ filters: options });
+  const { Volumes } = await docker.listVolumes({ filters: JSON.stringify(options) });
   // Return is not correctly typed, casting to actual tested values
   return Volumes as DockerVolumeListItem[];
 }
