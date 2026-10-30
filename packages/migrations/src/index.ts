@@ -4,6 +4,8 @@ import { pruneUserActionLogs } from "./pruneUserActionLogs.js";
 import { recreateContainersIfLegacyDns } from "./recreateContainersIfLegacyDns.js";
 import { ensureCoreComposesHardcodedIpsRange } from "./ensureCoreComposesHardcodedIpsRange.js";
 import { determineIsDappnodeAws } from "./determineIsDappnodeAws.js";
+import { startMevBoostRelayMigration } from "./migrateMevBoostRelays.js";
+import { Network } from "@dappnode/types";
 
 class MigrationError extends Error {
   errors: Error[];
@@ -56,6 +58,11 @@ export async function executeMigrations(): Promise<void> {
       fn: determineIsDappnodeAws,
       migration: "determine if the dappnode is running in Dappnode AWS",
       coreVersion: "0.2.94"
+    },
+    {
+      fn: () => startMevBoostRelayMigration(Network.Hoodi),
+      migration: "stage existing Hoodi MEV-Boost relay choices for Brain",
+      coreVersion: "0.2.71"
     }
   ];
 
