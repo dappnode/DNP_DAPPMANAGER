@@ -41,7 +41,8 @@ export const sign = wrapHandler<Params>(async (req, res) => {
 /**
  * Find IPv4 adresses only, this is a IPv6 to IPv4 prefix
  */
-export async function getDnpFromIp(ip: string): Promise<PackageContainer> {
+export async function getDnpFromIp(ip: string | undefined): Promise<PackageContainer> {
+  if (!ip) throw new HttpError({ statusCode: 400, name: "Could not determine client IP" });
   const ipv4 = ip.replace("::ffff:", "");
   const dnps = await listPackageContainers();
   const dnp = dnps.find((_dnp) => _dnp.ip === ipv4);

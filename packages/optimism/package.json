@@ -23,5 +23,8 @@
     "@dappnode/installer": "workspace:^0.1.0",
     "@dappnode/types": "workspace:^0.1.0",
     "@dappnode/utils": "workspace:^0.1.0"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3"
   }
 }

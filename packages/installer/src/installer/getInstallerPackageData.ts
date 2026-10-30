@@ -1,4 +1,4 @@
-import deepmerge from "deepmerge";
+import { deepmergeCustom } from "deepmerge-ts";
 import { orderInstallPackages } from "./orderInstallPackages.js";
 import {
   ComposeEditor,
@@ -22,6 +22,8 @@ import { gt } from "semver";
 import { logs } from "@dappnode/logger";
 import { params } from "@dappnode/params";
 
+const deepmerge = deepmergeCustom({ filterValues: false });
+
 interface GetInstallerPackageDataArg {
   releases: PackageRelease[];
   userSettings: UserSettingsAllDnps;
@@ -42,18 +44,17 @@ export async function getInstallerPackagesData({
   const dnps = await listPackages();
 
   const packagesDataUnordered = await Promise.all(
-    releases.map(
-      async (release): Promise<InstallPackageData> =>
-        getInstallerPackageData(
-          release,
-          userSettings[release.dnpName],
-          notificationsSettings?.[release.dnpName],
-          currentVersions[release.dnpName],
-          await getContainersStatus({
-            dnpName: release.dnpName,
-            dnp: dnps.find((pkg) => pkg.dnpName === release.dnpName)
-          })
-        )
+    releases.map(async (release): Promise<InstallPackageData> =>
+      getInstallerPackageData(
+        release,
+        userSettings[release.dnpName],
+        notificationsSettings?.[release.dnpName],
+        currentVersions[release.dnpName],
+        await getContainersStatus({
+          dnpName: release.dnpName,
+          dnp: dnps.find((pkg) => pkg.dnpName === release.dnpName)
+        })
+      )
     )
   );
 

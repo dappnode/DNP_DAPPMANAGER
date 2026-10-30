@@ -2,13 +2,14 @@ import "mocha";
 import { expect } from "chai";
 import sinon from "sinon";
 import { createRequire } from "node:module";
+import { fileURLToPath } from "node:url";
 import type express from "express";
 import httpProxy from "http-proxy";
 import { ethers } from "ethers";
 import { params } from "@dappnode/params";
 
 const require = createRequire(import.meta.url);
-const HTTP = require("ipfs-utils/src/http.js");
+const { HTTP } = require(fileURLToPath(new URL("./lib/http.js", import.meta.resolve("kubo-rpc-client"))));
 const abi = ethers.AbiCoder.defaultAbiCoder();
 const swarmHash = "42ac3c26c60ffb14882d3e7fa401e791a069ef589f8d365dde7f241f1e67b095";
 const ipfsHash = "0xe30101701220aa4396c7e54ce85638b1f5a66f83b0b698a80e6ca3511ccc7e8551c6ae89ab40";
