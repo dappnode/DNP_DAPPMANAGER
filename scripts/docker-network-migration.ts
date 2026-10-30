@@ -752,11 +752,13 @@ export async function execute(
 export async function main(args = process.argv.slice(2)) {
   const [command, ...options] = args;
   if (
-    !["plan", "apply", "resume", "rollback", "status"].includes(command) ||
+    !["plan", "apply", "resume", "retry", "rollback", "status"].includes(command) ||
     options.length > 2 ||
     (options.length && (options[0] !== "--state-dir" || !options[1]))
   )
-    throw new Error("Usage: docker-network-migration.ts plan|apply|resume|rollback|status [--state-dir DIRECTORY]");
+    throw new Error(
+      "Usage: docker-network-migration.ts plan|apply|resume|retry|rollback|status [--state-dir DIRECTORY]"
+    );
   const journal = new Journal(options[1] || "/state"),
     docker = new Docker();
   if (command === "status") {
@@ -787,7 +789,7 @@ export async function main(args = process.argv.slice(2)) {
       state = journal.read();
       if (state.plan.policyHash !== hash(defaultPolicy))
         throw new Error("Migration policy differs from journal; use the original image");
-      if (command === "resume" && state.phase === "completed") {
+      if (["resume", "retry"].includes(command) && state.phase === "completed") {
         await verify(docker, state.plan);
         console.log("completed");
         return;
@@ -804,7 +806,12 @@ export async function main(args = process.argv.slice(2)) {
           throw new Error(`Compose network configuration changed: ${c.name}`);
     }
     try {
-      await execute(docker, journal, state, command === "rollback" || state.direction === "rollback");
+      await execute(
+        docker,
+        journal,
+        state,
+        command === "rollback" || (command !== "retry" && state.direction === "rollback")
+      );
     } catch (error) {
       if (command === "rollback" || state.direction === "rollback") throw error;
       console.error(

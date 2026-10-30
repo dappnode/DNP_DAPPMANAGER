@@ -3,8 +3,8 @@ set -eu
 
 # A detached, network-less worker retains the manager's configuration mounts and
 # Docker socket, and survives stopping the manager. Its journal is a named volume.
-case "${1:-}" in plan|apply|resume|rollback|status) ;; *)
-  echo "Usage: $0 plan|apply|resume|rollback|status" >&2; exit 2 ;;
+case "${1:-}" in plan|apply|resume|retry|rollback|status) ;; *)
+  echo "Usage: $0 plan|apply|resume|retry|rollback|status" >&2; exit 2 ;;
 esac
 [ "$#" -eq 1 ] || exit 2
 manager=DAppNodeCore-dappmanager.dnp.dappnode.eth

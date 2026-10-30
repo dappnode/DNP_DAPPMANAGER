@@ -71,6 +71,8 @@ docker logs DAppNodeTool-network-migration
 sh scripts/migrate-docker-networks.sh resume
 # Or restore the original network configuration and running-service set:
 sh scripts/migrate-docker-networks.sh rollback
+# Explicitly retry the approved forward migration from its original journal:
+sh scripts/migrate-docker-networks.sh retry
 ```
 
 Ordinary failures trigger rollback. After process/daemon interruption, `resume`
@@ -85,6 +87,9 @@ separately reviewed migration; do not overwrite a previous recovery journal.
 After a verified rollback, run `plan` and `apply` again to retry. The previous
 rollback journal is archived privately in the same state volume before a new
 operation begins.
+`retry` explicitly chooses forward recovery using the original approved plan,
+including its running-service set. This is useful when rollback restores a legacy
+address collision; it does not accept a new snapshot of partially migrated state.
 
 After migration, check DNS, dashboard, VPN, execution/consensus sync, signer
 health, and successful validator attestations. Then validate Docker restarts.
