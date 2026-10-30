@@ -1,5 +1,4 @@
-import * as db from "@dappnode/db";
-
+/** @deprecated Plain HTTP mirrors cannot authenticate release contents. */
 export async function mirrorProviderGet(): Promise<{ enabled: boolean }> {
-  return { enabled: db.mirrorProviderEnabled.get() };
+  return { enabled: false };
 }

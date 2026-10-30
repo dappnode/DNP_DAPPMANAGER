@@ -49,18 +49,7 @@ export async function downloadImages(
   );
 }
 
-/**
- * Streams a DNP image file to disk.
- *
- * @param hash - Individual file CID (source "ipfs"). For source "mirror" this is a placeholder —
- *               the mirror has no per-file CIDs; actual routing uses packageHash + filename instead.
- * @param path - Destination path on disk.
- * @param fileSize - Expected file size in bytes (for progress reporting).
- * @param progress - Progress callback (0–100).
- * @param filename - Image filename within the package dir (e.g. "amd64.tar.xz"). Required for source "mirror".
- * @param packageHash - Package directory CID. Required for source "mirror"; mirror URL is {baseUrl}/{packageHash}/{filename}.
- *                      NOT the same as hash: hash is the individual file CID, packageHash is the release directory CID.
- */
+/** Download an image by its authenticated file CID. */
 export async function downloadImage(
   dappnodeInstaller: DappnodeInstaller,
   hash: string,
@@ -84,26 +73,15 @@ export async function getImage(
   progress: (n: number) => void
 ): Promise<void> {
   // Validate parameters
-  if (!path || path.startsWith("/ipfs/") || !isAbsolute("/")) throw Error(`Invalid path: "${path}"`);
+  if (!path || path.startsWith("/ipfs/") || !isAbsolute(path)) throw Error(`Invalid path: "${path}"`);
   validatePath(path);
 
-  // Check if cache exist and validate it
-  try {
-    await validateTarImage(path);
-    return; // Image OK
-  } catch (e) {
-    // Continue, bad image
-    logs.debug(`Image at ${path} is invalid: ${e}`);
-  }
-
-  const { hash, size, filename, packageHash } = imageFile;
+  // Re-export from a verified CAR on cache hits; archive validity alone is insufficient.
+  const { hash, size } = imageFile;
 
   switch (imageFile.source) {
     case "ipfs":
       await downloadImage(dappnodeInstaller, hash, path, size, progress);
-      break;
-    case "mirror":
-      await downloadImage(dappnodeInstaller, hash, path, size, progress, filename, packageHash);
       break;
     default:
       throw Error(`Unsupported source ${imageFile.source}`);

@@ -176,6 +176,12 @@ export const params = {
   CONTENT_MIRROR_MAX_BYTES: 20 * 1024 * 1024 * 1024, // 20 GB
   // Web3 parameters
   ETH_MAINNET_RPC_URL_REMOTE: process.env.ETH_MAINNET_RPC_URL_REMOTE || "https://web3.dappnode.net",
+  UPDATE_CHAIN_CHECKPOINT: process.env.UPDATE_CHAIN_CHECKPOINT || "",
+  UPDATE_CHAIN_CONSENSUS_RPC_URL:
+    process.env.UPDATE_CHAIN_CONSENSUS_RPC_URL || "http://beacon-chain.mainnet.dncore.dappnode:3500",
+  UPDATE_CHAIN_EXECUTION_RPC_URL:
+    process.env.UPDATE_CHAIN_EXECUTION_RPC_URL || process.env.ETH_MAINNET_RPC_URL_REMOTE || "https://web3.dappnode.net",
+  UPDATE_CHAIN_BINARY: process.env.UPDATE_CHAIN_BINARY || "/usr/local/bin/helios",
   ETH_MAINNET_CHECKPOINTSYNC_URL_REMOTE: "https://checkpoint-sync.dappnode.net",
 
   // Prysm legacy specs for: gnosis and mainnet

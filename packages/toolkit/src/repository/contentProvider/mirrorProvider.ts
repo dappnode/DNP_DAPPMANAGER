@@ -7,7 +7,7 @@ import { normalizeCid, roundProgress } from "./utils.js";
 const pipeline = util.promisify(stream.pipeline);
 
 /**
- * HTTP mirror provider for downloading DAppNode package files.
+ * @deprecated Unverified HTTP transport. Never use for package installation.
  *
  * Files are served at: {baseUrl}/{packageCID}/{filename}
  * Directory listings:  {baseUrl}/{packageCID}/

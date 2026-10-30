@@ -38,6 +38,23 @@ jobs:
     env:
       INFURA_MAINNET_KEY: ${{ secrets.INFURA_MAINNET_KEY }}
 
+  update-light-client:
+    name: Light client (${{ matrix.runner }})
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-latest, ubuntu-24.04-arm]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify consensus and execution proof fixtures
+        run: docker build --target update-light-client-tests -t dappmanager-verifier-tests .
+      - name: Build Dappmanager with bundled verifier
+        run: docker build -t dappmanager-verified-updates .
+      - name: Smoke test bundled verifier
+        run: docker run --rm --network none --entrypoint /usr/local/bin/helios dappmanager-verified-updates --version
+
   # integration-test:
   #   runs-on: ubuntu-latest
   #   name: In app integration tests
@@ -57,7 +74,7 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
-    needs: [ unit-test ]
+    needs: [unit-test, update-light-client]
     if: github.event_name == 'workflow_dispatch'
     steps:
       - name: Verify input

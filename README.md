@@ -14,6 +14,69 @@ The **DNP_DAPPMANAGER** handles the Dappnode core DNPs and any user installed DN
 
 It is an AragonApp whose repo is deployed at this address: [0x0c564ca7b948008fb324268d8baedaeb1bd47bce](https://etherscan.io/address/0x0c564ca7b948008fb324268d8baedaeb1bd47bce) and whose ENS address is: [dappmanager.dnp.dappnode.eth](https://etherscan.io/enslookup?q=dappmanager.dnp.dappnode.eth])
 
+## Package download integrity
+
+Release directories and files are authenticated against their IPFS CIDs. Every CAR
+block consumed by UnixFS is hashed before decoding. Image downloads are staged on
+disk and replace the destination only after verification succeeds. Cached CARs are
+verified again on reuse; a cached tarball alone is never trusted.
+
+The former plain HTTP content-mirror protocol is deprecated because it supplied no
+proof that its files belonged to the requested CID. Existing mirror settings are
+ignored and migrated to disabled. Packages use the configured local or remote IPFS
+gateways, which must support raw DAG-PB and CAR responses. Publisher signature
+checks apply regardless of where the bytes are downloaded.
+
+## Registry chain verification
+
+Normal installs, automatic/core upgrades, and resolved dependencies require an
+Ethereum mainnet registry record verified by the bundled Helios light client.
+ENS resolution and APM contract calls execute locally against account, bytecode,
+and storage proofs from one verified finalized block. The execution and consensus
+RPCs supply data; their responses alone cannot authorize a release. Finalized
+blocks older than 30 minutes are rejected. Existing signature-bypass and
+resolver-bypass options do not bypass chain verification.
+
+Before the first registry install, configure these Dappmanager container variables:
+
+| Variable                         | Purpose                                                                                                                                                                                                        |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `UPDATE_CHAIN_CHECKPOINT`        | Operator-trusted mainnet **beacon block root**, less than 14 days old. This is the root of trust; obtain and verify it independently of the execution RPC. An execution block hash is not a beacon checkpoint. |
+| `UPDATE_CHAIN_CONSENSUS_RPC_URL` | Beacon API supporting the Ethereum light-client endpoints. Defaults to the local mainnet beacon service.                                                                                                       |
+| `UPDATE_CHAIN_EXECUTION_RPC_URL` | Execution RPC supporting `eth_getProof` and proof-backed contract reads. Defaults to `ETH_MAINNET_RPC_URL_REMOTE`, then `https://web3.dappnode.net`.                                                           |
+
+Helios is built from source at revision
+`2af9b41887e069144ee56cd710f3ddca195473f8` (0.12.0), with the archive checksum
+pinned in the Dockerfile. There is no runtime binary download and its RPC binds
+only to loopback inside Dappmanager. `UPDATE_CHAIN_BINARY` can point development
+runs at a locally built copy of that binary.
+
+Verified checkpoint progress is saved under `dnp_repo/update-light-client` in the
+existing persistent volume and reused on restart. Changing
+`UPDATE_CHAIN_CHECKPOINT` explicitly refreshes the operator trust anchor. After an
+extended offline period, supply a new independently verified checkpoint and
+restart Dappmanager. The helper enforces the 14-day bootstrap age limit and never
+fetches an alternative checkpoint automatically. Missing or expired checkpoints,
+invalid proofs, and unavailable RPCs block registry installs and report a recovery
+error; the rest of Dappmanager remains available.
+
+Direct-CID requests must match the manifest name/version's verified registry CID.
+Unregistered releases must use the explicit developer-install flow. This change
+also retires plain mirror downloads, including installations that previously had
+the mirror enabled. Publisher signature requirements remain independent of chain
+authorization.
+
+The light-client build and offline proof tests run separately from the existing
+JavaScript unit-test job on native amd64 and arm64 CI runners. To run them locally:
+
+```sh
+docker build --target update-light-client-tests -t dappmanager-verifier-tests .
+yarn build
+yarn workspace @dappnode/toolkit test
+yarn workspace @dappnode/installer test
+yarn workspace @dappnode/dappmanager test
+```
+
 ## Getting Started
 
 This repo is a single piece of Dappnode. To install and use Dappnode go to the [installation guide](https://docs.dappnode.io/docs/user/install/overview).

@@ -1,6 +1,9 @@
+import { AsyncLocalStorage } from "node:async_hooks";
 import { params } from "@dappnode/params";
 import { logs } from "@dappnode/logger";
-import { DappnodeRepository } from "@dappnode/toolkit";
+import { DappnodeRepository, VerifiedRegistryClient, RegistrySession, normalizeReleaseCid } from "@dappnode/toolkit";
+import type { ApmVersionRawAndOrigin, ApmVersionState } from "@dappnode/toolkit";
+import { validRange } from "semver";
 import * as db from "@dappnode/db";
 import {
   DistributedFile,
@@ -13,7 +16,9 @@ import {
   SetupWizard,
   GrafanaDashboard,
   PrometheusTarget,
-  NotificationsConfig
+  NotificationsConfig,
+  RegistryVerification,
+  releaseFilesToDownload
 } from "@dappnode/types";
 import { DappGetState, DappgetOptions, dappGet } from "./dappGet/index.js";
 import {
@@ -46,7 +51,17 @@ export function getIpfsUrls(): string[] {
 }
 
 export class DappnodeInstaller extends DappnodeRepository {
-  constructor(ipfsUrl: string | string[], provider: JsonRpcApiProvider) {
+  private readonly registrySessions = new AsyncLocalStorage<RegistrySession>();
+
+  constructor(
+    ipfsUrl: string | string[],
+    provider: JsonRpcApiProvider,
+    private readonly registryVerifier = new VerifiedRegistryClient({
+      async request() {
+        throw new Error("CHAIN VERIFICATION: configure the managed light client and a trusted checkpoint");
+      }
+    })
+  ) {
     super(
       ipfsUrl,
       provider,
@@ -55,9 +70,119 @@ export class DappnodeInstaller extends DappnodeRepository {
         timeoutMs: params.CONTENT_MIRROR_TIMEOUT_MS,
         maxBytes: params.CONTENT_MIRROR_MAX_BYTES
       },
-      () => db.mirrorProviderEnabled.get(),
+      () => false,
       (level, message) => logs[level](message)
     );
+  }
+
+  /** Keep concurrent installs isolated while sharing one snapshot throughout dependency resolution. */
+  private async withRegistry<T>(operation: (session: RegistrySession) => Promise<T>): Promise<T> {
+    const active = this.registrySessions.getStore();
+    if (active) return operation(active);
+    const session = await this.registryVerifier.begin();
+    return this.registrySessions.run(session, () => operation(session));
+  }
+
+  override async getVersionAndIpfsHash(
+    args: Parameters<DappnodeRepository["getVersionAndIpfsHash"]>[0]
+  ): Promise<ApmVersionRawAndOrigin> {
+    return this.withRegistry(async (session) => {
+      const { dnpNameOrHash, version = "*", contractAddress } = args;
+      if (dnpNameOrHash.endsWith(".dappnode.eth") && (version === "latest" || validRange(version))) {
+        const proof = await session.resolve(dnpNameOrHash, version);
+        if (contractAddress && contractAddress.toLowerCase() !== proof.repositoryAddress.toLowerCase()) {
+          throw new Error(`CHAIN VERIFICATION: repository address changed for ${dnpNameOrHash}`);
+        }
+        return { version: proof.version, contentUri: proof.cid };
+      }
+      // Direct CIDs are authenticated first, then checked for registration using the manifest identity.
+      const result = await super.getVersionAndIpfsHash(args);
+      const entries = await this.list(result.contentUri);
+      const manifest = await this.getPkgAsset<Manifest>(releaseFilesToDownload.manifest, {
+        source: "ipfs",
+        entries,
+        packageCidStr: result.contentUri
+      });
+      if (!manifest) throw new Error("Missing release manifest");
+      validateManifestSchema(manifest);
+      if (dnpNameOrHash.endsWith(".dappnode.eth") && dnpNameOrHash !== manifest.name) {
+        throw new Error("CHAIN VERIFICATION: requested name differs from manifest");
+      }
+      const proof = await session.resolve(manifest.name, manifest.version);
+      if (normalizeReleaseCid(result.contentUri) !== proof.cid) {
+        throw new Error(
+          "CHAIN VERIFICATION: CID has no matching registry record; use the explicit developer install path"
+        );
+      }
+      return { ...result, version: proof.version, contentUri: proof.cid };
+    });
+  }
+
+  override async getRepoContract(name: string) {
+    return this.withRegistry((session) => session.contract(name));
+  }
+
+  override async fetchApmVersionsState(name: string, lastVersionId = 0): Promise<ApmVersionState[]> {
+    return this.withRegistry((session) => session.versions(name, lastVersionId));
+  }
+
+  override async getManifestFromDir(name: string, version?: string): Promise<Manifest> {
+    return this.withRegistry(async (session) => {
+      const expected = await this.getVersionAndIpfsHash({ dnpNameOrHash: name, version });
+      const manifest = await super.getManifestFromDir(name, version);
+      validateManifestSchema(manifest);
+      const proof = await session.resolve(manifest.name, manifest.version);
+      this.assertReleaseIdentity(manifest, expected.version, expected.contentUri, proof, name);
+      return manifest;
+    });
+  }
+
+  override async getPkgRelease(args: Parameters<DappnodeRepository["getPkgRelease"]>[0]): Promise<PackageRelease> {
+    return this.withRegistry(async (session) => {
+      const expected = await this.getVersionAndIpfsHash(args);
+      const release = await super.getPkgRelease(args);
+      const proof = await session.resolve(release.dnpName, release.semVersion);
+      this.assertReleaseIdentity(release.manifest, expected.version, expected.contentUri, proof, args.dnpNameOrHash);
+      release.registryVerification = proof;
+      return release;
+    });
+  }
+
+  override async getPkgsReleases(
+    ...args: Parameters<DappnodeRepository["getPkgsReleases"]>
+  ): Promise<PackageRelease[]> {
+    return this.withRegistry(() => super.getPkgsReleases(...args));
+  }
+
+  private assertReleaseIdentity(
+    manifest: Manifest,
+    version: string,
+    cid: string,
+    proof: RegistryVerification,
+    requestedName: string
+  ): void {
+    if (
+      manifest.version !== version ||
+      manifest.name !== proof.packageName ||
+      (requestedName.endsWith(".dappnode.eth") && manifest.name !== requestedName) ||
+      normalizeReleaseCid(cid) !== proof.cid
+    ) {
+      throw new Error("CHAIN VERIFICATION: release name, version or CID differs from the verified registry record");
+    }
+  }
+
+  /** Recheck every chosen CID using a fresh finalized snapshot before Docker mutation. */
+  async assertVerifiedReleases(releases: PackageRelease[]): Promise<void> {
+    await this.withRegistry(async (session) => {
+      for (const release of releases) {
+        if (!release.registryVerification || !release.releaseCid)
+          throw new Error("CHAIN VERIFICATION: unverified release");
+        const proof = await session.resolve(release.dnpName, release.semVersion);
+        this.assertReleaseIdentity(release.manifest, release.semVersion, release.releaseCid, proof, release.dnpName);
+        if (normalizeReleaseCid(release.registryVerification.cid) !== proof.cid)
+          throw new Error("CHAIN VERIFICATION: release CID changed");
+      }
+    });
   }
 
   private async updateProviders(): Promise<void> {
@@ -166,12 +291,11 @@ export class DappnodeInstaller extends DappnodeRepository {
     alreadyUpdated: DappGetState;
     currentVersions: DappGetState;
   }> {
-    const result = await dappGet(this, req, options);
-    const releases = await this.getReleases(result.state);
-    return {
-      ...result,
-      releases
-    };
+    return this.withRegistry(async () => {
+      const result = await dappGet(this, req, options);
+      const releases = await this.getReleases(result.state);
+      return { ...result, releases };
+    });
   }
 
   private joinFilesInManifest({
