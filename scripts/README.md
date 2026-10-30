@@ -30,7 +30,7 @@ sh scripts/migrate-docker-networks.sh status
 interpolation, and inventories running **and stopped** containers. A fixed
 address is retained only if required by core policy or declared in Compose.
 Observed dynamic addresses are never promoted to static assignments. This also
-removes stale dynamic-address pins on Dappnode staking networks without
+removes stale dynamic-address pins on Dappnode's public and staking networks without
 recreating those networks. Explicit custom addresses must remain outside the new
 core-network allocation pool; conflicting or ambiguous configurations block the
 migration before any container is stopped. Unmanaged attached containers,
@@ -87,6 +87,9 @@ separately reviewed migration; do not overwrite a previous recovery journal.
 After a verified rollback, run `plan` and `apply` again to retry. The previous
 rollback journal is archived privately in the same state volume before a new
 operation begins.
+When a later release changes the allocation policy, a completed journal for the
+previous policy can likewise be archived after a new plan is approved. Completed
+migrations for the same policy are verified instead of repeated.
 `retry` explicitly chooses forward recovery using the original approved plan,
 including its running-service set. This is useful when rollback restores a legacy
 address collision; it does not accept a new snapshot of partially migrated state.

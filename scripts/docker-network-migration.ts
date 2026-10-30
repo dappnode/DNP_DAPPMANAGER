@@ -336,7 +336,10 @@ export function networkCreateOptions(network: NetworkOptions, replacement?: Brid
 }
 
 function desiredEndpoint(old: DockerEndpoint, intent: ComposeEndpoint, fixed?: string): Endpoint {
-  const endpoint: Endpoint = { Aliases: old.Aliases || [], IPAMConfig: {} };
+  const endpoint: Endpoint = {
+    Aliases: [...new Set([...(old.Aliases || []), ...(intent.aliases || [])])],
+    IPAMConfig: {}
+  };
   const ip = fixed || intent.ipv4_address;
   if (ip) endpoint.IPAMConfig.IPv4Address = ip;
   if (intent.ipv6_address) endpoint.IPAMConfig.IPv6Address = intent.ipv6_address;
@@ -777,8 +780,11 @@ export async function main(args = process.argv.slice(2)) {
     let state: MigrationState;
     if (command === "apply") {
       const previous = fs.existsSync(path.join(journal.directory, "journal.json")) ? journal.read() : null;
-      if (previous && previous.phase !== "rolled-back")
-        throw new Error("A migration journal exists; use status, resume or rollback");
+      const canArchive =
+        previous &&
+        (previous.phase === "rolled-back" ||
+          (previous.phase === "completed" && previous.plan.policyHash !== hash(defaultPolicy)));
+      if (previous && !canArchive) throw new Error("A migration journal exists; use status, resume or rollback");
       const plan = await inspectPlan(docker),
         approved = journal.read<MigrationPlan>("plan.json");
       if (plan.fingerprint !== approved.fingerprint) throw new Error("Inventory changed since plan; run plan again");

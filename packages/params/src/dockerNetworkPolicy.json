@@ -20,6 +20,7 @@
     }
   },
   "dynamicNetworks": [
+    "dnpublic_network",
     "mainnet_network",
     "hoodi_network",
     "sepolia_network",

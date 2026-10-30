@@ -61,6 +61,29 @@ test("explicit custom addresses outside the pool are preserved", () => {
   const plan = make([container("custom", "10.20.0.20")], { custom: { test: { ipv4_address: "10.20.0.20" } } });
   assert.equal(plan.containers[0].desired.test.IPAMConfig.IPv4Address, "10.20.0.20");
 });
+test("restore declared aliases without losing existing aliases", () => {
+  const plan = make([container("app", "10.20.0.20")], { app: { test: { aliases: ["declared-alias"] } } });
+  assert.deepEqual(plan.containers[0].desired.test.Aliases, ["app", "app.dappnode", "declared-alias"]);
+});
+test("clean undeclared pins on public/staking networks without recreating their bridges", () => {
+  const c = container("app", "10.20.0.20");
+  c.NetworkSettings.Networks.external = c.NetworkSettings.Networks.test;
+  delete c.NetworkSettings.Networks.test;
+  const external = structuredClone(network);
+  external.Name = "external";
+  const p = structuredClone(policy);
+  p.dynamicNetworks = ["external"];
+  const plan = buildPlan({
+    containers: [c],
+    networks: [external],
+    intents: { app: { external: { aliases: ["https.external"] } } },
+    policy: p
+  });
+  assert.equal(plan.networks[0].recreate, false);
+  assert.deepEqual(plan.containers[0].desired.external.IPAMConfig, {});
+  assert.ok(plan.containers[0].desired.external.Aliases!.includes("https.external"));
+  assert.ok(defaultPolicy.dynamicNetworks.includes("dnpublic_network"));
+});
 test("custom statics inside the automatic pool fail before mutations", () => {
   assert.throws(
     () => make([container("custom", "10.20.0.150")], { custom: { test: { ipv4_address: "10.20.0.150" } } }),
