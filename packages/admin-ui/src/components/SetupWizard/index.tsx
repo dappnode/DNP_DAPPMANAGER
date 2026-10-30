@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import deepmerge from "deepmerge";
+import { deepmergeCustom } from "deepmerge-ts";
 import { isEqual } from "lodash-es";
 // Components
 import Card from "components/Card";
@@ -19,6 +19,8 @@ import Button from "components/Button";
 import { parseSetupWizardErrors } from "pages/installer/parsers/formDataErrors";
 import { SetupWizardFormDataReturn } from "pages/installer/types";
 import "./setupWizard.scss";
+
+const deepmerge = deepmergeCustom({ filterValues: false });
 
 export function SetupWizard({
   setupWizard,
