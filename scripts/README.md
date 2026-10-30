@@ -47,7 +47,11 @@ when necessary, restores aliases/addressing intent, and starts previously runnin
 containers. Dappmanager is stopped first to prevent its daemon racing migration.
 Container IDs, writable layers, images, mounts, keys, restart policies and
 unrelated network attachments are retained. Previously stopped containers stay
-stopped. Graceful shutdown failure aborts the operation. Dynamic addresses can
+stopped. Failure to stop a container aborts before network changes. Docker first
+requests graceful shutdown; legacy images which require Docker's timeout/forced
+stop are recorded in the journal and worker log. Container files are never copied
+or recreated, retaining the same recovery semantics as an ordinary Docker restart.
+Dappmanager handles Docker's default SIGTERM as well as SIGINT. Dynamic addresses can
 change; applications must use their existing DNS aliases.
 
 ## Recovery
@@ -74,6 +78,9 @@ dynamic addresses may change during rollback, while original static intent and
 aliases are restored. A completed `resume` verifies the result without repeating
 the outage. Use a new `DAPPNODE_NETWORK_MIGRATION_STATE_VOLUME` only for a new,
 separately reviewed migration; do not overwrite a previous recovery journal.
+After a verified rollback, run `plan` and `apply` again to retry. The previous
+rollback journal is archived privately in the same state volume before a new
+operation begins.
 
 After migration, check DNS, dashboard, VPN, execution/consensus sync, signer
 health, and successful validator attestations. Then validate Docker restarts.

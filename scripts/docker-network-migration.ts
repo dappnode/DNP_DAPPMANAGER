@@ -562,13 +562,21 @@ async function validateIdentities(docker: DockerClient, plan: MigrationPlan) {
   }
 }
 
-async function stopContainers(docker: DockerClient, plan: MigrationPlan) {
+async function stopContainers(docker: DockerClient, plan: MigrationPlan, state: MigrationState, journal: Journal) {
   const ordered = [...plan.containers].sort((a, b) => Number(b.name === managerName) - Number(a.name === managerName));
   for (const c of ordered) {
     if (!(await docker.inspect(c.id)).State.Running) continue;
     await docker.request("POST", `/containers/${c.id}/stop?t=60`);
-    const state = (await docker.inspect(c.id)).State;
-    if (state.Running || state.ExitCode === 137) throw new Error(`Graceful shutdown failed: ${c.name}`);
+    const currentState = (await docker.inspect(c.id)).State;
+    if (currentState.Running) throw new Error(`Container failed to stop: ${c.name}`);
+    if (currentState.ExitCode === 137) {
+      const message = `Docker required a forced stop for ${c.name}; container data is retained in place`;
+      console.warn(message);
+      // No container or database files are copied: retain normal Docker stop /
+      // restart crash-recovery semantics for legacy images without signal forwarding.
+      state.forcedStops = [...new Set([...(state.forcedStops || []), c.name])];
+      journal.write(state);
+    }
   }
 }
 
@@ -670,8 +678,21 @@ export async function execute(
     await fn();
     await checkpoint(name);
   };
-  await phase(rollback ? "rollback-stopping" : "stopping", () => stopContainers(docker, plan));
-  await phase(rollback ? "rollback-disconnecting" : "disconnecting", () => disconnect(docker, plan));
+  if (rollback && !state.networkMutationStarted) {
+    // A failure during shutdown has not touched networking. Restore only the
+    // stopped services rather than disrupting the remaining running services.
+    await phase("rollback-starting", () => startContainers(docker, plan, true));
+    await phase("verifying", () => verify(docker, plan, true));
+    state.phase = "rolled-back";
+    journal.write(state);
+    return;
+  }
+  await phase(rollback ? "rollback-stopping" : "stopping", () => stopContainers(docker, plan, state, journal));
+  await phase(rollback ? "rollback-disconnecting" : "disconnecting", async () => {
+    state.networkMutationStarted = true;
+    journal.write(state);
+    await disconnect(docker, plan);
+  });
   await phase(rollback ? "rollback-networks" : "networks", () => restoreNetworks(docker, plan, rollback));
   await phase(rollback ? "rollback-connecting" : "connecting", () => connect(docker, plan, rollback));
   await phase(rollback ? "rollback-starting" : "starting", () => startContainers(docker, plan, rollback));
@@ -705,11 +726,13 @@ export async function main(args = process.argv.slice(2)) {
     }
     let state: MigrationState;
     if (command === "apply") {
-      if (fs.existsSync(path.join(journal.directory, "journal.json")))
+      const previous = fs.existsSync(path.join(journal.directory, "journal.json")) ? journal.read() : null;
+      if (previous && previous.phase !== "rolled-back")
         throw new Error("A migration journal exists; use status, resume or rollback");
       const plan = await inspectPlan(docker),
         approved = journal.read<MigrationPlan>("plan.json");
       if (plan.fingerprint !== approved.fingerprint) throw new Error("Inventory changed since plan; run plan again");
+      if (previous) journal.write(previous, `history-${randomUUID()}.json`);
       state = { phase: "prepared", createdAt: new Date().toISOString(), plan };
       journal.write(state);
     } else {

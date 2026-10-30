@@ -1,4 +1,10 @@
-import type { NetworkPolicy, Intent, MigrationState, ComposeCache } from "../docker-network-migration.ts";
+import type {
+  DockerNetwork,
+  NetworkPolicy,
+  Intent,
+  MigrationState,
+  ComposeCache
+} from "../docker-network-migration.ts";
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { execFileSync } from "node:child_process";
@@ -115,6 +121,31 @@ test(
       });
       const journal = new Journal(path.join(dir, "state")),
         state: MigrationState = { phase: "prepared", plan };
+
+      // A stop failure must not cause rollback to stop other running services or
+      // rebuild networks which have not been touched yet.
+      const originalNetwork = await docker.request<DockerNetwork>("GET", `/networks/${net}`);
+      let stopCalls = 0;
+      const failing = {
+        inspect: (id: string) => docker.inspect(id),
+        request: async <T>(
+          method: string,
+          route: string,
+          ...args: [data?: unknown, allowed?: number[]]
+        ): Promise<T> => {
+          if (route.includes("/stop?")) {
+            stopCalls++;
+            if (route.includes(ids[0])) throw new Error("simulated stop failure");
+          }
+          return await docker.request<T>(method, route, ...args);
+        }
+      };
+      await assert.rejects(() => execute(failing, journal, state), /simulated stop failure/);
+      const stoppedBeforeRollback = stopCalls;
+      await execute(failing, journal, journal.read(), true);
+      assert.equal(stopCalls, stoppedBeforeRollback);
+      assert.equal((await docker.request<DockerNetwork>("GET", `/networks/${net}`)).Id, originalNetwork.Id);
+      await verify(docker, plan, true);
 
       // Simulate death immediately after the replacement network is created.
       await assert.rejects(
