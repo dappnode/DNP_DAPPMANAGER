@@ -139,7 +139,7 @@ test(
           route: string,
           ...args: [data?: unknown, allowed?: number[]]
         ): Promise<T> => {
-          if (route.includes("/stop?")) {
+          if (route.includes("/stop")) {
             stopCalls++;
             if (route.includes(ids[0])) throw new Error("simulated stop failure");
           }

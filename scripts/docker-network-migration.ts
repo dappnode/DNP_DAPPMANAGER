@@ -244,7 +244,9 @@ export class Docker implements DockerClient {
           });
         }
       );
-      request.setTimeout(120000, () => request.destroy(new Error(`Docker request timed out: ${route}`)));
+      request.setTimeout(route.includes("/stop") ? 600000 : 120000, () =>
+        request.destroy(new Error(`Docker request timed out: ${route}`))
+      );
       request.on("error", reject);
       request.end(body);
     });
@@ -580,7 +582,9 @@ async function stopContainers(docker: DockerClient, plan: MigrationPlan, state: 
       }
       continue;
     }
-    await docker.request("POST", `/containers/${c.id}/stop?t=60`);
+    // Honor each image/Compose StopTimeout and Docker's default, just like an
+    // ordinary stop. A fixed timeout here would override package shutdown policy.
+    await docker.request("POST", `/containers/${c.id}/stop`);
     const currentState = (await docker.inspect(c.id)).State;
     if (currentState.Running) throw new Error(`Container failed to stop: ${c.name}`);
     if (currentState.ExitCode === 137) {
