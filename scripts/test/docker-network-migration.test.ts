@@ -65,6 +65,26 @@ test("restore declared aliases without losing existing aliases", () => {
   const plan = make([container("app", "10.20.0.20")], { app: { test: { aliases: ["declared-alias"] } } });
   assert.deepEqual(plan.containers[0].desired.test.Aliases, ["app", "app.dappnode", "declared-alias"]);
 });
+test("unchanged inventory has the same fingerprint regardless of Docker ordering", () => {
+  const a = container("a", "10.20.0.20"),
+    b = container("b", "10.20.0.21");
+  a.Mounts = [
+    { Destination: "/b", Source: "b" },
+    { Destination: "/a", Source: "a" }
+  ];
+  const external = structuredClone(network);
+  external.Name = "external";
+  const p = structuredClone(policy);
+  p.dynamicNetworks = ["external"];
+  const input = { containers: [a, b], networks: [network, external], intents: { a: {}, b: {} }, policy: p };
+  const first = buildPlan(input);
+  const reordered = structuredClone(input);
+  reordered.containers.reverse();
+  reordered.networks.reverse();
+  reordered.containers.find((c) => c.Id === "a")!.Mounts.reverse();
+  for (const c of reordered.containers) c.NetworkSettings.Networks.test.Aliases!.reverse();
+  assert.equal(buildPlan(reordered).fingerprint, first.fingerprint);
+});
 test("clean undeclared pins on public/staking networks without recreating their bridges", () => {
   const c = container("app", "10.20.0.20");
   c.NetworkSettings.Networks.external = c.NetworkSettings.Networks.test;

@@ -179,6 +179,8 @@ const hash = (value: unknown) =>
     .update(JSON.stringify(canonical(value)))
     .digest("hex");
 const clone = <T>(value: T): T => structuredClone(value);
+const compare = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0);
+const orderedMounts = (mounts: Mount[]) => [...mounts].sort((a, b) => compare(a.Destination, b.Destination));
 
 function ipv4Number(ip: string) {
   const parts = ip.split(".");
@@ -337,7 +339,7 @@ export function networkCreateOptions(network: NetworkOptions, replacement?: Brid
 
 function desiredEndpoint(old: DockerEndpoint, intent: ComposeEndpoint, fixed?: string): Endpoint {
   const endpoint: Endpoint = {
-    Aliases: [...new Set([...(old.Aliases || []), ...(intent.aliases || [])])],
+    Aliases: [...new Set([...(old.Aliases || []), ...(intent.aliases || [])])].sort(),
     IPAMConfig: {}
   };
   const ip = fixed || intent.ipv4_address;
@@ -362,7 +364,7 @@ export function buildPlan({
   policy?: NetworkPolicy;
 }): MigrationPlan {
   const names = new Set([...Object.keys(policy.networks), ...(policy.dynamicNetworks || [])]);
-  const selected = networks.filter((network) => names.has(network.Name));
+  const selected = networks.filter((network) => names.has(network.Name)).sort((a, b) => compare(a.Name, b.Name));
   const errors = [];
   const plannedNetworks = selected.map((network) => {
     const replacement = policy.networks[network.Name];
@@ -435,7 +437,7 @@ export function buildPlan({
       id: container.Id,
       name,
       image: container.Image,
-      mounts: container.Mounts,
+      mounts: orderedMounts(container.Mounts),
       restartPolicy: container.HostConfig.RestartPolicy,
       running: container.State.Running,
       intentHash: hash(intent),
@@ -465,7 +467,12 @@ export function buildPlan({
     }
   }
   if (errors.length) throw new Error(`Migration preflight failed:\n${errors.join("\n")}`);
-  const plan = { version: 1, policyHash: hash(policy), networks: plannedNetworks, containers: targets };
+  const plan = {
+    version: 1,
+    policyHash: hash(policy),
+    networks: plannedNetworks,
+    containers: targets.sort((a, b) => compare(a.name, b.name))
+  };
   return { ...plan, fingerprint: hash(plan) };
 }
 
@@ -561,7 +568,7 @@ async function validateIdentities(docker: DockerClient, plan: MigrationPlan) {
     if (
       current.Name !== `/${c.name}` ||
       current.Image !== c.image ||
-      hash(current.Mounts) !== hash(c.mounts) ||
+      hash(orderedMounts(current.Mounts)) !== hash(orderedMounts(c.mounts)) ||
       hash(current.HostConfig.RestartPolicy) !== hash(c.restartPolicy)
     )
       throw new Error(`Container identity, mounts, image or restart policy changed: ${c.name}`);
