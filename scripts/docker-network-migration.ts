@@ -157,6 +157,7 @@ export interface DockerClient {
   request<T = void>(method: string, route: string, data?: unknown, allowed?: number[]): Promise<T>;
   inspect(id: string): Promise<Container>;
 }
+type Controller = { name: string; mounts: Pick<Mount, "Destination">[] };
 
 const policyUrl = ["dist", "src"]
   .map((dir) => new URL(`../packages/params/${dir}/dockerNetworkPolicy.json`, import.meta.url))
@@ -562,10 +563,23 @@ async function validateIdentities(docker: DockerClient, plan: MigrationPlan) {
   }
 }
 
+const coreJobName = "DAppNodeCore-core.dnp.dappnode.eth";
+const oneShot = (c: PlannedContainer) => ["no", "on-failure"].includes(c.restartPolicy.Name);
+const controlsDocker = (c: Controller) => c.mounts.some((m) => m.Destination === "/var/run/docker.sock");
+export const shutdownPriority = (c: Controller) =>
+  c.name === coreJobName ? 0 : c.name === managerName ? 2 : controlsDocker(c) ? 1 : 3;
+
 async function stopContainers(docker: DockerClient, plan: MigrationPlan, state: MigrationState, journal: Journal) {
-  const ordered = [...plan.containers].sort((a, b) => Number(b.name === managerName) - Number(a.name === managerName));
+  const ordered = [...plan.containers].sort((a, b) => shutdownPriority(a) - shutdownPriority(b));
   for (const c of ordered) {
-    if (!(await docker.inspect(c.id)).State.Running) continue;
+    const before = (await docker.inspect(c.id)).State;
+    if (!before.Running) {
+      if (c.running && oneShot(c) && before.ExitCode === 0) {
+        state.completedJobs = [...new Set([...(state.completedJobs || []), c.name])];
+        journal.write(state);
+      }
+      continue;
+    }
     await docker.request("POST", `/containers/${c.id}/stop?t=60`);
     const currentState = (await docker.inspect(c.id)).State;
     if (currentState.Running) throw new Error(`Container failed to stop: ${c.name}`);
@@ -578,6 +592,9 @@ async function stopContainers(docker: DockerClient, plan: MigrationPlan, state: 
       journal.write(state);
     }
   }
+  for (const c of plan.containers)
+    if ((await docker.inspect(c.id)).State.Running)
+      throw new Error(`Container restarted during shutdown; networking is unchanged: ${c.name}`);
 }
 
 async function disconnect(docker: DockerClient, plan: MigrationPlan) {
@@ -618,17 +635,21 @@ async function connect(docker: DockerClient, plan: MigrationPlan, rollback: bool
       });
 }
 
-async function startContainers(docker: DockerClient, plan: MigrationPlan, rollback: boolean) {
+async function startContainers(docker: DockerClient, plan: MigrationPlan, rollback: boolean, state: MigrationState) {
   const priority = (c: PlannedContainer) =>
-    c.name.startsWith("DAppNodeCore-bind.")
-      ? 0
+    c.name === coreJobName
+      ? 5
       : c.name === managerName
-        ? 2
-        : Object.values(rollback ? c.original : c.desired).some((e) => e.IPAMConfig.IPv4Address)
-          ? 1
-          : 3;
+        ? 4
+        : controlsDocker(c)
+          ? 3
+          : c.name.startsWith("DAppNodeCore-bind.")
+            ? 0
+            : Object.values(rollback ? c.original : c.desired).some((e) => e.IPAMConfig.IPv4Address)
+              ? 1
+              : 2;
   for (const c of [...plan.containers].sort((a, b) => priority(a) - priority(b)))
-    if (c.running) await docker.request("POST", `/containers/${c.id}/start`);
+    if (c.running && !state.completedJobs?.includes(c.name)) await docker.request("POST", `/containers/${c.id}/start`);
 }
 
 export async function verify(docker: DockerClient, plan: MigrationPlan, rollback = false) {
@@ -640,7 +661,8 @@ export async function verify(docker: DockerClient, plan: MigrationPlan, rollback
   }
   for (const c of plan.containers) {
     const current = await docker.inspect(c.id);
-    if (current.State.Running !== c.running) throw new Error(`Running state differs: ${c.name}`);
+    const jobCompleted = c.running && oneShot(c) && !current.State.Running && current.State.ExitCode === 0;
+    if (current.State.Running !== c.running && !jobCompleted) throw new Error(`Running state differs: ${c.name}`);
     for (const [name, expected] of Object.entries(rollback ? c.original : c.desired)) {
       const actual = current.NetworkSettings.Networks[name];
       if (!actual || expected.Aliases.some((a) => !actual.Aliases?.includes(a)))
@@ -648,13 +670,35 @@ export async function verify(docker: DockerClient, plan: MigrationPlan, rollback
       for (const field of ["IPv4Address", "IPv6Address"] as const)
         if ((expected.IPAMConfig[field] || "") !== (actual.IPAMConfig?.[field] || ""))
           throw new Error(`Addressing intent differs: ${c.name} ${name}`);
-      if (c.running && expected.IPAMConfig.IPv4Address && actual.IPAddress !== expected.IPAMConfig.IPv4Address)
+      if (
+        current.State.Running &&
+        expected.IPAMConfig.IPv4Address &&
+        actual.IPAddress !== expected.IPAMConfig.IPv4Address
+      )
         throw new Error(`Static address differs: ${c.name} ${name}`);
       const range = plan.networks
         .find((n) => n.original.Name === name)
         ?.desired.IPAM.Config.find((c) => c.IPRange)?.IPRange;
-      if (!rollback && c.running && !expected.IPAMConfig.IPv4Address && range && !inSubnet(actual.IPAddress!, range))
+      if (
+        !rollback &&
+        current.State.Running &&
+        !expected.IPAMConfig.IPv4Address &&
+        range &&
+        (!actual.IPAddress || !inSubnet(actual.IPAddress!, range))
+      )
         throw new Error(`Dynamic address is outside its pool: ${c.name} ${name}`);
+    }
+  }
+}
+
+async function verifySettled(docker: DockerClient, plan: MigrationPlan, rollback: boolean) {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      await verify(docker, plan, rollback);
+      return;
+    } catch (error) {
+      if (attempt >= 30) throw error;
+      await new Promise((resolve) => setTimeout(resolve, 1000));
     }
   }
 }
@@ -681,8 +725,8 @@ export async function execute(
   if (rollback && !state.networkMutationStarted) {
     // A failure during shutdown has not touched networking. Restore only the
     // stopped services rather than disrupting the remaining running services.
-    await phase("rollback-starting", () => startContainers(docker, plan, true));
-    await phase("verifying", () => verify(docker, plan, true));
+    await phase("rollback-starting", () => startContainers(docker, plan, true, state));
+    await phase("verifying", () => verifySettled(docker, plan, true));
     state.phase = "rolled-back";
     journal.write(state);
     return;
@@ -695,8 +739,8 @@ export async function execute(
   });
   await phase(rollback ? "rollback-networks" : "networks", () => restoreNetworks(docker, plan, rollback));
   await phase(rollback ? "rollback-connecting" : "connecting", () => connect(docker, plan, rollback));
-  await phase(rollback ? "rollback-starting" : "starting", () => startContainers(docker, plan, rollback));
-  await phase("verifying", () => verify(docker, plan, rollback));
+  await phase(rollback ? "rollback-starting" : "starting", () => startContainers(docker, plan, rollback, state));
+  await phase("verifying", () => verifySettled(docker, plan, rollback));
   state.phase = rollback ? "rolled-back" : "completed";
   journal.write(state);
 }

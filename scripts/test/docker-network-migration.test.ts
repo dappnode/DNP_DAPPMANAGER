@@ -1,4 +1,4 @@
-import type { Container, DockerNetwork, NetworkPolicy, Intent } from "../docker-network-migration.ts";
+import type { Container, DockerNetwork, NetworkPolicy, Intent, Mount } from "../docker-network-migration.ts";
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import fs from "node:fs";
@@ -10,7 +10,8 @@ import {
   defaultPolicy,
   inSubnet,
   Journal,
-  resolveComposePath
+  resolveComposePath,
+  shutdownPriority
 } from "../docker-network-migration.ts";
 
 const policy: NetworkPolicy = {
@@ -143,6 +144,17 @@ test("policy keeps every required core address outside automatic allocation", ()
   assert.equal(inSubnet("172.33.128.0", "172.33.128.0/17"), true);
   assert.equal(inSubnet("172.33.1.7", "172.33.128.0/17"), false);
   assert.throws(() => inSubnet("300.1.1.1", "10.0.0.0/8"), /Invalid/);
+});
+test("stop the core coordinator before the manager and the ordinary services", () => {
+  const target = (name: string, mounts: Pick<Mount, "Destination">[] = []) => ({ name, mounts });
+  const coordinator = target("DAppNodeCore-core.dnp.dappnode.eth");
+  const manager = target("DAppNodeCore-dappmanager.dnp.dappnode.eth");
+  const app = target("DAppNodePackage-app.dnp.dappnode.eth");
+  const controller = target("DAppNodePackage-controller.dnp.dappnode.eth", [{ Destination: "/var/run/docker.sock" }]);
+  assert.deepEqual(
+    [app, manager, coordinator, controller].sort((a, b) => shutdownPriority(a) - shutdownPriority(b)),
+    [coordinator, controller, manager, app]
+  );
 });
 test("journal is private, atomic and refuses concurrent owners", async () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "network-journal-"));

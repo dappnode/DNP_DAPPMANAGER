@@ -44,7 +44,11 @@ this tool never silently changes its subnet or discards endpoints.
 `apply` requires an unchanged saved plan. Schedule a maintenance window: the
 operation gracefully stops affected containers, replaces the two legacy bridges
 when necessary, restores aliases/addressing intent, and starts previously running
-containers. Dappmanager is stopped first to prevent its daemon racing migration.
+containers. The core coordinator and other Docker controllers are stopped before
+Dappmanager; all affected containers must remain stopped before network changes.
+Ordinary services are started before the manager and core coordinator, preventing
+their startup reconciliation from racing network restoration. Successfully
+completed one-shot jobs are accepted as completed and are not needlessly rerun.
 Container IDs, writable layers, images, mounts, keys, restart policies and
 unrelated network attachments are retained. Previously stopped containers stay
 stopped. Failure to stop a container aborts before network changes. Docker first

@@ -31,7 +31,7 @@ test(
     } catch {
       execFileSync("docker", ["pull", image], { stdio: "inherit" });
     }
-    const names = ["dns", "dynamic", "custom", "stopped"].map((name) => `DAppNodePackage-${name}.${suffix}`);
+    const names = ["dns", "dynamic", "custom", "stopped", "job"].map((name) => `DAppNodePackage-${name}.${suffix}`);
     const policy: NetworkPolicy = {
       version: 1,
       networks: {
@@ -72,7 +72,13 @@ test(
         };
         const created = await docker.request<{ Id: string }>("POST", `/containers/create?name=${name}`, {
           Image: image,
-          Cmd: ["sh", "-c", "trap 'exit 0' TERM INT; while :; do sleep 1; done"],
+          Cmd: [
+            "sh",
+            "-c",
+            i === 4
+              ? "if [ -f /job-started ]; then exit 0; fi; touch /job-started; trap 'exit 0' TERM INT; while :; do sleep 1; done"
+              : "trap 'exit 0' TERM INT; while :; do sleep 1; done"
+          ],
           Labels: {
             "dappnode.dnp.dnpName": name,
             "com.docker.compose.project": `networktest${suffix.replaceAll("-", "")}`,
@@ -80,7 +86,7 @@ test(
             "com.docker.compose.project.config_files": composeFile,
             "com.docker.compose.project.working_dir": dir
           },
-          HostConfig: { RestartPolicy: { Name: "unless-stopped" }, NetworkMode: net },
+          HostConfig: { RestartPolicy: { Name: i === 4 ? "no" : "unless-stopped" }, NetworkMode: net },
           NetworkingConfig: { EndpointsConfig: { [net]: endpoint } }
         });
         ids.push(created.Id);
