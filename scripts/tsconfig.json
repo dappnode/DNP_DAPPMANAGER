@@ -1,0 +1,17 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "allowJs": false,
+    "incremental": false,
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false,
+    "target": "ESNext",
+    "allowImportingTsExtensions": true,
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true,
+    "useUnknownInCatchVariables": true
+  },
+  "include": ["./**/*.ts"]
+}
