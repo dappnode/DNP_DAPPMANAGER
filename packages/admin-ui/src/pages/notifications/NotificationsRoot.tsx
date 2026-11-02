@@ -51,7 +51,7 @@ export const NotificationsRoot: React.FC = () => {
     return (
       <>
         <Title title={title} />
-        <SectionNavigator routes={availableRoutes} />
+        <SectionNavigator basePath="/notifications" routes={availableRoutes} />
       </>
     );
   });

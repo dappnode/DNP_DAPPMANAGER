@@ -42,7 +42,7 @@ export function VpnHome() {
   return (
     <>
       <Title title={title} />
-      <SectionNavigator routes={availableRoutes} />
+      <SectionNavigator basePath="/vpn" routes={availableRoutes} />
     </>
   );
 }

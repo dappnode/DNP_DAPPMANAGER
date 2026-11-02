@@ -104,7 +104,7 @@ const StakersRoot: React.FC = () => {
           onChange={handleNetworkFilter}
         />
       </div>
-      <SectionNavigator routes={filteredRoutes} />
+      <SectionNavigator basePath="/stakers" routes={filteredRoutes} />
     </>
   );
 };

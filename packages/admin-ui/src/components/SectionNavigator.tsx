@@ -4,12 +4,13 @@ import { RouteType } from "types";
 import "./sectionNavigator.scss";
 
 interface SectionNavbarProps {
+  basePath: string;
   routes: RouteType[];
   hideNavbar?: boolean;
   variant?: "sm";
 }
 
-export const SectionNavigator: React.FC<SectionNavbarProps> = ({ routes, hideNavbar = false, variant }) => {
+export const SectionNavigator: React.FC<SectionNavbarProps> = ({ basePath, routes, hideNavbar = false, variant }) => {
   return (
     <div>
       {/* Navbar   */}
@@ -19,7 +20,11 @@ export const SectionNavigator: React.FC<SectionNavbarProps> = ({ routes, hideNav
             .filter((route) => !route.hideSection)
             .map((route) => (
               <button key={route.subPath + "/*"} className="item-container">
-                <NavLink to={route.subPath} className="item no-a-style" style={{ whiteSpace: "nowrap" }}>
+                <NavLink
+                  to={`${basePath}/${route.subPath.replace(/\/\*$/, "")}`}
+                  className="item no-a-style"
+                  style={{ whiteSpace: "nowrap" }}
+                >
                   {route.name.toUpperCase()}
                 </NavLink>
               </button>
