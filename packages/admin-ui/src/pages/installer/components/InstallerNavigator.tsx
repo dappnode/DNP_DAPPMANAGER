@@ -84,7 +84,12 @@ Nobody, DAppNode Association, DAppNodeDAO or anyone, will be held responsible fo
             const guard = r.link === "public" ? confirmPublicDappstore : undefined;
             return (
               <button key={r.subPath} className="item-container" onClick={guard}>
-                <NavLink to={r.link} className="item no-a-style" style={{ whiteSpace: "nowrap" }} onClick={guard}>
+                <NavLink
+                  to={`/installer/${r.link}`}
+                  className="item no-a-style"
+                  style={{ whiteSpace: "nowrap" }}
+                  onClick={guard}
+                >
                   {r.name.toUpperCase()}
                 </NavLink>
               </button>
@@ -94,7 +99,7 @@ Nobody, DAppNode Association, DAppNodeDAO or anyone, will be held responsible fo
       )}
 
       {/* Reuse SectionNavigator */}
-      <SectionNavigator routes={sectionRoutes} hideNavbar />
+      <SectionNavigator basePath="/installer" routes={sectionRoutes} hideNavbar />
     </>
   );
 };

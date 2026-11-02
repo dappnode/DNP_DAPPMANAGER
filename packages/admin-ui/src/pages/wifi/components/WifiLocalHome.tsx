@@ -27,7 +27,7 @@ export const WifiLocalHome: React.FC = () => {
   return (
     <>
       <Title title={title} />
-      <SectionNavigator routes={availableRoutes} />
+      <SectionNavigator basePath="/wireless-network" routes={availableRoutes} />
     </>
   );
 };

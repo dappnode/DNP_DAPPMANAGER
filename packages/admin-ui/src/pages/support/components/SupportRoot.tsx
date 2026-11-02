@@ -38,7 +38,7 @@ const SupportRoot: React.FC = () => {
   return (
     <>
       <Title title={title} />
-      <SectionNavigator routes={availableRoutes} />
+      <SectionNavigator basePath="/support" routes={availableRoutes} />
     </>
   );
 };
