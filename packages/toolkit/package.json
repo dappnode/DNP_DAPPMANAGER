@@ -18,28 +18,26 @@
   ],
   "license": "ISC",
   "devDependencies": {
-    "@types/mocha": "^10",
+    "@types/mocha": "^10.0.10",
     "@types/semver": "^7.8.0",
-    "mocha": "^12.0.0",
+    "mocha": "^12.0.3",
+    "prettier": "^3.9.10",
     "rimraf": "^5.0.10",
-    "truffle": "^5.11.5",
-    "ts-loader": "^9.6.2",
-    "tsconfig-paths": "^4.2.0"
+    "typescript": "5.9.3"
   },
   "dependencies": {
     "@dappnode/types": "workspace:^0.1.0",
-    "@ipld/car": "5.4.0",
-    "@ipld/dag-pb": "4.0.4",
-    "esm": "^3.2.25",
+    "@ipld/car": "5.4.7",
+    "@ipld/dag-pb": "4.2.0",
     "ethers": "^6.17.0",
     "graphql": "^16.14.2",
     "graphql-request": "^6.1.0",
     "ipfs-unixfs-exporter": "^13.7.3",
     "is-ipfs": "^8.0.4",
     "kubo-rpc-client": "^5.4.1",
-    "multiformats": "^13.4.2",
+    "multiformats": "^14.0.5",
     "semver": "^7.8.5",
-    "yaml": "^2.9.0"
+    "yaml": "^2.9.1"
   },
   "browser": {
     "fs": false,

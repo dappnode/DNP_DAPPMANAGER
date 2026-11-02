@@ -21,11 +21,13 @@
     "@dappnode/dockerapi": "workspace:^0.1.0",
     "@dappnode/logger": "workspace:^0.1.0",
     "@dappnode/types": "workspace:^0.1.0",
-    "@dappnode/utils": "workspace:^0.1.0",
-    "monero-rpc": "0.5.0"
+    "@dappnode/utils": "workspace:^0.1.0"
   },
   "devDependencies": {
-    "@types/mocha": "^10",
-    "mocha": "^12.0.0"
+    "@types/mocha": "^10.0.10",
+    "@types/sinon": "^22.0.2",
+    "mocha": "^12.0.3",
+    "sinon": "^22.1.0",
+    "typescript": "5.9.3"
   }
 }

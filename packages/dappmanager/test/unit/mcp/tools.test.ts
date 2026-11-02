@@ -1,5 +1,6 @@
 import { expect } from "chai";
-import { dispatchTool, getOpenAITools } from "../../../src/mcp/dispatch.js";
+import { z } from "zod";
+import { dispatchTool, getOpenAITools, toOpenAIFormat } from "../../../src/mcp/dispatch.js";
 import { dappnodeTools } from "../../../src/mcp/tools.js";
 
 const addedTools = [
@@ -13,6 +14,36 @@ const addedTools = [
 ];
 
 describe("mcp / tools", () => {
+  it("preserves constraints and nested records when exporting Zod 4 schemas", () => {
+    const tool = toOpenAIFormat({
+      name: "test_schema",
+      displayName: "Test schema",
+      description: "Schema migration regression test",
+      schema: {
+        name: z.string().min(1),
+        limit: z.number().int().min(1).max(100).optional(),
+        environment: z.record(z.string(), z.record(z.string(), z.string()))
+      },
+      async execute() {}
+    });
+
+    expect(tool.function.parameters).to.not.have.property("$schema");
+    expect(tool.function.parameters.required).to.deep.equal(["name", "environment"]);
+    expect(tool.function.parameters.properties).to.deep.equal({
+      name: { type: "string", minLength: 1 },
+      limit: { type: "integer", minimum: 1, maximum: 100 },
+      environment: {
+        type: "object",
+        propertyNames: { type: "string" },
+        additionalProperties: {
+          type: "object",
+          propertyNames: { type: "string" },
+          additionalProperties: { type: "string" }
+        }
+      }
+    });
+  });
+
   it("registers volume, package removal, port, action log, and node status tools", () => {
     for (const expectedTool of addedTools) {
       const tool = dappnodeTools[expectedTool.name];
@@ -63,7 +94,7 @@ describe("mcp / tools", () => {
     const result = await dispatchTool("dappnode_get_node_status", { networks: ["foo" as never] });
 
     expect(result.ok).to.equal(false);
-    expect(result.error).to.include("Invalid enum value");
+    expect(result.error).to.include("networks");
   });
 });
 

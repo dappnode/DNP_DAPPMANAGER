@@ -1,5 +1,6 @@
 import * as isIPFS from "is-ipfs";
-import { CID, IPFSEntry } from "kubo-rpc-client";
+import { IPFSEntry } from "kubo-rpc-client";
+import { CID } from "multiformats/cid";
 import { CarReader } from "@ipld/car";
 import * as dagPb from "@ipld/dag-pb";
 import { sha256 } from "multiformats/hashes/sha2";

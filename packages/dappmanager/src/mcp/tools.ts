@@ -125,13 +125,13 @@ function errMessage(err: unknown): string {
   return err instanceof Error ? err.message : String(err);
 }
 
-const dashboardSupportedNetworks = [
+const dashboardSupportedNetworks = [Network.Mainnet, Network.Gnosis, Network.Lukso, Network.Hoodi, Network.Sepolia] as [
   Network.Mainnet,
   Network.Gnosis,
   Network.Lukso,
   Network.Hoodi,
   Network.Sepolia
-] as [Network.Mainnet, Network.Gnosis, Network.Lukso, Network.Hoodi, Network.Sepolia];
+];
 
 /* ────────────── Tools ────────────── */
 
@@ -523,7 +523,10 @@ const getPortsStatusTool: DappnodeTool = {
   description:
     "Return ports that packages need exposed, plus optional UPnP mapping status and optional external TCP scan status. Use for networking/port-forwarding troubleshooting.",
   schema: {
-    checkUpnp: z.boolean().optional().describe("If true, compare required ports with current UPnP mappings. Default true."),
+    checkUpnp: z
+      .boolean()
+      .optional()
+      .describe("If true, compare required ports with current UPnP mappings. Default true."),
     checkApi: z
       .boolean()
       .optional()
@@ -566,7 +569,13 @@ const getUserActionLogsTool: DappnodeTool = {
   description:
     "Read recent DAppManager user action logs, newest first. Useful for support questions like 'what changed recently?' or failed package operations.",
   schema: {
-    first: z.number().int().min(1).max(200).optional().describe("Number of log entries to return. Default 50, max 200."),
+    first: z
+      .number()
+      .int()
+      .min(1)
+      .max(200)
+      .optional()
+      .describe("Number of log entries to return. Default 50, max 200."),
     after: z.number().int().min(0).optional().describe("Pagination offset, where 0 is the newest log. Default 0.")
   },
   async execute({ first = 50, after = 0 }: { first?: number; after?: number }) {
@@ -643,9 +652,7 @@ const getStakerConfigTool: DappnodeTool = {
   schema: {
     network: z
       .nativeEnum(Network)
-      .describe(
-        "Staker network: 'mainnet', 'gnosis', 'lukso', 'hoodi', 'sepolia', 'starknet', 'starknet-sepolia'."
-      )
+      .describe("Staker network: 'mainnet', 'gnosis', 'lukso', 'hoodi', 'sepolia', 'starknet', 'starknet-sepolia'.")
   },
   async execute({ network }: { network: Network }) {
     const { stakerConfigGet } = await import("../calls/stakerConfig.js");
@@ -664,9 +671,7 @@ const setStakerConfigTool: DappnodeTool = {
     executionDnpName: z
       .string()
       .nullable()
-      .describe(
-        "Execution client dnpName, or null to unset. Required to avoid accidental partial staker changes."
-      ),
+      .describe("Execution client dnpName, or null to unset. Required to avoid accidental partial staker changes."),
     consensusDnpName: z.string().nullable().describe("Consensus client dnpName, or null to unset."),
     mevBoostDnpName: z.string().nullable().describe("MEV-boost dnpName, or null to unset."),
     web3signerDnpName: z.string().nullable().describe("Web3signer dnpName, or null to unset."),
@@ -713,7 +718,7 @@ const setPackageEnvironmentTool: DappnodeTool = {
   schema: {
     dnpName: z.string().min(1).describe("The package dnpName whose env to edit"),
     environmentByService: z
-      .record(z.record(z.string()))
+      .record(z.string(), z.record(z.string(), z.string()))
       .describe("Map of serviceName → { envKey: envValue }. Existing keys are merged.")
   },
   async execute({
@@ -739,6 +744,7 @@ const setPackagePortMappingsTool: DappnodeTool = {
     dnpName: z.string().min(1).describe("The package dnpName whose ports to edit"),
     portMappingsByService: z
       .record(
+        z.string(),
         z.array(
           z.object({
             host: z.number().int().min(1).max(65535).optional(),
@@ -777,11 +783,11 @@ const validatePackageTool: DappnodeTool = {
     "Validate a DAppNode package you are DEVELOPING, fast and offline, WITHOUT building an IPFS hash. Pass the raw contents of dappnode_package.json (manifest) and docker-compose.yml, plus optionally setup-wizard.yml. Runs the exact manifest + DAppNode-compose + setup-wizard schema checks the dappmanager applies at install time, and returns the list of problems to fix. Call this on every iteration while authoring a package. NOTE: it does NOT run `docker compose config` (the Docker-level structural check) — run that yourself locally, together with `docker compose build/up` and reading container logs, to verify the package actually runs.",
   schema: {
     manifest: z
-      .union([z.string(), z.record(z.any())])
+      .union([z.string(), z.record(z.string(), z.any())])
       .describe("Contents of dappnode_package.json — either the raw JSON string or the already-parsed object."),
     compose: z.string().min(1).describe("Raw contents of docker-compose.yml (YAML)."),
     setupWizard: z
-      .union([z.string(), z.record(z.any())])
+      .union([z.string(), z.record(z.string(), z.any())])
       .optional()
       .describe("Optional contents of setup-wizard.yml / setup-wizard.json (YAML or JSON).")
   },
@@ -972,7 +978,7 @@ const installDevPackageTool: DappnodeTool = {
   mutating: true,
   schema: {
     manifest: z
-      .union([z.string(), z.record(z.any())])
+      .union([z.string(), z.record(z.string(), z.any())])
       .describe("Contents of dappnode_package.json — either the raw JSON string or the already-parsed object."),
     compose: z.string().min(1).describe("Raw contents of docker-compose.yml (YAML)."),
     imageFileId: z
@@ -982,7 +988,7 @@ const installDevPackageTool: DappnodeTool = {
         "File ID for the staged `docker save` image tarball. Use the `/upload` endpoint with an admin session cookie, or use the MCP chunked upload tools and pass the imageFileId returned by dappnode_finish_dev_image_upload."
       ),
     setupWizard: z
-      .union([z.string(), z.record(z.any())])
+      .union([z.string(), z.record(z.string(), z.any())])
       .optional()
       .describe("Optional contents of setup-wizard.yml / setup-wizard.json (YAML or JSON).")
   },
@@ -1071,7 +1077,7 @@ const installPackageTool: DappnodeTool = {
     name: z.string().min(1).describe("Package dnpName to install"),
     version: z.string().optional().describe("Optional target version (semver or IPFS hash). Defaults to latest."),
     userSettings: z
-      .record(z.any())
+      .record(z.string(), z.any())
       .optional()
       .describe(
         "Per-package settings (env vars, port mappings, named-volume mountpoints, …). Structure matches the setup wizard returned by dappnode_fetch_install_preview."

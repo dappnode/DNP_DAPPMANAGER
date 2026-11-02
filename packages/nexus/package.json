@@ -21,7 +21,8 @@
     "@dappnode/types": "workspace:^0.1.0"
   },
   "devDependencies": {
-    "@types/mocha": "^10",
-    "mocha": "^12.0.0"
+    "@types/mocha": "^10.0.10",
+    "mocha": "^12.0.3",
+    "typescript": "5.9.3"
   }
 }

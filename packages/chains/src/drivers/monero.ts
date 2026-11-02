@@ -1,5 +1,3 @@
-// @ts-expect-error the library monoro-rpc is not typed
-import { Daemon } from "monero-rpc";
 import { InstalledPackageData } from "@dappnode/types";
 import { buildNetworkAlias } from "@dappnode/utils";
 import { ChainDataResult } from "../types.js";
@@ -35,13 +33,19 @@ export async function monero(dnp: InstalledPackageData): Promise<ChainDataResult
   // http://monero.dappnode:18081
   const apiUrl = `http://${containerDomain}:18081`;
 
-  const info: MoneroRpcGetInfoResult = await new Promise((resolve, reject): void => {
-    const daemon = new Daemon(apiUrl);
-    daemon.getInfo((err: Error, res: MoneroRpcGetInfoResult) => {
-      if (err) reject(err);
-      else resolve(res);
-    });
+  const response = await fetch(`${apiUrl}/json_rpc`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ jsonrpc: "2.0", id: "dappnode_monitoring", method: "get_info", params: [] })
   });
+  if (!response.ok) throw Error(`Monero RPC request failed: ${response.status}`);
+
+  const { result: info, error } = (await response.json()) as {
+    result?: MoneroRpcGetInfoResult;
+    error?: { message: string };
+  };
+  if (error) throw Error(error.message);
+  if (!info) throw Error("Monero RPC response has no result");
 
   const highestBlock = info.target_height;
   const currentBlock = info.height;
