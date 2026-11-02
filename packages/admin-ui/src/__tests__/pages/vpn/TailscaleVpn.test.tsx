@@ -24,7 +24,6 @@ vi.mock("pages/packages/components/Config", () => ({
     return <div>Auth-key configuration</div>;
   }
 }));
-vi.mock("../../../pages/vpn/components/VpnDocsGuide", () => ({ VpnDocsGuide: () => <div>Setup guide</div> }));
 
 const dnpName = "tailscale.dnp.dappnode.eth";
 const base = {
@@ -43,8 +42,18 @@ const update = (element: React.ReactElement) =>
   act(() => {
     renderer.update(element);
   });
-const links = () => renderer.root.findAllByType("a").filter((link) => link.children.includes("Sign in to Tailscale"));
+const links = () =>
+  renderer.root.findAllByType("a").filter((link) => link.props.href?.startsWith("https://login.tailscale.com/a/"));
 const content = () => JSON.stringify(renderer.toJSON());
+const activeLight = () => {
+  const active = renderer.root
+    .findAllByType("span")
+    .filter(
+      (node) => node.props.className?.includes("tailscale-light--") && node.props.className.includes("is-active")
+    );
+  expect(active).toHaveLength(1);
+  return active[0].props.className.match(/tailscale-light--(green|yellow|red)/)?.[1];
+};
 
 beforeEach(() => {
   vi.useFakeTimers();
@@ -65,6 +74,7 @@ describe("Tailscale VPN status", () => {
   it("opens fresh sign-in in another tab without referrer and retains config/docs", () => {
     render(<TailscaleVpn />);
     expect(links()).toHaveLength(1);
+    expect(activeLight()).toBe("yellow");
     expect(links()[0].props).toMatchObject({
       target: "_blank",
       rel: "noopener noreferrer",
@@ -88,24 +98,26 @@ describe("Tailscale VPN status", () => {
     update(<TailscaleVpn />);
     expect(links()).toHaveLength(0);
     expect(content()).toContain("Connected to Tailscale");
+    expect(activeLight()).toBe("green");
   });
   it.each([
-    ["preparing", "Preparing Tailscale sign-in"],
-    ["approval", "Awaiting device approval"],
-    ["connected", "Connected to Tailscale"],
-    ["offline", "Reconnecting"],
-    ["stopped", "Tailscale stopped"],
-    ["legacy", "Upgrade the Tailscale package"],
-    ["restarting", "services are starting"],
-    ["reporter-stopped", "reporter is stopped"],
-    ["missing", "status unavailable"],
-    ["invalid", "status unavailable"],
-    ["stale", "status unavailable"],
-    ["unavailable", "status unavailable"]
-  ] as const)("shows %s without a sign-in link", (scenario, message) => {
+    ["preparing", "Getting Tailscale ready", "yellow"],
+    ["approval", "Approve this Dappnode", "yellow"],
+    ["connected", "Connected to Tailscale", "green"],
+    ["offline", "Reconnecting", "yellow"],
+    ["stopped", "Tailscale is stopped", "red"],
+    ["legacy", "Update Tailscale for browser sign-in", "yellow"],
+    ["restarting", "Getting Tailscale ready", "yellow"],
+    ["reporter-stopped", "Connection check stopped", "red"],
+    ["missing", "Status unavailable", "red"],
+    ["invalid", "Status unavailable", "red"],
+    ["stale", "Status unavailable", "red"],
+    ["unavailable", "Status unavailable", "red"]
+  ] as const)("shows %s without a sign-in link", (scenario, message, light) => {
     render(<TailscaleStatusPanel dnp={mockTailscaleReport(base, scenario)} />);
     expect(links()).toHaveLength(0);
     expect(content()).toContain(message);
+    expect(activeLight()).toBe(light);
     if (scenario === "approval")
       expect(renderer.root.findByType("a").props.href).toBe("https://login.tailscale.com/admin/machines");
   });
@@ -116,10 +128,11 @@ describe("Tailscale VPN status", () => {
       render(<TailscaleStatusPanel dnp={dnp} />);
       act(() => vi.advanceTimersByTime(89000));
       update(<TailscaleStatusPanel dnp={{ ...dnp }} />);
-      expect(content()).not.toContain("status unavailable");
+      expect(content()).not.toContain("Status unavailable");
       act(() => vi.advanceTimersByTime(2000));
       expect(links()).toHaveLength(0);
-      expect(content()).toContain("status unavailable");
+      expect(content()).toContain("Status unavailable");
+      expect(activeLight()).toBe("red");
       expect(content()).not.toContain("Connected to Tailscale");
     }
   );
@@ -133,6 +146,7 @@ describe("Tailscale VPN status", () => {
     };
     render(<TailscaleStatusPanel dnp={stopped} />);
     expect(links()).toHaveLength(0);
+    expect(activeLight()).toBe("red");
   });
   it("waits for a newly observed report after service restart", () => {
     const dnp = mockTailscaleReport(base, "login");
@@ -154,6 +168,53 @@ describe("Tailscale VPN status", () => {
       update(<TailscaleVpn />);
       expect(links()).toHaveLength(0);
     }
+  });
+  it("keeps sign-in in focus and advanced settings collapsed", () => {
+    render(<TailscaleVpn />);
+    const settings = renderer.root.findByType("details");
+    expect(settings.props.open).toBeUndefined();
+    expect(
+      renderer.root
+        .findByType("summary")
+        .children.filter((child) => typeof child === "string")
+        .join("")
+    ).toContain("Auth key & advanced settings");
+    expect(renderer.root.findByType("h5").children).toEqual(["Connect your Dappnode"]);
+    expect(links()).toHaveLength(1);
+    expect(content()).toContain("This page will update automatically");
+    expect(mocks.revalidate).not.toHaveBeenCalled();
+  });
+  it("keeps the connection card stable during refresh while disabling the private link", () => {
+    render(<TailscaleVpn />);
+    const title = renderer.root.findByType("h5").children;
+    mocks.request.mockReturnValue({
+      data: mockTailscaleReport(base, "login"),
+      revalidate: mocks.revalidate,
+      isValidating: true
+    });
+    update(<TailscaleVpn />);
+    expect(renderer.root.findByType("h5").children).toEqual(title);
+    expect(links()).toHaveLength(0);
+    expect(renderer.root.findAllByType("button").some((button) => button.props.disabled)).toBe(true);
+    expect(content()).not.toContain("Unable to check");
+  });
+  it("lets users retry a failed status check", () => {
+    mocks.request.mockReturnValue({
+      data: mockTailscaleReport(base, "login"),
+      revalidate: mocks.revalidate,
+      error: Error("failed")
+    });
+    render(<TailscaleVpn />);
+    const retry = renderer.root.findAllByType("button").find((button) => button.children.includes("Check again"));
+    expect(retry).toBeDefined();
+    act(() => retry!.props.onClick());
+    expect(mocks.revalidate).toHaveBeenCalledOnce();
+    expect(links()).toHaveLength(0);
+  });
+  it("points a stopped connection to package management", () => {
+    render(<TailscaleStatusPanel dnp={mockTailscaleReport(base, "reporter-stopped")} />);
+    act(() => renderer.root.findByType("button").props.onClick());
+    expect(mocks.navigate).toHaveBeenCalledWith(`/packages/my/${dnpName}/info`);
   });
   it("keeps the existing loading and install action", () => {
     mocks.request.mockReturnValue({ revalidate: mocks.revalidate, isValidating: true });
