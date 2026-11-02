@@ -125,7 +125,11 @@ export const PackageById: React.FC = () => {
       <div className="horizontal-navbar">
         {availableRoutes.map((route) => (
           <button key={route.subPath} className="item-container">
-            <NavLink to={route.subPath} className="item no-a-style" style={{ whiteSpace: "nowrap" }}>
+            <NavLink
+              to={`/${basePath}/${backSubPath}/${encodeURIComponent(dnpName)}/${route.subPath}`}
+              className="item no-a-style"
+              style={{ whiteSpace: "nowrap" }}
+            >
               {route.name.toUpperCase()}
             </NavLink>
           </button>

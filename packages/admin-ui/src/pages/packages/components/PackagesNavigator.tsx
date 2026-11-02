@@ -87,7 +87,7 @@ export const PackagesNavigator: React.FC = () => {
           <div className="horizontal-navbar">
             {routesForNavbar.map((r) => (
               <button key={r.subPath} className="item-container">
-                <NavLink to={r.link} className="item no-a-style" style={{ whiteSpace: "nowrap" }}>
+                <NavLink to={`/${basePath}/${r.link}`} className="item no-a-style" style={{ whiteSpace: "nowrap" }}>
                   {r.name.toUpperCase()}
                 </NavLink>
               </button>
@@ -96,7 +96,7 @@ export const PackagesNavigator: React.FC = () => {
         </>
       )}
 
-      <SectionNavigator routes={sectionRoutes} hideNavbar />
+      <SectionNavigator basePath={`/${basePath}`} routes={sectionRoutes} hideNavbar />
     </>
   );
 };

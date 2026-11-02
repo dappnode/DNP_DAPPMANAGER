@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { api, useApi } from "api";
 import { useDispatch } from "react-redux";
-import { Routes, Route, useNavigate, useLocation, useParams, NavLink } from "react-router-dom";
+import { Routes, Route, useNavigate, useLocation, useParams, useMatch, NavLink } from "react-router-dom";
 import { isEmpty, throttle } from "lodash-es";
 import { difference } from "utils/lodashExtended";
 import { prettyDnpName, isDnpVerified } from "utils/format";
@@ -44,6 +44,9 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
   const navigate = useNavigate();
   const location = useLocation();
   const params = useParams();
+  const packageRoute = useMatch("/installer/:scope/:id/*")!;
+  const packagePath = packageRoute.pathnameBase;
+  const storePath = `/installer/${packageRoute.params.scope}`;
 
   const [userSettings, setUserSettings] = useState({} as UserSettingsAllDnps);
   const [bypassCoreOpt, setBypassCoreOpt] = useState<boolean>();
@@ -310,7 +313,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
    * - When the DNP is updated (finish installation), redirect to /packages
    */
   useEffect(() => {
-    if (currentSubRoute) navigate(".");
+    if (currentSubRoute) navigate(packagePath);
   }, []);
 
   // Do this in a different way
@@ -323,18 +326,18 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
     // When going to the last step "install", redirect to home and install
     if (nextIndex >= availableRoutes.length - 1) {
       // This navigates to the current route. Modify it according to your setup.
-      navigate(".");
+      navigate(packagePath);
       onInstallThrottle(newData);
     } else {
       const nextStep = availableRoutes[nextIndex];
-      if (nextStep) navigate(nextStep.subPath);
+      if (nextStep) navigate(`${packagePath}/${nextStep.subPath}`);
     }
   }
 
   function goBack() {
     const prevStep = availableRoutes[currentIndex - 1];
-    if (prevStep) navigate(`../${encodeURIComponent(params.id || "")}/${prevStep.subPath}`);
-    else navigate("..");
+    if (prevStep) navigate(`${packagePath}/${prevStep.subPath}`);
+    else navigate(storePath);
   }
 
   return (
