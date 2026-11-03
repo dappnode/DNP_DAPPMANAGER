@@ -43,7 +43,7 @@ export class IpfsGatewayClient {
       }
 
       try {
-        this.log("info", `Trying IPFS gateway ${requestUrl}`);
+        this.log("debug", `Trying IPFS gateway ${requestUrl}`);
         const response = await fetch(requestUrl, { ...init, signal: controller.signal });
         if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
         return await consume(response);
@@ -66,7 +66,7 @@ export class IpfsGatewayClient {
   }
 }
 
-export type IpfsGatewayLog = (level: "info" | "warn", message: string) => void;
+export type IpfsGatewayLog = (level: "debug" | "warn", message: string) => void;
 
 function normalizeGatewayUrls(gatewayUrls: string | string[]): string[] {
   const normalized = (Array.isArray(gatewayUrls) ? gatewayUrls : [gatewayUrls])

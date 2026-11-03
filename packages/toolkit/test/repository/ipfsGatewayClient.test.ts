@@ -70,7 +70,7 @@ describe("IpfsGatewayClient", () => {
     }
   });
 
-  it("logs every gateway attempt and failure with the requested IPFS path", async () => {
+  it("logs gateway attempts at debug level and failures at warn level", async () => {
     const logEntries: { level: string; message: string }[] = [];
     let requestCount = 0;
     globalThis.fetch = async () => {
@@ -86,12 +86,12 @@ describe("IpfsGatewayClient", () => {
     await client.fetch("/ipfs/cid?format=car", {}, async (response) => response.text());
 
     expect(logEntries).to.deep.equal([
-      { level: "info", message: "Trying IPFS gateway https://first.example/ipfs/cid?format=car" },
+      { level: "debug", message: "Trying IPFS gateway https://first.example/ipfs/cid?format=car" },
       {
         level: "warn",
         message: "IPFS gateway failed https://first.example/ipfs/cid?format=car: 503 Service Unavailable"
       },
-      { level: "info", message: "Trying IPFS gateway https://second.example/ipfs/cid?format=car" }
+      { level: "debug", message: "Trying IPFS gateway https://second.example/ipfs/cid?format=car" }
     ]);
   });
 });
