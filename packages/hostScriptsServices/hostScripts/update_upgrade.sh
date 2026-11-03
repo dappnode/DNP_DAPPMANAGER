@@ -1,18 +1,18 @@
 #!/bin/bash
 
 # This script will perform an update and upgrade of the system.
-set -Eeuo pipefail
 
 # Set noninteractive frontend (useful for automated scripts)
 export DEBIAN_FRONTEND=noninteractive
 
 # Update the package list
-apt-get -o APT::Update::Error-Mode=any update
+apt-get update -y
 
 # Upgrade all installed packages
-apt-get -o DPkg::Lock::Timeout=300 -y --with-new-pkgs upgrade
+apt-get -y upgrade
 
-# Keep previous kernels available for recovery until the user has rebooted.
+# Remove packages that are no longer required
+apt-get -y autoremove
 
 # Clean up apt cache
 apt-get clean
