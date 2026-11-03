@@ -12,7 +12,8 @@ export const getRebootRequiredMemoized = memoize(
     const infoParsed = JSON.parse(response);
     return {
       rebootRequired: infoParsed.rebootRequired,
-      pkgs: infoParsed.pkgs
+      pkgs: infoParsed.pkgs,
+      kernelSecurityMitigation: infoParsed.kernelSecurityMitigation
     };
   },
   {

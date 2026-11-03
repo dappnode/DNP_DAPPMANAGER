@@ -837,6 +837,8 @@ export interface HostHardDisk {
 export interface RebootRequiredScript {
   rebootRequired: boolean;
   pkgs: string;
+  /** Live interim mitigation status; never indicates whether the kernel is patched. */
+  kernelSecurityMitigation?: "mitigated" | "failed" | "removed" | "not-applicable";
 }
 
 export interface HostInfoScript {

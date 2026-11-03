@@ -18,14 +18,16 @@ export function UpdateUpgrade() {
 
     await withToastNoThrow(() => api.updateUpgrade(), {
       message: "Updating and upgrading...",
-      onSuccess: "Updated and upgraded"
+      onSuccess: "Host packages updated. A reboot may be required to activate kernel updates."
     });
   }
   return (
     <Card spacing>
       <p>
         Update and upgrade the host machine. This action updates and upgrades the list of packages of the host machine.
-        This action might require a reboot of the host machine, you will receive a notification if so.
+        This action might require a reboot of the host machine, you will receive a notification if so. Only packages
+        selected by your configured repositories are installed. Temporary security mitigations do not replace installing
+        a fixed kernel and rebooting.
       </p>
 
       <Button variant="outline-danger" onClick={updateUpgrade}>
