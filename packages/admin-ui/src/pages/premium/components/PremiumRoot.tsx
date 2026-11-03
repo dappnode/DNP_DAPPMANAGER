@@ -96,7 +96,7 @@ const PremiumRoot: React.FC = () => {
         installPremiumPkg={installPremiumPkg}
         isLoading={isLoading}
         isRunning={isRunning}
-        successComponent={<SectionNavigator routes={routes} />}
+        successComponent={<SectionNavigator basePath="/premium" routes={routes} />}
       />
     </div>
   );

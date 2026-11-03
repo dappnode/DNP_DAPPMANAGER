@@ -74,7 +74,7 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
   return (
     <div className="premium-backup-node">
       <DescriptionCardsGrid />
-      <SectionNavigator routes={routes} variant="sm" />
+      <SectionNavigator basePath={`/${basePath}/${subPaths.backupNode}`} routes={routes} variant="sm" />
     </div>
   );
 }

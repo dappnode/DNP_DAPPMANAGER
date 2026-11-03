@@ -85,7 +85,7 @@ const SystemRoot: React.FC = () => {
   return (
     <>
       <Title title={title} />
-      <SectionNavigator routes={availableRoutes} />
+      <SectionNavigator basePath="/system" routes={availableRoutes} />
     </>
   );
 };
