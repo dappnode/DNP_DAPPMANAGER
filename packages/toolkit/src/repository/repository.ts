@@ -1,6 +1,7 @@
 import * as isIPFS from "is-ipfs";
 import { IPFSEntry } from "kubo-rpc-client";
 import { CID } from "multiformats/cid";
+import { equals } from "multiformats/bytes";
 import { CarReader } from "@ipld/car";
 import * as dagPb from "@ipld/dag-pb";
 import { sha256 } from "multiformats/hashes/sha2";
@@ -550,7 +551,7 @@ export class DappnodeRepository extends ApmRepository {
    *
    * @param hash - The content identifier (CID) of the content to get and verify.
    * @returns The verified UnixFS content.
-   * @throws Error when the CAR is incomplete or its root CID does not match the requested hash.
+   * @throws Error when the CAR is incomplete, has the wrong root, or contains an invalid block hash.
    */
   private async getVerifiedContentFromGateway(
     hash: string,
@@ -601,6 +602,14 @@ export class DappnodeRepository extends ApmRepository {
         // TODO: remove below type casting
         const block = await carReader.get(cid as CID);
         if (!block) throw Error(`Could not get block ${cid}`);
+        if (cid.multihash.code !== sha256.code) {
+          throw Error(`Unsupported IPFS block hash: ${cid.multihash.code}`);
+        }
+        // CAR indexing only matches CID labels; verify the bytes before decoding or exporting them.
+        const digest = await sha256.digest(block.bytes);
+        if (!equals(cid.multihash.bytes, digest.bytes)) {
+          throw Error(`IPFS block integrity check failed for ${cid}`);
+        }
         return block.bytes;
       }
     });
