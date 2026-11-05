@@ -129,7 +129,7 @@ describe("files / compose / validateDappnodeCompose", () => {
       )
     ).to.throw(`Error validating compose file with dappnode requirements:
 
-The docker network danger_network is not allowed. Only docker networks dncore_network,dnpublic_network are allowed`);
+The docker network danger_network is not allowed. Only docker networks dncore_network,dnprivate_network,dnpublic_network are allowed`);
   });
 
   it("Should throw an error due to unsafe volumes", () => {
@@ -193,7 +193,7 @@ service validator has key credential_spec that is not allowed. Allowed keys are:
       )
     ).to.throw(`Error validating compose file with dappnode requirements:
 
-service validator has a non-whitelisted docker network: danger_network. Only docker networks dncore_network,dnpublic_network are allowed`);
+service validator has a non-whitelisted docker network: danger_network. Only docker networks dncore_network,dnprivate_network,dnpublic_network are allowed`);
   });
 
   it("Should throw an error due to unsafe service networks in object format", () => {
@@ -222,9 +222,9 @@ service validator has a non-whitelisted docker network: danger_network. Only doc
       )
     ).to.throw(`Error validating compose file with dappnode requirements:
 
-service validator has a non-whitelisted docker network: danger_network. Only docker networks dncore_network,dnpublic_network are allowed
+service validator has a non-whitelisted docker network: danger_network. Only docker networks dncore_network,dnprivate_network,dnpublic_network are allowed
 service validator has the network danger_network with reserved docker alias. Aliases dappmanager.dappnode,wifi.dappnode,vpn.dappnode,wireguard.dappnode,ipfs.dappnode,bind.dappnode are reserved to core packages
-service validator has a non-whitelisted docker network: other_network. Only docker networks dncore_network,dnpublic_network are allowed`);
+service validator has a non-whitelisted docker network: other_network. Only docker networks dncore_network,dnprivate_network,dnpublic_network are allowed`);
   });
 
   it("Should only reject unsafe volumes when a legacy compose version is present", () => {

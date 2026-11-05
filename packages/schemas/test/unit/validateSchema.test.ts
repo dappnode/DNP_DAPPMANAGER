@@ -11,7 +11,7 @@ import { cleanTestDir, testDir } from "../testUtils.js";
 import { Manifest, SetupWizard, NotificationsConfig, GatusEndpoint, CustomEndpoint } from "@dappnode/types";
 import { Priority } from "../../../types/src/notifications.js";
 
-describe.only("schemaValidation", function () {
+describe("schemaValidation", function () {
   this.timeout(10000);
   describe("manifest", () => {
     before(() => {
@@ -84,6 +84,76 @@ describe.only("schemaValidation", function () {
 
       expect(() => validateManifestSchema(manifest as Manifest)).to.throw();
     });
+
+    it("validateManifest upnpDisable as boolean", () => {
+      const manifest: Manifest = {
+        name: "example.dnp.dappnode.eth",
+        version: "1.0.0",
+        description: "Example package",
+        type: "service",
+        license: "MIT",
+        upnpDisable: true
+      };
+
+      expect(() => validateManifestSchema(manifest)).to.not.throw();
+    });
+
+    it("validateManifest upnpDisable as array of port numbers", () => {
+      const manifest: Manifest = {
+        name: "example.dnp.dappnode.eth",
+        version: "1.0.0",
+        description: "Example package",
+        type: "service",
+        license: "MIT",
+        upnpDisable: [8545, 30303, 9000]
+      };
+
+      expect(() => validateManifestSchema(manifest)).to.not.throw();
+    });
+
+    it("throw error validating with invalid upnpDisable", () => {
+      // Override upnpDisable property with invalid value to test schema
+      const manifest: Omit<Manifest, "upnpDisable"> & { upnpDisable: string } = {
+        name: "example.dnp.dappnode.eth",
+        version: "1.0.0",
+        description: "Example package",
+        type: "service",
+        license: "MIT",
+        upnpDisable: "invalid"
+      };
+
+      expect(() => validateManifestSchema(manifest as unknown as Manifest)).to.throw();
+    });
+
+    for (const upnpDisable of [false, [], [1, 65535]]) {
+      it(`validateManifest with upnpDisable ${JSON.stringify(upnpDisable)}`, () => {
+        const manifest: Manifest = {
+          name: "example.dnp.dappnode.eth",
+          version: "1.0.0",
+          description: "Example package",
+          type: "service",
+          license: "MIT",
+          upnpDisable
+        };
+
+        expect(() => validateManifestSchema(manifest)).to.not.throw();
+      });
+    }
+
+    for (const upnpDisable of [[0], [-1], [65536], [8545.5], {}]) {
+      it(`rejects invalid upnpDisable ${JSON.stringify(upnpDisable)}`, () => {
+        const manifest = {
+          name: "example.dnp.dappnode.eth",
+          version: "1.0.0",
+          description: "Example package",
+          type: "service",
+          license: "MIT",
+          upnpDisable
+        };
+
+        expect(() => validateManifestSchema(manifest as unknown as Manifest)).to.throw();
+      });
+    }
   });
 
   describe("compose", () => {
