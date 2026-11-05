@@ -1,5 +1,5 @@
 import path from "path";
-import { mapValues, pick, omitBy, isObject, mergeWith, union } from "lodash-es";
+import { mapValues, pick, omitBy, isObject } from "lodash-es";
 import {
   parsePortMappings,
   stringifyPortMappings,
@@ -10,7 +10,15 @@ import {
   parseServiceNetworks
 } from "./index.js";
 import { parseEnvironment } from "@dappnode/utils";
-import { Compose, ComposeServiceNetworks, PortMapping, UserSettings, VolumeMapping } from "@dappnode/types";
+import {
+  Compose,
+  ComposeServiceNetwork,
+  ComposeServiceNetworks,
+  ComposeServiceNetworksObj,
+  PortMapping,
+  UserSettings,
+  VolumeMapping
+} from "@dappnode/types";
 import { cleanCompose, isOmitable } from "./clean.js";
 import { stringifyVolumeMappings } from "./volumes.js";
 import { readContainerLabels, writeDefaultsToLabels } from "./labelsDb.js";
@@ -145,7 +153,7 @@ export function applyUserSettings(
     const userSetEnvironment = (userSettings.environment || {})[serviceName] || {};
     const userSetPortMappings = (userSettings.portMappings || {})[serviceName] || {};
     const userSetLegacyBindVolumes = (userSettings.legacyBindVolumes || {})[serviceName] || {};
-    const userSetNetworks = (userSettings.networks?.serviceNetworks || {})[serviceName] || {};
+    const userSetNetworks = parseServiceNetworks((userSettings.networks?.serviceNetworks || {})[serviceName] || {});
 
     // New values
     const nextEnvironment = mapValues(environment, (envValue, envName) => userSetEnvironment[envName] || envValue);
@@ -159,13 +167,64 @@ export function applyUserSettings(
       })
     );
 
-    // docker aliases must be unique
-    // merge base and user networks, then remove any empty/nullish props (e.g. empty ipv4_address)
-    const mergedNetworks = mergeWith(networks, userSetNetworks, (value1, value2) =>
-      mergeWith(value1, value2, (subvalue1, subvalue2) => union(subvalue1, subvalue2))
-    );
-    const nextNetworks = mapValues(mergedNetworks, (config) =>
-      omitBy(config, (v) => v == null || (Array.isArray(v) && v.length === 0))
+    // Function to ensure types are correct and enforce Compose file compatibility
+    const normalizeNetwork = (network: ComposeServiceNetwork): ComposeServiceNetwork => {
+      const normalized: ComposeServiceNetwork = {};
+      // Only add aliases if the array is non-empty
+      if (Array.isArray(network.aliases) && network.aliases.length > 0) {
+        normalized.aliases = network.aliases;
+      }
+      // Only add ipv4_address if it is defined (not undefined)
+      if (network.ipv4_address) {
+        normalized.ipv4_address = network.ipv4_address;
+      }
+      return normalized;
+    };
+
+    // Function to merge base and user networks, ensuring proper type for ipv4_address and aliases
+    const mergeNetworks = (
+      base: ComposeServiceNetworksObj,
+      user: ComposeServiceNetworksObj
+    ): ComposeServiceNetworksObj => {
+      const merged: ComposeServiceNetworksObj = {};
+
+      // Iterate over the keys of the base networks
+      for (const networkName in base) {
+        merged[networkName] = { ...base[networkName] }; // Start with a shallow copy of the base network
+
+        if (user[networkName]) {
+          // If the user has provided overrides for this network, merge them
+          for (const subKey in user[networkName]) {
+            if (subKey === "ipv4_address") {
+              merged[networkName].ipv4_address = base[networkName].ipv4_address; // Always take base ipv4_address
+            } else if (subKey === "aliases") {
+              // Merge and deduplicate aliases
+              const baseAliases = base[networkName].aliases || [];
+              const userAliases = user[networkName].aliases || [];
+              merged[networkName].aliases = Array.from(new Set([...baseAliases, ...userAliases]));
+            }
+          }
+        } else {
+          // If user doesn't have settings for the network, just copy the base network
+          if (!merged[networkName].ipv4_address && base[networkName].ipv4_address) {
+            merged[networkName].ipv4_address = base[networkName].ipv4_address;
+          }
+        }
+      }
+
+      // Ensure that networks that don't have user settings but exist in base are still included
+      for (const key in user) {
+        if (!(key in base)) {
+          merged[key] = { ...user[key] }; // Add user networks that don't exist in base
+        }
+      }
+
+      return merged;
+    };
+
+    // Normalize the merged networks to ensure types are correct and compatible with Compose
+    const nextNetworks = Object.fromEntries(
+      Object.entries(mergeNetworks(networks, userSetNetworks)).map(([key, config]) => [key, normalizeNetwork(config)])
     );
 
     // ##### <DEPRECATED> Kept for legacy compatibility

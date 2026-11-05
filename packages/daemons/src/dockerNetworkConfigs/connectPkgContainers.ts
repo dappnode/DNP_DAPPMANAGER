@@ -14,7 +14,7 @@ export async function connectPkgContainers({
 }: {
   pkg: InstalledPackageDataApiReturn;
   networkName: string;
-  dappmanagerIp: string;
+  dappmanagerIp?: string;
   bindIp: string;
 }): Promise<void> {
   const network = docker.getNetwork(networkName);
@@ -32,12 +32,23 @@ export async function connectPkgContainers({
     // Special handling for bind and dappmanager containers
     const isBindContainer = containerName === params.bindContainerName;
     const isDappmanagerContainer = containerName === params.dappmanagerContainerName;
-    if (isBindContainer || isDappmanagerContainer) {
+    if (isBindContainer) {
       logs.info(`Connecting special container ${containerName} to network ${network.id} with IP ${bindIp}`);
       await connectPkgContainerWithIp({
         network,
         containerName,
-        containerIp: isBindContainer ? bindIp : dappmanagerIp,
+        containerIp: bindIp,
+        aliases
+      }).catch((error) =>
+        logs.error(`Failed to connect special container ${containerName} to network ${network.id}: ${error.message}`)
+      );
+      continue;
+    } else if (isDappmanagerContainer && dappmanagerIp) {
+      logs.info(`Connecting special container ${containerName} to network ${network.id} with IP ${dappmanagerIp}`);
+      await connectPkgContainerWithIp({
+        network,
+        containerName,
+        containerIp: dappmanagerIp,
         aliases
       }).catch((error) =>
         logs.error(`Failed to connect special container ${containerName} to network ${network.id}: ${error.message}`)
@@ -163,7 +174,7 @@ async function connectPkgContainerRetryOnIpUsed({
   if (maxAttempts > 100) maxAttempts = 100;
   if (maxAttempts < 1) maxAttempts = 1;
   let attemptCount = 0;
-  const networkOptions = {
+  const networkOptions: Dockerode.NetworkConnectOptions = {
     Container: containerName,
     EndpointConfig: {
       IPAMConfig: {

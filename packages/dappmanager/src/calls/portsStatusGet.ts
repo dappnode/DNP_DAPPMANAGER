@@ -3,7 +3,7 @@ import { list } from "@dappnode/upnpc";
 import { logs } from "@dappnode/logger";
 import { PortToOpen, UpnpTablePortStatus, ApiTablePortStatus, UpnpPortMapping, PackagePort } from "@dappnode/types";
 import { params } from "@dappnode/params";
-import Ajv from "ajv";
+import { Ajv } from "ajv";
 
 // If the keyword value is an object, then for the data array to be valid
 // each item of the array should be valid according to the schema in this value.

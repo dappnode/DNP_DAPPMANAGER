@@ -5,9 +5,28 @@ import { mockContainer } from "../testUtils.js";
 import { getPortsToOpen } from "../../src/natRenewal/getPortsToOpen.js";
 import fs from "fs";
 import path from "path";
+import os from "os";
 import { ComposeEditor } from "@dappnode/dockercompose";
+import { params } from "@dappnode/params";
+import { getManifestPath } from "@dappnode/utils";
 
 describe("daemons > natRenewal > getPortsToOpen", () => {
+  let testDir: string;
+  const originalRepoDir = params.REPO_DIR;
+  const originalCoreDir = params.DNCORE_DIR;
+
+  beforeEach(() => {
+    testDir = fs.mkdtempSync(path.join(os.tmpdir(), "nat-renewal-"));
+    params.REPO_DIR = path.join(testDir, "dnp_repo");
+    params.DNCORE_DIR = path.join(testDir, "DNCORE");
+  });
+
+  afterEach(() => {
+    params.REPO_DIR = originalRepoDir;
+    params.DNCORE_DIR = originalCoreDir;
+    fs.rmSync(testDir, { recursive: true, force: true });
+  });
+
   it("Return portsToOpen on a normal case", async () => {
     const stoppedDnp = "stopped.dnp.dappnode.eth";
     const containers: PackageContainer[] = [
@@ -47,6 +66,7 @@ describe("daemons > natRenewal > getPortsToOpen", () => {
         ...mockContainer,
         isCore: false,
         dnpName: stoppedDnp,
+        serviceName: stoppedDnp,
         running: false
       }
     ];
@@ -108,8 +128,20 @@ describe("daemons > natRenewal > getPortsToOpen", () => {
         protocol: "UDP",
         portNumber: 32770,
         serviceName: "mock-dnp.dnp.dappnode.eth"
-      }
+      },
       // From "stopped.dnp.dappnode.eth"
+      {
+        dnpName: stoppedDnp,
+        protocol: "UDP",
+        portNumber: 4001,
+        serviceName: stoppedDnp
+      },
+      {
+        dnpName: stoppedDnp,
+        protocol: "TCP",
+        portNumber: 4001,
+        serviceName: stoppedDnp
+      }
     ]);
   });
 
@@ -159,38 +191,9 @@ describe("daemons > natRenewal > getPortsToOpen", () => {
   });
 
   describe("upnpDisable functionality", () => {
-    beforeEach(() => {
-      try {
-        if (fs.existsSync("./dnp_repo")) {
-          fs.rmSync("./dnp_repo", { recursive: true, force: true });
-        }
-      } catch (e) {
-          /* empty */
-      }
-    });
-
-    afterEach(() => {
-      try {
-        if (fs.existsSync("./dnp_repo")) {
-          fs.rmSync("./dnp_repo", { recursive: true, force: true });
-        }
-      } catch (e) {
-          /* empty */
-      }
-    });
-
     function createTestManifest(dnpName: string, manifest: Manifest): void {
-      const dnpDir = path.join("./dnp_repo", dnpName);
-      if (!fs.existsSync(dnpDir)) {
-        fs.mkdirSync(dnpDir, { recursive: true });
-      }
-      const manifestPath = path.join(dnpDir, "dappnode_package.json");
-      
-      const dir = path.dirname(manifestPath);
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-      }
-      
+      const manifestPath = getManifestPath(dnpName, manifest.type === "dncore");
+      fs.mkdirSync(path.dirname(manifestPath), { recursive: true });
       fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
     }
 
@@ -382,6 +385,122 @@ describe("daemons > natRenewal > getPortsToOpen", () => {
           protocol: "TCP",
           portNumber: 3000,
           serviceName: "mock-dnp.dnp.dappnode.eth"
+        }
+      ]);
+    });
+
+    it("Filters host ports for both protocols across services without affecting other packages", () => {
+      const dnpName = "multi-service.dnp.dappnode.eth";
+      createTestManifest(dnpName, {
+        name: dnpName,
+        version: "1.0.0",
+        description: "Test package",
+        type: "service",
+        license: "MIT",
+        upnpDisable: [30303]
+      });
+
+      const containers: PackageContainer[] = [
+        {
+          ...mockContainer,
+          dnpName,
+          serviceName: "first",
+          ports: [
+            { container: 9000, host: 30303, protocol: PortProtocol.TCP },
+            { container: 30303, host: 8545, protocol: PortProtocol.TCP }
+          ]
+        },
+        {
+          ...mockContainer,
+          dnpName,
+          serviceName: "second",
+          ports: [{ container: 9000, host: 30303, protocol: PortProtocol.UDP }]
+        },
+        {
+          ...mockContainer,
+          ports: [
+            { container: 30303, host: 30303, protocol: PortProtocol.TCP },
+            { container: 9000, protocol: PortProtocol.TCP }
+          ]
+        }
+      ];
+
+      expect(getPortsToOpen(containers)).to.deep.equal([
+        { dnpName, serviceName: "first", portNumber: 8545, protocol: PortProtocol.TCP },
+        {
+          dnpName: mockContainer.dnpName,
+          serviceName: mockContainer.serviceName,
+          portNumber: 30303,
+          protocol: PortProtocol.TCP
+        }
+      ]);
+    });
+
+    const stoppedConfigurations: (true | number[])[] = [true, [8545], []];
+    for (const upnpDisable of stoppedConfigurations) {
+      it(`Filters stopped container ports with upnpDisable ${JSON.stringify(upnpDisable)}`, () => {
+        const dnpName = "stopped-upnp.dnp.dappnode.eth";
+        createTestManifest(dnpName, {
+          name: dnpName,
+          version: "1.0.0",
+          description: "Test package",
+          type: "service",
+          license: "MIT",
+          upnpDisable
+        });
+        const compose = new ComposeEditor({ services: { service: { image: dnpName } } });
+        compose.services().service.setPortMapping([
+          { container: 8545, host: 8545, protocol: PortProtocol.TCP },
+          { container: 30303, host: 30303, protocol: PortProtocol.UDP }
+        ]);
+        compose.writeTo(ComposeEditor.getComposePath(dnpName, false));
+
+        const ports = getPortsToOpen([{ ...mockContainer, dnpName, serviceName: "service", running: false }]);
+        const expectedPorts = upnpDisable === true ? [] : upnpDisable.length ? [30303] : [8545, 30303];
+        expect(ports.map((port) => port.portNumber)).to.deep.equal(expectedPorts);
+      });
+    }
+
+    it("Reads UPnP exclusions from core package manifests", () => {
+      const dnpName = params.vpnDnpName;
+      createTestManifest(dnpName, {
+        name: dnpName,
+        version: "1.0.0",
+        description: "Test core package",
+        type: "dncore",
+        license: "MIT",
+        upnpDisable: true
+      });
+
+      expect(
+        getPortsToOpen([
+          {
+            ...mockContainer,
+            dnpName,
+            isCore: true,
+            ports: [{ container: 1194, host: 1194, protocol: PortProtocol.UDP }]
+          }
+        ])
+      ).to.deep.equal([]);
+    });
+
+    it("Continues with other packages when a manifest cannot be parsed", () => {
+      const dnpName = "invalid-manifest.dnp.dappnode.eth";
+      const manifestPath = getManifestPath(dnpName, false);
+      fs.mkdirSync(path.dirname(manifestPath), { recursive: true });
+      fs.writeFileSync(manifestPath, "upnpDisable: [");
+
+      expect(
+        getPortsToOpen([
+          { ...mockContainer, dnpName, ports: [{ container: 8545, host: 8545, protocol: PortProtocol.TCP }] },
+          { ...mockContainer, ports: [{ container: 30303, host: 30303, protocol: PortProtocol.UDP }] }
+        ])
+      ).to.deep.equal([
+        {
+          dnpName: mockContainer.dnpName,
+          serviceName: mockContainer.serviceName,
+          portNumber: 30303,
+          protocol: PortProtocol.UDP
         }
       ]);
     });

@@ -1,9 +1,8 @@
 import "mocha";
-import { CID } from "kubo-rpc-client";
+import { CID, IPFSEntry } from "kubo-rpc-client";
 import { ethers } from "ethers";
 import { expect } from "chai";
 import { ReleaseSignature, ReleaseSignatureStatusCode, TrustedReleaseKey } from "@dappnode/types";
-import { IPFSEntry } from "../../src/repository/types.js";
 import { serializeIpfsDirectory, getReleaseSignatureStatus } from "../../src/repository/releaseSignature.js";
 
 describe("modules / release / verifyReleaseSignature", () => {

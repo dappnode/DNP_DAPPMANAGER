@@ -6,11 +6,12 @@
 
     /* Emit */
     "outDir": "dist",
+    "rootDir": "src",
 
     /* Language and Environment */
     "lib": ["ESNext"]
   },
 
   "include": ["src/**/*", "src/**/*.json"],
-  "exclude": ["node_modules", "test/**/*", "theGraph", "dist"]
+  "exclude": ["node_modules", "test/**/*", "dist"]
 }

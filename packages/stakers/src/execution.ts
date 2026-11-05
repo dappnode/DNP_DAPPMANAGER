@@ -1,16 +1,17 @@
 import {
   ExecutionClientGnosis,
-  ExecutionClientHolesky,
   ExecutionClientHoodi,
+  ExecutionClientSepolia,
   ExecutionClientLukso,
   ExecutionClientMainnet,
-  ExecutionClientPrater,
+  StarknetExecutionMainnet,
+  StarknetExecutionSepolia,
   Network,
   StakerItem,
   UserSettings
 } from "@dappnode/types";
 import { StakerComponent } from "./stakerComponent.js";
-import { DappnodeInstaller, ethereumClient } from "@dappnode/installer";
+import { DappnodeInstaller } from "@dappnode/installer";
 import * as db from "@dappnode/db";
 import { params } from "@dappnode/params";
 import { listPackage } from "@dappnode/dockerapi";
@@ -27,13 +28,14 @@ export class Execution extends StakerComponent {
       set: (globEnvValue: string | null | undefined) => Promise<void>;
     }
   > = {
-    [Network.Mainnet]: db.executionClientMainnet,
-    [Network.Gnosis]: db.executionClientGnosis,
-    [Network.Prater]: db.executionClientPrater,
-    [Network.Holesky]: db.executionClientHolesky,
-    [Network.Hoodi]: db.executionClientHoodi,
-    [Network.Lukso]: db.executionClientLukso
-  };
+      [Network.Mainnet]: db.executionClientMainnet,
+      [Network.Gnosis]: db.executionClientGnosis,
+      [Network.Sepolia]: db.executionClientSepolia,
+      [Network.Hoodi]: db.executionClientHoodi,
+      [Network.Lukso]: db.executionClientLukso,
+      [Network.StarknetMainnet]: db.executionStarknetMainnet,
+      [Network.StarknetSepolia]: db.executionStarknetSepolia
+    };
 
   protected static readonly CompatibleExecutions: Record<Network, { dnpName: string; minVersion: string }[]> = {
     [Network.Mainnet]: [
@@ -45,20 +47,9 @@ export class Execution extends StakerComponent {
     ],
     [Network.Gnosis]: [
       { dnpName: ExecutionClientGnosis.Nethermind, minVersion: "1.0.18" },
-      { dnpName: ExecutionClientGnosis.Erigon, minVersion: "0.1.0" }
-    ],
-    [Network.Prater]: [
-      { dnpName: ExecutionClientPrater.Geth, minVersion: "0.4.26" },
-      { dnpName: ExecutionClientPrater.Erigon, minVersion: "0.1.0" },
-      { dnpName: ExecutionClientPrater.Nethermind, minVersion: "1.0.1" },
-      { dnpName: ExecutionClientPrater.Besu, minVersion: "0.1.0" }
-    ],
-    [Network.Holesky]: [
-      { dnpName: ExecutionClientHolesky.Reth, minVersion: "0.1.0" },
-      { dnpName: ExecutionClientHolesky.Geth, minVersion: "0.1.0" },
-      { dnpName: ExecutionClientHolesky.Erigon, minVersion: "0.1.0" },
-      { dnpName: ExecutionClientHolesky.Nethermind, minVersion: "0.1.0" },
-      { dnpName: ExecutionClientHolesky.Besu, minVersion: "0.1.0" }
+      { dnpName: ExecutionClientGnosis.Erigon, minVersion: "0.1.0" },
+      { dnpName: ExecutionClientGnosis.Geth, minVersion: "0.1.0" },
+      { dnpName: ExecutionClientGnosis.Reth, minVersion: "0.1.0" }
     ],
     [Network.Hoodi]: [
       { dnpName: ExecutionClientHoodi.Reth, minVersion: "0.1.0" },
@@ -67,7 +58,19 @@ export class Execution extends StakerComponent {
       { dnpName: ExecutionClientHoodi.Nethermind, minVersion: "0.1.0" },
       { dnpName: ExecutionClientHoodi.Besu, minVersion: "0.1.0" }
     ],
-    [Network.Lukso]: [{ dnpName: ExecutionClientLukso.Geth, minVersion: "0.1.0" }]
+    [Network.Sepolia]: [
+      { dnpName: ExecutionClientSepolia.Geth, minVersion: "0.1.3" },
+      { dnpName: ExecutionClientSepolia.Reth, minVersion: "0.1.0" }
+    ],
+    [Network.Lukso]: [{ dnpName: ExecutionClientLukso.Geth, minVersion: "0.1.0" }],
+    [Network.StarknetMainnet]: [
+      { dnpName: StarknetExecutionMainnet.Juno, minVersion: "0.1.0" },
+      { dnpName: StarknetExecutionMainnet.Pathfinder, minVersion: "0.1.0" }
+    ],
+    [Network.StarknetSepolia]: [
+      { dnpName: StarknetExecutionSepolia.Juno, minVersion: "0.1.0" },
+      { dnpName: StarknetExecutionSepolia.Pathfinder, minVersion: "0.1.0" }
+    ]
   };
 
   constructor(dappnodeInstaller: DappnodeInstaller) {
@@ -115,12 +118,6 @@ export class Execution extends StakerComponent {
     if (newExecutionDnpName !== prevExecClientDnpName) {
       // persist on db
       await this.DbHandlers[network].set(newExecutionDnpName);
-      // update fullnode alias
-      await ethereumClient.updateFullnodeAlias({
-        network,
-        newExecClientDnpName: newExecutionDnpName,
-        prevExecClientDnpName: prevExecClientDnpName || ""
-      });
     }
   }
 
@@ -172,6 +169,8 @@ export class Execution extends StakerComponent {
     if (dnpName.includes("erigon")) return "erigon";
     if (dnpName.includes("besu")) return "besu";
     if (dnpName.includes("reth")) return "reth";
+    if (dnpName.includes("juno")) return "juno";
+    if (dnpName.includes("pathfinder")) return "pathfinder";
 
     return dnpName;
   }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { throttle, isEmpty } from "lodash-es";
 import { SelectedCategories } from "../../types";
 // This page
@@ -16,21 +16,18 @@ import Input from "components/Input";
 import Button from "components/Button";
 import Loading from "components/Loading";
 import ErrorView from "components/ErrorView";
-import Alert from "react-bootstrap/Alert";
 // Selectors
 import { getDnpDirectory, getDirectoryRequestStatus } from "services/dnpDirectory/selectors";
 import { fetchDnpDirectory } from "services/dnpDirectory/actions";
-import { activateFallbackPath } from "pages/system/data";
-import { getEthClientWarning } from "services/dappnodeStatus/selectors";
 import { confirmPromise } from "components/ConfirmDialog";
 import { stakehouseLsdUrl } from "params";
+import { InstallerAIBanner } from "../aiDappstore/InstallerAiBanner";
 
 export const InstallerDnp: React.FC = () => {
   const navigate = useNavigate();
 
   const directory = useSelector(getDnpDirectory);
   const requestStatus = useSelector(getDirectoryRequestStatus);
-  const ethClientWarning = useSelector(getEthClientWarning);
   const dispatch = useDispatch();
 
   const [query, setQuery] = useState("");
@@ -67,7 +64,8 @@ export const InstallerDnp: React.FC = () => {
       // open a dialog that says it will open an external link, are you sure?
       confirmPromise({
         title: "Ready to Explore Stakehouse?",
-        text: "Clicking 'Open' will direct you to external Stakehouse App in a new tab. It's not part of Dappnode, but it's a trusted platform. Happy journey!",
+        text:
+          "Clicking 'Open' will direct you to external Stakehouse App in a new tab. It's not part of Dappnode, but it's a trusted platform. Happy journey!",
         buttons: [
           {
             label: "Cancel",
@@ -95,8 +93,19 @@ export const InstallerDnp: React.FC = () => {
     }
   }
 
+  // Toggle category: sets only one category to true at a time
   function onCategoryChange(category: string) {
-    setSelectedCategories((x) => ({ ...x, [category]: !x[category] }));
+    setSelectedCategories((x) => {
+      const newCategories = { ...x, [category]: !x[category] };
+
+      // If the category has been set to true, set all others to false
+      if (newCategories[category]) {
+        Object.keys(newCategories).forEach((key) => {
+          if (key !== category) newCategories[key] = false;
+        });
+      }
+      return newCategories;
+    });
   }
 
   const directoryFiltered = filterDirectory({
@@ -125,7 +134,7 @@ export const InstallerDnp: React.FC = () => {
   };
 
   const dnpsNoError = directoryFiltered.filter((dnp) => dnp.status !== "error");
-  const dnpsFeatured = dnpsNoError.filter((dnp) => dnp.isFeatured);
+  // const dnpsFeatured = dnpsNoError.filter((dnp) => dnp.isFeatured);
   const dnpsNormal = dnpsNoError.filter((dnp) => !dnp.isFeatured);
   const dnpsError = directoryFiltered.filter((dnp) => dnp.status === "error");
 
@@ -145,30 +154,24 @@ export const InstallerDnp: React.FC = () => {
         <CategoryFilter categories={categories} onCategoryChange={onCategoryChange} />
       )}
 
-      {ethClientWarning && (
-        <Alert variant="warning">
-          The DAppStore will not work temporarily. Eth client not available: {ethClientWarning}
-          <br />
-          Enable the <NavLink to={activateFallbackPath}>repository source fallback</NavLink> to use the DAppStore
-          meanwhile
-        </Alert>
-      )}
-
       {directory.length ? (
         !directoryFiltered.length ? (
           <NoPackageFound query={query} />
         ) : (
-          <div className="dnps-container">
-            <DnpStore directory={dnpsFeatured} openDnp={openDnp} featured />
-            <DnpStore directory={dnpsNormal} openDnp={openDnp} />
-            {dnpsError.length ? (
-              showErrorDnps ? (
-                <DnpStore directory={dnpsError} openDnp={openDnp} />
-              ) : (
-                <Button onClick={() => setShowErrorDnps(true)}>Show packages still propagating</Button>
-              )
-            ) : null}
-          </div>
+          <>
+            {!selectedCategories.AI && <InstallerAIBanner onCategoryChange={onCategoryChange} />}
+            <div className="dnps-container">
+              {/* <DnpStore directory={dnpsFeatured} openDnp={openDnp} featured /> */}
+              <DnpStore directory={dnpsNormal} openDnp={openDnp} />
+              {dnpsError.length ? (
+                showErrorDnps ? (
+                  <DnpStore directory={dnpsError} openDnp={openDnp} />
+                ) : (
+                  <Button onClick={() => setShowErrorDnps(true)}>Show packages still propagating</Button>
+                )
+              ) : null}
+            </div>
+          </>
         )
       ) : requestStatus.error ? (
         <ErrorView error={requestStatus.error} />

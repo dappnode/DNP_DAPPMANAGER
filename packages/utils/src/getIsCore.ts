@@ -15,5 +15,7 @@ const coreDnpNames = [
   params.wifiDnpName,
   params.bindDnpName,
   params.ipfsDnpName,
-  params.HTTPS_PORTAL_DNPNAME
+  params.HTTPS_PORTAL_DNPNAME,
+  params.notificationsDnpName,
+  params.PREMIUM_DNP_NAME
 ];

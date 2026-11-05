@@ -2,12 +2,11 @@ import React from "react";
 import { useApi } from "api";
 import { useSelector } from "react-redux";
 import { useParams, useSearchParams } from "react-router-dom";
-import { title } from "../data";
 // This module
 import InstallDnpView from "./InstallDnpView";
 // Utils
 import { prettyDnpName } from "utils/format";
-import Title from "components/Title";
+import SubTitle from "components/SubTitle";
 import Loading from "components/Loading";
 import ErrorView from "components/ErrorView";
 import { getProgressLogsByDnp } from "services/isInstallingLogs/selectors";
@@ -29,10 +28,11 @@ const InstallDnpContainer: React.FC = () => {
 
   return (
     <>
-      <Title title={title} subtitle={dnpName ? prettyDnpName(dnpName) : id} />
-
       {dnp ? (
-        <InstallDnpView dnp={dnp} progressLogs={progressLogs} />
+        <>
+          <SubTitle>{prettyDnpName(dnp.dnpName)}</SubTitle>
+          <InstallDnpView dnp={dnp} progressLogs={progressLogs} />
+        </>
       ) : error ? (
         <ErrorView error={error} />
       ) : isValidating ? (

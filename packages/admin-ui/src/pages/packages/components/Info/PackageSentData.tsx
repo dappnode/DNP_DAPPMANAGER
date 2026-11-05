@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ClipboardJS from "clipboard";
-import InputGroup from "react-bootstrap/esm/InputGroup";
+import { InputGroup } from "react-bootstrap";
 import Button from "components/Button";
 import { GoEye, GoEyeClosed, GoCopy } from "react-icons/go";
 import { isSecret } from "utils/isSecret";
@@ -66,14 +66,12 @@ export function RenderPackageSentData({ dnpName, data }: { dnpName: string; data
 }
 
 function SentDataRow({ value, isLink, isSecret }: { value: string; isLink?: boolean; isSecret?: boolean }) {
-  const [show, setShow] = useState(false);
+  const [show, setShow] = useState(isSecret ? false : true);
   const [showCopyTooltip, setShowCopyTooltip] = useState(false);
 
   const handleShowCopyTooltip = () => {
     setShowCopyTooltip(true);
-    setTimeout(() => {
-      setShowCopyTooltip(false);
-    }, 1500);
+    setTimeout(() => setShowCopyTooltip(false), 1500);
   };
 
   useEffect(() => {
@@ -88,31 +86,24 @@ function SentDataRow({ value, isLink, isSecret }: { value: string; isLink?: bool
           {value}
         </a>
       ) : (
-        <input
-          className="form-control copiable-input"
-          type={!isSecret || show ? "text" : "password"}
-          value={value}
-          readOnly={true}
-        />
+        <input className="form-control copiable-input" type={show ? "text" : "password"} value={value} readOnly />
+      )}
+
+      {!isLink && isSecret && (
+        <Button onClick={() => setShow((x) => !x)} className="input-append-button">
+          {show ? <GoEyeClosed /> : <GoEye />}
+        </Button>
       )}
 
       {!isLink && (
-        <InputGroup.Append>
-          {isSecret && (
-            <Button onClick={() => setShow((x) => !x)} className="input-append-button">
-              {show ? <GoEyeClosed /> : <GoEye />}
-            </Button>
-          )}
-
-          <Button
-            className="input-append-button copy-input-copy"
-            data-clipboard-text={value}
-            onClick={handleShowCopyTooltip}
-          >
-            {showCopyTooltip && <div className="copy-tooltip">copied!</div>}
-            <GoCopy />
-          </Button>
-        </InputGroup.Append>
+        <Button
+          className="input-append-button copy-input-copy"
+          data-clipboard-text={value}
+          onClick={handleShowCopyTooltip}
+        >
+          {showCopyTooltip && <div className="copy-tooltip">copied!</div>}
+          <GoCopy />
+        </Button>
       )}
     </InputGroup>
   );

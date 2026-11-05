@@ -1,4 +1,3 @@
-import semver from "semver";
 import { Compose, ComposeService, Manifest, dockerComposeSafeKeys } from "@dappnode/types";
 import { dockerParams } from "./params.js";
 
@@ -14,13 +13,20 @@ function err(msg: string): void {
  * @param param0
  */
 export function validateDappnodeCompose(compose: Compose, manifest: Manifest): void {
+  // Skip validation if SKIP_COMPOSE_VALIDATION is set to true
+  if (dockerParams.SKIP_COMPOSE_VALIDATION) {
+    console.log(
+      `[WARN] Skipping compose validation for ${manifest.name} because SKIP_COMPOSE_VALIDATION is set to true`
+    );
+    return;
+  }
+
   // clean the errors
   aggregatedError = [];
   const isCore = manifest.type === "dncore";
 
   // COMPOSE TOP LEVEL restrictions
 
-  validateComposeVersion(compose);
   validateComposeNetworks(compose);
 
   // SERVICE LEVEL restrictions
@@ -33,16 +39,6 @@ export function validateDappnodeCompose(compose: Compose, manifest: Manifest): v
 
   if (aggregatedError.length > 0)
     throw Error(`Error validating compose file with dappnode requirements:\n\n${aggregatedError.join("\n")}`);
-}
-
-/**
- * Ensures the docker compose version is supported
- */
-function validateComposeVersion(compose: Compose): void {
-  if (semver.lt(compose.version + ".0", dockerParams.MINIMUM_COMPOSE_FILE_VERSION + ".0"))
-    err(
-      `Compose version ${compose.version} is not supported. Minimum version is ${dockerParams.MINIMUM_COMPOSE_FILE_VERSION}`
-    );
 }
 
 /**

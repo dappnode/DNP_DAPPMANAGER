@@ -4,7 +4,6 @@ import SubTitle from "components/SubTitle";
 import Card from "components/Card";
 import StatusIcon from "components/StatusIcon";
 import SeverityBadge, { SeverityLevel } from "./SeverityBadge";
-import ChangeHostUserPassword from "./ChangeHostUserPassword";
 import ChangeWifiPassword from "./ChangeWifiPassword";
 import Ok from "components/Ok";
 // Style
@@ -20,17 +19,9 @@ interface SecurityIssue {
 }
 
 export default function SecurityIssues() {
-  const passwordIsSecureReq = useApi.passwordIsSecure();
   const wifiReportReq = useApi.wifiReportGet();
 
   const securityIssues: SecurityIssue[] = [
-    {
-      name: "Change host user password",
-      severity: "critical",
-      component: ChangeHostUserPassword,
-      isActive: passwordIsSecureReq.data === false,
-      okMessage: "Host user password changed"
-    },
     {
       name: "Change WIFI default password",
       severity: "critical",

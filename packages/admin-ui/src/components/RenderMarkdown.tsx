@@ -13,10 +13,14 @@ export default function RenderMarkdown({
   noMargin?: boolean;
 }) {
   return (
-    <ReactMarkdown
-      className={`markdown-render ${joinCssClass({ spacing, noMargin })}`}
-      children={source}
-      linkTarget={"_blank"}
-    />
+    <div className={`markdown-render ${joinCssClass({ spacing, noMargin })}`}>
+      <ReactMarkdown
+        components={{
+          a: ({ node: _node, ...props }) => <a {...props} target="_blank" rel="noopener noreferrer" />
+        }}
+      >
+        {source}
+      </ReactMarkdown>
+    </div>
   );
 }

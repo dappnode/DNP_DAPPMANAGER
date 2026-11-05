@@ -6,10 +6,22 @@ import { execution, consensus, mevBoost, signer } from "../index.js";
  * mev boost, graffiti, fee recipient address and checkpoint sync url
  */
 export async function stakerConfigSet({ stakerConfig }: { stakerConfig: StakerConfigSet }): Promise<void> {
-  const { network, executionDnpName, consensusDnpName, mevBoostDnpName, relays, web3signerDnpName } = stakerConfig;
+  const {
+    network,
+    executionDnpName,
+    consensusDnpName,
+    mevBoostDnpName,
+    relays,
+    web3signerDnpName,
+    starknetSignerOperationalAddress,
+    starknetSignerPrivateKey
+  } = stakerConfig;
   await Promise.all([
     await execution.setNewExecution(network, executionDnpName),
-    await consensus.setNewConsensus(network, consensusDnpName),
+    await consensus.setNewConsensus(network, consensusDnpName, {
+      starknetSignerOperationalAddress,
+      starknetSignerPrivateKey
+    }),
     await mevBoost.setNewMevBoost(network, mevBoostDnpName, relays)
   ]);
 

@@ -12,12 +12,13 @@ import { mevBoost, execution, consensus } from "../../index.js";
  * Collect the metrics:
  *   - IPFS node local or remote
  *   - Ethereum node local or remote
- *   - Which clients running on Ethereum, Gnosis, Lukso, Prater, Holesky
+ *   - Which clients running on Ethereum, Gnosis, Lukso
  *   - Which is the favourite connectivity method: Wifi, VPN, Wireguard, local
  *   - Auto-updates enabled
  *   - Fallback enabled
  *   - Dappnode graffiti or other
  *   - User sessions
+ *   - UI telemetry enabled
  */
 export const metrics = wrapHandler(async (_, res) => {
   // Return all metrics the Prometheus exposition format
@@ -40,40 +41,6 @@ register.registerMetric(
         this.set({ ipfsClientTargetLocal: "local" }, 1);
       } else {
         this.set({ ipfsClientTargetLocal: "local" }, 0);
-      }
-    }
-  })
-);
-
-// Ethereum node local or remote
-register.registerMetric(
-  new client.Gauge({
-    name: "dappmanager_eth_client_target_local",
-    help: "eth client target local",
-    labelNames: ["ethClientTargetLocal"],
-    collect() {
-      const ethClientRemote = db.ethClientRemote.get();
-      if (ethClientRemote === "on") {
-        this.set({ ethClientTargetLocal: "local" }, 0);
-      } else {
-        this.set({ ethClientTargetLocal: "local" }, 1);
-      }
-    }
-  })
-);
-
-// Ethereum fallback enabled
-register.registerMetric(
-  new client.Gauge({
-    name: "dappmanager_eth_fallback_enabled",
-    help: "eth fallback enabled",
-    labelNames: ["ethFallbackEnabled"],
-    collect() {
-      const ethClientFallback = db.ethClientFallback.get();
-      if (ethClientFallback === "on") {
-        this.set({ ethFallbackEnabled: "enabled" }, 1);
-      } else {
-        this.set({ ethFallbackEnabled: "enabled" }, 0);
       }
     }
   })
@@ -103,7 +70,7 @@ register.registerMetric(
         return 0;
       }
 
-      for (const network of ["mainnet", "prater", "gnosis", "lukso", "holesky", "hoodi"] as Network[]) {
+      for (const network of ["mainnet", "gnosis", "lukso", "hoodi", "sepolia"] as Network[]) {
         const isMevBoostSelected = mevBoost.DbHandlers[network].get();
         const executionClient = execution.DbHandlers[network].get();
         const consensusClient = consensus.DbHandlers[network].get();
@@ -236,6 +203,30 @@ register.registerMetric(
       // Note: This value is typically static and does not change over time,
       // so it might be more efficient to document this elsewhere unless it's important for it to be queryable in Prometheus.
       if (max) this.labels("max").set(max);
+    }
+  })
+);
+
+// Mirror content provider enabled or disabled
+register.registerMetric(
+  new client.Gauge({
+    name: "dappmanager_mirror_content_provider",
+    help: "Whether the Dappnode mirror content provider is enabled (1) or disabled (0)",
+    labelNames: ["mirrorContentProvider"],
+    collect() {
+      const enabled = db.mirrorProviderEnabled.get();
+      this.set({ mirrorContentProvider: "enabled" }, enabled ? 1 : 0);
+    }
+  })
+);
+
+// UI telemetry enabled or disabled
+register.registerMetric(
+  new client.Gauge({
+    name: "dappmanager_ui_telemetry_enabled",
+    help: "Whether UI telemetry is enabled (1) or disabled (0)",
+    collect() {
+      this.set(db.uiTelemetryConsent.get() ? 1 : 0);
     }
   })
 );

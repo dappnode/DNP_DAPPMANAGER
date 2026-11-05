@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Form from "react-bootstrap/Form";
 import { api } from "api";
 // Components
 import Input from "components/Input";
@@ -51,18 +52,14 @@ export function CopyFileTo({ container, toPathDefault }: { container: PackageCon
     <div className="card-subgroup">
       {/* TO, choose source file */}
       <div className="input-group mb-3">
-        <div className="custom-file">
-          <input
-            type="file"
-            className="custom-file-input"
-            onChange={(e) => {
-              if (e && e.target && e.target.files && e.target.files[0]) setFile(e.target.files[0]);
-            }}
-          />
-          <label className="custom-file-label" htmlFor="inputGroupFile01">
-            {name ? `${name} (${humanFileSize(size || 0)})` : "Choose file"}
-          </label>
-        </div>
+        <Form.Control
+          type="file"
+          className="custom-file-input"
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            if (e && e.target && e.target.files && e.target.files[0]) setFile(e.target.files[0]);
+          }}
+        />
+        <Form.Label className="custom-file-label">{name && `(${humanFileSize(size || 0)})`}</Form.Label>
       </div>
 
       {name && size && size > fileSizeWarning && (

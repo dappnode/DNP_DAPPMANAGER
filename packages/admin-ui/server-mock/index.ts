@@ -69,5 +69,6 @@ startHttpApi({
   subscriptionsLogger,
   eventBus,
   isNewDappmanagerVersion: () => false,
+  getIpfsFileBytes: async () => new Uint8Array(),
   adminPasswordDb: new AdminPasswordDb(params)
 });

@@ -11,7 +11,7 @@ import { cleanTestDir, testDir } from "../testUtils.js";
 import { Manifest, SetupWizard, NotificationsConfig, GatusEndpoint, CustomEndpoint } from "@dappnode/types";
 import { Priority } from "../../../types/src/notifications.js";
 
-describe.only("schemaValidation", function () {
+describe("schemaValidation", function () {
   this.timeout(10000);
   describe("manifest", () => {
     before(() => {
@@ -124,6 +124,36 @@ describe.only("schemaValidation", function () {
 
       expect(() => validateManifestSchema(manifest as unknown as Manifest)).to.throw();
     });
+
+    for (const upnpDisable of [false, [], [1, 65535]]) {
+      it(`validateManifest with upnpDisable ${JSON.stringify(upnpDisable)}`, () => {
+        const manifest: Manifest = {
+          name: "example.dnp.dappnode.eth",
+          version: "1.0.0",
+          description: "Example package",
+          type: "service",
+          license: "MIT",
+          upnpDisable
+        };
+
+        expect(() => validateManifestSchema(manifest)).to.not.throw();
+      });
+    }
+
+    for (const upnpDisable of [[0], [-1], [65536], [8545.5], {}]) {
+      it(`rejects invalid upnpDisable ${JSON.stringify(upnpDisable)}`, () => {
+        const manifest = {
+          name: "example.dnp.dappnode.eth",
+          version: "1.0.0",
+          description: "Example package",
+          type: "service",
+          license: "MIT",
+          upnpDisable
+        };
+
+        expect(() => validateManifestSchema(manifest as unknown as Manifest)).to.throw();
+      });
+    }
   });
 
   describe("compose", () => {
@@ -135,7 +165,7 @@ describe.only("schemaValidation", function () {
       const validCompose = `version: "3.4"
 services:
   beacon-chain:
-    image: "beacon-chain.prysm-prater.dnp.dappnode.eth:1.0.0"
+    image: "beacon-chain.prysm.dnp.dappnode.eth:1.0.0"
     volumes:
       - "beacon-chain-data:/data"
     ports:
@@ -143,20 +173,20 @@ services:
       - 12000/udp
     restart: unless-stopped
     environment:
-      HTTP_WEB3PROVIDER: "http://goerli-geth.dappnode:8545"
+      HTTP_WEB3PROVIDER: "http://geth.dappnode:8545"
       CHECKPOINT_SYNC_URL: ""
-      CORSDOMAIN: "http://prysm-prater.dappnode"
+      CORSDOMAIN: "http://prysm.dappnode"
       WEB3_BACKUP: ""
       EXTRA_OPTS: ""
   validator:
-    image: "validator.prysm-prater.dnp.dappnode.eth:1.0.0"
+    image: "validator.prysm.dnp.dappnode.eth:1.0.0"
     volumes:
       - "validator-data:/root/"
     restart: unless-stopped
     environment:
       LOG_TYPE: INFO
-      BEACON_RPC_PROVIDER: "beacon-chain.prysm-prater.dappnode:4000"
-      BEACON_RPC_GATEWAY_PROVIDER: "beacon-chain.prysm-prater.dappnode:3500"
+      BEACON_RPC_PROVIDER: "beacon-chain.prysm.dappnode:4000"
+      BEACON_RPC_GATEWAY_PROVIDER: "beacon-chain.prysm.dappnode:3500"
       GRAFFITI: validating_from_DAppNode
       EXTRA_OPTS: ""
       FEE_RECIPIENT_ADDRESS: ""
@@ -224,7 +254,7 @@ volumes:
       const validCompose1 = `version: "3.4"
   services:
   beacon-chain:
-    image: "beacon-chain.prysm-prater.dnp.dappnode.eth:1.0.0"
+    image: "beacon-chain.prysm.dnp.dappnode.eth:1.0.0"
     volumes:
       - "beacon-chain-data:/data"
     ports:
@@ -232,20 +262,20 @@ volumes:
       - 12000/udp
     restart: unless-stopped
     environment:
-      HTTP_WEB3PROVIDER: "http://goerli-geth.dappnode:8545"
+      HTTP_WEB3PROVIDER: "http://geth.dappnode:8545"
       CHECKPOINT_SYNC_URL: ""
-      CORSDOMAIN: "http://prysm-prater.dappnode"
+      CORSDOMAIN: "http://prysm.dappnode"
       WEB3_BACKUP: ""
       EXTRA_OPTS: ""
   validator:
-    image: "validator.prysm-prater.dnp.dappnode.eth:1.0.0"
+    image: "validator.prysm.dnp.dappnode.eth:1.0.0"
     volumes:
       - "validator-data:/root/"
     restart: unless-stopped
     environment:
       LOG_TYPE: INFO
-      BEACON_RPC_PROVIDER: "beacon-chain.prysm-prater.dappnode:4000"
-      BEACON_RPC_GATEWAY_PROVIDER: "beacon-chain.prysm-prater.dappnode:3500"
+      BEACON_RPC_PROVIDER: "beacon-chain.prysm.dappnode:4000"
+      BEACON_RPC_GATEWAY_PROVIDER: "beacon-chain.prysm.dappnode:3500"
       GRAFFITI: validating_from_DAppNode
       EXTRA_OPTS: ""
       FEE_RECIPIENT_ADDRESS: ""
@@ -311,7 +341,7 @@ volumes:
             },
             title: "Add a backup web3 provider",
             description:
-              "It's a good idea to add a backup web3 provider in case your main one goes down. For example, if your primary EL client is a local Geth, but you want to use Infura as a backup. Get your web3 backup from [infura](https://infura.io/) (i.e https://XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@eth2-beacon-prater.infura.io)",
+              "It's a good idea to add a backup web3 provider in case your main one goes down. For example, if your primary EL client is a local Geth, but you want to use Infura as a backup. Get your web3 backup from [infura](https://infura.io/) (i.e https://XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@eth2-beacon-mainnet.infura.io)",
             required: false
           },
           {
@@ -323,7 +353,7 @@ volumes:
             },
             title: "Checkpoint for fast sync",
             description:
-              "To get Prysm up and running in only a few minutes, you can start Prysm from a recent finalized checkpoint state rather than syncing from genesis. This is substantially **faster** and consumes **less resources** than syncing from genesis, while still providing all the same features. Be sure you are using a trusted node for the fast sync. Check [Prysm docs](https://docs.prylabs.network/docs/prysm-usage/parameters/) Get your checkpoint sync from [infura](https://infura.io/) (i.e https://XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@eth2-beacon-prater.infura.io)",
+              "To get Prysm up and running in only a few minutes, you can start Prysm from a recent finalized checkpoint state rather than syncing from genesis. This is substantially **faster** and consumes **less resources** than syncing from genesis, while still providing all the same features. Be sure you are using a trusted node for the fast sync. Check [Prysm docs](https://docs.prylabs.network/docs/prysm-usage/parameters/) Get your checkpoint sync from [infura](https://infura.io/) (i.e https://XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@eth2-beacon-mainnet.infura.io)",
             required: false
           }
         ]
@@ -366,7 +396,7 @@ volumes:
             },
             title: "Add a backup web3 provider",
             description:
-              "It's a good idea to add a backup web3 provider in case your main one goes down. For example, if your primary EL client is a local Geth, but you want to use Infura as a backup. Get your web3 backup from [infura](https://infura.io/) (i.e https://XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@eth2-beacon-prater.infura.io)",
+              "It's a good idea to add a backup web3 provider in case your main one goes down. For example, if your primary EL client is a local Geth, but you want to use Infura as a backup. Get your web3 backup from [infura](https://infura.io/) (i.e https://XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@eth2-beacon-mainnet.infura.io)",
             required: false
           },
           {
@@ -378,7 +408,7 @@ volumes:
             },
             title: "Checkpoint for fast sync",
             description:
-              "To get Prysm up and running in only a few minutes, you can start Prysm from a recent finalized checkpoint state rather than syncing from genesis. This is substantially **faster** and consumes **less resources** than syncing from genesis, while still providing all the same features. Be sure you are using a trusted node for the fast sync. Check [Prysm docs](https://docs.prylabs.network/docs/prysm-usage/parameters/) Get your checkpoint sync from [infura](https://infura.io/) (i.e https://XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@eth2-beacon-prater.infura.io)",
+              "To get Prysm up and running in only a few minutes, you can start Prysm from a recent finalized checkpoint state rather than syncing from genesis. This is substantially **faster** and consumes **less resources** than syncing from genesis, while still providing all the same features. Be sure you are using a trusted node for the fast sync. Check [Prysm docs](https://docs.prylabs.network/docs/prysm-usage/parameters/) Get your checkpoint sync from [infura](https://infura.io/) (i.e https://XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@eth2-beacon-mainnet.infura.io)",
             required: false
           },
           {

@@ -1,7 +1,7 @@
 import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
 import { generateKeysIfNotExistOrNotValid } from "@dappnode/dyndns";
-import { getDappmanagerImage } from "@dappnode/dockerapi";
+import { getDappmanagerImage, listPackageContainerNoThrow } from "@dappnode/dockerapi";
 import { getInternalIp, getServerName, getStaticIp, ping } from "./utils/index.js";
 import { getExternalUpnpIp, isUpnpAvailable } from "@dappnode/upnpc";
 import { writeGlobalEnvsToEnvFile } from "@dappnode/db";
@@ -36,12 +36,23 @@ function returnNullIfError(fn: () => Promise<string>, silent?: boolean): () => P
 export async function initializeDb(): Promise<void> {
   /**
    * ipfsClientTarget
+   * Check if the IPFS package container exists. If it does not,
+   * default to remote so the system can still resolve IPFS content.
    */
   try {
-    const ipfsClientTarget = db.ipfsClientTarget.get();
-    if (!ipfsClientTarget) {
-      logs.info("ipfsClientTarget not found, setting to local");
-      db.ipfsClientTarget.set(IpfsClientTarget.local);
+    const ipfsContainer = await listPackageContainerNoThrow({
+      containerName: params.ipfsContainerName
+    });
+
+    if (!ipfsContainer) {
+      logs.info("IPFS package not found, setting ipfsClientTarget to remote");
+      db.ipfsClientTarget.set(IpfsClientTarget.remote);
+    } else {
+      const ipfsClientTarget = db.ipfsClientTarget.get();
+      if (!ipfsClientTarget) {
+        logs.info("ipfsClientTarget not found, setting to local");
+        db.ipfsClientTarget.set(IpfsClientTarget.local);
+      }
     }
   } catch (e) {
     logs.error("Error getting ipfsClientTarget", e);
@@ -52,11 +63,13 @@ export async function initializeDb(): Promise<void> {
    * Migrate ipfs remote gateway endpoint from http://ipfs.dappnode.io:8081 to https://ipfs.gateway.dappnode.io
    * The endpoint http://ipfs.dappnode.io:8081 is being deprecated
    */
-  if (db.ipfsGateway.get() === "http://ipfs.dappnode.io:8081") db.ipfsGateway.set(params.IPFS_REMOTE);
+  const storedIpfsGateways = db.getIpfsGateways();
+  db.setIpfsGateways(
+    storedIpfsGateways.map((gateway) => (gateway === "http://ipfs.dappnode.io:8081" ? params.IPFS_REMOTE : gateway))
+  );
 
   /**
-   *
-   *
+   * Initialize telegram notifications settings
    */
 
   if (db.notifications.get() === null) {
@@ -70,6 +83,7 @@ export async function initializeDb(): Promise<void> {
 
     db.newFeatureStatus.set("enable-ethical-metrics", "pending");
     db.newFeatureStatus.set("enable-notifications", "pending");
+    db.newFeatureStatus.set("enable-ui-telemetry", "pending");
   }
 
   /**

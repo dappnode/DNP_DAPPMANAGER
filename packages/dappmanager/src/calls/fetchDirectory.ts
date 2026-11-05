@@ -4,9 +4,7 @@ import { logs } from "@dappnode/logger";
 import { listPackages } from "@dappnode/dockerapi";
 import { fileToGatewayUrl, getIsInstalled, getIsUpdated } from "@dappnode/utils";
 import { throttle } from "lodash-es";
-import { getEthersProvider } from "@dappnode/installer";
-import { DappNodeDirectory } from "@dappnode/toolkit";
-import { dappnodeInstaller } from "../index.js";
+import { dappnodeInstaller, directory } from "../index.js";
 
 const loadThrottle = 500; // 0.5 seconds
 
@@ -14,8 +12,6 @@ const loadThrottle = 500; // 0.5 seconds
  * Fetches all package names in the custom dappnode directory.
  */
 export async function fetchDirectory(): Promise<DirectoryItem[]> {
-  const directory = new DappNodeDirectory(await getEthersProvider());
-
   const installedDnpList = await listPackages();
 
   // Returns already sorted by: feat#0, feat#1, dnp#0, dnp#1, dnp#2
@@ -49,7 +45,7 @@ export async function fetchDirectory(): Promise<DirectoryItem[]> {
           ...directoryItemBasic,
           status: "ok",
           description: getShortDescription(manifest),
-          avatarUrl: fileToGatewayUrl(avatarFile), // Must be URL to a resource in a DAPPMANAGER API
+          avatarUrl: fileToGatewayUrl(avatarFile),
           isInstalled: getIsInstalled(release, installedDnpList),
           isUpdated: getIsUpdated(release, installedDnpList),
           featuredStyle: manifest.style,

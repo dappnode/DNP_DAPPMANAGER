@@ -109,7 +109,7 @@ cd packages/admin-ui
 yarn start
 ```
 
-_Note: This mode is not working a the moment since cross-domain cookies are not enabled._
+_Note: This mode is not working at the moment since cross-domain cookies are not enabled._
 
 4. Docker real-time development (recommended).
 

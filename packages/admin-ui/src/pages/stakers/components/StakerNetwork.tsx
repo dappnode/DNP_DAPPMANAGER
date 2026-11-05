@@ -5,23 +5,29 @@ import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import { api, useApi } from "api";
 import ErrorView from "components/ErrorView";
-import { confirm } from "components/ConfirmDialog";
 import MevBoost from "./columns/MevBoost";
 import RemoteSigner from "./columns/RemoteSigner";
 import ConsensusClient from "./columns/ConsensusClient";
 import ExecutionClient from "./columns/ExecutionClient";
 import Button from "components/Button";
-import { disclaimer } from "../data";
 import Loading from "components/Loading";
 import { Alert } from "react-bootstrap";
-import "./stakers.scss";
 import { AppContext } from "App";
 import { Network } from "@dappnode/types";
-import { useStakerConfig } from "./useStakerConfig";
 import { AlertDismissible } from "components/AlertDismissible";
 import { docsSmooth } from "params";
 import { BsInfoCircleFill } from "react-icons/bs";
-import Card from "components/Card";
+import { CustomAccordion, CustomAccordionItem } from "components/CustomAccordion";
+import { Link } from "react-router-dom";
+import { useStakerConfig } from "hooks/stakers/useStakerConfig";
+import {
+  UpgradeToPremiumModal,
+  ActivateBackupModal,
+  StakerDisclaimerModal
+} from "components/modals/StakersPremiumModals";
+import { useStakerModals } from "hooks/stakers/useStakerModals";
+
+import "./stakers.scss";
 
 export default function StakerNetwork({ network, description }: { network: Network; description: string }) {
   // Context
@@ -46,42 +52,45 @@ export default function StakerNetwork({ network, description }: { network: Netwo
     changes
   } = useStakerConfig(network, currentStakerConfigReq);
 
+  const isExecutionChanged =
+    newExecClient?.dnpName !==
+    currentStakerConfigReq.data?.executionClients.find((ec) => ec.status === "ok" && ec.isSelected)?.dnpName;
+
+  const isSignerSelected = Boolean(newWeb3signer?.isSelected);
+
+  // Configuration flow with modals
+  const {
+    nonPremiumModalShow,
+    nonPremiumModalOnClose,
+    premiumModalShow,
+    premiumModalOnClose,
+    disclaimerModalShow,
+    disclaimerModalOnClose,
+    displayPremiumModals,
+    displayDisclaimerModal
+  } = useStakerModals({
+    network,
+    isExecutionChanged,
+    isSignerSelected
+  });
+
   /**
    * Set new staker config
    */
-  async function setNewConfig(isLaunchpad: boolean) {
+  async function setNewConfig() {
+    let showToast = false;
     try {
       // Make sure there are changes
       if (changes) {
-        // TODO: Ask for removing the previous Execution Client and/or Consensus Client if its different
-        if (!isLaunchpad) {
-          await new Promise((resolve: (confirmOnSetConfig: boolean) => void) => {
-            confirm({
-              title: `Staker configuration`,
-              text: "Are you sure you want to implement this staker configuration?",
-              buttons: [
-                {
-                  label: "Continue",
-                  onClick: () => resolve(true)
-                }
-              ]
-            });
-          });
-          await new Promise((resolve: (confirmOnSetConfig: boolean) => void) => {
-            confirm({
-              title: `Disclaimer`,
-              text: disclaimer,
-              buttons: [
-                {
-                  label: "Continue",
-                  onClick: () => resolve(true)
-                }
-              ]
-            });
-          });
+        // Request user input through all required modals
+        const userApproved = await displayDisclaimerModal();
+        if (!userApproved) {
+          return; // User aborted the flow
         }
 
+        // Apply the configuration changes
         setReqStatus({ loading: true });
+        displayPremiumModals();
         await withToast(
           () =>
             // Omit metadata to be sent back to the backend
@@ -101,40 +110,34 @@ export default function StakerNetwork({ network, description }: { network: Netwo
             onError: `Error setting new staker configuration`
           }
         );
+
         setReqStatus({ result: true });
+        showToast = true;
       }
     } catch (e) {
       setReqStatus({ error: e });
+      showToast = true;
     } finally {
-      setReqStatus({ loading: true });
-      await withToast(() => currentStakerConfigReq.revalidate(), {
-        message: `Getting new ${network} staker configuration`,
-        onSuccess: `Successfully loaded ${network} staker configuration`,
-        onError: `Error new loading ${network} staker configuration`
-      });
-      setReqStatus({ loading: false });
+      if (showToast) {
+        setReqStatus({ loading: true });
+        await withToast(() => currentStakerConfigReq.revalidate(), {
+          message: `Getting new ${network} staker configuration`,
+          onSuccess: `Successfully loaded ${network} staker configuration`,
+          onError: `Error new loading ${network} staker configuration`
+        });
+        setReqStatus({ loading: false });
+      }
     }
   }
 
   return (
-    <>
-      {network === "prater" && (
-        <AlertDismissible variant="warning">
-          <p>
-            The prater network is deprecated, please migrate to <b>Hoodi</b>.
-          </p>
-        </AlertDismissible>
-      )}
+    <div className="staker-network-container">
+      {/* Modals */}
+      <UpgradeToPremiumModal show={nonPremiumModalShow} onClose={nonPremiumModalOnClose} />
+      <ActivateBackupModal show={premiumModalShow} onClose={premiumModalOnClose} network={network} />
+      <StakerDisclaimerModal show={disclaimerModalShow} onClose={disclaimerModalOnClose} />
 
-      {network === "holesky" && (
-        <AlertDismissible variant="warning">
-          <p>
-            The holesky network is about to be deprecated, please migrate to <b>Hoodi</b>.
-          </p>
-        </AlertDismissible>
-      )}
-
-      {(network === "holesky" || network === "mainnet") && (
+      {(network === Network.Hoodi || network === Network.Mainnet) && (
         <AlertDismissible variant="info">
           <p>
             <BsInfoCircleFill className="smooth-alert-icon" />
@@ -150,25 +153,45 @@ export default function StakerNetwork({ network, description }: { network: Netwo
         </AlertDismissible>
       )}
 
+      {network === Network.Sepolia && (
+        <AlertDismissible variant="info">
+          <p>
+            <BsInfoCircleFill className="smooth-alert-icon" />
+            <b>Sepolia network is not intended for staking</b>, as it only supports whitelisted validators. Running a
+            Sepolia node is still useful for L2s, infrastructure testing, and other use cases. To test staking, run a{" "}
+            <b>
+              <Link to="/stakers/hoodi">Hoodi node</Link>
+            </b>{" "}
+            instead.
+          </p>
+        </AlertDismissible>
+      )}
+
       <div className={theme === "light" ? "stakers-light" : "stakers-dark"}>
         {currentStakerConfigReq.data ? (
           <div>
-            <Card>
-              <p>
-                Set up your Proof-of-Stake validator configuration for Ethereum and Ethereum-based chains. You will need
-                to: <br />
-                (1) Choose an Execution Layer client <br />
-                (2) Choose a Consensus Layer client (+ validator) <br />
-                (3) Install the web3signer, which will hold the validator keys and sign <br />
-                {network !== "gnosis" && network !== "lukso" && (
-                  <>
-                    (4) Optional; delegate block-building capacities through the MEV Boost network and potentially
-                    profit from MEV
-                  </>
-                )}
-              </p>
-              <p className="network-description">{description}</p>
-            </Card>
+            <CustomAccordion defaultOpen={false}>
+              <CustomAccordionItem header={<>Network Description</>}>
+                <p className="network-description">{description}</p>
+                <p>
+                  Set up your Proof-of-Stake validator configuration for Ethereum and Ethereum-based chains. You will
+                  need to: <br />
+                  (1) Choose an Execution Layer client <br />
+                  (2) Choose a Consensus Layer client (+ validator) <br />
+                  {network !== Network.Sepolia && (
+                    <>
+                      (3) Install the web3signer, which will hold the validator keys and sign <br />
+                      {network !== Network.Gnosis && network !== Network.Lukso && (
+                        <>
+                          (4) Optional; delegate block-building capacities through the MEV Boost network and potentially
+                          profit from MEV
+                        </>
+                      )}
+                    </>
+                  )}
+                </p>
+              </CustomAccordionItem>
+            </CustomAccordion>
 
             <Row className="staker-network">
               <Col>
@@ -179,44 +202,55 @@ export default function StakerNetwork({ network, description }: { network: Netwo
                     executionClient={executionClient}
                     setNewExecClient={setNewExecClient}
                     isSelected={executionClient.dnpName === newExecClient?.dnpName}
+                    isDisabled={reqStatus.loading}
                   />
                 ))}
               </Col>
 
-              <Col>
-                <SubTitle>Consensus Clients</SubTitle>
-                {currentStakerConfigReq.data.consensusClients.map((consensusClient, i) => (
-                  <ConsensusClient
-                    key={i}
-                    consensusClient={consensusClient}
-                    setNewConsClient={setNewConsClient}
-                    isSelected={consensusClient.dnpName === newConsClient?.dnpName}
-                  />
-                ))}
-              </Col>
-
-              <Col>
-                <SubTitle>Remote signer</SubTitle>
-                <RemoteSigner
-                  signer={currentStakerConfigReq.data.web3Signer}
-                  setNewWeb3signer={setNewWeb3signer}
-                  isSelected={Boolean(newWeb3signer)}
-                />
-              </Col>
-              {["prater", "mainnet", "holesky", "hoodi"].includes(network) && currentStakerConfigReq.data.mevBoost && (
+              {/* Only shows consensus clients if data is available */}
+              {currentStakerConfigReq.data.consensusClients.length > 0 && (
                 <Col>
-                  <SubTitle>Mev Boost</SubTitle>
-                  <MevBoost
-                    network={network}
-                    mevBoost={currentStakerConfigReq.data.mevBoost}
-                    newMevBoost={newMevBoost}
-                    setNewMevBoost={setNewMevBoost}
-                    newRelays={newRelays}
-                    setNewRelays={setNewRelays}
-                    isSelected={currentStakerConfigReq.data.mevBoost.dnpName === newMevBoost?.dnpName}
+                  <SubTitle>Consensus Clients</SubTitle>
+                  {currentStakerConfigReq.data.consensusClients.map((consensusClient, i) => (
+                    <ConsensusClient
+                      key={i}
+                      consensusClient={consensusClient}
+                      setNewConsClient={setNewConsClient}
+                      isSelected={consensusClient.dnpName === newConsClient?.dnpName}
+                      isDisabled={reqStatus.loading}
+                    />
+                  ))}
+                </Col>
+              )}
+
+              {/* Only shows signer if data is available */}
+              {network !== Network.Sepolia && currentStakerConfigReq.data.web3Signer && (
+                <Col>
+                  <SubTitle>Remote signer</SubTitle>
+                  <RemoteSigner
+                    signer={currentStakerConfigReq.data.web3Signer}
+                    setNewWeb3signer={setNewWeb3signer}
+                    isSelected={Boolean(newWeb3signer)}
+                    isDisabled={reqStatus.loading}
                   />
                 </Col>
               )}
+              {[Network.Mainnet, Network.Hoodi].includes(network) &&
+                currentStakerConfigReq.data.mevBoost && (
+                  <Col>
+                    <SubTitle>Mev Boost</SubTitle>
+                    <MevBoost
+                      network={network}
+                      mevBoost={currentStakerConfigReq.data.mevBoost}
+                      newMevBoost={newMevBoost}
+                      setNewMevBoost={setNewMevBoost}
+                      newRelays={newRelays}
+                      setNewRelays={setNewRelays}
+                      isSelected={currentStakerConfigReq.data.mevBoost.dnpName === newMevBoost?.dnpName}
+                      isDisabled={reqStatus.loading}
+                    />
+                  </Col>
+                )}
             </Row>
             <hr />
             <div>
@@ -224,7 +258,7 @@ export default function StakerNetwork({ network, description }: { network: Netwo
                 <Button
                   variant="dappnode"
                   disabled={!changes.isAllowed || reqStatus.loading}
-                  onClick={() => setNewConfig(false)}
+                  onClick={() => setNewConfig()}
                 >
                   Apply changes
                 </Button>
@@ -251,6 +285,6 @@ export default function StakerNetwork({ network, description }: { network: Netwo
           <ErrorView error={"No data"} hideIcon red />
         )}
       </div>
-    </>
+    </div>
   );
 }

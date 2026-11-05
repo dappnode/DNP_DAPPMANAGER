@@ -1,7 +1,7 @@
 import React from "react";
-
-const SubTitle: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className }) => (
-  <div className={`section-subtitle ${className || ""}`}>{children}</div>
+// convert children into text
+const SubTitle: React.FC<{ children: string; className?: string }> = ({ children, className }) => (
+  <div className={`section-subtitle ${className || ""}`}>{children.toUpperCase()}</div>
 );
 
 export default SubTitle;

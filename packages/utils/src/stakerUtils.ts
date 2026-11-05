@@ -44,15 +44,14 @@ export function getDefaultConsensusUserSettings({ network }: { network: Network 
 
 const getDefaultCheckpointSync = (network: Network): string =>
   network === "mainnet"
-    ? "https://checkpoint-sync.dappnode.io"
-    : network === "prater"
-      ? "https://checkpoint-sync-prater.dappnode.io"
-      : network === "gnosis"
-        ? "https://checkpoint-sync-gnosis.dappnode.io"
-        : network === "holesky"
-          ? "https://checkpoint-sync-holesky.dappnode.io"
-          : network === "hoodi"
-            ? "https://checkpoint-sync-hoodi.dappnode.io"
-            : network === "lukso"
-              ? "https://checkpoints.mainnet.lukso.network"
-              : "";
+    ? "https://checkpoint-sync.dappnode.net"
+    : network === "gnosis"
+      ? "https://checkpoint-sync-gnosis.dappnode.net"
+      : network === "hoodi"
+        ? "https://checkpoint-sync-hoodi.dappnode.net"
+        : network === "lukso"
+          ? "https://checkpoints.mainnet.lukso.network"
+          : network === "sepolia"
+            ? "https://checkpoint-sync-sepolia.dappnode.net"
+            : "";
+                

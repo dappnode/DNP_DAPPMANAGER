@@ -7,7 +7,7 @@ import { parsePortMappings } from "./ports.js";
 // Cannot create container for service ipfs.dnp.dappnode.eth: invalid port specification: "65536"
 const maxPortNumber = 65535;
 
-export function verifyCompose(compose: Compose): void {
+export function verifyCompose(compose: Compose, allowSubstitution = false): void {
   for (const serviceName in compose.services) {
     const service = compose.services[serviceName];
     try {
@@ -20,7 +20,7 @@ export function verifyCompose(compose: Compose): void {
   }
 
   // Make sure there is no variable substitution in the compose
-  assertNoSubstitution(compose);
+  if (!allowSubstitution) assertNoSubstitution(compose);
 }
 
 function verifyServiceVolumes(volumes: string[]): void {

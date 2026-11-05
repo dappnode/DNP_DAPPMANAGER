@@ -1,0 +1,10 @@
+.content-provider-wrapper {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  justify-content: space-between;
+  @media (max-width: 40rem) {
+    flex-direction: column;
+    align-items: center;
+  }
+}

@@ -8,8 +8,6 @@ import Start from "./Start";
 import Finished from "./Finished";
 import SystemAutoUpdates from "./features/SystemAutoUpdates";
 import ChangeHostPassword from "./features/ChangeHostPassword";
-import Repository from "./features/Repository";
-import RepositoryFallback from "./features/RepositoryFallback";
 import EnableEthicalMetrics from "./features/EnableEthicalMetrics";
 // Utils
 import { isEqual } from "lodash-es";
@@ -17,6 +15,7 @@ import { NewFeatureId } from "@dappnode/types";
 // styles
 import "./welcome.scss";
 import EnableNotifications from "./features/EnableNotifications";
+import EnableUiTelemetry from "./features/EnableUiTelemetry";
 
 /**
  * This internal Welcome status allows to freeze featureIds
@@ -38,16 +37,18 @@ function getRouteIdComponent(routeId: NewFeatureId): React.FC<RouteProps> | unde
   switch (routeId) {
     case "system-auto-updates":
       return (props: RouteProps) => <SystemAutoUpdates {...props} />;
+
     case "change-host-password":
       return (props: RouteProps) => <ChangeHostPassword {...props} />;
-    case "repository":
-      return (props: RouteProps) => <Repository {...props} />;
-    case "repository-fallback":
-      return (props: RouteProps) => <RepositoryFallback {...props} />;
+
     case "enable-ethical-metrics":
       return (props: RouteProps) => <EnableEthicalMetrics {...props} />;
+
     case "enable-notifications":
       return (props: RouteProps) => <EnableNotifications {...props} />;
+
+    case "enable-ui-telemetry":
+      return (props: RouteProps) => <EnableUiTelemetry {...props} />;
     default:
       return undefined;
   }
@@ -71,6 +72,7 @@ export default function Welcome() {
     featureId: NewFeatureId;
     render: React.FC<RouteProps>;
   }[] = [];
+
   for (const featureId of intFeatureIds) {
     const render = getRouteIdComponent(featureId);
     if (render) routes.push({ featureId, render });

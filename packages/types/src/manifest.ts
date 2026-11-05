@@ -97,6 +97,7 @@ export interface Manifest {
 
   // Network metadata
   exposable?: ExposableServiceManifestInfo[];
+  /** Disable UPnP for all ports (true) or selected host ports, for both TCP and UDP. */
   upnpDisable?: boolean | number[];
 
   // setupWizard for compacted manifests in core packages

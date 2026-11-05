@@ -4,12 +4,18 @@ import { PackageRelease } from "./pkg.js";
 
 export enum Network {
   Mainnet = "mainnet",
-  Prater = "prater",
   Gnosis = "gnosis",
   Lukso = "lukso",
-  Holesky = "holesky",
-  Hoodi = "hoodi"
+  Sepolia = "sepolia",
+  Hoodi = "hoodi",
+  StarknetMainnet = "starknet",
+  StarknetSepolia = "starknet-sepolia"
 }
+
+export const networksByType = {
+  mainnets: [Network.Mainnet, Network.Gnosis, Network.Lukso, Network.StarknetMainnet],
+  testnets: [Network.Hoodi, Network.Sepolia, Network.StarknetSepolia]
+};
 
 // MAINNET
 export enum ConsensusClientMainnet {
@@ -31,49 +37,6 @@ export enum SignerMainnet {
 }
 export enum MevBoostMainnet {
   Mevboost = "mev-boost.dnp.dappnode.eth"
-}
-
-// PRATER
-export enum ConsensusClientPrater {
-  Prysm = "prysm-prater.dnp.dappnode.eth",
-  Lighthouse = "lighthouse-prater.dnp.dappnode.eth",
-  Teku = "teku-prater.dnp.dappnode.eth",
-  Nimbus = "nimbus-prater.dnp.dappnode.eth",
-  Lodestar = "lodestar-prater.dnp.dappnode.eth"
-}
-export enum ExecutionClientPrater {
-  Geth = "goerli-geth.dnp.dappnode.eth",
-  Erigon = "goerli-erigon.dnp.dappnode.eth",
-  Nethermind = "goerli-nethermind.dnp.dappnode.eth",
-  Besu = "goerli-besu.dnp.dappnode.eth"
-}
-export enum SignerPrater {
-  Web3signer = "web3signer-prater.dnp.dappnode.eth"
-}
-export enum MevBoostPrater {
-  Mevboost = "mev-boost-goerli.dnp.dappnode.eth"
-}
-
-// HOLESKY
-export enum ConsensusClientHolesky {
-  Prysm = "prysm-holesky.dnp.dappnode.eth",
-  Lighthouse = "lighthouse-holesky.dnp.dappnode.eth",
-  Teku = "teku-holesky.dnp.dappnode.eth",
-  Nimbus = "nimbus-holesky.dnp.dappnode.eth",
-  Lodestar = "lodestar-holesky.dnp.dappnode.eth"
-}
-export enum ExecutionClientHolesky {
-  Geth = "holesky-geth.dnp.dappnode.eth",
-  Erigon = "holesky-erigon.dnp.dappnode.eth",
-  Nethermind = "holesky-nethermind.dnp.dappnode.eth",
-  Besu = "holesky-besu.dnp.dappnode.eth",
-  Reth = "holesky-reth.dnp.dappnode.eth"
-}
-export enum SignerHolesky {
-  Web3signer = "web3signer-holesky.dnp.dappnode.eth"
-}
-export enum MevBoostHolesky {
-  Mevboost = "mev-boost-holesky.dnp.dappnode.eth"
 }
 
 // HOODI
@@ -107,7 +70,9 @@ export enum ConsensusClientGnosis {
 }
 export enum ExecutionClientGnosis {
   Nethermind = "nethermind-xdai.dnp.dappnode.eth",
-  Erigon = "gnosis-erigon.dnp.dappnode.eth"
+  Erigon = "gnosis-erigon.dnp.dappnode.eth",
+  Geth = "gnosis-geth.dnp.dappnode.eth",
+  Reth = "gnosis-reth.dnp.dappnode.eth"
 }
 export enum SignerGnosis {
   Web3signer = "web3signer-gnosis.dnp.dappnode.eth"
@@ -128,11 +93,49 @@ export enum SignerLukso {
   Web3signer = "web3signer-lukso.dnp.dappnode.eth"
 }
 
+// SEPOLIA
+export enum ConsensusClientSepolia {
+  /*"prysm-sepolia.dnp.dappnode.eth",*/
+  Prysm = "prysm-sepolia.dnp.dappnode.eth",
+  Lighthouse = "lighthouse-sepolia.dnp.dappnode.eth"
+}
+
+export enum ExecutionClientSepolia {
+  Geth = "sepolia-geth.dnp.dappnode.eth",
+  Reth = "sepolia-reth.dnp.dappnode.eth"
+}
+
+export enum SignerSepolia {
+  Web3signer = "web3signer-sepolia.dnp.dappnode.eth"
+}
+
+// For starknet, we treat juno/pathfinder as an execution client, but its basically a fullnode on its own.
+// "Starknetstaking" (validator sofware) is treated as consensus client.
+// STARKNET MAINNET
+export enum StarknetExecutionMainnet {
+  Juno = "juno.dnp.dappnode.eth",
+  Pathfinder = "pathfinder.dnp.dappnode.eth"
+}
+export enum StarknetConsensusMainnet {
+  StarknetStaking = "starknetstaking.dnp.dappnode.eth"
+}
+
+// STARKNET SEPOLIA
+export enum StarknetExecutionSepolia {
+  Juno = "juno-sepolia.dnp.dappnode.eth",
+  Pathfinder = "pathfinder-sepolia.dnp.dappnode.eth"
+}
+export enum StarknetConsensusSepolia {
+  StarknetStaking = "starknetstaking-sepolia.dnp.dappnode.eth"
+}
+
 export type StakerItem = StakerItemOk | StakerItemError;
 
 interface StakerItemBasic {
   dnpName: string;
   relays?: string[];
+  starknetSignerOperationalAddress?: string;
+  starknetSignerPrivateKey?: string;
 }
 
 export type StakerItemError = {
@@ -180,4 +183,8 @@ export interface StakerConfigSet {
   mevBoostDnpName: string | null;
   relays: string[];
   web3signerDnpName: string | null;
+  /** Starknet-specific: Operational address for signing attestations (Hot wallet) */
+  starknetSignerOperationalAddress?: string;
+  /** Starknet-specific: Internal signing private key */
+  starknetSignerPrivateKey?: string;
 }

@@ -16,16 +16,15 @@ export const subPaths = {
   staticIp: "static-ip",
   network: "network",
   update: "update",
-  // Must be "add-ipfs-peer" for backwards compatibility with the previous IFPS peer links
-  peers: "add-ipfs-peer",
-  power: "power",
+  ipfs: "ipfs",
+  peers: "add-ipfs-peer", // Mantain it for backwards compatibility with the previous IFPS peer links
   profile: "profile",
   advanced: "advanced",
-  hardware: "hardware"
+  host: "host",
+  app: "app"
 };
 
 // Computed paths
-export const activateFallbackPath = `${subPaths.repository}/eth`;
 export const systemProfilePath = `${pathName}/${subPaths.profile}`;
 
 // DAppNode data

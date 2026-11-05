@@ -1,28 +1,13 @@
-import React, { useEffect } from "react";
+import React from "react";
 import BottomButtons from "../BottomButtons";
 import { docsUrl, externalUrlProps } from "params";
 import SubTitle from "components/SubTitle";
 import Switch from "components/Switch";
-import { notificationsDnpName } from "params.js";
 import Loading from "components/Loading";
-import { prettyDnpName } from "utils/format";
-import ErrorBoundary from "components/ErrorBoundary";
 import { useHandleNotificationsPkg } from "hooks/useHandleNotificationsPkg";
 
 export default function EnableNotifications({ onBack, onNext }: { onBack?: () => void; onNext: () => void }) {
-  const {
-    isLoading,
-    isInstalled,
-    isRunning,
-    startStopNotifications,
-    installNotificationsPkg,
-    isInstalling,
-    errorInstallingNotifications
-  } = useHandleNotificationsPkg();
-
-  useEffect(() => {
-    if (!isLoading && !isInstalled && !errorInstallingNotifications) installNotificationsPkg();
-  }, [isLoading, isInstalled, errorInstallingNotifications]);
+  const { isLoading, isRunning, startStopNotifications } = useHandleNotificationsPkg();
 
   return (
     <div>
@@ -38,20 +23,6 @@ export default function EnableNotifications({ onBack, onNext }: { onBack?: () =>
         </div>
         {isLoading ? (
           <Loading steps={["Loading"]} />
-        ) : isInstalling ? (
-          <Loading steps={["Installing notifications package"]} />
-        ) : !isInstalled ? (
-          errorInstallingNotifications ? (
-            <>
-              <br />
-              <ErrorBoundary> {errorInstallingNotifications} </ErrorBoundary>
-            </>
-          ) : (
-            <>
-              <br />
-              Could not install {prettyDnpName(notificationsDnpName)}. A manual installation may be required.
-            </>
-          )
         ) : (
           <>
             <SubTitle>Enable new notifications</SubTitle>
@@ -72,7 +43,7 @@ export default function EnableNotifications({ onBack, onNext }: { onBack?: () =>
         )}
       </div>
 
-      <BottomButtons onBack={onBack} onNext={() => onNext()} nextDisabled={isInstalling} backDisabled={isInstalling} />
+      <BottomButtons onBack={onBack} onNext={() => onNext()} />
       <br />
       <br />
     </div>

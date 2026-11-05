@@ -11,7 +11,7 @@ import { Compose } from "@dappnode/types";
  */
 export function cleanCompose(compose: Compose): Compose {
   return {
-    version: compose.version,
+    ...(compose.version === undefined ? {} : { version: compose.version }),
     ...omitBy(compose, isOmitable),
     services: mapValues(compose.services, (service) => ({
       ...omitBy(service, isOmitable),

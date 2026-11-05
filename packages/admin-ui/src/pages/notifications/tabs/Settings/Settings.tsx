@@ -47,12 +47,11 @@ export function NotificationsSettings() {
             </div>
             <div>Enable notifications to retrieve a registry of notifications on your Dappnode.</div>
           </div>
-          <br />
+          <hr />
           {isRunning && !notificationsPkgLoading && (
             <div>
               <SubTitle className="notifications-section-title">Manage notifications</SubTitle>
               <div>Enable, disable and customize notifications individually.</div>
-              <br />
               <div className="manage-notifications-wrapper">
                 {endpointsData &&
                   Object.entries(endpointsData).map(([dnpName, endpoints]) => (

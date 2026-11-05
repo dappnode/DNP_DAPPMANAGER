@@ -10,7 +10,7 @@ import { ethers } from "ethers";
 describe.skip("Dappnode Repository", function () {
   const ipfsUrls = [
     //"https://api.ipfs.dappnode.io",
-    "https://gateway.ipfs.dappnode.io"
+    "https://ipfs-gateway.dappnode.net"
   ];
 
   const prysmDnpName = "prysm.dnp.dappnode.eth";
@@ -30,7 +30,9 @@ describe.skip("Dappnode Repository", function () {
     this.timeout(100000);
     const contract = new DappnodeRepository(
       ipfsUrl,
-      new ethers.InfuraProvider("mainnet", process.env.INFURA_MAINNET_KEY)
+      new ethers.InfuraProvider("mainnet", process.env.INFURA_MAINNET_KEY),
+      { baseUrl: "https://packages.dappnode.net", timeoutMs: 30_000, maxBytes: 20 * 1024 * 1024 * 1024 },
+      () => false
     );
 
     it(`[${ipfsUrl}] Should get and validate package version for Prysm:${prysmVersion}`, async () => {

@@ -6,7 +6,7 @@ import { urlJoin } from "@dappnode/utils";
 import { logs } from "@dappnode/logger";
 import * as views from "./views/index.js";
 import { NodeNotAvailable, ProxyError, EnsResolverError, NotFoundError, Content } from "./types.js";
-import { EthProviderError } from "@dappnode/types";
+import { mainnetJsonRpc } from "./resolveDomain.js";
 
 export enum ProxyType {
   ETHFORWARD = "ETHFORWARD",
@@ -106,15 +106,36 @@ function errorToResponseHtml(e: Error, domain?: string): string {
   if (e instanceof EnsResolverError || e instanceof NotFoundError) return views.notFound(e);
 
   // Node not available views
-  if (e instanceof EthProviderError) return views.noEth(e);
   if (e instanceof NodeNotAvailable)
     if (e.location === "swarm") return views.noSwarm(e);
     else if (e.location === "ipfs") return views.noIpfs(e);
 
   // Proxy errors
-  if (e instanceof ProxyError) return views.unknownError(e);
+  if (e instanceof ProxyError) {
+    if (e.target.includes("ipfs.dappnode")) return views.noIpfs(e);
+    if (e.target.includes("swarm.dappnode")) return views.noSwarm(e);
+    return views.unknownError(e);
+  }
+
+  // ETH resolution errors may still happen after preflight checks
+  if (isEthNodeUnavailableError(e)) return views.noEth(e);
 
   // Unknown errors, log to error
   logs.error(`ETHFORWARD Unknown error resolving ${domain}`, e);
   return views.unknownError(e);
+}
+
+function isEthNodeUnavailableError(e: Error): boolean {
+  const err = e as Error & { code?: string; shortMessage?: string };
+  const fullMessage = `${err.message || ""} ${err.shortMessage || ""}`.toLowerCase();
+
+  return (
+    err.code === "NETWORK_ERROR" ||
+    err.code === "SERVER_ERROR" ||
+    fullMessage.includes(mainnetJsonRpc.toLowerCase()) ||
+    fullMessage.includes("could not detect network") ||
+    fullMessage.includes("failed to fetch") ||
+    fullMessage.includes("econnrefused") ||
+    fullMessage.includes("ehostunreach")
+  );
 }

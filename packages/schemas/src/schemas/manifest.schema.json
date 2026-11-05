@@ -490,15 +490,17 @@
         },
         {
           "type": "array",
-          "description": "List of specific ports to disable UPnP port mapping for",
+          "description": "List of host ports to disable UPnP port mapping for (both TCP and UDP)",
           "items": {
-            "type": "number",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 65535,
             "description": "Port number to disable UPnP mapping for",
             "examples": [8545, 30303, 9000]
           }
         }
       ],
-      "description": "Disable UPnP port mapping for this package. Can be set to true to disable for all ports, or an array of port numbers to disable for specific ports only."
+      "description": "Disable UPnP port mapping for this package. Set true to disable all ports, or an array of host port numbers to disable specific ports for both TCP and UDP. False or an empty array keeps UPnP enabled."
     },
     "author": {
       "type": "string",
@@ -541,7 +543,9 @@
           "Storage",
           "Lido",
           "DVT",
-          "LSD"
+          "LSD",
+          "AI",
+          "MCP"
         ],
         "enumDescriptions": {
           "Blockchain": "Blockchain nodes, i.e. Bitcoin, Monero",

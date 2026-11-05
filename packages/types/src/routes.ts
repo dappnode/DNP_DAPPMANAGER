@@ -4,8 +4,6 @@ import {
   VpnDeviceCredentials,
   VpnDevice,
   HostDiagnoseItem,
-  EthClientFallback,
-  Eth2ClientTarget,
   EthicalMetricsConfig,
   CoreUpdateData,
   DirectoryItem,
@@ -44,17 +42,26 @@ import {
   InstalledPackageData
 } from "./calls.js";
 import { PackageEnvs } from "./compose.js";
-import { PackageBackup } from "./manifest.js";
+import { PackageBackup, Manifest } from "./manifest.js";
 import {
   CustomEndpoint,
   GatusEndpoint,
   Notification,
+  NotificationPayload,
   NotificationsConfig,
-  NotificationsSettingsAllDnps
+  NotificationsSettingsAllDnps,
+  NotifierSubscription
 } from "./notifications.js";
 import { TrustedReleaseKey } from "./pkg.js";
 import { OptimismConfigSet, OptimismConfigGet } from "./rollups.js";
 import { Network, StakerConfigGet, StakerConfigSet } from "./stakers.js";
+import { BeaconBackupActivationParams, BeaconBackupNetworkStatus } from "./beaconBackup.js";
+import {
+  DashboardSupportedNetwork,
+  NodeStatusByNetwork,
+  SignerStatus,
+  ValidatorsNetworkData
+} from "./stakingDashboard.js";
 
 export interface Routes {
   /**
@@ -66,8 +73,9 @@ export interface Routes {
    * Edits the auto-update settings
    * @param id = "my-packages", "system-packages" or "bitcoin.dnp.dappnode.eth"
    * @param enabled Auto update is enabled for ID
+   * @param applyToAll Clear package overrides when editing "my-packages"
    */
-  autoUpdateSettingsEdit: (kwargs: { id: string; enabled: boolean }) => Promise<void>;
+  autoUpdateSettingsEdit: (kwargs: { id: string; enabled: boolean; applyToAll?: boolean }) => Promise<void>;
 
   /**
    * Generates a backup of a package and sends it to the client for download.
@@ -131,6 +139,22 @@ export interface Routes {
 
   /** Sets the staker configuration for a given network */
   stakerConfigSet: (kwargs: { stakerConfig: StakerConfigSet }) => Promise<void>;
+
+  /**
+   * Returns the consensus client for a given network
+   * @param network Network to get the consensus client for
+   */
+  consensusClientsGetByNetworks: (kwargs: {
+    networks: Network[];
+  }) => Promise<Partial<Record<Network, string | null | undefined>>>;
+
+  /**
+   * Returns the execution client for a given network
+   * @param network Network to get the execution client for
+   */
+  executionClientsGetByNetworks: (kwargs: {
+    networks: Network[];
+  }) => Promise<Partial<Record<Network, string | null | undefined>>>;
 
   /** Set the dappnodeWebNameSet */
   dappnodeWebNameSet: (kwargs: { dappnodeWebName: string }) => Promise<void>;
@@ -203,24 +227,6 @@ export interface Routes {
   dockerUpgradeCheck: () => Promise<DockerUpgradeRequirements>;
 
   /**
-   * Sets if a fallback should be used
-   */
-  ethClientFallbackSet: (kwargs: { fallback: EthClientFallback }) => Promise<void>;
-
-  /**
-   * Changes the ethereum client used to fetch package data
-   */
-  ethClientTargetSet: (kwargs: {
-    target: Eth2ClientTarget;
-    ethRemoteRpc: string;
-    sync?: boolean;
-    deletePrevExecClient?: boolean;
-    deletePrevExecClientVolumes?: boolean;
-    deletePrevConsClient?: boolean;
-    deletePrevConsClientVolumes?: boolean;
-  }) => Promise<void>;
-
-  /**
    * Enables ethical metrics notifications
    * @param mail
    * @param tgChannelId
@@ -232,6 +238,11 @@ export interface Routes {
    * Disables ethical metrics notifications
    */
   disableEthicalMetrics: () => Promise<void>;
+
+  /**
+   * Returns true if host scripts are disabled
+   */
+  disableHostScriptsGet: () => Promise<boolean>;
 
   /**
    * Returns current core version in string if core was installed, else returns empty string
@@ -264,6 +275,19 @@ export interface Routes {
   fetchDnpRequest: (kwargs: { id: string; version?: string }) => Promise<RequestedDnp>;
 
   /**
+   * Sends custom notification to notifier service
+   */
+  notificationsSendCustom(kwargs: {
+    notificationPayload: NotificationPayload;
+    subscriptionEndpoint?: string;
+  }): Promise<void>;
+
+  /**
+   * Returns the node status for the given networks
+   */
+  nodeStatusGetByNetwork(kwargs: { networks: DashboardSupportedNetwork[] }): Promise<NodeStatusByNetwork>;
+
+  /**
    * Get all the notifications
    */
   notificationsGetAll(): Promise<Notification[]>;
@@ -271,7 +295,7 @@ export interface Routes {
   /**
    * Get banner notifications that should be displayed within the given timestamp range
    */
-  notificationsGetBanner(timestamp: number): Promise<Notification[]>;
+  notificationsGetBanner(kwargs: { timestamp: number }): Promise<Notification[]>;
 
   /**
    * Get unseen notifications count
@@ -293,7 +317,7 @@ export interface Routes {
   /**
    * Set a notification as seen by providing its correlationId
    */
-  notificationSetSeenByCorrelationID(correlationId: string): Promise<void>;
+  notificationSetSeenByCorrelationID(kwargs: { correlationId: string }): Promise<void>;
 
   /**
    * Gatus update endpoint
@@ -323,6 +347,36 @@ export interface Routes {
     isNotifierRunning: boolean;
     servicesNotRunning: string[];
   }>;
+
+  /**
+   * Returns notifications package status
+   */
+  notificationsGetVapidKey: () => Promise<string | null>;
+
+  /**
+   * Returns all subs from notifier
+   */
+  notificationsGetSubscriptions(): Promise<NotifierSubscription[] | null>;
+
+  /**
+   * Updates a subscription alias from notifier by its endpoint
+   */
+  notificationsUpdateSubAlias(kwargs: { endpoint: string; alias: string }): Promise<void>;
+
+  /**
+   * Deletes a subscription from notifier by its endpoint
+   */
+  notificationsDeleteSubscription(kwargs: { endpoint: string }): Promise<void>;
+
+  /**
+   * Posts a new subscription to notifier
+   */
+  notificationsPostSubscription(kwargs: { subscription: NotifierSubscription }): Promise<void>;
+
+  /**
+   * Sends a test notification to all subscriptions / specific subscription
+   */
+  notificationsSendSubTest(kwargs: { endpoint?: string }): Promise<void>;
 
   /**
    * Returns the user action logs. This logs are stored in a different
@@ -367,6 +421,23 @@ export interface Routes {
    * Gets the Ipfs client target
    */
   ipfsClientTargetGet(): Promise<IpfsRepository>;
+
+  /**
+   * Gets the mirror content provider enabled status
+   */
+  mirrorProviderGet(): Promise<{ enabled: boolean }>;
+
+  /**
+   * Enables or disables the mirror content provider
+   */
+  mirrorProviderSet(kwargs: { enabled: boolean }): Promise<void>;
+
+  /**
+   * Returns the keystores imported for the given networks.
+   */
+  keystoresGetByNetwork(kwargs: {
+    networks: Network[];
+  }): Promise<Partial<Record<Network, Record<string, string[]> | null>>>;
 
   /**
    * Local proxying allows to access the admin UI through dappnode.local.
@@ -465,6 +536,46 @@ export interface Routes {
       BYPASS_SIGNED_RESTRICTION?: boolean;
     };
   }) => Promise<void>;
+
+  /**
+   * Installs a DAppNode Package locally for development, without IPFS.
+   * The package image must already have been uploaded as a `docker save` tarball
+   * via the `/upload` endpoint, which returns a `fileId`. That `imageFileId` is
+   * resolved here to the host file path and loaded into Docker.
+   * The package is tagged as a custom package and shown under the "My custom packages" tab.
+   * @param manifest Package manifest (dappnode_package.json content)
+   * @param compose Package docker-compose.yml content (as a YAML string)
+   * @param imageFileId File ID returned by `/upload` for the `docker save` tarball
+   * @param setupWizard Optional setup-wizard.yml content (as a YAML string)
+   */
+  packageInstallDev: (kwargs: {
+    manifest: Manifest;
+    compose: string;
+    imageFileId: string;
+    setupWizard?: string;
+  }) => Promise<void>;
+
+  /**
+   * Get whether an MCP API bearer key has been generated, plus the external
+   * MCP mutating-tools setting. The raw key is only returned when generated.
+   */
+  mcpApiKeyGet: () => Promise<{ hasApiKey: boolean; mutatingToolsEnabled: boolean }>;
+
+  /**
+   * Generate a new MCP API bearer key. Invalidates any previously generated key.
+   */
+  mcpApiKeyGenerate: () => Promise<{ apiKey: string }>;
+
+  /**
+   * Remove the in-app MCP API bearer key. Bearer auth is disabled until the
+   * admin generates a new key.
+   */
+  mcpApiKeyRemove: () => Promise<{ ok: true }>;
+
+  /**
+   * Enable or disable mutating tools for external MCP clients.
+   */
+  mcpMutatingToolsSet: (kwargs: { enabled: boolean }) => Promise<{ enabled: boolean }>;
 
   /**
    * Get package detail information
@@ -581,6 +692,85 @@ export interface Routes {
   portsApiStatusGet: (kwargs: { portsToOpen: PortToOpen[] }) => Promise<ApiTablePortStatus[]>;
 
   /**
+   * Returns the Premium package status
+   */
+  premiumPkgStatus: () => Promise<{
+    premiumDnpInstalled: boolean;
+    premiumDnpRunning: boolean;
+  }>;
+
+  /**
+   * Sets current license key
+   * @param licenseKey License key to set
+   */
+  premiumSetLicenseKey: (licenseKey: string) => Promise<void>;
+
+  /**
+   * Returns your current license key and hash
+   */
+  premiumGetLicenseKey: () => Promise<{
+    key: string;
+    hash: string;
+  }>;
+
+  /**
+   * Activates premium license key
+   */
+  premiumActivateLicense: () => Promise<void>;
+
+  /**
+   * Deactivates premium license key
+   */
+  premiumDeactivateLicense: () => Promise<void>;
+
+  /**
+   * Checks if the premium license is active
+   */
+  premiumIsLicenseActive: () => Promise<boolean>;
+
+  /**
+   * Activates the beacon node backup
+   * @param id the hashed license
+   */
+  premiumBeaconBackupActivate: ({ key, network }: BeaconBackupActivationParams) => Promise<void>;
+
+  /**
+   * Deactivates the beacon node backup
+   * @param id the hashed license
+   */
+  premiumBeaconBackupDeactivate: ({ key, network }: BeaconBackupActivationParams) => Promise<void>;
+
+  /**
+   * Checks the activation and validity status of the beacon node backup associated with the given hashed license.
+   *
+   * - Determines if the backup is activable.
+   * - Determines if the backup is currently active.
+   * - Returns time remaining until activation becomes possible in seconds (if not activable).
+   * - Returns time remaining until deactivation in seconds (if currently active).
+   *
+   * @param hashedLicense The hashed license string used to identify the key.
+   */
+  premiumBeaconBackupStatus: (hashedLicense: string) => Promise<Partial<Record<Network, BeaconBackupNetworkStatus>>>;
+
+  /**
+   * Returns the PWA mapping URL if it exists, otherwise returns undefined.
+   */
+  pwaUrlGet: () => Promise<string | undefined>;
+
+  /**
+   * Returns the HTTPS package status and PWA mapping url if it exists, otherwise adds the mapping.
+   */
+  pwaRequirementsGet: (kwargs: { host: string }) => Promise<{
+    httpsDnpInstalled: boolean;
+    isHttpsRunning: boolean;
+    pwaMappingUrl: string | undefined;
+    privateIp?: boolean | undefined;
+    pwaDnsResolves?: boolean | undefined;
+    containersInExternalNetwork?: { dappmanager: boolean; httpsDnp: boolean } | undefined;
+    externalPointToDappmanager: boolean;
+  }>;
+
+  /**
    * Reboots the host machine via the DBus socket
    */
   rebootHost: () => Promise<void>;
@@ -588,9 +778,11 @@ export interface Routes {
   /** Add a release key to trusted keys db */
   releaseTrustedKeyAdd(newTrustedKey: TrustedReleaseKey): Promise<void>;
   /** List all keys from trusted keys db */
-  releaseTrustedKeyList(): Promise<TrustedReleaseKey[]>;
+  releaseTrustedKeyList(): Promise<{ keys: TrustedReleaseKey[]; isDefault: boolean }>;
   /** Remove a release key from trusted keys db, by name */
-  releaseTrustedKeyRemove(keyName: string): Promise<void>;
+  releaseTrustedKeyRemove(keyName: string, dnpNameSuffix?: string): Promise<void>;
+  /** Delete the saved trusted keys list and restore defaults */
+  releaseTrustedKeyReset(): Promise<void>;
 
   /**
    * Returns weather or not should show the smooth modal
@@ -626,6 +818,16 @@ export interface Routes {
   telegramStatusSet: (kwarg: { telegramStatus: boolean }) => Promise<void>;
 
   /**
+   * Gets UI telemetry consent status
+   */
+  uiTelemetryConsentGet: () => Promise<boolean>;
+
+  /**
+   * Sets UI telemetry consent status
+   */
+  uiTelemetryConsentSet: (kwargs: { enabled: boolean }) => Promise<void>;
+
+  /**
    * Get telegram configuration: token and user ID
    */
   telegramConfigGet: () => Promise<{
@@ -642,6 +844,11 @@ export interface Routes {
    * Updates and upgrades the host machine
    */
   updateUpgrade: () => Promise<string>;
+
+  /**
+   * Returns the signer status of the provided networks
+   */
+  signerByNetworkGet: (kwargs: { networks: Network[] }) => Promise<Partial<Record<Network, SignerStatus>>>;
 
   /**
    * Return the current SSH port from sshd
@@ -674,6 +881,23 @@ export interface Routes {
   natRenewalIsEnabled: () => Promise<boolean>;
 
   /**
+   * Returns the active validators by network
+   * @param networks Array of networks to retrieve its active validators
+   */
+  validatorsFilterActiveByNetwork(kwargs: {
+    networks: Network[];
+  }): Promise<Partial<Record<Network, { validators: string[]; beaconError?: Error } | null>>>;
+
+  /**
+   * Combined endpoint: returns active validators, attesting validators, and balances
+   * in a single call per network, minimizing beacon chain API requests.
+   * @param networks List of networks
+   */
+  validatorsDataByNetwork: (kwargs: {
+    networks: Network[];
+  }) => Promise<Partial<Record<Network, ValidatorsNetworkData>>>;
+
+  /**
    * Removes a docker volume by name
    * @param name Full volume name: "bitcoindnpdappnodeeth_bitcoin_data"
    */
@@ -704,6 +928,9 @@ export interface Routes {
   /** Get credentials for a single Wireguard device */
   wireguardDeviceGet(device: string): Promise<WireguardDeviceCredentials>;
 
+  /** Get a remote or local config for a single Wireguard device */
+  wireguardDeviceConfigGet(options: { device: string; isLocal: boolean }): Promise<string>;
+
   /** Get URLs to a single Wireguard credentials */
   wireguardDevicesGet(): Promise<string[]>;
 }
@@ -728,6 +955,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   copyFileToDockerContainer: { log: true },
   stakerConfigGet: {},
   stakerConfigSet: { log: true },
+  consensusClientsGetByNetworks: {},
+  executionClientsGetByNetworks: {},
   dappnodeWebNameSet: { log: true },
   deviceAdd: { log: true },
   deviceAdminToggle: { log: true },
@@ -740,16 +969,17 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   diagnose: {},
   dockerUpgrade: { log: true },
   dockerUpgradeCheck: { log: true },
-  ethClientFallbackSet: {},
-  ethClientTargetSet: { log: true },
   enableEthicalMetrics: { log: true },
   getCoreVersion: {},
   getEthicalMetricsConfig: { log: true },
   disableEthicalMetrics: { log: true },
+  disableHostScriptsGet: {},
   fetchCoreUpdateData: {},
   fetchDirectory: {},
   fetchRegistry: {},
   fetchDnpRequest: {},
+  nodeStatusGetByNetwork: {},
+  notificationsSendCustom: {},
   notificationsGetAll: {},
   notificationsGetBanner: {},
   notificationsGetUnseenCount: {},
@@ -759,6 +989,12 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   notificationsUpdateEndpoints: {},
   notificationsApplyPreviousEndpoints: {},
   notificationsPackageStatus: {},
+  notificationsGetVapidKey: {},
+  notificationsGetSubscriptions: {},
+  notificationsUpdateSubAlias: {},
+  notificationsDeleteSubscription: {},
+  notificationsPostSubscription: {},
+  notificationsSendSubTest: {},
   getUserActionLogs: {},
   getHostUptime: {},
   httpsPortalPwaMappingAdd: { log: true },
@@ -770,6 +1006,9 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   ipfsTest: {},
   ipfsClientTargetSet: {},
   ipfsClientTargetGet: {},
+  mirrorProviderGet: {},
+  mirrorProviderSet: {},
+  keystoresGetByNetwork: { log: true },
   localProxyingEnableDisable: { log: true },
   localProxyingStatusGet: {},
   lvmhardDisksGet: {},
@@ -784,6 +1023,11 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   optimismConfigGet: {},
   optimismConfigSet: { log: true },
   packageInstall: { log: true },
+  packageInstallDev: { log: true },
+  mcpApiKeyGet: {},
+  mcpApiKeyGenerate: {},
+  mcpApiKeyRemove: { log: true },
+  mcpMutatingToolsSet: { log: true },
   packageGet: {},
   packagesGet: {},
   packageGettingStartedToggle: {},
@@ -801,12 +1045,25 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   portsToOpenGet: {},
   portsUpnpStatusGet: {},
   portsApiStatusGet: {},
+  premiumPkgStatus: {},
+  premiumSetLicenseKey: {},
+  premiumGetLicenseKey: {},
+  premiumActivateLicense: { log: true },
+  premiumDeactivateLicense: { log: true },
+  premiumIsLicenseActive: {},
+  premiumBeaconBackupActivate: { log: true },
+  premiumBeaconBackupDeactivate: { log: true },
+  premiumBeaconBackupStatus: {},
+  pwaUrlGet: {},
+  pwaRequirementsGet: {},
   rebootHost: { log: true },
   releaseTrustedKeyAdd: { log: true },
   releaseTrustedKeyList: {},
   releaseTrustedKeyRemove: { log: true },
+  releaseTrustedKeyReset: { log: true },
   setShouldShownSmooth: {},
   getShouldShowSmooth: {},
+  signerByNetworkGet: {},
   setStaticIp: { log: true },
   statsCpuGet: {},
   statsDiskGet: {},
@@ -820,9 +1077,13 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   telegramStatusSet: { log: true },
   telegramConfigGet: {},
   telegramConfigSet: { log: true },
+  uiTelemetryConsentGet: {},
+  uiTelemetryConsentSet: { log: true },
   updateUpgrade: { log: true },
   natRenewalEnable: {},
   natRenewalIsEnabled: {},
+  validatorsFilterActiveByNetwork: {},
+  validatorsDataByNetwork: {},
   volumeRemove: { log: true },
   volumesGet: {},
   ipPublicGet: {},
@@ -831,6 +1092,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   wireguardDeviceAdd: { log: true },
   wireguardDeviceRemove: { log: true },
   wireguardDeviceGet: {},
+  wireguardDeviceConfigGet: {},
   wireguardDevicesGet: {}
 };
 

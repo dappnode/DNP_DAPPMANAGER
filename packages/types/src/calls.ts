@@ -516,6 +516,8 @@ export interface PackageContainer {
   // DAppNode package data
   isDnp: boolean;
   isCore: boolean;
+  /** Installed locally for development without IPFS (see packageInstallDev) */
+  isDev?: boolean;
   defaultEnvironment?: PackageEnvs;
   defaultPorts?: PortMapping[];
   defaultVolumes?: VolumeMapping[];
@@ -523,6 +525,7 @@ export interface PackageContainer {
   avatarUrl: string;
   origin?: string;
   chain?: ChainDriver;
+  categories?: string[];
   domainAlias?: string[];
   canBeFullnode?: boolean;
   isMain?: boolean;
@@ -542,10 +545,12 @@ export type InstalledPackageData = Pick<
   | "version"
   | "isDnp"
   | "isCore"
+  | "isDev"
   | "dependencies"
   | "avatarUrl"
   | "origin"
   | "chain"
+  | "categories"
   | "domainAlias"
   | "canBeFullnode"
 > & {
@@ -871,14 +876,6 @@ export interface SystemInfo {
   internalIp: string; // "192.168.0.1",
   // publicIp is used to check for internet connection after installation
   publicIp: string;
-  // Eth multi-client configuration
-  eth2ClientTarget: Eth2ClientTarget;
-  ethClientFallback: EthClientFallback;
-  // Eth multi-client status (cached, may be a small delay with real status)
-  // - EthClientStatus = status of the current target
-  // - undefined = status of current target has not been defined yet
-  // - null = current target is remote and has no status
-  ethClientStatus: EthClientStatus | undefined | null;
   ethRemoteRpc: string;
   // Domain maps
   fullnodeDomainTarget: string;
@@ -929,16 +926,19 @@ export interface LocalIpResponse {
  * ====
  */
 
-export type DistributedFileSource = "ipfs" | "swarm";
+export type DistributedFileSource = "ipfs" | "swarm" | "mirror";
 export interface DistributedFile {
-  hash: string;
+  hash: string; // Individual file CID for "ipfs". Needed for fetching the file from IPFS.
   source: DistributedFileSource;
   size: number;
+  filename?: string; // Required for "mirror": filename within the package dir (e.g. "avatar.png")
+  packageHash?: string; // Required for "mirror": package directory CID; mirror URL is {baseUrl}/{packageHash}/{filename}
 }
 
 export interface IpfsRepository {
   ipfsClientTarget: IpfsClientTarget;
-  ipfsGateway: string;
+  /** Remote gateways in priority order. */
+  ipfsGateway: string[];
 }
 
 export enum IpfsClientTarget {
@@ -1003,93 +1003,15 @@ export interface SpecialPermissionAllDnps {
 }
 
 /**
- * ===================
- * REPOSITORY ETHEREUM
- * ===================
- */
-
-/**
- * DB types
- */
-
-export type EthClientInstallStatus =
-  | { status: "TO_INSTALL" }
-  | { status: "INSTALLING" }
-  | { status: "INSTALLING_ERROR"; error: ErrorSerialized }
-  | { status: "INSTALLED" }
-  | { status: "UNINSTALLED" };
-
-export type EthClientSyncedNotificationStatus = {
-  execClientTarget: string;
-  status: "AwaitingSynced" | "Synced";
-} | null;
-
-export type Eth2ClientTarget =
-  | {
-      execClient: string;
-      consClient: string;
-    }
-  | "remote";
-
-/**
- * If the DAPPMANAGER should use a eth remote node in cases of error syncing
- */
-export type EthClientFallback = "on" | "off";
-
-export enum EthClientRemote {
-  on = "on",
-  off = "off"
-}
-
-export type EthClientStatus = EthClientStatusOk | EthClientStatusError;
-
-export type EthClientStatusOk =
-  // All okay, client is functional
-  { ok: true; url: string; dnpName: string };
-
-export type EthClientStatusError =
-  // Unexpected error
-  | { ok: false; code: "UNKNOWN_ERROR"; error: ErrorSerialized }
-  // State is not correct, node is not synced but eth_syncing did not picked it up
-  | { ok: false; code: "STATE_NOT_SYNCED" }
-  // APM state call failed, syncing call succeeded and is not working
-  // = Likely an error related to fetching state content
-  | { ok: false; code: "STATE_CALL_ERROR"; error: ErrorSerialized }
-  // State call failed and eth_syncing returned true
-  | { ok: false; code: "IS_SYNCING" }
-  // syncing call failed, but the client is running
-  // ???, a connection error?
-  | { ok: false; code: "NOT_AVAILABLE"; error: ErrorSerialized }
-  // NOT Expected: Package's container is not running
-  | { ok: false; code: "NOT_RUNNING" }
-  // Package's container does not exist in docker ps -a, and there's no clear reason why
-  | { ok: false; code: "NOT_INSTALLED" }
-  // Expected: Package is installing or pending to be installed
-  | { ok: false; code: "INSTALLING" }
-  // Expected: Package is installing but an error happened
-  | { ok: false; code: "INSTALLING_ERROR"; error: ErrorSerialized }
-  // NOT Expected: Package should be installed but it is not
-  | { ok: false; code: "UNINSTALLED" };
-
-/**
- * Serialized errors so the can be persisted in the db, a JSON to disk
- */
-export interface ErrorSerialized {
-  message: string;
-  stack?: string;
-}
-
-/**
  * Welcome wizard / setup flow
  * Available routes / views in the UI
  */
 export type NewFeatureId =
-  | "repository"
-  | "repository-fallback"
   | "system-auto-updates"
   | "enable-ethical-metrics"
   | "change-host-password"
-  | "enable-notifications";
+  | "enable-notifications"
+  | "enable-ui-telemetry";
 
 /**
  * =======

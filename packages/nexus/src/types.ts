@@ -1,0 +1,168 @@
+import type { InstalledPackageData } from "@dappnode/types";
+
+export type FetchLike = typeof fetch;
+
+export interface LoggerLike {
+  info(message: string): void;
+  warn(message: string): void;
+}
+
+export interface NexusStoredChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
+export interface NexusStoredConversation {
+  id: string;
+  title: string;
+  messages: NexusStoredChatMessage[];
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface NexusHistoryStore {
+  getAll(): Record<string, NexusStoredConversation>;
+  get(id: string): NexusStoredConversation | null | undefined;
+  set(id: string, value: NexusStoredConversation): void;
+  remove(id: string): void;
+}
+
+export interface NexusApiKeyStore {
+  get(): string;
+  set(value: string): void;
+  getSource?(): "manual" | "nexus";
+  getAccountLabel?(): string | null;
+}
+
+export interface NexusStatus {
+  configured: boolean;
+  gatewayUrl: string;
+  defaultModel: string;
+  keySource: "manual" | "nexus" | "none";
+  accountLabel: string | null;
+  /** True when traffic is routed through Nexus Proofs. */
+  privateMode: boolean;
+  /** Where the operator can inspect the attestation evidence. */
+  verificationUrl: string;
+}
+
+/**
+ * What Nexus Proofs reports about its own verification of the Gateway.
+ * Read from the proxy rather than attested here: one verifier on the node,
+ * everything else reads its answer.
+ */
+export interface NexusProxyProbe {
+  /** Whether Nexus Proofs answered at all. */
+  reachable: boolean;
+  /** Whether the Nexus Proofs package is installed, when the caller can tell. */
+  installed?: boolean;
+  /** Whether its container is running, when the caller can tell. */
+  running?: boolean;
+  /** Whether it has currently verified the Gateway. */
+  verified: boolean;
+  /** The proxy's own status string, when it answered. */
+  status?: string;
+  /** Gateway origin the proxy is verifying. */
+  gateway?: string | null;
+  /** Attested Gateway release currently in force. */
+  sourceRevision?: string | null;
+  /** How many checks the proxy performed. */
+  checks?: number;
+  /** Why the probe did not come back verified. */
+  reason?: string;
+}
+
+export interface GatewayModel {
+  id: string;
+  display_name?: string;
+  description?: string;
+  kind?: string;
+  endpoints?: string[];
+  features?: string[];
+  context_size?: number;
+  max_output_tokens?: number;
+  input_price_per_1m_tokens_cents?: number;
+  output_price_per_1m_tokens_cents?: number;
+  /** How the model proves confidentiality; "none" for Anonymous models. */
+  proof_mode?: string;
+}
+
+export interface HistorySummary {
+  id: string;
+  title: string;
+  messageCount: number;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface OpenAITool {
+  type: "function";
+  function: {
+    name: string;
+    description: string;
+    parameters: Record<string, unknown>;
+  };
+}
+
+export interface NexusToolSummary {
+  name: string;
+  displayName: string;
+  mutating?: boolean;
+}
+
+export interface ToolDispatchResult {
+  ok: boolean;
+  output?: unknown;
+  error?: string;
+  mutating?: boolean;
+}
+
+export type ConfirmationDecision = "approve" | "deny";
+
+export interface ConfirmationResult {
+  decision: ConfirmationDecision;
+  reason?: string;
+}
+
+export interface CreatedConfirmation {
+  id: string;
+  promise: Promise<ConfirmationResult>;
+}
+
+export interface NexusMcpAdapter {
+  toolList: NexusToolSummary[];
+  getOpenAITools(): OpenAITool[];
+  dispatchTool(name: string, rawArgs: unknown): Promise<ToolDispatchResult>;
+  createPendingConfirmation(tool: string, args: unknown, signal?: AbortSignal): CreatedConfirmation;
+  resolveConfirmation(id: string, decision: ConfirmationDecision, reason?: string): boolean;
+}
+
+export interface NexusStreamWriter {
+  readonly writableEnded: boolean;
+  status(code: number): void;
+  setHeader(name: string, value: string): void;
+  flushHeaders?: () => void;
+  write(chunk: string): void;
+}
+
+export interface NexusRawResponse {
+  statusCode: number;
+  contentType: string;
+  body: string;
+}
+
+export interface NexusApiDeps {
+  apiKeyStore: NexusApiKeyStore;
+  historyStore: NexusHistoryStore;
+  listPackages(): Promise<InstalledPackageData[]>;
+  logger: LoggerLike;
+  mcp: NexusMcpAdapter;
+  fetch?: FetchLike;
+  now?: () => number;
+  getGatewayUrl?: () => string | undefined;
+  privateModeStore?: { get: () => boolean; set: (value: boolean) => void };
+  getDefaultModel?: () => string | undefined;
+  startDocsWarmup?: () => void;
+}
+
+export type NexusServiceDeps = NexusApiDeps;

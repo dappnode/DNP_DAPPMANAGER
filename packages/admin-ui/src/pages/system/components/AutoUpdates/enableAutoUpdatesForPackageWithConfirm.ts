@@ -40,7 +40,7 @@ export async function enableAutoUpdatesForPackageWithConfirm(dnpName: string): P
 
     const id = enableForAll ? MY_PACKAGES : dnpName;
     const logId = enableForAll ? "all packages" : prettyName;
-    await withToastNoThrow(() => api.autoUpdateSettingsEdit({ id, enabled: true }), {
+    await withToastNoThrow(() => api.autoUpdateSettingsEdit({ id, enabled: true, applyToAll: enableForAll }), {
       message: `Enabling auto-updates for ${logId}`,
       onSuccess: `Enabled auto-updates for ${logId}`
     });

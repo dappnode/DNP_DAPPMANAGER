@@ -10,14 +10,7 @@
     "dev": "tsc -w",
     "build": "tsc -p tsconfig.json",
     "format": "prettier --write \"src/**/*.ts\"",
-    "test": "mocha --config .mocharc.yml test/**/*.test.ts",
-    "truffle:compile:v0.4": "truffle compile --config ./truffle/truffle-config-v0.4.cjs",
-    "truffle:compile:v0.5": "truffle compile --config ./truffle/truffle-config-v0.5.cjs",
-    "truffle:develop:v0.5": "truffle develop --config ./truffle/truffle-config-v0.5.cjs",
-    "truffle:test:v0.4": "truffle test --config ./truffle/truffle-config-v0.4.cjs",
-    "truffle:test:v0.5": "truffle test --config ./truffle/truffle-config-v0.5.cjs",
-    "truffle:migrate:v0.4": "truffle migrate --config ./truffle/truffle-config-v0.4.cjs --reset --network development",
-    "truffle:migrate:v0.5": "truffle migrate --config ./truffle/truffle-config-v0.5.cjs --reset --network development"
+    "test": "mocha --config .mocharc.yml test/**/*.test.ts"
   },
   "author": "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
   "contributors": [
@@ -25,27 +18,26 @@
   ],
   "license": "ISC",
   "devDependencies": {
-    "@types/mocha": "^10",
-    "@types/semver": "^7.3.13",
-    "mocha": "^10.7.0",
-    "rimraf": "^5.0.0",
-    "truffle": "^5.9.0",
-    "ts-loader": "^9.4.2",
-    "tsconfig-paths": "^4.2.0"
+    "@types/mocha": "^10.0.10",
+    "@types/semver": "^7.8.0",
+    "mocha": "^12.0.3",
+    "prettier": "^3.9.10",
+    "rimraf": "^5.0.10",
+    "typescript": "5.9.3"
   },
   "dependencies": {
     "@dappnode/types": "workspace:^0.1.0",
-    "@ipld/car": "^5.4.0",
-    "esm": "^3.2.25",
-    "ethers": "^6.10.0",
-    "graphql": "^16.6.0",
-    "graphql-request": "^6.0.0",
-    "ipfs-unixfs-exporter": "^13.6.2",
-    "is-ipfs": "^8.0.1",
-    "kubo-rpc-client": "^5.1.0",
-    "multiformats": "^13.3.2",
-    "semver": "^7.5.0",
-    "yaml": "^2.4.5"
+    "@ipld/car": "5.4.7",
+    "@ipld/dag-pb": "4.2.0",
+    "ethers": "^6.17.0",
+    "graphql": "^16.14.2",
+    "graphql-request": "^6.1.0",
+    "ipfs-unixfs-exporter": "^13.7.3",
+    "is-ipfs": "^8.0.4",
+    "kubo-rpc-client": "^5.4.1",
+    "multiformats": "^14.0.5",
+    "semver": "^7.8.5",
+    "yaml": "^2.9.1"
   },
   "browser": {
     "fs": false,

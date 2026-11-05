@@ -2,6 +2,7 @@ import { getInstallerPackagesData } from "../installer/getInstallerPackageData.j
 import createVolumeDevicePaths from "../installer/createVolumeDevicePaths.js";
 // Utils
 import {
+  downloadAvatars,
   downloadImages,
   loadImages,
   flagPackagesAreInstalling,
@@ -17,6 +18,7 @@ import { logs, getLogUi, logUiClear } from "@dappnode/logger";
 import { Routes } from "@dappnode/types";
 import { PackageRequest } from "@dappnode/types";
 import { DappnodeInstaller } from "../dappnodeInstaller.js";
+import { params } from "@dappnode/params";
 
 /**
  * Installs a DAppNode Package.
@@ -50,6 +52,7 @@ export async function packageInstall(
 
   try {
     log(id, "Resolving dependencies...");
+    if (params.ALWAYS_DAPPGETBASIC) options.BYPASS_RESOLVER = true;
     const { state, currentVersions, releases } = await dappnodeInstaller.getReleasesResolved(req, options);
     logs.info("Resolved request", req, state);
 
@@ -84,6 +87,7 @@ export async function packageInstall(
       flagPackagesAreInstalling(dnpNames);
 
       await downloadImages(dappnodeInstaller, packagesData, log);
+      await downloadAvatars(dappnodeInstaller, packagesData, log);
       await loadImages(packagesData, log);
 
       await createVolumeDevicePaths(packagesData);

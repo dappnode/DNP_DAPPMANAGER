@@ -1,6 +1,8 @@
 import { UserSettingsAllDnps } from "@dappnode/types";
-import deepmerge from "deepmerge";
+import { deepmergeCustom } from "deepmerge-ts";
 import { difference, isDeepEmpty } from "../../utils/lodashExtended";
+
+const deepmerge = deepmergeCustom({ filterValues: false });
 
 describe("lodashExtended", () => {
   describe("difference", () => {

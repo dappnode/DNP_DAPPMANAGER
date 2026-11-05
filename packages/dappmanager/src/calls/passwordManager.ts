@@ -94,7 +94,7 @@ export async function passwordIsSecure(): Promise<boolean> {
           status: Status.triggered,
           callToAction: {
             title: "Change",
-            url: "http://my.dappnode/system/security"
+            url: "http://my.dappnode/system/host"
           },
           isBanner: true,
           isRemote: false,

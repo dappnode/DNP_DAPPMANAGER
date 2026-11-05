@@ -1,7 +1,7 @@
 import * as logUserAction from "./logUserAction.js";
 import { logs } from "./logs.js";
 import { routesData, Routes } from "@dappnode/types";
-import { LoggerMiddleware, Args, Result, EthProviderError } from "@dappnode/types";
+import { LoggerMiddleware, Args, Result } from "@dappnode/types";
 
 export const routesLogger: LoggerMiddleware = {
   onCall: (route: string, args: Args = []): void => {
@@ -24,9 +24,7 @@ export const routesLogger: LoggerMiddleware = {
 
   onError: (route: string, error: Error, args: Args = []): void => {
     const msg = error.message;
-    if (error instanceof EthProviderError) {
-      logs.warn(`Eth provider error, on ${route}: ${msg}`);
-    } else if (isSyncingError(msg)) {
+    if (isSyncingError(msg)) {
       logs.warn(`Chain is still syncing, on ${route}: ${msg}`);
     } else {
       if (isNodeConnectionError(msg)) logs.warn(`Error connecting to ethchain node, on ${route}: ${msg}`);

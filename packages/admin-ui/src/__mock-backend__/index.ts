@@ -1,10 +1,4 @@
-import {
-  ConsensusClientMainnet,
-  ExecutionClientMainnet,
-  IpfsClientTarget,
-  PortProtocol,
-  Routes
-} from "@dappnode/types";
+import { BeaconBackupNetworkStatus, IpfsClientTarget, PortProtocol, Routes } from "@dappnode/types";
 import { autoUpdate } from "./autoUpdate";
 import { devices } from "./devices";
 import { fetchPkgsData } from "./fetchPkgsData";
@@ -62,13 +56,49 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
       progress: 0.83027522935
     }
   ],
+  nodeStatusGetByNetwork: async () => ({
+    mainnet: {
+      ec: {
+        name: "Nethermind",
+        dnp: "nethermind.dnp.dappnode.eth",
+        isSynced: true,
+        currentBlock: 23648945,
+        progress: 100,
+        peers: 50
+      },
+      cc: {
+        name: "Nimbus",
+        dnp: "nimbus.dnp.dappnode.eth",
+        isSynced: true,
+        currentBlock: 12875373,
+        progress: 100,
+        peers: 40
+      }
+    },
+    hoodi: {
+      ec: {
+        name: "besu",
+        dnp: "besu-hoodi.dnp.dappnode.eth",
+        isSynced: true,
+        currentBlock: 1480848,
+        progress: 100,
+        peers: 30
+      },
+      cc: {
+        name: "Prysm",
+        dnp: "prysm-hoodi.dnp.dappnode.eth",
+        isSynced: false,
+        currentBlock: 1592925,
+        progress: 100,
+        peers: 20
+      }
+    }
+  }),
   changeIpfsTimeout: async () => {},
   cleanCache: async () => {},
   cleanDb: async () => {},
   copyFileToDockerContainer: async () => {},
   diagnose: async () => [],
-  ethClientFallbackSet: async () => {},
-  ethClientTargetSet: async () => {},
   getHostUptime: async () => "1 week, 1 day, 5 hours, 10 minutes",
   ipfsTest: async () => {},
   ipPublicGet: async () => ({
@@ -207,20 +237,6 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     internalIp: "192.168.0.1",
     publicIp: "85.84.83.82",
     identityAddress: "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B",
-    ethClientTarget: "nethermind",
-    eth2ClientTarget: {
-      execClient: ExecutionClientMainnet.Geth,
-      consClient: ConsensusClientMainnet.Prysm
-    },
-    ethClientFallback: "off",
-    ethClientStatus: {
-      ok: false,
-      code: "STATE_CALL_ERROR",
-      error: {
-        message: "Some Error",
-        stack: "Some Error\nline 56 file.ts"
-      }
-    },
     ethRemoteRpc: "http://remoteNode.dappnode:8545",
     fullnodeDomainTarget: "geth.dnp.dappnode.eth",
     newFeatureIds: [
@@ -246,8 +262,10 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   ipfsClientTargetSet: async () => {},
   ipfsClientTargetGet: async () => ({
     ipfsClientTarget: IpfsClientTarget.remote,
-    ipfsGateway: "https://gateway.ipfs.dappnode.io"
+    ipfsGateway: ["https://ipfs-gateway.dappnode.net"]
   }),
+  mirrorProviderGet: async () => ({ enabled: false }),
+  mirrorProviderSet: async () => {},
   enableEthicalMetrics: async () => {},
   getEthicalMetricsConfig: async () => ({
     mail: "@example.com",
@@ -382,6 +400,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     dockerLatestVersion: "20.10.8"
   }),
   getCoreVersion: async () => "0.2.92",
+  notificationsSendCustom: async () => {},
   notificationsGetAllEndpoints: async () => {
     return { "geth.dnp.dappnode.eth": { endpoints: [], customEndpoints: [], isCore: false } };
   },
@@ -399,8 +418,112 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     isInstalled: false,
     isRunning: false,
     isNotifierRunning: false,
-    servicesNotRunning: [],
+    servicesNotRunning: []
   }),
+  notificationsGetVapidKey: async () => "B3N1b2JzY3JpcHRpb25LZXk6IHNvbWUtdmFwaWQta2V5",
+  notificationsGetSubscriptions: async () => [],
+  notificationsPostSubscription: async () => {},
+  notificationsUpdateSubAlias: async () => {},
+  notificationsDeleteSubscription: async () => {},
+  notificationsSendSubTest: async () => {},
+  pwaUrlGet: async () => "https://pwa.abcdef.dyndns.dappnode.io",
+  pwaRequirementsGet: async () => ({
+    pwaMappingUrl: "https://pwa.abcdef.dyndns.dappnode.io",
+    httpsDnpInstalled: true,
+    isHttpsRunning: true,
+    externalPointToDappmanager: true
+  }),
+  premiumPkgStatus: async () => ({
+    premiumDnpInstalled: true,
+    premiumDnpRunning: true
+  }),
+  premiumSetLicenseKey: async () => {},
+  premiumGetLicenseKey: async () => ({
+    key: "ABCDEF-123456-ABCDEF-123456-ABCDEF-V1",
+    hash: "1234567890abcdef1234567890abcdef1234567890"
+  }),
+  premiumActivateLicense: async () => {},
+  premiumDeactivateLicense: async () => {},
+  premiumIsLicenseActive: async () => false,
+  consensusClientsGetByNetworks: async () => {
+    return {
+      mainnet: "prysm.dnp.dappnode.eth",
+      gnosis: "prysm-gnosis.dnp.dappnode.eth"
+    };
+  },
+  executionClientsGetByNetworks: async () => {
+    return {
+      mainnet: "geth.dnp.dappnode.eth",
+      gnosis: "nethermind-xdai.dnp.dappnode.eth"
+    };
+  },
+  premiumBeaconBackupActivate: async () => {},
+  premiumBeaconBackupDeactivate: async () => {},
+  premiumBeaconBackupStatus: async (): Promise<Record<string, BeaconBackupNetworkStatus>> => {
+    return {
+      mainnet: {
+        validatorLimit: 100,
+        isActivable: true,
+        timeUntilAvailable: 0,
+        isActive: false,
+        timeLeft: 2450
+        // secondsUntilDeactivation is optional and can be omitted or set to undefined
+      }
+    };
+  },
+  keystoresGetByNetwork: async () => ({
+    mainnet: { solo: ["0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"] },
+    hoodi: null
+  }),
+  validatorsFilterActiveByNetwork: async () => ({
+    mainnet: { validators: ["0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"] },
+    hoodi: { validators: [] },
+    gnosis: null
+  }),
+
+  validatorsDataByNetwork: async () => ({
+    mainnet: {
+      active: { validators: ["0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"] },
+      attesting: { validators: ["0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"] },
+      balances: {
+        balances: {
+          "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef": "32000000000"
+        }
+      }
+    },
+    hoodi: {
+      active: { validators: [] },
+      attesting: { validators: [] },
+      balances: { balances: {} }
+    },
+    gnosis: {
+      active: null,
+      attesting: null,
+      balances: null
+    }
+  }),
+
+  signerByNetworkGet: async () => ({
+    mainnet: {
+      isInstalled: true,
+      brainRunning: true
+    },
+    hoodi: {
+      isInstalled: true,
+      brainRunning: false
+    },
+    gnosis: {
+      isInstalled: false,
+      brainRunning: false
+    }
+  }),
+  disableHostScriptsGet: async () => false,
+  uiTelemetryConsentGet: async () => true,
+  uiTelemetryConsentSet: async () => {},
+  mcpApiKeyGet: async () => ({ hasApiKey: false, mutatingToolsEnabled: false }),
+  mcpApiKeyGenerate: async () => ({ apiKey: "mock-mcp-api-key" }),
+  mcpApiKeyRemove: async () => ({ ok: true }),
+  mcpMutatingToolsSet: async ({ enabled }) => ({ enabled })
 };
 
 export const calls: Routes = {

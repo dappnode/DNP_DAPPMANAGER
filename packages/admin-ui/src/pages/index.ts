@@ -8,8 +8,9 @@ import * as system from "./system";
 import * as wifi from "./wifi";
 import * as community from "./community";
 import * as stakers from "./stakers";
-import * as repository from "./repository";
 import * as notifications from "./notifications";
+import * as premium from "./premium";
+import * as nexus from "./nexus";
 
 export const pages = {
   dashboard,
@@ -22,8 +23,9 @@ export const pages = {
   support,
   community,
   system,
-  repository,
-  notifications
+  notifications,
+  premium,
+  nexus
 };
 
 export const defaultPage = dashboard;

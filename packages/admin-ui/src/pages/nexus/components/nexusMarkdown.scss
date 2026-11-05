@@ -1,0 +1,77 @@
+.nexus-markdown {
+  p:last-child {
+    margin-bottom: 0;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.75rem 0;
+    font-size: 0.9rem;
+  }
+
+  th,
+  td {
+    border: 1px solid var(--border-color);
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+  }
+
+  th {
+    background: rgba(0, 0, 0, 0.04);
+    font-weight: 600;
+  }
+
+  tr:nth-child(even) {
+    background: rgba(0, 0, 0, 0.02);
+  }
+
+  code {
+    background: rgba(0, 0, 0, 0.06);
+    padding: 0.15rem 0.35rem;
+    border-radius: 4px;
+    font-size: 0.85em;
+  }
+
+  pre {
+    background: rgba(0, 0, 0, 0.05);
+    padding: 0.75rem;
+    border-radius: 8px;
+    overflow-x: auto;
+
+    code {
+      background: transparent;
+      padding: 0;
+    }
+  }
+
+  ul,
+  ol {
+    padding-left: 1.25rem;
+  }
+
+  blockquote {
+    border-left: 3px solid var(--dappnode-strong-main-color);
+    padding-left: 0.75rem;
+    margin-left: 0;
+    opacity: 0.85;
+  }
+}
+
+#dark .nexus-markdown {
+  th {
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  code {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  pre {
+    background: rgba(255, 255, 255, 0.08);
+  }
+}

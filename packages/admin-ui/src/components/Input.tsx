@@ -49,11 +49,9 @@ const Input: React.FC<InputProps & React.HTMLAttributes<HTMLInputElement>> = ({
         "is-invalid": isInvalid
       })}
       type={type || "text"}
-      onChange={(e) => {
-        onValueChange(e.target.value);
-      }}
+      onChange={(e) => onValueChange(e.target.value)}
       onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
-        const key = e.charCode ? e.charCode : e.keyCode ? e.keyCode : 0;
+        const key = e.charCode || e.keyCode || 0;
         if (key === 13 && onEnterPress) onEnterPress();
       }}
       value={value}
@@ -62,48 +60,13 @@ const Input: React.FC<InputProps & React.HTMLAttributes<HTMLInputElement>> = ({
     />
   );
 
-  if (prepend && append)
-    return (
-      <InputGroup>
-        <InputPrepend>{prepend}</InputPrepend>
-        {input}
-        <InputAppend>{append}</InputAppend>
-      </InputGroup>
-    );
-
-  if (prepend)
-    return (
-      <InputGroup>
-        <InputPrepend>{prepend}</InputPrepend>
-        {input}
-      </InputGroup>
-    );
-
-  if (append)
-    return (
-      <InputGroup>
-        {input}
-        <InputAppend>{append}</InputAppend>
-      </InputGroup>
-    );
-
-  return input;
+  return (
+    <InputGroup>
+      {prepend && (typeof prepend === "string" ? <InputGroup.Text>{prepend}</InputGroup.Text> : prepend)}
+      {input}
+      {append && (typeof append === "string" ? <InputGroup.Text>{append}</InputGroup.Text> : append)}
+    </InputGroup>
+  );
 };
-
-/**
- * If children is plain text wrapper it with InputGroupText
- * Otherwise return children as-is. Use React.Fragment due to Typescript
- */
-const InputPrepend: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <InputGroup.Prepend>
-    {typeof children === "string" ? <InputGroup.Text>{children}</InputGroup.Text> : children}
-  </InputGroup.Prepend>
-);
-
-const InputAppend: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <InputGroup.Append>
-    {typeof children === "string" ? <InputGroup.Text>{children}</InputGroup.Text> : children}
-  </InputGroup.Append>
-);
 
 export default Input;

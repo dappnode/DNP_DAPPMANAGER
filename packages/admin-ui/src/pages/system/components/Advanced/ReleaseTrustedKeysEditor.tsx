@@ -15,10 +15,32 @@ export function ReleaseTrustedKeysEditor() {
   const [addingKey, setAddingKey] = useState(false);
   const trustedKeys = useApi.releaseTrustedKeyList();
 
+  function resetTrustedKeys() {
+    confirm({
+      title: "Reset trusted keys to defaults?",
+      text: "This will discard your changes and restore the default trusted keys.",
+      label: "Reset to defaults",
+      variant: "danger",
+      onClick: () =>
+        withToastNoThrow(
+          async () => {
+            await api.releaseTrustedKeyReset();
+            setAddingKey(false);
+            await trustedKeys.revalidate();
+          },
+          {
+            message: "Resetting trusted keys...",
+            onSuccess: "Restored default trusted keys"
+          }
+        )
+    });
+  }
+
   return (
     <Card spacing>
+      <p>The default trusted keys are used until you add or remove a key. Reset to defaults to discard your changes.</p>
       {trustedKeys.data ? (
-        <ReleaseTrustedKeysGrid keys={trustedKeys.data} onEdit={trustedKeys.revalidate} />
+        <ReleaseTrustedKeysGrid keys={trustedKeys.data.keys} onEdit={trustedKeys.revalidate} />
       ) : trustedKeys.error ? (
         <ErrorView error={trustedKeys.error} hideIcon red />
       ) : trustedKeys.isValidating ? (
@@ -28,30 +50,43 @@ export function ReleaseTrustedKeysEditor() {
       {addingKey ? (
         <>
           <hr />
-          <ReleaseTrustedKeysAdder onEdit={trustedKeys.revalidate} />
+          <ReleaseTrustedKeysAdder
+            onEdit={() => {
+              setAddingKey(false);
+              trustedKeys.revalidate();
+            }}
+          />
         </>
-      ) : (
-        <Button type="submit" onClick={() => setAddingKey(true)}>
-          Add new key
+      ) : null}
+      <div className="release-trusted-keys-actions">
+        {addingKey ? (
+          <Button onClick={() => setAddingKey(false)}>Cancel</Button>
+        ) : (
+          <Button type="submit" onClick={() => setAddingKey(true)}>
+            Add new key
+          </Button>
+        )}
+        <Button onClick={resetTrustedKeys} disabled={!trustedKeys.data || trustedKeys.data.isDefault}>
+          Reset to defaults
         </Button>
-      )}
+      </div>
     </Card>
   );
 }
 
 function ReleaseTrustedKeysGrid({ keys, onEdit }: { keys: TrustedReleaseKey[]; onEdit: () => void }) {
-  async function removeTrustedKey(keyName: string) {
+  async function removeTrustedKey(keyName: string, dnpNameSuffix: string) {
     await new Promise<void>((resolve) =>
       confirm({
         title: `Are you sure you want to remove the key ${keyName}?`,
-        text: "Your DAppNode won't be to safely verify releases signed by this key.",
+        text: "Your DAppNode won't be able to safely verify releases signed by this key.",
         label: "Remove",
         variant: "danger",
         onClick: resolve
       })
     );
 
-    await withToastNoThrow(() => api.releaseTrustedKeyRemove(keyName), {
+    await withToastNoThrow(() => api.releaseTrustedKeyRemove(keyName, dnpNameSuffix), {
       message: "Removing trusted key...",
       onSuccess: "Removed trusted key"
     });
@@ -71,16 +106,16 @@ function ReleaseTrustedKeysGrid({ keys, onEdit }: { keys: TrustedReleaseKey[]; o
       <hr />
 
       {keys.map((key) => (
-        <React.Fragment key={key.name}>
+        <React.Fragment key={`${key.name} ${key.dnpNameSuffix}`}>
           <span>{key.name}</span>
           <span>{key.dnpNameSuffix}</span>
           <span>{key.signatureProtocol}</span>
           <span className="key" title={key.key}>
             {key.key}
           </span>
-          <span onClick={() => removeTrustedKey(key.name)}>
+          <Button aria-label={`Remove ${key.name}`} onClick={() => removeTrustedKey(key.name, key.dnpNameSuffix)}>
             <MdClose />
-          </span>
+          </Button>
         </React.Fragment>
       ))}
 
@@ -103,12 +138,16 @@ function ReleaseTrustedKeysAdder({ onEdit }: { onEdit: () => void }) {
       key
     };
 
-    withToastNoThrow(() => api.releaseTrustedKeyAdd(trustedKey), {
-      message: "Adding trusted key...",
-      onSuccess: "Added trusted key"
-    });
-
-    onEdit();
+    await withToastNoThrow(
+      async () => {
+        await api.releaseTrustedKeyAdd(trustedKey);
+        onEdit();
+      },
+      {
+        message: "Adding trusted key...",
+        onSuccess: "Added trusted key"
+      }
+    );
   }
 
   return (

@@ -1,59 +1,53 @@
-import { PackageContainer, PortToOpen, PortMapping } from "@dappnode/types";
+import { Manifest, PackageContainer, PortToOpen, PortMapping } from "@dappnode/types";
 import { logs } from "@dappnode/logger";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
 import { readManifestIfExists } from "@dappnode/utils";
 
-export function shouldAddPort(port: PortMapping, container: PackageContainer): boolean {
-  const manifest = readManifestIfExists(container.dnpName);
-  if (manifest && manifest.upnpDisable) {
-    if (Array.isArray(manifest.upnpDisable)) {
-      if (port.host && manifest.upnpDisable.includes(port.host)) {
-        logs.info(`UPnP disabled for port ${port.host} of ${manifest.name} package`);
-        return false; // Skip this port if it's in the disable list
-      }
-    } else if (manifest.upnpDisable === true) {
-      // It's a boolean true, skip all ports
-      logs.info(`UPnP disabled for ${manifest.name} package`);
-      return false;
-    }
-  }
-  return true;
-}
-
 export function getPortsToOpen(containers: PackageContainer[]): PortToOpen[] {
-  // Aggreate ports with an object form to prevent duplicates
+  // Aggregate ports with an object form to prevent duplicates
   const portsToOpen = new Map<string, PortToOpen>();
-
-  const addPortToOpen = (port: PortMapping, container: PackageContainer): void => {
-    if (shouldAddPort(port, container) && port.host) {
-      portsToOpen.set(`${port.host}-${port.protocol}`, {
-        protocol: port.protocol,
-        portNumber: port.host,
-        serviceName: container.serviceName,
-        dnpName: container.dnpName
-      });
-    }
-  };
+  const upnpDisableByPackage = new Map<string, Manifest["upnpDisable"]>();
 
   for (const container of containers) {
-    if (container.running) {
-      // If a container is running the port mapping is available in listContainers()
-      for (const port of container.ports || []) {
-        addPortToOpen(port, container);
+    try {
+      if (!upnpDisableByPackage.has(container.dnpName)) {
+        upnpDisableByPackage.set(container.dnpName, readManifestIfExists(container.dnpName)?.upnpDisable);
       }
-    } else {
-      try {
+      const upnpDisable = upnpDisableByPackage.get(container.dnpName);
+      if (upnpDisable === true) {
+        logs.debug(`UPnP disabled for ${container.dnpName} package`);
+        continue;
+      }
+
+      const addPortToOpen = (port: PortMapping): void => {
+        if (!port.host) return;
+        if (Array.isArray(upnpDisable) && upnpDisable.includes(port.host)) {
+          logs.debug(`UPnP disabled for port ${port.host} of ${container.dnpName} package`);
+          return;
+        }
+        portsToOpen.set(`${port.host}-${port.protocol}`, {
+          protocol: port.protocol,
+          portNumber: port.host,
+          serviceName: container.serviceName,
+          dnpName: container.dnpName
+        });
+      };
+
+      if (container.running) {
+        // If a container is running the port mapping is available in listContainers()
+        for (const port of container.ports || []) addPortToOpen(port);
+      } else {
         // If DNP is exited, the port mapping is only available in the docker-compose
         const compose = new ComposeFileEditor(container.dnpName, container.isCore);
 
         const service = compose.services()[container.serviceName];
         if (service) {
           // Only consider ports that are mapped (not ephemeral ports)
-          for (const port of service.getPortMappings()) addPortToOpen(port, container);
+          for (const port of service.getPortMappings()) addPortToOpen(port);
         }
-      } catch (e) {
-        logs.error(`Error getting ports of ${container.dnpName} from docker-compose`, e);
       }
+    } catch (e) {
+      logs.error(`Error getting ports of ${container.dnpName}`, e);
     }
   }
 

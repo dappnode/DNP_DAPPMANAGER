@@ -1,0 +1,51 @@
+.premium-backup-node {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+  .backup-description-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
+    width: 100%;
+  }
+
+  .premium-backup-not-premium-card {
+    display: flex;
+    flex-direction: row;
+    padding: 30px;
+    align-items: center;
+    justify-content: space-between;
+
+    @media (max-width: 60rem) {
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    @media (max-width: 40rem) {
+      padding: 15px;
+    }
+  }
+
+  .backup-description-card {
+    padding: 15px;
+    height: 100%;
+
+    > div {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-evenly;
+      align-items: center;
+      text-align: center;
+      height: 100%;
+      .backup-card-title {
+        font-size: 18px;
+        font-weight: bold;
+      }
+      .backup-card-body {
+        color: var(--light-text-color);
+        font-style: italic;
+      }
+    }
+  }
+}

@@ -1,0 +1,521 @@
+import { expect } from "chai";
+import { NexusApi, NexusApiError, canonicalDocUrl, stripMdFromDocsUrls, trimTrailingSlashes } from "../../src/index.js";
+import type {
+  FetchLike,
+  NexusHistoryStore,
+  NexusMcpAdapter,
+  NexusStoredConversation,
+  NexusStreamWriter
+} from "../../src/index.js";
+
+describe("nexus / api", () => {
+  it("normalizes docs URLs without regex-style trailing slash trimming", () => {
+    expect(trimTrailingSlashes("https://example.com///")).to.equal("https://example.com");
+    expect(canonicalDocUrl("https://docs.dappnode.io/docs/wireguard.md/")).to.equal(
+      "https://docs.dappnode.io/docs/wireguard"
+    );
+    expect(stripMdFromDocsUrls("- [Wireguard](https://docs.dappnode.io/docs/wireguard.md): VPN")).to.equal(
+      "- [Wireguard](https://docs.dappnode.io/docs/wireguard): VPN"
+    );
+  });
+
+  it("validates and stores a Nexus API key without leaking it in status", async () => {
+    const { service, state } = makeService({
+      fetch: async (url) => {
+        expect(String(url)).to.equal("https://gateway.example/v1/models");
+        return jsonResponse({ data: [] });
+      }
+    });
+
+    const status = await service.setApiKey(" secret-key ");
+
+    expect(state.apiKey).to.equal("secret-key");
+    expect(status).to.deep.equal({
+      configured: true,
+      gatewayUrl: "https://gateway.example/v1",
+      defaultModel: "nexus/test",
+      keySource: "manual",
+      accountLabel: null,
+      privateMode: false,
+      verificationUrl: "http://nexus-proofs.dappnode.private:3301/verification"
+    });
+    expect(JSON.stringify(status)).to.not.include("secret-key");
+  });
+
+  it("routes through Nexus Proofs when private mode is on", async () => {
+    let requested = "";
+    const { service } = makeService({
+      apiKey: "secret",
+      gatewayUrl: null,
+      privateMode: true,
+      fetch: async (url) => {
+        requested = String(url);
+        return jsonResponse({ data: [] });
+      }
+    });
+
+    await service.listModels();
+
+    expect(requested).to.equal("http://nexus-proofs.dappnode.private:3301/v1/models");
+    expect(service.readStatus().privateMode).to.equal(true);
+  });
+
+  it("routes direct when private mode is off", async () => {
+    let requested = "";
+    const { service } = makeService({
+      apiKey: "secret",
+      gatewayUrl: null,
+      privateMode: false,
+      fetch: async (url) => {
+        requested = String(url);
+        return jsonResponse({ data: [] });
+      }
+    });
+
+    await service.listModels();
+
+    expect(requested).to.equal("https://nexus-api.dappnode.com/v1/models");
+  });
+
+  // A developer pointing at a staging gateway must not be silently redirected
+  // to Nexus Proofs.
+  it("lets an explicit gateway URL win over private mode", async () => {
+    let requested = "";
+    const { service } = makeService({
+      apiKey: "secret",
+      gatewayUrl: "https://staging.example/v1",
+      privateMode: true,
+      fetch: async (url) => {
+        requested = String(url);
+        return jsonResponse({ data: [] });
+      }
+    });
+
+    await service.listModels();
+
+    expect(requested).to.equal("https://staging.example/v1/models");
+  });
+
+  it("turns private mode on once Nexus Proofs has verified Nexus", async () => {
+    const { service, state } = makeService({
+      apiKey: "secret",
+      gatewayUrl: null,
+      fetch: async () => jsonResponse({ status: "verified", current: { checks: [1] } })
+    });
+
+    expect(service.readStatus().privateMode).to.equal(false);
+    const status = await service.setPrivateMode(true);
+
+    expect(state.privateMode).to.equal(true);
+    expect(status.privateMode).to.equal(true);
+    expect(status.gatewayUrl).to.equal("http://nexus-proofs.dappnode.private:3301/v1");
+  });
+
+  it("refuses to turn private mode on while Nexus Proofs is missing", async () => {
+    const { service, state } = makeService({
+      apiKey: "secret",
+      gatewayUrl: null,
+      fetch: async () => {
+        throw new Error("getaddrinfo ENOTFOUND nexus-proofs.dappnode.private");
+      }
+    });
+
+    let error: unknown;
+    try {
+      await service.setPrivateMode(true);
+    } catch (err) {
+      error = err;
+    }
+
+    expect((error as NexusApiError).code).to.equal("nexus_proofs_unavailable");
+    expect(state.privateMode).to.equal(false);
+  });
+
+  it("always turns private mode off, even without Nexus Proofs", async () => {
+    let fetched = false;
+    const { service, state } = makeService({
+      apiKey: "secret",
+      privateMode: true,
+      fetch: async () => {
+        fetched = true;
+        throw new Error("unreachable");
+      }
+    });
+
+    const status = await service.setPrivateMode(false);
+
+    expect(status.privateMode).to.equal(false);
+    expect(state.privateMode).to.equal(false);
+    expect(fetched).to.equal(false);
+  });
+
+  it("rejects a non-boolean private mode", async () => {
+    const { service } = makeService({ apiKey: "secret" });
+    let error: unknown;
+    try {
+      await service.setPrivateMode("yes");
+    } catch (err) {
+      error = err;
+    }
+    expect((error as NexusApiError).code).to.equal("invalid_request");
+  });
+
+  it("reports a verified Nexus Proofs", async () => {
+    const { service } = makeService({
+      apiKey: "secret",
+      fetch: async () =>
+        jsonResponse({
+          status: "verified",
+          gateway: "https://nexus-api-tee.dappnode.com",
+          current: { source_revision: "893f4c9f306707b83f3b41782f25eb05adbc4f30", checks: [1, 2, 3] }
+        })
+    });
+
+    const probe = await service.probeLocalProxy();
+
+    expect(probe.reachable).to.equal(true);
+    expect(probe.verified).to.equal(true);
+    expect(probe.checks).to.equal(3);
+    expect(probe.sourceRevision).to.equal("893f4c9f306707b83f3b41782f25eb05adbc4f30");
+  });
+
+  // Private mode fails closed, so a missing proxy has to be reported as such
+  // rather than surfacing later as a chat message that will not send.
+  it("reports an absent Nexus Proofs as unreachable", async () => {
+    const { service } = makeService({
+      apiKey: "secret",
+      fetch: async () => {
+        throw new Error("ECONNREFUSED");
+      }
+    });
+
+    const probe = await service.probeLocalProxy();
+
+    expect(probe.reachable).to.equal(false);
+    expect(probe.verified).to.equal(false);
+    expect(probe.reason).to.include("not installed");
+  });
+
+  it("reports a running but unverified Nexus Proofs", async () => {
+    const { service } = makeService({
+      apiKey: "secret",
+      fetch: async () => jsonResponse({ status: "starting", current: null })
+    });
+
+    const probe = await service.probeLocalProxy();
+
+    expect(probe.reachable).to.equal(true);
+    expect(probe.verified).to.equal(false);
+    expect(probe.status).to.equal("starting");
+  });
+
+  it("reports an unreadable Nexus Proofs response as unverified", async () => {
+    const { service } = makeService({
+      apiKey: "secret",
+      fetch: async () => textResponse("not json", 200)
+    });
+
+    const probe = await service.probeLocalProxy();
+
+    expect(probe.reachable).to.equal(true);
+    expect(probe.verified).to.equal(false);
+  });
+
+  it("filters model list to chat-completions capable models", async () => {
+    const { service } = makeService({
+      apiKey: "secret",
+      fetch: async () =>
+        jsonResponse({
+          data: [
+            { id: "chat", endpoints: ["chat/completions"] },
+            { id: "legacy-chat", endpoints: ["/v1/chat/completions"] },
+            { id: "embed", endpoints: ["embeddings"] }
+          ]
+        })
+    });
+
+    const models = await service.listModels();
+
+    expect(models.map((model) => model.id)).to.deep.equal(["chat", "legacy-chat"]);
+  });
+
+  // The auto router is not available on the TEE endpoint.
+  it("hides the auto router in private mode only", async () => {
+    const catalog = {
+      data: [
+        { id: "nexus/auto", endpoints: ["chat/completions"] },
+        { id: "private/model", endpoints: ["chat/completions"], proof_mode: "tinfoil_attested_transport" }
+      ]
+    };
+    const direct = makeService({ apiKey: "secret", gatewayUrl: null, fetch: async () => jsonResponse(catalog) });
+    const proofs = makeService({
+      apiKey: "secret",
+      gatewayUrl: null,
+      privateMode: true,
+      fetch: async () => jsonResponse(catalog)
+    });
+
+    expect((await direct.service.listModels()).map((model) => model.id)).to.deep.equal(["nexus/auto", "private/model"]);
+    expect((await proofs.service.listModels()).map((model) => model.id)).to.deep.equal(["private/model"]);
+  });
+
+  it("upserts, lists, deletes, clears, and prunes chat history", () => {
+    let now = 1000;
+    const { service, state } = makeService({ now: () => now++ });
+
+    const first = service.upsertHistory("first", {
+      messages: [{ role: "user", content: "hello      nexus" }]
+    });
+    expect(first.title).to.equal("hello nexus");
+    expect(service.listHistory()).to.have.length(1);
+
+    service.deleteHistory("first");
+    expect(service.listHistory()).to.deep.equal([]);
+
+    for (let i = 0; i < 51; i++) {
+      service.upsertHistory(`c${i}`, { messages: [{ role: "user", content: `message ${i}` }] });
+    }
+
+    expect(Object.keys(state.history)).to.have.length(50);
+    expect(state.history.c0).to.equal(undefined);
+
+    service.clearHistory();
+    expect(service.listHistory()).to.deep.equal([]);
+    expect(state.history).to.deep.equal({});
+  });
+
+  it("runs a read-only tool loop and resumes the upstream chat", async () => {
+    const writer = new MemoryWriter();
+    const dispatched: unknown[] = [];
+    const chatResponses = [
+      sseResponse([
+        {
+          model: "model-a",
+          choices: [
+            {
+              delta: {
+                tool_calls: [
+                  {
+                    index: 0,
+                    id: "call-1",
+                    type: "function",
+                    function: { name: "read_tool", arguments: '{"dnpName":"pkg"}' }
+                  }
+                ]
+              },
+              finish_reason: null
+            }
+          ]
+        },
+        { choices: [{ delta: {}, finish_reason: "tool_calls" }] }
+      ]),
+      sseResponse([{ model: "model-a", choices: [{ delta: { content: "Done" }, finish_reason: "stop" }] }])
+    ];
+    const { service } = makeService({
+      apiKey: "secret",
+      mcp: {
+        toolList: [{ name: "read_tool", displayName: "Read tool" }],
+        getOpenAITools: () => [],
+        dispatchTool: async (name, args) => {
+          dispatched.push({ name, args });
+          return { ok: true, output: { ok: true } };
+        },
+        createPendingConfirmation: () => {
+          throw new Error("unexpected confirmation");
+        },
+        resolveConfirmation: () => false
+      },
+      fetch: async (url) => {
+        if (String(url).endsWith("/llms.txt")) return textResponse("");
+        return chatResponses.shift() ?? sseResponse([]);
+      }
+    });
+
+    await service.chatCompletions(
+      { messages: [{ role: "user", content: "hi" }] },
+      writer,
+      new AbortController().signal
+    );
+
+    expect(dispatched).to.deep.equal([{ name: "read_tool", args: { dnpName: "pkg" } }]);
+    expect(writer.body).to.include("Running **Read tool**");
+    expect(writer.body).to.include("Done");
+    expect(writer.body).to.include("[DONE]");
+  });
+
+  it("denies a mutating tool when confirmation is denied", async () => {
+    const writer = new MemoryWriter();
+    const chatResponses = [
+      sseResponse([
+        {
+          model: "model-a",
+          choices: [
+            {
+              delta: {
+                tool_calls: [
+                  {
+                    index: 0,
+                    id: "call-1",
+                    type: "function",
+                    function: { name: "mutating_tool", arguments: "{}" }
+                  }
+                ]
+              },
+              finish_reason: null
+            }
+          ]
+        },
+        { choices: [{ delta: {}, finish_reason: "tool_calls" }] }
+      ]),
+      sseResponse([{ model: "model-a", choices: [{ delta: { content: "Skipped" }, finish_reason: "stop" }] }])
+    ];
+    const { service } = makeService({
+      apiKey: "secret",
+      mcp: {
+        toolList: [{ name: "mutating_tool", displayName: "Mutating tool", mutating: true }],
+        getOpenAITools: () => [],
+        dispatchTool: async () => {
+          throw new Error("dispatch should not run");
+        },
+        createPendingConfirmation: () => ({
+          id: "confirm-1",
+          promise: Promise.resolve({ decision: "deny", reason: "not now" })
+        }),
+        resolveConfirmation: () => false
+      },
+      fetch: async (url) => {
+        if (String(url).endsWith("/llms.txt")) return textResponse("");
+        return chatResponses.shift() ?? sseResponse([]);
+      }
+    });
+
+    await service.chatCompletions({ messages: [] }, writer, new AbortController().signal);
+
+    expect(writer.body).to.include("confirm_required");
+    expect(writer.body).to.include("Skipped **Mutating tool** - not now");
+  });
+
+  it("writes an upstream error event into the stream", async () => {
+    const writer = new MemoryWriter();
+    const { service } = makeService({
+      apiKey: "secret",
+      fetch: async (url) => {
+        if (String(url).endsWith("/llms.txt")) return textResponse("");
+        return textResponse("bad gateway", 502);
+      }
+    });
+
+    await service.chatCompletions({ messages: [] }, writer, new AbortController().signal);
+
+    expect(writer.body).to.include('"code":"upstream_502"');
+    expect(writer.body).to.include("Nexus gateway error (502): bad gateway");
+    expect(writer.body).to.include("[DONE]");
+  });
+
+  it("throws a structured error when chat is not configured", async () => {
+    const { service } = makeService();
+
+    try {
+      await service.chatCompletions({ messages: [] }, new MemoryWriter(), new AbortController().signal);
+      throw new Error("expected error");
+    } catch (err) {
+      expect(err).to.be.instanceOf(NexusApiError);
+      expect((err as NexusApiError).statusCode).to.equal(503);
+      expect((err as NexusApiError).payload?.status?.configured).to.equal(false);
+    }
+  });
+});
+
+function makeService({
+  apiKey = "",
+  fetch = async () => jsonResponse({ data: [] }),
+  now = () => 1000,
+  mcp,
+  gatewayUrl = "https://gateway.example/v1///",
+  privateMode = false
+}: {
+  apiKey?: string;
+  fetch?: FetchLike;
+  now?: () => number;
+  mcp?: NexusMcpAdapter;
+  gatewayUrl?: string | null;
+  privateMode?: boolean;
+} = {}): {
+  service: NexusApi;
+  state: { apiKey: string; privateMode: boolean; history: Record<string, NexusStoredConversation> };
+} {
+  const state = { apiKey, privateMode, history: {} as Record<string, NexusStoredConversation> };
+  const historyStore: NexusHistoryStore = {
+    getAll: () => state.history,
+    get: (id) => state.history[id],
+    set: (id, value) => {
+      state.history[id] = value;
+    },
+    remove: (id) => {
+      delete state.history[id];
+    }
+  };
+  const service = new NexusApi({
+    apiKeyStore: {
+      get: () => state.apiKey,
+      set: (value) => {
+        state.apiKey = value;
+      }
+    },
+    historyStore,
+    listPackages: async () => [],
+    logger: { info: () => {}, warn: () => {} },
+    mcp: mcp ?? {
+      toolList: [],
+      getOpenAITools: () => [],
+      dispatchTool: async () => ({ ok: true, output: {} }),
+      createPendingConfirmation: () => ({ id: "confirm", promise: Promise.resolve({ decision: "approve" }) }),
+      resolveConfirmation: () => false
+    },
+    fetch,
+    now,
+    getGatewayUrl: () => gatewayUrl ?? undefined,
+    privateModeStore: {
+      get: () => state.privateMode,
+      set: (value: boolean) => {
+        state.privateMode = value;
+      }
+    },
+    getDefaultModel: () => "nexus/test"
+  });
+  return { service, state };
+}
+
+function jsonResponse(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
+}
+
+function textResponse(body: string, status = 200): Response {
+  return new Response(body, { status, headers: { "content-type": "text/plain" } });
+}
+
+function sseResponse(chunks: unknown[]): Response {
+  const body = chunks.map((chunk) => `data: ${JSON.stringify(chunk)}\n\n`).join("") + "data: [DONE]\n\n";
+  return new Response(body, { headers: { "content-type": "text/event-stream" } });
+}
+
+class MemoryWriter implements NexusStreamWriter {
+  writableEnded = false;
+  statusCode = 0;
+  headers: Record<string, string> = {};
+  body = "";
+
+  status(code: number): void {
+    this.statusCode = code;
+  }
+
+  setHeader(name: string, value: string): void {
+    this.headers[name.toLowerCase()] = value;
+  }
+
+  flushHeaders(): void {}
+
+  write(chunk: string): void {
+    this.body += chunk;
+  }
+}

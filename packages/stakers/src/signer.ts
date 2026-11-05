@@ -1,11 +1,10 @@
 import {
   Network,
   SignerGnosis,
-  SignerHolesky,
   SignerHoodi,
   SignerLukso,
   SignerMainnet,
-  SignerPrater,
+  SignerSepolia,
   StakerItem,
   UserSettings
 } from "@dappnode/types";
@@ -26,20 +25,25 @@ export class Signer extends StakerComponent {
       dnpName: SignerGnosis.Web3signer,
       minVersion: "0.1.10"
     },
-    [Network.Prater]: {
-      dnpName: SignerPrater.Web3signer,
-      minVersion: "0.1.11"
-    },
-    [Network.Holesky]: {
-      dnpName: SignerHolesky.Web3signer,
-      minVersion: "0.1.0"
-    },
     [Network.Hoodi]: {
       dnpName: SignerHoodi.Web3signer,
       minVersion: "0.1.0"
     },
     [Network.Lukso]: {
       dnpName: SignerLukso.Web3signer,
+      minVersion: "0.1.0"
+    },
+    [Network.Sepolia]: {
+      dnpName: SignerSepolia.Web3signer, 
+      minVersion: "0.1.0"
+    },
+    // TODO: dont exist but need to be added
+    [Network.StarknetMainnet]: {
+      dnpName: "web3signer-starknet.dnp.dappnode.eth",
+      minVersion: "0.1.0"
+    },
+    [Network.StarknetSepolia]: {
+      dnpName: "web3signer-starknet-sepolia.dnp.dappnode.eth",
       minVersion: "0.1.0"
     }
   };
@@ -88,13 +92,13 @@ export class Signer extends StakerComponent {
         serviceNetworks: {
           [serviceName]: {
             [params.DOCKER_STAKER_NETWORKS[network]]: {
-              aliases: [`${serviceName}.${network}.staker.dappnode`]
+              aliases: [`${serviceName}.${network}.staker.dappnode`, `signer.${network}.staker.dappnode`]
             },
             [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-              aliases: [`${serviceName}.${network}.dncore.dappnode`]
+              aliases: [`${serviceName}.${network}.dncore.dappnode`, `signer.${network}.dncore.dappnode`]
             },
             [params.DOCKER_PRIVATE_NETWORK_NEW_NAME]: {
-              aliases: [`${serviceName}.${network}.dappnode.private`]
+              aliases: [`${serviceName}.${network}.dappnode.private`, `signer.${network}.dappnode.private`]
             }
           }
         }

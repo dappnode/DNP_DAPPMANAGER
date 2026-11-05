@@ -10,6 +10,17 @@ describe("validateCompose", () => {
     expect(validateCompose(compose)).to.deep.equal(compose);
   });
 
+  it("Should validate a compose without a version", () => {
+    const compose = { ...mockCompose };
+    delete compose.version;
+    expect(validateCompose(compose)).to.deep.equal(compose);
+  });
+
+  it("Should validate a compose with a legacy version", () => {
+    const compose: Compose = { ...mockCompose, version: "2" };
+    expect(validateCompose(compose)).to.deep.equal(compose);
+  });
+
   it("Should reject an empty compose", () => {
     expect(function () {
       validateCompose({} as Compose);

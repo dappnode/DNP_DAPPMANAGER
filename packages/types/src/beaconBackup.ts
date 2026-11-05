@@ -1,0 +1,53 @@
+import { Network } from "./stakers.js";
+
+export type DetailsResponse = {
+  id?: string;
+  networks?: Record<string, NetworkDetailsRes>;
+};
+
+export type NetworkDetailsRes = {
+  activation_history: Array<{
+    activation_date: string;
+    end_date: string;
+  }>;
+  available_activation_seconds: number;
+  time_to_be_available: number;
+  active: boolean;
+  validator_limit: number;
+};
+
+export type BeaconBackupNetworkStatus = {
+  validatorLimit: number;
+  isActivable: boolean;
+  isActive: boolean;
+  activationHistory?: Array<{
+    activation_date: string;
+    end_date: string;
+  }>;
+  timeLeft: number;
+  timeUntilAvailable: number;
+};
+
+/**
+ * Parameters for beacon backup activation/deactivation
+ */
+export type BeaconBackupActivationParams = {
+  key: string;
+  network: Network;
+};
+
+export type BackupConsensusInfo = {
+  noConsensusSelected: boolean;
+  isPrysmOrTeku: boolean;
+  name: string | null | undefined;
+};
+
+/**
+ * Type used in the admin UI to show parsed backup data for a network
+ */
+export type ParsedNetworkBackupData = BeaconBackupNetworkStatus & {
+  activeValidators: number;
+  beaconApiError: boolean;
+  consensusInfo?: BackupConsensusInfo;
+  activationHistoryParsed: { activation_date: Date; end_date: Date }[];
+};

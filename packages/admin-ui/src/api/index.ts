@@ -110,7 +110,7 @@ export const useApi: {
   return function (...args: any[]) {
     const argsKey = args.length > 0 ? JSON.stringify(args) : "";
     const fetcher = (...args: any[]) => callRoute<any>(route, args);
-    const res = useSWR([route, argsKey], () => fetcher(...args));
+    const res = useSWR([route, argsKey], () => fetcher(...args), { revalidateOnFocus: false });
 
     // Attach optional subscriptions
     const subscriptionRoute = routeSubscription[route as keyof Routes];

@@ -2,8 +2,7 @@ import { expect } from "chai";
 import { ethers } from "ethers";
 import { ComposeEditor } from "@dappnode/dockercompose";
 import { dappnodeInstaller } from "../testUtils.js";
-import { getContainerName, getImageTag } from "@dappnode/utils";
-import { ReleaseSignatureStatusCode, Manifest } from "@dappnode/types";
+import { ReleaseSignatureStatusCode, Manifest, getContainerName, getImageTag } from "@dappnode/types";
 import { uploadDirectoryRelease } from "./integrationSpecs/index.js";
 import { signRelease } from "./integrationSpecs/signRelease.js";
 

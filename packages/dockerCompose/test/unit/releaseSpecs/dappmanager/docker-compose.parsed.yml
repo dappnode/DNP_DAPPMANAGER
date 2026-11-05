@@ -4,13 +4,15 @@ services:
     container_name: DAppNodeCore-dappmanager.dnp.dappnode.eth
     environment:
       DISABLE_UPNP: ""
-      ETH_MAINNET_RPC_URL_OVERRIDE: ""
       ETH_MAINNET_RPC_URL_REMOTE: ""
       IPFS_HOST: ""
       LOG_LEVEL: "info"
     image: "dappmanager.dnp.dappnode.eth:0.2.33"
     logging:
-      driver: journald
+      driver: json-file
+      options:
+        max-file: "3"
+        max-size: 10m
     networks:
       dncore_network:
         aliases:

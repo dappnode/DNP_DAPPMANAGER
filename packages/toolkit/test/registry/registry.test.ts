@@ -41,10 +41,6 @@ describe("Dappnode Registry", function () {
     //     id: "0x074d45071f362f98c575bf48f63a7b026a45ec791ea5c7ef203dee9581c76a2cbf000000",
     //     Registry_id:
     //       "0xd9ea6cf5c20cbc09d529ae706f302f4ab650f538d7ebb1acfd5692800a9662b2",
-    //     name: "nimbus-prater",
-    //     repo: "0xee9ab633d545ef3c53943e9ff6dfefa3ccfd1ed0",
-    //   },
-    //   {
     //     id: "0x08b592c227a0e92a2e42499f282b6f0099349e328c8f22d836f3bb674b4c795e47000000",
     //     Registry_id:
     //       "0x779809cb8a44dac10ed6de506b7e81a119e59bb7779835dc8ecf98d3e9daf368",
@@ -83,10 +79,6 @@ describe("Dappnode Registry", function () {
     //     id: "0x0e08b6ed1d5e3ed6fef904e063d295401e4168fac757058b070a34b3d52469d318010000",
     //     Registry_id:
     //       "0x9090c535741297574813af66add9878a5320269cfb9be133bd0adc2f57d35e1e",
-    //     name: "prysm-prater",
-    //     repo: "0x448bfb454718f20941fe8a1bfa63a0024f21ba50",
-    //   },
-    //   {
     //     id: "0x10a76e0604bb5a6047bc8c1b60ec2723e79adcab456cda97b6cfebeaeaf7d54638000000",
     //     Registry_id:
     //       "0xd88b3d6ce3b30af8a8a6ee417f1618117bd2ff9dad4788f51d6d76b1f12726d1",
@@ -321,10 +313,6 @@ describe("Dappnode Registry", function () {
     //     id: "0x6b5f20385444fccce2896ea77aa22ff1649b07cadf3d3a4865e2c59949e8f77318010000",
     //     Registry_id:
     //       "0xc9aac391ff1a04268a09f4d9ff3578eb817273de2a48d87cba5668ee19959af7",
-    //     name: "web3signer-prater",
-    //     repo: "0x7e5b7076e8330104b846df807cac75575fd320d6",
-    //   },
-    //   {
     //     id: "0x6c24eeecf7c7cb1c7f8377c94839629b507819f628f2c3df4151e67bc3c7d74113000000",
     //     Registry_id:
     //       "0xf0fd18dddb6696315841e69e87e43596b504e77f22de394c760230065ac62573",
@@ -363,10 +351,6 @@ describe("Dappnode Registry", function () {
     //     id: "0x76393f8858866426c9a996ac00e3d184d68dc3e95efebca2b4883a383c57492c6b000000",
     //     Registry_id:
     //       "0x8a269769afd971555fddda0d05b8a77c3cead95843369a632cbbbbffaf932e56",
-    //     name: "ssv-prater",
-    //     repo: "0xea6d433366c42faecbd4c604e81a138d28666c59",
-    //   },
-    //   {
     //     id: "0x7a9259a5493c8ea2de7ae8731fc6e2fb96308cc7f26753dababbf2a5f41a6a8a4a000000",
     //     Registry_id:
     //       "0xd6affa9983d13fb9210ace7aa13a8d650700cc848211235ca49e2d5f9b5e4ff3",
@@ -608,10 +592,6 @@ describe("Dappnode Registry", function () {
     //     id: "0xc8e5db976daf4eb2f916dcd5c2c1ce703a7ae424e474ae61c60cb2e3504aa5514c000000",
     //     Registry_id:
     //       "0xcba23ad7d08ccfaf05995a192a73ba6b3be054e8034eea75457b8c9dfa611571",
-    //     name: "teku-prater",
-    //     repo: "0x5cdf7d87a18b3bb4708facc8c5dd503ea41ffd75",
-    //   },
-    //   {
     //     id: "0xcbef57b91502e252abb460dc6da340f8cdab57b2cb4156e781e8b87362a04e9396000000",
     //     Registry_id:
     //       "0xc1d7647cd6f8b8e0df2b71f6627ba091e26e1f74ad7feadfc35002c22b7185ea",
@@ -657,10 +637,6 @@ describe("Dappnode Registry", function () {
     //     id: "0xe300fb0bfbd00be01efca67b63076647afdffb27cd434c72d9d297256d1b43b02b010000",
     //     Registry_id:
     //       "0x77941c878845bad39b505f9298b634dc7e01bda3cd191e7b72c38e3ff62fd151",
-    //     name: "lodestar-prater",
-    //     repo: "0xe74bc1c4c27284ab7dbcf55f71fcc04b832fc32c",
-    //   },
-    //   {
     //     id: "0xe5866770f8fff8fa270f13d8afd6dbdf1226a167baff0b04931f8f2066c9225440000000",
     //     Registry_id:
     //       "0x377022fdf542b656429e5f3965f4cdc72bf5241aa27d13209c1f1ec0c06ef5c2",
@@ -671,10 +647,6 @@ describe("Dappnode Registry", function () {
     //     id: "0xec963a56aefaf162b433409057cbd131f11dbae12a79052a61e68af5149592a081000000",
     //     Registry_id:
     //       "0xda235a125d9ca6ea8a4e604040242bd6dbd02e1f9e617cf55dc99c810a090e83",
-    //     name: "lighthouse-prater",
-    //     repo: "0x66b1eee6f56b8b53de472e5cfe2de420e9fa6d2e",
-    //   },
-    //   {
     //     id: "0xee1a9a18a65b3fd4663c3d43cce98f03f491c44976f828919f8121a1774cc5cd90000000",
     //     Registry_id:
     //       "0xc384a04c1a2d256e095a742097d080f9daaf171003be0741c37daa511f668bde",

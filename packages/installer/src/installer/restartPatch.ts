@@ -14,6 +14,7 @@ import { afterInstall } from "./afterInstall.js";
 import { flagPackagesAreInstalling } from "./packageIsInstalling.js";
 import { ComposeEditor } from "@dappnode/dockercompose";
 import { InstallPackageData, InstallPackageDataPaths } from "@dappnode/types";
+import { sendCoreInstalledResolvedNotification } from "./sendCoreInstallResolvedNotification.js";
 
 const restartId = params.restartDnpName;
 const dappmanagerName = params.dappmanagerDnpName;
@@ -167,6 +168,7 @@ export async function postRestartPatch(): Promise<void> {
         afterInstall(dnpNames);
       } else {
         // All okay, finish installation
+        await sendCoreInstalledResolvedNotification(packagesData);
         postInstallClean(packagesData, log);
       }
     }

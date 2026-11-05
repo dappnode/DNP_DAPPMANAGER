@@ -8,13 +8,13 @@ import { getInstallerPath } from "pages/installer";
 import { prettyDnpName } from "utils/format";
 import Card from "components/Card";
 import SubTitle from "components/SubTitle";
-import './noDnpInstalled.scss';
+import "./noDnpInstalled.scss";
 
 export const NoDnpInstalled = ({ id, customCopy }: { id: string; customCopy?: string }) => {
   const navigate = useNavigate();
   return (
     <Card className="install-pkg-card">
-      <SubTitle>Install {prettyDnpName(id)} package</SubTitle>
+      <SubTitle>{`Install ${prettyDnpName(id)} package`}</SubTitle>
       {customCopy ? <p>{customCopy}</p> : <p>{prettyDnpName(id)} package not installed, click below to install it</p>}
       <Button variant="dappnode" onClick={() => navigate(getInstallerPath(id) + "/" + id)}>
         Install

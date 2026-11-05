@@ -54,13 +54,7 @@ export default function ExecutionClient({
           >
             UPDATE
           </Button>
-          <br />
-          <br />
         </>
-      )}
-
-      {executionClient.status === "ok" && (
-        <div className="description">{isSelected && executionClient.data?.manifest?.shortDescription}</div>
       )}
     </Card>
   );

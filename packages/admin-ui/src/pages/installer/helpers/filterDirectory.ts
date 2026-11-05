@@ -25,14 +25,19 @@ export default function filterDirectory({
   query: string;
   selectedCategories: SelectedCategories;
 }): DirectoryItem[] {
-  const isSomeCategorySelected = Object.values(selectedCategories).reduce((acc, val) => acc || val, false);
+  const selected = Object.keys(selectedCategories).filter((key) => selectedCategories[key]);
+  const isAnyCategorySelected = selected.length > 0;
+
   return directory
     .filter((dnp) => !query || includesSafe(dnp, query))
-    .filter(
-      (dnp) =>
-        !isSomeCategorySelected ||
-        (dnp.status === "ok" && (dnp.categories || []).some((category) => selectedCategories[category]))
-    );
+    .filter((dnp) => {
+      if (!isAnyCategorySelected) return true;
+      if (dnp.status !== "ok") return false;
+
+      const dnpCategories = dnp.categories || [];
+      // Must contain *any* selected categories
+      return selected.some((cat) => dnpCategories.includes(cat));
+    });
 }
 
 /**

@@ -1,4 +1,4 @@
-import Ajv, { ErrorObject } from "ajv";
+import { Ajv, ErrorObject } from "ajv";
 import { mapValues } from "lodash-es";
 import { Args, LoggerMiddleware, Subscriptions, subscriptionsData } from "@dappnode/types";
 

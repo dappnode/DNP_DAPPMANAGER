@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { throttle, isEmpty } from "lodash-es";
 import { SelectedCategories } from "../../types";
 // This page
@@ -17,11 +17,8 @@ import Input from "components/Input";
 import Button from "components/Button";
 import Loading from "components/Loading";
 import ErrorView from "components/ErrorView";
-import Alert from "react-bootstrap/Alert";
 // Selectors
 import { getDnpRegistry, getRegistryRequestStatus } from "services/dnpRegistry/selectors";
-import { activateFallbackPath } from "pages/system/data";
-import { getEthClientWarning } from "services/dappnodeStatus/selectors";
 import { fetchDnpRegistry } from "services/dnpRegistry/actions";
 
 export const InstallerPublic: React.FC = () => {
@@ -29,7 +26,6 @@ export const InstallerPublic: React.FC = () => {
 
   const registry = useSelector(getDnpRegistry);
   const requestStatus = useSelector(getRegistryRequestStatus);
-  const ethClientWarning = useSelector(getEthClientWarning);
   const dispatch = useDispatch();
 
   const [query, setQuery] = useState("");
@@ -112,15 +108,6 @@ export const InstallerPublic: React.FC = () => {
         <div className="type-filter placeholder" />
       ) : (
         <CategoryFilter categories={categories} onCategoryChange={onCategoryChange} />
-      )}
-
-      {ethClientWarning && (
-        <Alert variant="warning">
-          The DAppStore will not work temporarily. Eth client not available: {ethClientWarning}
-          <br />
-          Enable the <NavLink to={activateFallbackPath}>repository source fallback</NavLink> to use the DAppStore
-          meanwhile
-        </Alert>
       )}
 
       {registry.length ? (

@@ -3,7 +3,7 @@ import { NavLink, useParams } from "react-router-dom";
 import { useApi } from "api";
 import ClipboardJS from "clipboard";
 // Own module
-import { rootPath, subPaths, title } from "../../data";
+import { rootPath, subPaths } from "../../data";
 // Components
 import Form from "react-bootstrap/esm/Form";
 import Alert from "react-bootstrap/esm/Alert";
@@ -14,12 +14,12 @@ import QrCode from "components/QrCode";
 import newTabProps from "utils/newTabProps";
 import Loading from "components/Loading";
 import ErrorView from "components/ErrorView";
-import Title from "components/Title";
 // Icons
 import { MdOpenInNew } from "react-icons/md";
 import { GoCopy } from "react-icons/go";
 import { urlJoin } from "utils/url";
 import { VpnDeviceCredentials } from "@dappnode/types";
+import SubTitle from "components/SubTitle";
 
 function OpenVpnDeviceDetailsLoaded({ device }: { device: VpnDeviceCredentials }) {
   const [showQr, setShowQr] = useState(false);
@@ -123,7 +123,7 @@ export const OpenVpnDeviceDetails: React.FC = () => {
 
   return (
     <>
-      <Title title={title} subtitle={id} />
+      <SubTitle>{id}</SubTitle>
 
       {deviceCredentials.data ? (
         <OpenVpnDeviceDetailsLoaded device={deviceCredentials.data} />

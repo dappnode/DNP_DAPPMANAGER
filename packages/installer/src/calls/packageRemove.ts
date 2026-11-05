@@ -1,7 +1,7 @@
 import fs from "fs";
 import { eventBus } from "@dappnode/eventbus";
 import { params } from "@dappnode/params";
-import { getRepoDirPath, getDockerComposePath, shell } from "@dappnode/utils";
+import { getRepoDirPath, getDockerComposePath, getAvatarPath, shell } from "@dappnode/utils";
 import { logs } from "@dappnode/logger";
 import {
   getDockerTimeoutMax,
@@ -96,6 +96,16 @@ export async function packageRemove({
 
   // Remove DNP folder and files
   if (fs.existsSync(packageRepoDir)) await shell(`rm -r ${packageRepoDir}`);
+
+  // Remove cached avatar:
+  // If we get here, the container and repo are already removed, so even if this fails 
+  // the package is effectively removed.
+  try {
+    const avatarPath = getAvatarPath(dnp.dnpName, dnp.isCore);
+    if (fs.existsSync(avatarPath)) fs.unlinkSync(avatarPath);
+  } catch (e) {
+    logs.debug(`Failed to remove avatar for ${dnp.dnpName}: ${e}`);
+  }
 
   // Emit packages update
   eventBus.requestPackages.emit();

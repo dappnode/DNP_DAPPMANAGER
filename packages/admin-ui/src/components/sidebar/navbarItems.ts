@@ -13,11 +13,12 @@ import {
   MdDevices,
   MdDashboard,
   MdWifi,
-  MdPeople
+  MdPeople,
+  MdStar,
+  MdChatBubbleOutline
 } from "react-icons/md";
 import { FaRegBell } from "react-icons/fa";
 import { SiEthereum } from "react-icons/si";
-import { BiGitRepoForked } from "react-icons/bi";
 // URLs
 import { relativePath as dashboardRelativePath } from "pages/dashboard";
 import { relativePath as devicesRelativePath } from "pages/vpn";
@@ -29,8 +30,9 @@ import { relativePath as supportRelativePath } from "pages/support";
 import { relativePath as wifiRelativePath } from "pages/wifi";
 import { relativePath as communityRelativePath } from "pages/community";
 import { relativePath as stakersRelativePath } from "pages/stakers";
-import { relativePath as repositoryRelativePath } from "pages/repository";
 import { relativePath as notificationsRelativePath } from "pages/notifications";
+import { relativePath as premiumRelativePath } from "pages/premium";
+import { relativePath as nexusRelativePath } from "pages/nexus";
 
 export const fundedBy: { logo: string; text: string; link: string }[] = [
   {
@@ -55,6 +57,8 @@ export const fundedBy: { logo: string; text: string; link: string }[] = [
   }
 ];
 
+export const premiumLabel = "PREMIUM";
+
 export const sidenavItems: {
   name: string;
   href: string;
@@ -63,13 +67,13 @@ export const sidenavItems: {
   show: boolean;
 }[] = [
   {
-    name: "Dashboard",
+    name: "DASHBOARD",
     href: dashboardRelativePath,
     icon: MdDashboard,
     show: true
   },
   {
-    name: "Wi-Fi",
+    name: "WI-FI",
     href: wifiRelativePath,
     icon: MdWifi,
     show: true
@@ -81,57 +85,63 @@ export const sidenavItems: {
     show: true
   },
   {
-    name: "DAppStore",
+    name: "DAPPSTORE",
     href: installerRelativePath,
     icon: MdCreateNewFolder,
     show: true
   },
   {
-    name: "Packages",
+    name: "PACKAGES",
     href: packagesRelativePath,
     icon: MdFolder,
     show: true
   },
   {
-    name: "Stakers",
+    name: "STAKERS",
     href: stakersRelativePath,
     icon: SiEthereum,
     show: true
   },
   {
-    name: "Repository",
-    href: repositoryRelativePath,
-    icon: BiGitRepoForked,
-    show: true
-  },
-  {
-    name: "System",
+    name: "SYSTEM",
     href: systemRelativePath,
     icon: MdSettings,
     show: true
   },
   {
-    name: "Notifications",
+    name: "NOTIFICATIONS",
     href: notificationsRelativePath,
     icon: FaRegBell,
     show: true
   },
   {
-    name: "Community",
+    name: "COMMUNITY",
     href: communityRelativePath,
     icon: MdPeople,
     show: true
   },
   {
-    name: "Sdk",
+    name: "SDK",
     href: sdkRelativePath,
     icon: MdBuild,
     show: true
   },
   {
-    name: "Support",
+    name: "SUPPORT",
     href: supportRelativePath,
     icon: MdHelp,
+    show: true
+  },
+  {
+    name: "NEXUS",
+    href: nexusRelativePath,
+    icon: MdChatBubbleOutline,
+    show: true
+  },
+  {
+    name: premiumLabel,
+    href: premiumRelativePath,
+    icon: MdStar,
     show: true
   }
 ];

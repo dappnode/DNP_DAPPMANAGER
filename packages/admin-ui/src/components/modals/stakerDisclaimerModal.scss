@@ -1,0 +1,180 @@
+.staker-disclaimer-modal {
+  z-index: 3000 !important; /* Ensure modal appears above sidebar (z-index: 2000) */
+
+  .modal-dialog {
+    max-width: 800px;
+  }
+
+  .modal-header {
+    background-color: var(--background-secondary);
+    border-bottom: 2px solid var(--border-color);
+    padding: 1.5rem;
+
+    .modal-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .btn-close {
+      opacity: 0.7;
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
+
+  .modal-body {
+    padding: 1.5rem;
+    max-height: 70vh;
+    overflow-y: auto;
+    background-color: var(--background-primary);
+
+    .disclaimer-intro {
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      background-color: var(--background-secondary);
+      border-left: 4px solid var(--warning-color);
+      border-radius: 4px;
+
+      p {
+        margin-bottom: 0.75rem;
+        line-height: 1.6;
+        color: var(--text-primary);
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        strong {
+          font-weight: 600;
+          color: var(--text-primary);
+        }
+      }
+    }
+
+    .disclaimer-sections {
+      margin-bottom: 1.5rem;
+    }
+
+    .disclaimer-acceptance {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background-color: var(--background-secondary);
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+
+      .disclaimer-checkbox-label {
+        display: flex;
+        align-items: flex-start;
+        cursor: pointer;
+        margin: 0;
+        user-select: none;
+
+        input[type="checkbox"] {
+          margin-right: 0.5rem;
+          width: 20px;
+          height: 20px;
+          cursor: pointer;
+          flex-shrink: 0;
+        }
+
+        span {
+          font-size: 1rem;
+          font-weight: 500;
+          color: var(--text-primary);
+          line-height: 1.5;
+        }
+
+        &:hover {
+          span {
+            color: var(--primary-color);
+          }
+        }
+      }
+    }
+
+    // Custom scrollbar
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: var(--background-secondary);
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+
+      &:hover {
+        background: var(--text-tertiary);
+      }
+    }
+  }
+
+  .modal-footer {
+    background-color: var(--background-secondary);
+    border-top: 2px solid var(--border-color);
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+
+    button {
+      min-width: 120px;
+    }
+  }
+}
+
+.modal-backdrop {
+  z-index: 2999 !important; /* Just below modal but above sidebar */
+}
+
+// Dark mode adjustments - modal is rendered outside #dark, so target body.dark or html.dark
+body.dark,
+html.dark {
+  .staker-disclaimer-modal {
+    .modal-header,
+    .modal-body,
+    .modal-footer {
+      background-color: var(--color-dark-card);
+    }
+
+    .modal-header {
+      border-bottom-color: var(--color-dark-border);
+
+      .modal-title {
+        color: var(--color-dark-maintext);
+      }
+    }
+
+    .modal-body {
+      .disclaimer-intro {
+        background-color: var(--color-dark-background-main);
+        border-left-color: var(--warning-color);
+
+        p,
+        strong {
+          color: var(--color-dark-secondarytext);
+        }
+      }
+
+      .disclaimer-acceptance {
+        background-color: var(--color-dark-background-main);
+        border-color: var(--color-dark-border);
+
+        .disclaimer-checkbox-label {
+          span {
+            color: var(--color-dark-maintext);
+          }
+        }
+      }
+    }
+
+    .modal-footer {
+      border-top-color: var(--color-dark-border);
+    }
+  }
+}

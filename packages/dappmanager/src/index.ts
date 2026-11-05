@@ -8,7 +8,7 @@ import {
   copyHostServices,
   copyHostTimers
 } from "@dappnode/hostscriptsservices";
-import { DappnodeInstaller, getEthersProvider, getEthUrl, getIpfsUrl, postRestartPatch } from "@dappnode/installer";
+import { DappnodeInstaller, getIpfsUrls, postRestartPatch } from "@dappnode/installer";
 import * as calls from "./calls/index.js";
 import { routesLogger, subscriptionsLogger, logs } from "@dappnode/logger";
 import * as routes from "./api/routes/index.js";
@@ -23,30 +23,59 @@ import { getLimiter, getViewsCounterMiddleware, getEthForwardMiddleware } from "
 import { AdminPasswordDb } from "./api/auth/adminPasswordDb.js";
 import { DeviceCalls } from "./calls/device/index.js";
 import { startHttpApi } from "./api/startHttpApi.js";
-import { DappNodeRegistry } from "@dappnode/toolkit";
+import { DappNodeDirectory, DappNodeRegistry, MultiUrlJsonRpcProvider } from "@dappnode/toolkit";
 import { Consensus, Execution, MevBoost, Signer } from "@dappnode/stakers";
 
 const controller = new AbortController();
+
+process.on("unhandledRejection", (reason) => {
+  console.error("Unhandled Rejection:", reason);
+});
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught Exception:", err);
+});
+
+// Graceful shutdown
+process.on("SIGINT", () => {
+  controller.abort();
+  server.close();
+  process.exit(0);
+});
 
 // Initialize DB must be the first step so the db has the required values
 initializeDb()
   .then(() => logs.info("Initialized Database"))
   .catch((e) => logs.error("Error inititializing Database", e));
 
-await getEthUrl().catch((e) => {
-  logs.error(`Error getting ethUrl, using default ${params.ETH_MAINNET_RPC_URL_REMOTE}`, e);
-  return params.ETH_MAINNET_RPC_URL_REMOTE;
-});
-
-let ipfsUrl = params.IPFS_LOCAL;
+let ipfsUrls = [params.IPFS_LOCAL];
 try {
-  ipfsUrl = getIpfsUrl(); // Attempt to update with value from getIpfsUrl
+  ipfsUrls = getIpfsUrls();
 } catch (e) {
-  logs.error(`Error getting ipfsUrl: ${e.message}. Using default: ${ipfsUrl}`);
+  logs.error(`Error getting IPFS URLs: ${e.message}. Using default: ${ipfsUrls}`);
 }
 
+// Read and print version data
+const versionData = getVersionData();
+if (versionData.ok) logs.info("Version info", versionData.data);
+else logs.error(`Error getting version data: ${versionData.message}`);
+
+const providers = new MultiUrlJsonRpcProvider(
+  [
+    {
+      url: "http://execution.mainnet.dncore.dappnode:8545",
+      beaconchainUrl: "http://beacon-chain.mainnet.dncore.dappnode:3500",
+      type: "local"
+    },
+    { url: params.ETH_MAINNET_RPC_URL_REMOTE, type: "remote" }
+  ],
+  {
+    ["x-dappmanager-version"]: `${versionData.data.version}-${db.versionData.get().commit?.slice(0, 8)}`
+  }
+);
+
 // Required db to be initialized
-export const dappnodeInstaller = new DappnodeInstaller(ipfsUrl, await getEthersProvider());
+export const directory = new DappNodeDirectory(providers);
+export const dappnodeInstaller = new DappnodeInstaller(ipfsUrls, providers);
 
 export const publicRegistry = new DappNodeRegistry("public");
 
@@ -72,7 +101,8 @@ const server = startHttpApi({
   subscriptionsLogger,
   adminPasswordDb,
   eventBus,
-  isNewDappmanagerVersion
+  isNewDappmanagerVersion,
+  getIpfsFileBytes: (cid, maxBytes) => dappnodeInstaller.getIpfsFileBytes(cid, maxBytes)
 });
 
 // Start Test API
@@ -89,21 +119,25 @@ executeMigrations().catch((e) => logs.error("Error on executeMigrations", e));
 // Start daemons
 startDaemons(dappnodeInstaller, execution, consensus, signer, mevBoost, controller.signal);
 
-Promise.all([
-  // Copy host scripts
-  copyHostScripts().catch((e) => logs.error("Error copying host scripts", e)),
-  // Copy host services
-  copyHostServices().catch((e) => logs.error("Error copying host services", e)),
-  // Copy host timers
-  copyHostTimers().catch((e) => logs.error("Error copying host timers", e))
-]).then(() => {
-  // ensure ipv4 forward
-  ensureIpv4Forward().catch((e) => logs.error("Error ensuring ipv4 forward", e));
-  // avahiDaemon uses a host script that must be copied before been initialized
-  startAvahiDaemon().catch((e) => logs.error("Error starting avahi daemon", e));
-  // start recreate-dappnode service with timer
-  recreateDappnode().catch((e) => logs.error("Error starting service recreate dappnode", e));
-});
+if (!params.DISABLE_HOST_SCRIPTS) {
+  Promise.all([
+    // Copy host scripts
+    copyHostScripts().catch((e) => logs.error("Error copying host scripts", e)),
+    // Copy host services
+    copyHostServices().catch((e) => logs.error("Error copying host services", e)),
+    // Copy host timers
+    copyHostTimers().catch((e) => logs.error("Error copying host timers", e))
+  ]).then(() => {
+    // ensure ipv4 forward
+    ensureIpv4Forward().catch((e) => logs.error("Error ensuring ipv4 forward", e));
+    // avahiDaemon uses a host script that must be copied before been initialized
+    startAvahiDaemon().catch((e) => logs.error("Error starting avahi daemon", e));
+    // start recreate-dappnode service with timer
+    recreateDappnode().catch((e) => logs.error("Error starting service recreate dappnode", e));
+  });
+} else {
+  logs.info("Host scripts/services disabled (DISABLE_HOST_SCRIPTS=true)");
+}
 
 // Create the global env file
 createGlobalEnvsEnvFile();
@@ -116,21 +150,11 @@ eventBus.notification.on((notification) => {
 
 // Initial calls to check this DAppNode's status
 // TODO: find a proper place for this. Consider having a initial calls health check
-calls
-  .passwordIsSecure()
-  .then((isSecure) => logs.info("Host password is", isSecure ? "secure" : "INSECURE"))
-  .catch((e) => logs.error("Error checking if host user password is secure", e));
-
-// Read and print version data
-const versionData = getVersionData();
-if (versionData.ok) logs.info("Version info", versionData.data);
-else logs.error(`Error getting version data: ${versionData.message}`);
+if (!params.DISABLE_HOST_SCRIPTS) {
+  calls
+    .passwordIsSecure()
+    .then((isSecure) => logs.info("Host password is", isSecure ? "secure" : "INSECURE"))
+    .catch((e) => logs.error("Error checking if host user password is secure", e));
+}
 
 postRestartPatch().catch((e) => logs.error("Error on postRestartPatch", e));
-
-// Graceful shutdown
-process.on("SIGINT", () => {
-  controller.abort();
-  server.close();
-  process.exit(0);
-});

@@ -76,7 +76,7 @@ describe("parseUserSettings", () => {
           ports: ["4001:4001", "9090:9090", "32764:6000"],
           volumes: ["/dev1/custom-path:/usr/data0", "moredata:/usr/data1", `${bitcoinVolumeNameNew}:/usr/data2`],
           networks: {
-            holesky_network: {
+            hoodi_network: {
               aliases: ["mock-dnp"]
             }
           }
@@ -94,7 +94,7 @@ describe("parseUserSettings", () => {
         }
       },
       networks: {
-        holesky_network: {
+        hoodi_network: {
           external: true
         }
       }
@@ -122,13 +122,13 @@ describe("parseUserSettings", () => {
       },
       networks: {
         rootNetworks: {
-          holesky_network: {
+          hoodi_network: {
             external: true
           }
         },
         serviceNetworks: {
           [mockDnpName]: {
-            holesky_network: {
+            hoodi_network: {
               aliases: ["mock-dnp"]
             }
           }
@@ -582,5 +582,121 @@ describe("applyUserSettings", () => {
       expectedComposeAfterUpdate,
       "Wrong composeAfterUpdate"
     );
+  });
+});
+
+describe("applyUserSettings - network merging logic", () => {
+  const serviceName = "test.dnp.dappnode.eth";
+  const baseCompose = (baseIp?: string, baseAliases?: string[]) => ({
+    version: "3.5",
+    services: {
+      [serviceName]: {
+        image: "test:latest",
+        container_name: "DAppNodePackage-test",
+        networks: {
+          net1: {
+            ...(baseIp !== undefined ? { ipv4_address: baseIp } : {}),
+            ...(baseAliases !== undefined ? { aliases: baseAliases } : {})
+          }
+        }
+      }
+    },
+    networks: { net1: {} }
+  });
+
+  const userSettings = (userIp?: string, userAliases?: string[]): UserSettings => ({
+    networks: {
+      rootNetworks: { net1: {} },
+      serviceNetworks: {
+        [serviceName]: {
+          net1: {
+            ...(userIp !== undefined ? { ipv4_address: userIp } : {}),
+            ...(userAliases !== undefined ? { aliases: userAliases } : {})
+          }
+        }
+      }
+    }
+  });
+
+  const applyUserSettingsTest: typeof applyUserSettings = (...args) => {
+    const nextCompose = applyUserSettings(...args);
+    for (const sName in nextCompose.services) delete nextCompose.services[sName].labels;
+    return nextCompose;
+  };
+
+  it("should merge aliases from both base and user networks, always resulting in an array", () => {
+    const compose = baseCompose(undefined, ["base1", "base2"]);
+    const settings = userSettings(undefined, ["user1", "base2"]);
+    const result = applyUserSettingsTest(compose, settings, { dnpName: serviceName });
+    expect(result.services[serviceName].networks).to.deep.equal({ net1: { aliases: ["base1", "base2", "user1"] } });
+  });
+
+  it("should always use the ip from the base network, not from user network", () => {
+    // base has ip, user has different ip
+    const compose = baseCompose("10.0.0.1");
+    const settings = userSettings("10.0.0.2");
+    const result = applyUserSettingsTest(compose, settings, { dnpName: serviceName });
+    expect(result.services[serviceName].networks).to.deep.equal({ net1: { ipv4_address: "10.0.0.1" } });
+  });
+
+  it("should not have ip if base network does not define it, even if user network does", () => {
+    const compose = baseCompose();
+    const settings = userSettings("10.0.0.2");
+    const result = applyUserSettingsTest(compose, settings, { dnpName: serviceName });
+    expect(result.services[serviceName].networks).to.deep.equal({ net1: {} });
+  });
+
+  it("should not have ip if neither base nor user network define it", () => {
+    const compose = baseCompose();
+    const settings = userSettings();
+    const result = applyUserSettingsTest(compose, settings, { dnpName: serviceName });
+    expect(result.services[serviceName].networks).to.deep.equal({ net1: {} });
+  });
+
+  it("should include user network and base network if both are defined in each", () => {
+    const serviceName = "test.dnp.dappnode.eth";
+    const baseCompose = () => ({
+      version: "3.5",
+      services: {
+        [serviceName]: {
+          image: "test:latest",
+          container_name: "DAppNodePackage-test",
+          networks: {
+            net1: {
+              ipv4_address: "10.0.0.6",
+              aliases: ["alias3", "alias4"]
+            }
+          }
+        }
+      },
+      networks: { net1: {} }
+    });
+
+    const userSettings = {
+      networks: {
+        rootNetworks: { net1: {}, net2: {} },
+        serviceNetworks: {
+          [serviceName]: {
+            net2: {
+              ipv4_address: "10.0.0.5",
+              aliases: ["alias1", "alias2"]
+            }
+          }
+        }
+      }
+    };
+
+    const compose = baseCompose();
+    const result = applyUserSettingsTest(compose, userSettings, { dnpName: serviceName });
+    expect(result.services[serviceName].networks).to.deep.equal({
+      net1: {
+        ipv4_address: "10.0.0.6",
+        aliases: ["alias3", "alias4"]
+      },
+      net2: {
+        ipv4_address: "10.0.0.5",
+        aliases: ["alias1", "alias2"]
+      }
+    });
   });
 });

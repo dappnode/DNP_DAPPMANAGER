@@ -1,5 +1,4 @@
 import React from "react";
-import { Routes, Route, NavLink } from "react-router-dom";
 import { useApi } from "api";
 // Own module
 import { subPaths, title } from "./data";
@@ -11,6 +10,9 @@ import { NotificationsSettings } from "./tabs/Settings/Settings";
 import { LegacyNotifications } from "./tabs/Legacy";
 import { NoDnpInstalled } from "pages/packages/components/NoDnpInstalled";
 import { notificationsDnpName } from "params";
+import { Subscriptions } from "./tabs/Devices";
+import { RouteType } from "types";
+import { SectionNavigator } from "components/SectionNavigator";
 
 export const NotificationsRoot: React.FC = () => {
   const notificationsPkgStatusRequest = useApi.notificationsPackageStatus();
@@ -23,49 +25,33 @@ export const NotificationsRoot: React.FC = () => {
   );
 
   return renderResponse(notificationsPkgStatusRequest, ["Loading notifications"], (data) => {
-    const availableRoutes: {
-      name: string;
-      subPath: string;
-      component: React.ComponentType;
-    }[] = [
+    const availableRoutes: RouteType[] = [
       {
         name: "Inbox",
         subPath: subPaths.inbox,
-        component: data.isInstalled ? Inbox : () => <InstallNotificationsPkg />
+        element: data.isInstalled ? <Inbox /> : <InstallNotificationsPkg />
       },
       {
         name: "Settings",
         subPath: subPaths.settings,
-        component: data.isInstalled ? NotificationsSettings : () => <InstallNotificationsPkg />
+        element: data.isInstalled ? <NotificationsSettings /> : <InstallNotificationsPkg />
+      },
+      {
+        name: "Devices",
+        subPath: subPaths.devices,
+        element: data.isInstalled ? <Subscriptions /> : <InstallNotificationsPkg />
       },
       {
         name: "Legacy",
         subPath: subPaths.legacy,
-        component: LegacyNotifications
+        element: <LegacyNotifications />
       }
     ];
 
     return (
       <>
         <Title title={title} />
-
-        <div className="horizontal-navbar">
-          {availableRoutes.map((route) => (
-            <button key={route.subPath} className="item-container">
-              <NavLink to={route.subPath} className="item no-a-style" style={{ whiteSpace: "nowrap" }}>
-                {route.name}
-              </NavLink>
-            </button>
-          ))}
-        </div>
-
-        <div className="section-spacing">
-          <Routes>
-            {availableRoutes.map((route) => (
-              <Route key={route.subPath} path={route.subPath} element={<route.component />} />
-            ))}
-          </Routes>
-        </div>
+        <SectionNavigator basePath="/notifications" routes={availableRoutes} />
       </>
     );
   });

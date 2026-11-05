@@ -1,15 +1,13 @@
 import * as db from "@dappnode/db";
 import { getVersionData } from "../utils/getVersionData.js";
 import { NewFeatureId, SystemInfo } from "@dappnode/types";
-import { ethereumClient } from "@dappnode/installer";
 import { isCoreUpdateEnabled } from "@dappnode/daemons";
+import { params } from "@dappnode/params";
 
 /**
  * Returns the current DAppNode system info
  */
 export async function systemInfoGet(): Promise<SystemInfo> {
-  const { target: eth2ClientTarget, ethRemoteRpc } = ethereumClient.computeEthereumTarget();
-
   return {
     // Git version data
     versionData: getVersionData().data,
@@ -26,11 +24,7 @@ export async function systemInfoGet(): Promise<SystemInfo> {
     internalIp: db.internalIp.get(),
     // publicIp is used to check for internet connection after installation
     publicIp: db.publicIp.get(),
-    // Eth provider configured URL
-    eth2ClientTarget,
-    ethClientStatus: eth2ClientTarget !== "remote" ? db.ethExecClientStatus.get(eth2ClientTarget.execClient) : null,
-    ethClientFallback: db.ethClientFallback.get(),
-    ethRemoteRpc,
+    ethRemoteRpc: "",
     // Domain map
     fullnodeDomainTarget: db.fullnodeDomainTarget.get(),
     // UI stats
@@ -47,27 +41,20 @@ export async function systemInfoGet(): Promise<SystemInfo> {
 function getNewFeatureIds(): NewFeatureId[] {
   const newFeatureIds: NewFeatureId[] = [];
 
-  if (db.executionClientMainnet.get() && db.consensusClientMainnet.get()) {
-    // If the user does not has the fallback on and has not seen the full
-    // repository view, show a specific one just asking for the fallback
-    if (db.ethClientFallback.get() === "off" && db.newFeatureStatus.get("repository") !== "seen")
-      newFeatureIds.push("repository-fallback");
-  } else {
-    // repository: Show only if nothing is selected
-    newFeatureIds.push("repository");
-  }
-
   // auto-updates: Show only if all are disabled
   if (!isCoreUpdateEnabled()) newFeatureIds.push("system-auto-updates");
 
-  // enable-ethical-metrics: Show only if not seen
-  if (db.newFeatureStatus.get("enable-ethical-metrics") !== "seen") newFeatureIds.push("enable-ethical-metrics");
-  
+  // enable-ethical-metrics: Disabled in the onboarding for now as we want to rethink how we present it
+  // if (db.newFeatureStatus.get("enable-ethical-metrics") !== "seen") newFeatureIds.push("enable-ethical-metrics");
+
   // enable-notifications: Show only if not seen
   if (db.newFeatureStatus.get("enable-notifications") !== "seen") newFeatureIds.push("enable-notifications");
 
-  // change-host-password: Show only if insecure
-  if (!db.passwordIsSecure.get()) newFeatureIds.push("change-host-password");
+  // enable-ui-telemetry: Show only if not seen
+  if (db.newFeatureStatus.get("enable-ui-telemetry") !== "seen") newFeatureIds.push("enable-ui-telemetry");
+
+  // change-host-password: Show only if insecure and host scripts are enabled
+  if (!db.passwordIsSecure.get() && !params.DISABLE_HOST_SCRIPTS) newFeatureIds.push("change-host-password");
 
   // Filter out features that the user has already seen or set
   return newFeatureIds.filter((featureId) => {

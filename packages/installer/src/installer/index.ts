@@ -1,4 +1,5 @@
 export * from "./afterInstall.js";
+export * from "./downloadAvatar.js";
 export * from "./downloadImages.js";
 export * from "./loadImages.js";
 export * from "./packageIsInstalling.js";

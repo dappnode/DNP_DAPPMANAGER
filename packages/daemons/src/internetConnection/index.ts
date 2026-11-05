@@ -72,7 +72,7 @@ async function monitorInternetConnection(): Promise<void> {
             category: Category.system,
             priority: Priority.critical,
             status: Status.resolved,
-            isBanner: false,
+            isBanner: true,
             isRemote: false,
             correlationId
           })
