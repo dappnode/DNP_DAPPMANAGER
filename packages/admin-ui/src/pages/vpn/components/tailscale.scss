@@ -1,0 +1,87 @@
+.tailscale-vpn {
+  width: 100%;
+
+  .tailscale-connection__header,
+  .tailscale-connection__status,
+  .tailscale-connection__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .tailscale-connection__header {
+    justify-content: space-between;
+    flex-wrap: wrap;
+    margin-bottom: 0.5rem;
+  }
+
+  .tailscale-connection__status {
+    font-size: 0.85rem;
+  }
+  .tailscale-connection__actions {
+    flex-wrap: wrap;
+  }
+
+  .tailscale-lights {
+    display: inline-flex;
+    gap: 0.35rem;
+  }
+
+  .tailscale-light {
+    display: block;
+    width: 0.65rem;
+    height: 0.65rem;
+    border-radius: 50%;
+    background: #9ca7ae;
+    opacity: 0.3;
+
+    &.is-active {
+      opacity: 1;
+      box-shadow: 0 0 0 3px #9ca7ae1a;
+    }
+    &--green.is-active {
+      background: #2da45a;
+    }
+    &--yellow.is-active {
+      background: #e3ad17;
+    }
+    &--red.is-active {
+      background: #d94b45;
+    }
+  }
+
+  .tailscale-settings {
+    summary {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      list-style: none;
+      &::-webkit-details-marker {
+        display: none;
+      }
+      > svg:last-child {
+        margin-left: auto;
+      }
+    }
+    &[open] summary > svg:last-child {
+      transform: rotate(180deg);
+    }
+  }
+
+  .tailscale-spinning {
+    animation: tailscale-spin 1.5s linear infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tailscale-spinning {
+      animation: none;
+    }
+  }
+}
+
+@keyframes tailscale-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
