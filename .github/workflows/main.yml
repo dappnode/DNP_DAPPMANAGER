@@ -32,6 +32,8 @@ jobs:
       - run: yarn
       - run: yarn build
       - run: yarn test
+      - run: yarn test:network-migration
+      - run: yarn test:network-migration:int
       - run: yarn lint
       # - run: yarn server-mock:check-types
       #   working-directory: packages/admin-ui

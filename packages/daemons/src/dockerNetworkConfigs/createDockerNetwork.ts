@@ -19,10 +19,14 @@ import Dockerode from "dockerode";
  */
 export async function createDockerNetwork({
   networkName,
-  subnet
+  subnet,
+  ipRange,
+  gateway
 }: {
   networkName: string;
   subnet: string;
+  ipRange?: string;
+  gateway?: string;
 }): Promise<void> {
   const networkOptions: Dockerode.NetworkCreateOptions = {
     Name: networkName,
@@ -31,7 +35,9 @@ export async function createDockerNetwork({
       Driver: "default",
       Config: [
         {
-          Subnet: subnet
+          Subnet: subnet,
+          ...(ipRange ? { IPRange: ipRange } : {}),
+          ...(gateway ? { Gateway: gateway } : {})
         }
       ]
     }
@@ -46,6 +52,11 @@ export async function createDockerNetwork({
     const network = docker.getNetwork(networkName);
     const info: Dockerode.NetworkInspectInfo = await network.inspect();
     const networkSubnets = info.IPAM?.Config?.map((c) => c.Subnet) ?? [];
+    if (ipRange && !info.IPAM?.Config?.some((c) => c.Subnet === subnet && c.IPRange === ipRange))
+      logs.warn(
+        `docker network ${networkName} does not reserve core addresses outside the dynamic pool ${ipRange}. ` +
+          "Run scripts/migrate-docker-networks.sh plan to prepare the explicit migration; startup will not recreate it."
+      );
     if (networkSubnets.includes(subnet)) logs.info(`docker network ${networkName} has correct subnet ${subnet}`);
     else
       logs.warn(

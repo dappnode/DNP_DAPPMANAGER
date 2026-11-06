@@ -10,6 +10,7 @@ packages/*/yarn-error.log
 # Compiled files
 packages/*/build/
 packages/*/dist
+**/*.tsbuildinfo
 
 # Test artifacts
 packages/*/*test*

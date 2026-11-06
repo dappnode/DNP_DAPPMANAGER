@@ -1,5 +1,6 @@
 import path from "path";
 import { Network } from "@dappnode/types";
+import networkPolicy from "./dockerNetworkPolicy.json" with { type: "json" };
 
 const devMode = process.env.LOG_LEVEL === "DEV_MODE";
 const MINUTE = 60 * 1000; // miliseconds
@@ -120,9 +121,9 @@ export const params = {
   PREMIUM_DNP_NAME: "premium.dnp.dappnode.eth",
 
   // Docker network parameters
-  DOCKER_NETWORK_SUBNET: "172.33.0.0/16", // "10.20.0.0/24";
+  DOCKER_NETWORK_SUBNET: networkPolicy.networks.dncore_network.subnet,
   DOCKER_PRIVATE_NETWORK_NAME: "dncore_network",
-  DOCKER_NETWORK_NEW_SUBNET: "10.20.0.0/24",
+  DOCKER_NETWORK_NEW_SUBNET: networkPolicy.networks.dnprivate_network.subnet,
   DOCKER_PRIVATE_NETWORK_NEW_NAME: "dnprivate_network",
   DOCKER_EXTERNAL_NETWORK_NAME: "dnpublic_network",
   DOCKER_STAKER_NETWORKS: {
@@ -134,10 +135,10 @@ export const params = {
     [Network.StarknetMainnet]: "starknet_network",
     [Network.StarknetSepolia]: "starknet_sepolia_network"
   },
-  DOCKER_LEGACY_DNS: "172.33.1.2",
-  BIND_IP: "172.33.1.2",
-  BIND_NEW_IP: "10.20.0.2",
-  DAPPMANAGER_IP: "172.33.1.7",
+  DOCKER_LEGACY_DNS: networkPolicy.networks.dncore_network.fixed["DAppNodeCore-bind.dnp.dappnode.eth"],
+  BIND_IP: networkPolicy.networks.dncore_network.fixed["DAppNodeCore-bind.dnp.dappnode.eth"],
+  BIND_NEW_IP: networkPolicy.networks.dnprivate_network.fixed["DAppNodeCore-bind.dnp.dappnode.eth"],
+  DAPPMANAGER_IP: networkPolicy.networks.dncore_network.fixed["DAppNodeCore-dappmanager.dnp.dappnode.eth"],
 
   // Docker compose parameters
   // Use of new compose file feature: network name

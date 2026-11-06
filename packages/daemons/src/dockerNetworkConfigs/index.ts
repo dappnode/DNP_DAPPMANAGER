@@ -3,7 +3,7 @@ import { createDockerNetwork } from "./createDockerNetwork.js";
 import { packagesGet } from "@dappnode/installer";
 import { dockerComposeUpPackage } from "@dappnode/dockerapi";
 import { writeDockerNetworkConfig } from "./writeDockerNetworkConfig.js";
-import { params } from "@dappnode/params";
+import { params, dockerNetworkPolicy } from "@dappnode/params";
 import { connectPkgContainers } from "./connectPkgContainers.js";
 import { InstalledPackageDataApiReturn } from "@dappnode/types";
 import { httpsPortal } from "@dappnode/httpsportal";
@@ -75,9 +75,12 @@ async function ensureDockerNetworkConfig({
   bindIp: string;
 }): Promise<void> {
   // 1. create the new docker network
+  const policy = Object.entries(dockerNetworkPolicy.networks).find(([name]) => name === networkName)?.[1];
   await createDockerNetwork({
     networkName,
-    subnet
+    subnet,
+    ipRange: policy?.ipRange,
+    gateway: policy?.gateway
   });
 
   const packages = await packagesGet();
@@ -108,14 +111,10 @@ async function ensureDockerNetworkConfig({
   }
 }
 
-function setDappmanagerAndBindFirst(packages: InstalledPackageDataApiReturn[]): InstalledPackageDataApiReturn[] {
-  return packages.sort((a, b) => {
-    if (a.dnpName === params.bindContainerName) return -1; // bind should be first
-    if (b.dnpName === params.bindContainerName) return 1; // bind should be first
-    if (a.dnpName === params.dappmanagerContainerName) return 1; // dappmanager should be second
-    if (b.dnpName === params.dappmanagerContainerName) return -1; // dappmanager should be second
-    return 0; // rest can be in any order
-  });
+export function setDappmanagerAndBindFirst(packages: InstalledPackageDataApiReturn[]): InstalledPackageDataApiReturn[] {
+  const priority = (name: string): number =>
+    name === params.bindDnpName ? 0 : name === params.dappmanagerDnpName ? 1 : 2;
+  return [...packages].sort((a, b) => priority(a.dnpName) - priority(b.dnpName));
 }
 
 export function startDockerNetworkConfigsDaemon(
