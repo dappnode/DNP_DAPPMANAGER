@@ -1,15 +1,18 @@
 import { logs } from "@dappnode/logger";
 import { runAtMostEvery } from "@dappnode/utils";
 import { notifications } from "@dappnode/notifications";
-import { Category, Notification, Priority, Status } from "@dappnode/types";
+import { Category, Notification, NotificationPayload, Priority, Status } from "@dappnode/types";
 import { getRebootRequiredMemoized } from "@dappnode/hostscriptsservices";
 import { params } from "@dappnode/params";
 
-const CHECK_INTERVAL = 7 * 24 * 60 * 60 * 1000; // 7 days
+import { getKernelMitigationNotification, KERNEL_MITIGATION_CORRELATION_ID } from "./kernelMitigationNotification.js";
+
+const CHECK_INTERVAL = 5 * 60 * 1000; // 5 minutes
 const BANNER_LOOKBACK_SECONDS = 30 * 24 * 60 * 60; // 30 days
 const CORRELATION_ID = "core-reboot-required";
 
 let notificationSent = false;
+let lastKernelNotification: NotificationPayload | undefined;
 
 export function getLatestNotificationByCorrelationId(
   notificationList: Notification[],
@@ -20,14 +23,14 @@ export function getLatestNotificationByCorrelationId(
     .sort((a, b) => b.timestamp - a.timestamp)[0];
 }
 
-async function getLatestRebootBannerNotification(): Promise<Notification | undefined> {
+async function getLatestRebootBannerNotification(correlationId = CORRELATION_ID): Promise<Notification | undefined> {
   try {
     const { isNotifierRunning } = await notifications.notificationsPackageStatus();
     if (!isNotifierRunning) return undefined;
 
     const timestamp = Math.floor(Date.now() / 1000) - BANNER_LOOKBACK_SECONDS;
     const bannerNotifications = await notifications.getBannerNotifications(timestamp);
-    return getLatestNotificationByCorrelationId(bannerNotifications, CORRELATION_ID);
+    return getLatestNotificationByCorrelationId(bannerNotifications, correlationId);
   } catch (e) {
     logs.warn("Error getting previous host reboot banner notification", e);
     return undefined;
@@ -42,6 +45,18 @@ async function getLatestRebootBannerNotification(): Promise<Notification | undef
 async function monitorHostReboot(): Promise<void> {
   try {
     const rebootRequired = await getRebootRequiredMemoized();
+    if (rebootRequired.kernelSecurityMitigation) {
+      const previous = await getLatestRebootBannerNotification(KERNEL_MITIGATION_CORRELATION_ID);
+      const securityNotification = getKernelMitigationNotification(
+        rebootRequired.kernelSecurityMitigation,
+        params.dappmanagerDnpName,
+        previous ?? lastKernelNotification
+      );
+      if (securityNotification) {
+        await notifications.sendNotification(securityNotification);
+        lastKernelNotification = securityNotification;
+      }
+    }
     const latestNotification = await getLatestRebootBannerNotification();
     const isRebootNotificationActive = latestNotification
       ? latestNotification.status === Status.triggered
@@ -78,7 +93,7 @@ async function monitorHostReboot(): Promise<void> {
           .sendNotification({
             title: "Dappnode host reboot was successful",
             dnpName: params.dappmanagerDnpName,
-            body: `All packages have been installed successfully.`,
+            body: `The host no longer reports a pending reboot. This does not verify individual security fixes.`,
             category: Category.system,
             priority: Priority.low,
             status: Status.resolved,
