@@ -13,6 +13,7 @@
     "mock-standalone": "VITE_APP_MOCK=true yarn start",
     "mock-standalone:build": "VITE_APP_MOCK=true yarn build",
     "dev": "VITE_APP_API_TEST=true vite build --watch",
+    "test:tailscale": "vitest run --config vitest.tailscale.config.ts",
     "test:navigation": "vitest run --config vite.config.ts src/__tests__/components/navigation.test.tsx"
   },
   "dependencies": {
