@@ -1,6 +1,6 @@
 import { mapValues, isEmpty } from "lodash-es";
 import { deepmergeCustom } from "deepmerge-ts";
-import { Ajv } from "ajv";
+import { Ajv, ValidateFunction } from "ajv";
 import addFormats from "ajv-formats";
 import { UserSettingsAllDnps, UserSettings, SetupWizardAllDnps } from "@dappnode/types";
 import { SetupWizardFormDataReturn } from "../types";
@@ -12,7 +12,21 @@ const deepmerge = deepmergeCustom({ filterValues: false });
 // `field.if` schemas are written by package developers. Ajv 8 strict mode throws on unknown
 // keywords, which would silently hide the field (see filterActiveSetupWizard), so keep Ajv 6 leniency
 const ajv = new Ajv({ allErrors: true, strict: false });
-addFormats(ajv);
+// "fast" is the format mode Ajv 6 used by default
+addFormats(ajv, { mode: "fast" });
+
+// Ajv 8 caches compiled schemas by object reference, not by content. `field.if` schemas are rebuilt
+// on every render, so cache by content to avoid compiling (and leaking) a new validator per render
+const ifValidators = new Map<string, ValidateFunction>();
+function validateIf(schema: SetupSchema, data: unknown): boolean {
+  const key = JSON.stringify(schema);
+  let validate = ifValidators.get(key);
+  if (!validate) {
+    validate = ajv.compile(schema);
+    ifValidators.set(key, validate);
+  }
+  return validate(data);
+}
 
 /**
  * Extract setup target objects from the setupWizard
@@ -184,7 +198,7 @@ export function filterActiveSetupWizard(
     fields: setupWizardDnp.fields.filter((field) => {
       if (field.if) {
         try {
-          return ajv.validate(correctJsonSchema(field.if), formData[dnpName]);
+          return validateIf(correctJsonSchema(field.if), formData[dnpName]);
         } catch (e) {
           console.error(`Validation error ${dnpName} ${field.id}`, e);
           return false;
