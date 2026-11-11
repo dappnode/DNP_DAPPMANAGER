@@ -1,4 +1,4 @@
-ARG NODE_VERSION=24.22.1
+ARG NODE_VERSION=24.22.3
 ARG BASE_IMAGE=node:${NODE_VERSION}-alpine3.23
 
 # Initial stage to gather git data
