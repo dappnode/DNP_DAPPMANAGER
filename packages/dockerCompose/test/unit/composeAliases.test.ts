@@ -206,7 +206,7 @@ networks:
       };
 
       const GlobalEnvsPrefixed: GlobalEnvsPrefixed = {
-        _DAPPNODE_GLOBAL_ACTIVE: "true",
+        _DAPPNODE_GLOBAL_ENVS_ACTIVE: "true",
         _DAPPNODE_GLOBAL_NO_NAT_LOOPBACK: "false"
       };
 
@@ -214,7 +214,7 @@ networks:
       composeService.setGlobalEnvs(
         [
           {
-            envs: ["ACTIVE", "NO_NAT_LOOPBACK"],
+            envs: ["ENVS_ACTIVE", "NO_NAT_LOOPBACK"],
             services: ["goerli-geth.dnp.dappnode.eth"]
           }
         ],
@@ -233,7 +233,7 @@ services:
     container_name: DAppNodePackage-goerli-geth.dnp.dappnode.eth
     environment:
       - EXTRA_OPTIONS=--http.api eth,net,web3,txpool
-      - _DAPPNODE_GLOBAL_ACTIVE=true
+      - _DAPPNODE_GLOBAL_ENVS_ACTIVE=true
       - _DAPPNODE_GLOBAL_NO_NAT_LOOPBACK=false
     image: goerli-geth.dnp.dappnode.eth:0.4.12
     logging:

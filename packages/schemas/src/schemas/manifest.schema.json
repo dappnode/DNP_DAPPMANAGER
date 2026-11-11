@@ -39,7 +39,7 @@
       "type": "string",
       "description": "DAppNode Package semantic version (semver).",
       "examples": ["0.2.0"],
-      "pattern": "^((([0-9]+).([0-9]+).([0-9]+)))$",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
       "errorMessage": "should be a semantic version in the format x.y.z"
     },
     "upstreamRepo": {
@@ -226,14 +226,14 @@
           "type": "string",
           "description": "Minimum DAppNode version that includes all the features necessary to run this DAppNode Package.",
           "examples": ["0.2.0"],
-          "pattern": "^((([0-9]+).([0-9]+).([0-9]+)))$",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
           "errorMessage": "should be a semantic version in the format x.y.z"
         },
         "minimumDockerVersion": {
           "type": "string",
           "description": "Minimum Docker version that includes all the features necessary to run this DAppNode Package.",
           "examples": ["23.0.3"],
-          "pattern": "^((([0-9]+).([0-9]+).([0-9]+)))$",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
           "errorMessage": "should be a semantic version in the format x.y.z"
         },
         "notInstalledPackages": {
@@ -248,29 +248,46 @@
       }
     },
     "globalEnvs": {
-      "type": "array",
-      "description": "Request the DAPPMANAGER to inject the selected global ENVs to this package's containers",
-      "items": {
-        "type": "object",
-        "properties": {
-          "envs": {
-            "type": "array",
-            "description": "The list of envs to inject to the defined services",
-            "items": {
-              "type": "string",
-              "examples": ["_DAPPNODE_GLOBAL_NO_NAT_LOOPBACK", "_DAPPNODE_GLOBAL_PUBLIC_IP"]
-            },
-            "services": {
-              "type": "array",
-              "description": "The services to inject the global ENVs to",
-              "items": {
-                "type": "string",
-                "examples": ["webserver", "backend", "service1"]
+      "description": "Request global ENVs by their short names (for example PUBLIC_IP). DAPPMANAGER adds _DAPPNODE_GLOBAL_ during installation. The legacy all form injects the global env file.",
+      "oneOf": [
+        {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["envs", "services"],
+            "properties": {
+              "envs": {
+                "type": "array",
+                "description": "Short names from the shared GLOBAL_ENVS catalogue, without the _DAPPNODE_GLOBAL_ prefix.",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "examples": ["NO_NAT_LOOPBACK", "PUBLIC_IP", "ENVS_ACTIVE"]
+                }
+              },
+              "services": {
+                "type": "array",
+                "description": "Compose services that receive the selected global ENVs.",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "examples": ["webserver", "backend", "service1"]
+                }
               }
             }
           }
+        },
+        {
+          "type": "object",
+          "required": ["all"],
+          "properties": {
+            "all": {
+              "type": "boolean",
+              "description": "Legacy form: true injects the global env file into all services; false leaves them unchanged."
+            }
+          }
         }
-      }
+      ]
     },
     "architectures": {
       "type": "array",
