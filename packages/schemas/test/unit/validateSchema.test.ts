@@ -28,11 +28,11 @@ describe("schemaValidation", function () {
         globalEnvs: [
           {
             services: ["web3signer", "ui"],
-            envs: ["_DAPPNODE_GLOBAL_INTERNAL_IP", "_DAPPNODE_GLOBAL_PUBLIC_IP"]
+            envs: ["INTERNAL_IP", "PUBLIC_IP"]
           },
           {
             services: ["db"],
-            envs: ["_DAPPNODE_GLOBAL_PUBKEY"]
+            envs: ["PUBKEY"]
           }
         ],
         chain: {

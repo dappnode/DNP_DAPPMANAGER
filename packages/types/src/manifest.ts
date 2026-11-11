@@ -49,9 +49,11 @@ export interface Manifest {
   };
   globalEnvs?:
     | {
-        all?: boolean;
+        /** Legacy form: true injects the global env file into every service. */
+        all: boolean;
       }
     | {
+        /** Short names such as PUBLIC_IP; DAPPMANAGER adds _DAPPNODE_GLOBAL_. */
         envs: string[];
         services: string[];
       }[];

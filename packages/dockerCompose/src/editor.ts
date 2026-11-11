@@ -163,12 +163,14 @@ export class ComposeServiceEditor {
         if (!globEnv.services.includes(this.serviceName)) continue;
         const globalEnvsFromManifestPrefixed = globEnv.envs.map((env) => `${params.GLOBAL_ENVS_PREFIX}${env}`);
 
-        if (globalEnvsFromManifestPrefixed.some((env) => !(env in globalEnvsFromDbPrefixed)))
-          throw Error(
-            `Global envs allowed are ${Object.keys(globalEnvsFromDbPrefixed).join(
-              ", "
-            )}. Got ${globEnv.envs.join(", ")}`
+        if (globalEnvsFromManifestPrefixed.some((env) => !(env in globalEnvsFromDbPrefixed))) {
+          const allowedNames = Object.keys(globalEnvsFromDbPrefixed).map((env) =>
+            env.startsWith(params.GLOBAL_ENVS_PREFIX) ? env.slice(params.GLOBAL_ENVS_PREFIX.length) : env
           );
+          throw Error(
+            `Global envs allowed are ${allowedNames.join(", ")}. Use short names without ${params.GLOBAL_ENVS_PREFIX}. Got ${globEnv.envs.join(", ")}`
+          );
+        }
 
         this.mergeEnvs(pick(globalEnvsFromDbPrefixed, globalEnvsFromManifestPrefixed));
       }
