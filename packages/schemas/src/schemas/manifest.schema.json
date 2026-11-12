@@ -77,6 +77,16 @@
             "type": "string",
             "description": "Environment variable name for specifying the version.",
             "examples": ["GETH_VERSION", "NETHERMIND_VERSION"]
+          },
+          "provider": {
+            "type": "string",
+            "description": "Optional. Where upstream bump tooling looks for new versions: 'docker' (default; GitHub releases, written in the form the Docker image tags use), 'github' (GitHub release tags as-is) or 'docker_tags' (the highest stable tag of the image). Ignored at install.",
+            "examples": ["docker", "github", "docker_tags"]
+          },
+          "tagPattern": {
+            "type": "string",
+            "description": "Optional. Regular expression selecting the upstream release tags to follow; capture group 1 (or the whole match) is the version written to the package. Use it for repositories that publish several tag families or prefix their versions. Ignored at install.",
+            "examples": ["^v(.+)$", "^op-node/v(.+)$"]
           }
         }
       }
