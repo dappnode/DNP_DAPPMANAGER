@@ -23,7 +23,7 @@
       }
       &.isSelected {
         .title {
-          color: var(--dappnode-color) !important;
+          color: var(--dappnode-links-color) !important;
         }
         border-bottom: 6px solid var(--dappnode-color) !important;
       }
@@ -71,10 +71,14 @@
       // );
       // background-color: var(--dappnode-color);
       .title {
-        color: var(--dappnode-color);
+        color: var(--dappnode-links-color);
       }
     }
-    transition: color 0.15s, background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
+    transition:
+      color 0.15s,
+      background-color 0.15s,
+      border-color 0.15s,
+      box-shadow 0.15s;
 
     // Disabled state while applying config
     &.isDisabled {
@@ -102,7 +106,7 @@
   .smooth-alert-icon {
     font-size: 1.2rem;
     margin-right: 4px;
-    color: var(--dappnode-color) !important;
+    color: var(--dappnode-links-color) !important;
     vertical-align: sub;
   }
 

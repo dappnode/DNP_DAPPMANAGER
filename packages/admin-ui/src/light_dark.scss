@@ -39,6 +39,15 @@ body {
 html.dark,
 body.dark {
   background-color: var(--color-dark-background-main);
+  --light-text-color: var(--color-dark-quaternarytext);
+  --dappnode-links-color: #5cd3ff;
+  --dappnode-links-darker-color: #a6e7ff;
+  --text-danger-color: #ffc0c5;
+  --text-warning-color: #ffdd66;
+  --text-success-color: #5cd3ff;
+  --text-success-green-color: #a3cfbb;
+  --eth-multi-client-description-color: var(--color-dark-quaternarytext);
+  --bs-code-color: #ffa9d1;
 }
 #dark.body {
   background-color: var(--color-dark-background-main);
@@ -68,18 +77,13 @@ body.dark {
 
   #main {
     background-color: var(--color-dark-background-main);
+    color: var(--color-dark-secondarytext);
 
     // =============
     // HTML elements
     // =============
-    p,
-    strong,
-    span,
-    div,
-    td,
-    label {
-      color: var(--color-dark-secondarytext);
-    }
+    // Inherit text color so alerts, badges, buttons and featured cards retain
+    // their own foreground/background pair, including nested markup.
     .section-title,
     .section-subtitle,
     th,
@@ -90,9 +94,11 @@ body.dark {
     // Custom
     .status-badge.ok {
       background-color: var(--color-dark-card-hover);
+      color: var(--color-dark-secondarytext);
     }
     .status-badge.not-ok {
       background-color: var(--color-dark-danger-background);
+      color: var(--color-dark-secondarytext);
     }
 
     .horizontal-navbar .item.active {
@@ -103,45 +109,14 @@ body.dark {
     // Bootstrap components
     // ====================
 
-    // ALERTS
-
-    .alert-success {
-      color: #155724;
-    }
-
-    .alert-warning {
-      *:not(a) {
-        color: #433c1d;
-      }
-    }
-
-    .alert-secondary {
-      background-color: var(--color-dark-card-hover) !important;
-      border-color: var(--color-dark-secondarytext);
-      color: var(--color-dark-quaternarytext);
-    }
-
-    .alert-info {
-      background-color: rgba(0, 177, 244, 0.4);
-      border-color: var(--color-dark-secondarytext);
-      color: var(--color-dark-quaternarytext);
-    }
-
-    .alert-danger {
-      background-color: var(--color-dark-danger-background);
-    }
-
     // ERROR VIEW
     .error-view pre {
       color: var(--color-dark-secondarytext);
     }
 
     // INPUTS
-    input[type="text"],
-    input[type="number"],
-    input[type="password"],
+    .form-control,
     input.custom-file-input,
-    textarea.form-control,
     label.custom-file-label,
     select {
       background-color: #605f5fd6;
@@ -170,6 +145,9 @@ body.dark {
     // CARDS
     .card {
       background-color: var(--color-dark-card);
+    }
+    .horizontal-navbar .item:not(.active) {
+      color: var(--color-dark-quaternarytext);
     }
     .eth-multi-client,
     .ipfs-multi-client {
@@ -238,6 +216,7 @@ body.dark {
 
   .dialog {
     background-color: var(--color-dark-background-main);
+    color: var(--color-dark-secondarytext);
   }
 
   h3,

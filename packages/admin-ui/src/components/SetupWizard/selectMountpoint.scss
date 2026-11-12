@@ -9,8 +9,8 @@
       &:hover,
       &:active,
       &:focus {
-        background-color: white;
-        color: #4a5259;
+        background-color: var(--bs-body-bg);
+        color: var(--bs-body-color);
       }
 
       &:disabled {
@@ -144,10 +144,10 @@
 
 .change-mountpoint-error {
   margin-top: 0.25rem;
-  color: var(--danger-color);
+  color: var(--text-danger-color);
 }
 
 .change-mountpoint-help {
   margin-top: 0.25rem;
-  color: #4a5259;
+  color: var(--bs-body-color);
 }

@@ -33,7 +33,7 @@ export default function SdkHome() {
           We have deployed a public APM (Aragon Package Manager) registry in which anyone can create their own APM
           repository: <a href="https://etherscan.io/address/public.dappnode.eth">public.dappnode.eth</a>
         </p>
-        <div className="alert alert-secondary" role="alert" style={{ backgroundColor: "#f1f1f3" }}>
+        <div className="alert alert-secondary" role="alert">
           The <strong>dappnodesdk</strong> is a <strong>CLI tool</strong>. This section provides only additional
           complimentary functionality
         </div>
@@ -52,7 +52,7 @@ export default function SdkHome() {
         <Card key={title} className="sdk-link">
           <div>
             <h5 className="card-title">{title}</h5>
-            <div style={{ opacity: "0.5" }}>{subtitle}</div>
+            <div className="help-text">{subtitle}</div>
           </div>
           <a href={url} {...newTabProps}>
             <Button>{urlTag}</Button>

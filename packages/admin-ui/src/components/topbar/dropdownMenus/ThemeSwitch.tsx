@@ -14,7 +14,12 @@ export default function ThemeSwitch({ toggleTheme }: { toggleTheme: () => void }
         placement={"bottom"}
         overlay={<Tooltip id={`tooltip-theme`}>Display {theme === "light" ? "dark mode" : "light mode"}</Tooltip>}
       >
-        <button style={{ border: "none", background: "none" }} className="tn-dropdown-toggle" onClick={toggleTheme}>
+        <button
+          aria-label={`Display ${theme === "light" ? "dark" : "light"} mode`}
+          style={{ border: "none", background: "none" }}
+          className="tn-dropdown-toggle"
+          onClick={toggleTheme}
+        >
           {theme === "light" ? <BsMoon style={{ fontSize: "larger" }} /> : <FaSun style={{ fontSize: "larger" }} />}
         </button>
       </OverlayTrigger>

@@ -38,7 +38,7 @@ import { getDappnodeParams } from "services/dappnodeStatus/selectors";
  */
 
 const ErrMsg = styled.div`
-  color: var(--danger-color);
+  color: var(--text-danger-color);
 `;
 
 export default function ShareIpfsPeer({ matchUrl }: { matchUrl: string }) {

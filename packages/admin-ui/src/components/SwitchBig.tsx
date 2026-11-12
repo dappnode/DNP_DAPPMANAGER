@@ -22,7 +22,7 @@ export default function SwitchBig({
   const width = 64 * factor;
   const fontSize = 16 * factor;
   const onColor = "#00b1f4";
-  const offColor = undefined; // "#bc2f39";
+  const offColor = "#555555";
   const switchLabelProps = {
     display: "flex",
     justifyContent: "center",
@@ -40,7 +40,7 @@ export default function SwitchBig({
         checked={checked}
         onChange={onChange}
         uncheckedIcon={<div style={switchLabelProps}>OFF</div>}
-        checkedIcon={<div style={switchLabelProps}>ON</div>}
+        checkedIcon={<div style={{ ...switchLabelProps, color: "var(--primary-button-text-color)" }}>ON</div>}
         className="react-switch"
         id={id}
         onColor={onColor}

@@ -115,9 +115,9 @@ export function confirm(props: ConfirmDialogProps) {
   if (!root) {
     // Create the root-modal element
     root = document.createElement("div");
-    root.setAttribute("id", theme + "-dialog");
     document.body.appendChild(root);
   }
+  root.setAttribute("id", theme + "-dialog");
   // render (or re-render) and mount the dialog
   render(<Modal {...props} onClose={() => unmountComponentAtNode(root)} />, root);
 }

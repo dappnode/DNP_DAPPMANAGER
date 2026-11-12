@@ -155,7 +155,11 @@ export function TelegramNotifications() {
             </Button>
           }
         />
-        {tokenError && <span style={{ fontSize: "12px", color: "red" }}>Telegram token format is incorrect</span>}
+        {tokenError && (
+          <span className="text-danger" style={{ fontSize: "12px" }}>
+            Telegram token format is incorrect
+          </span>
+        )}
         <br />
         <Form.Label>Telegram user ID</Form.Label>
         <Input
@@ -224,7 +228,11 @@ export function TelegramNotifications() {
           </Accordion.Item>
         </Accordion>
 
-        {userIdError && <span style={{ fontSize: "12px", color: "red" }}>Telegram user ID format is incorrect</span>}
+        {userIdError && (
+          <span className="text-danger" style={{ fontSize: "12px" }}>
+            Telegram user ID format is incorrect
+          </span>
+        )}
       </Form.Group>
 
       {reqStatusConfig.error && <ErrorView error={reqStatusConfig.error} hideIcon red />}

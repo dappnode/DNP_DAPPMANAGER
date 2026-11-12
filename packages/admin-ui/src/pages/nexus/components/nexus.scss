@@ -297,7 +297,7 @@
 
   &:hover:not(:disabled) {
     opacity: 1;
-    color: var(--danger-color);
+    color: var(--text-danger-color);
     background: rgba(188, 47, 57, 0.08);
   }
 
@@ -388,7 +388,7 @@
 
   &:hover {
     opacity: 1;
-    color: var(--danger-color);
+    color: var(--text-danger-color);
     background: rgba(188, 47, 57, 0.08);
   }
 }
@@ -629,7 +629,7 @@
 
 .nexus-composer-error {
   background: rgba(188, 47, 57, 0.08);
-  color: var(--danger-color);
+  color: var(--text-danger-color);
   padding: 0.6rem 0.85rem;
   border-radius: 8px;
   font-size: 0.85rem;
@@ -895,7 +895,7 @@
 
 .nexus-key-editor-error {
   background: rgba(188, 47, 57, 0.08);
-  color: var(--danger-color);
+  color: var(--text-danger-color);
   padding: 0.6rem 0.85rem;
   border-radius: 8px;
   font-size: 0.85rem;

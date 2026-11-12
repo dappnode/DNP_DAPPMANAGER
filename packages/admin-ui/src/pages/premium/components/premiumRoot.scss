@@ -14,19 +14,15 @@
       align-items: center;
       justify-content: center;
       text-transform: uppercase;
-      background-color: #e9ecef;
-      transition: background-color 0.5s ease-in-out;
-
-      animation: pulse 5s infinite ease-in-out;
 
       &.activated {
-        color: green;
-        animation: pulseActivated 5s infinite ease-in-out;
+        color: #185b28;
+        background-color: #d1e7dd;
       }
 
       &.deactivated {
-        color: orange;
-        animation: pulseDeactivated 5s infinite ease-in-out;
+        color: #664d03;
+        background-color: #fff3cd;
       }
 
       &::before {
@@ -34,74 +30,33 @@
         margin-right: 0.3rem;
         margin-bottom: 3px;
         font-size: 1.5rem;
+        // Pulse the indicator while keeping the status text readable throughout.
+        animation: premium-status-pulse 5s infinite ease-in-out;
       }
     }
   }
 }
 
-@keyframes pulseActivated {
-  0% {
-    background-color: #e9ecef;
+#dark .premium-root .premium-header .premium-status {
+  &.activated {
+    color: #a3cfbb;
+    background-color: #102d21;
   }
-  50% {
-    background-color: rgba(0, 128, 0, 0.3);
-  }
-  100% {
-    background-color: #e9ecef;
+
+  &.deactivated {
+    color: #ffe69c;
+    background-color: #332701;
   }
 }
 
-@keyframes pulseDeactivated {
-  0% {
-    background-color: #e9ecef;
-  }
+@keyframes premium-status-pulse {
   50% {
-    background-color: rgba(255, 166, 0, 0.3);
-  }
-  100% {
-    background-color: #e9ecef;
+    opacity: 0.5;
   }
 }
 
-#dark {
-  #main {
-    .premium-status {
-      background-color: var(--color-dark-card-hover);
-      animation: pulseDark 5s infinite ease-in-out;
-
-      &.activated {
-        color: #00ff00;
-        animation: pulseActivatedDark 5s infinite ease-in-out;
-      }
-
-      &.deactivated {
-        color: #ff9800;
-        animation: pulseDeactivatedDark 5s infinite ease-in-out;
-      }
-    }
-  }
-}
-
-@keyframes pulseActivatedDark {
-  0% {
-    background-color: var(--color-dark-card-hover);
-  }
-  50% {
-    background-color: #00ff004d;
-  }
-  100% {
-    background-color: var(--color-dark-card-hover);
-  }
-}
-
-@keyframes pulseDeactivatedDark {
-  0% {
-    background-color: var(--color-dark-card-hover);
-  }
-  50% {
-    background-color: #ff990049;
-  }
-  100% {
-    background-color: var(--color-dark-card-hover);
+@media (prefers-reduced-motion: reduce) {
+  .premium-root .premium-header .premium-status::before {
+    animation: none;
   }
 }

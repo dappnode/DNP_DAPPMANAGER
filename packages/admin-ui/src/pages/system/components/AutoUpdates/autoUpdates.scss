@@ -108,7 +108,7 @@
     min-content;
 
   .header {
-    color: #8c8c8c;
+    color: var(--light-text-color);
   }
 
   .state-badge {
@@ -128,12 +128,12 @@
   }
   .last-update {
     justify-self: right;
-    color: #8c8c8c;
+    color: var(--light-text-color);
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     .error {
-      color: #ce4545;
+      color: var(--text-danger-color);
       font-size: 80%;
       cursor: pointer;
       &:hover {
@@ -144,7 +144,7 @@
 
   .extra-info {
     grid-column: 1 / -1;
-    color: #ce4545;
+    color: var(--text-danger-color);
     font-size: 90%;
   }
 
@@ -174,7 +174,7 @@
   margin-top: var(--default-spacing);
   label {
     transition: opacity ease 0.1s;
-    color: #8c8c8c;
+    color: var(--light-text-color);
   }
   &:hover label {
     opacity: 1;

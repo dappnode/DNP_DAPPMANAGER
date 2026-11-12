@@ -1,7 +1,7 @@
 .dnp-card.loading,
 .dnp-card.error {
   .description {
-    color: #959595;
+    color: var(--light-text-color);
     .status {
       font-weight: bold;
     }

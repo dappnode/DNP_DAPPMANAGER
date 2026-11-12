@@ -126,35 +126,35 @@
       }
       .resolved-label {
         @extend .base-label;
-        background-color: var(--success-green-color) !important;
-        color: #bbffad !important;
+        background-color: #176c32 !important;
+        color: #e3ffe0 !important;
       }
 
       .critical-label {
         @extend .base-label;
         border: 1px solid var(--danger-color);
-        color: var(--danger-color) !important;
+        color: var(--text-danger-color) !important;
       }
       .high-label {
         @extend .base-label;
         border: 1px solid rgb(228, 156, 0);
-        color: rgb(228, 156, 0) !important;
+        color: var(--text-warning-color) !important;
       }
       .medium-label {
         @extend .base-label;
         border: 1px solid var(--success-color);
-        color: var(--success-color) !important;
+        color: var(--text-success-color) !important;
       }
       .low-label {
         @extend .base-label;
         border: 1px solid gray;
-        color: gray !important;
+        color: var(--light-text-color) !important;
       }
 
       .category-label {
         @extend .base-label;
         border: 1px solid #82898f;
-        color: #82898f !important;
+        color: var(--light-text-color) !important;
       }
     }
   }
@@ -200,13 +200,13 @@
       }
 
       .group-label {
-        background-color: var(--color-dark-border);
+        background-color: var(--color-dark-background-main);
       }
 
       .critical-label {
         @extend .group-label;
         border: 1px solid red;
-        color: red !important;
+        color: var(--text-danger-color) !important;
       }
       .high-label {
         @extend .group-label;
@@ -221,7 +221,7 @@
       .low-label {
         @extend .group-label;
         border: 1px solid gray;
-        color: gray !important;
+        color: var(--light-text-color) !important;
       }
     }
   }

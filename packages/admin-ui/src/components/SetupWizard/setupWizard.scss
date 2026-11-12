@@ -49,7 +49,7 @@
 
     .error {
       margin-top: 0.5rem;
-      color: var(--danger-color);
+      color: var(--text-danger-color);
     }
   }
 
@@ -72,7 +72,7 @@
       cursor: pointer;
       transition: color ease 150ms;
       &:hover {
-        color: black;
+        color: var(--bs-body-color);
       }
     }
   }

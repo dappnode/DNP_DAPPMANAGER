@@ -41,7 +41,7 @@
       gap: 10px;
 
       .premium-activate-error {
-        color: var(--danger-color);
+        color: var(--text-danger-color);
         font-size: 0.8rem;
       }
     }
@@ -129,7 +129,7 @@
             text-align: center;
             font-weight: bold;
             font-size: 0.75rem;
-            color: deepskyblue;
+            color: var(--dappnode-links-color);
           }
         }
       }
@@ -151,11 +151,11 @@
         border: 1px solid var(--color-dark-border);
       }
       .premium-trial-tag {
-        color: deepskyblue;
+        color: var(--dappnode-links-color);
       }
       .premium-activate {
         .premium-activate-error {
-          color: var(--danger-color);
+          color: var(--text-danger-color);
         }
       }
     }

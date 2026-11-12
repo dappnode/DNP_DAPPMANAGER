@@ -48,7 +48,10 @@
   &.selectable {
     cursor: pointer;
     /* All transitions have to be specified with commas in a single transition property */
-    transition: background 150ms ease, color 150ms ease, border 150ms ease;
+    transition:
+      background 150ms ease,
+      color 150ms ease,
+      border 150ms ease;
   }
   &.selectable:hover,
   &.selectable.active {
@@ -73,24 +76,24 @@
   }
 
   &.premium-item {
-    color: #ff397f;
+    color: #ba1b56;
     background-color: #ffefe1;
     svg {
       opacity: 0.7;
     }
     &.active {
-      color: #ff397f;
+      color: #ba1b56;
     }
   }
   &.premium-item:hover {
-    color: #ff397f;
+    color: #ba1b56;
   }
 }
 
 #dark {
   #sidebar {
     .nav .sidenav-item.premium-item {
-      color: #ff397f;
+      color: #ff8db5;
       background-color: #443428;
     }
   }
@@ -109,7 +112,7 @@
 
   span {
     font-weight: bold;
-    color: var(--dappnode-strong-main-color);
+    color: var(--dappnode-links-color);
   }
 }
 
@@ -119,7 +122,7 @@
 
 .funded-by-text-light,
 .funded-by-text-dark {
-  opacity: 0.3;
+  color: var(--light-text-color);
   text-align: center;
 }
 /* Controls the layout of the logos, all in one row with equal spacing */
@@ -144,8 +147,7 @@
   }
 }
 
-.funded-by-logo-dark,
-.funded-by-text-dark {
+.funded-by-logo-dark {
   filter: invert(94%) sepia(1%) saturate(0%) hue-rotate(139deg) brightness(93%) contrast(97%);
 }
 
