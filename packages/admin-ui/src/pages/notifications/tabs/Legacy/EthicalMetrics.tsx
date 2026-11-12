@@ -70,8 +70,8 @@ export default function EthicalMetrics() {
             mailValue && tgChannelIdValue
               ? "telegram channel and email"
               : mailValue
-              ? "email"
-              : tgChannelId && "telegram channel"
+                ? "email"
+                : tgChannelId && "telegram channel"
           }`,
           onSuccess: `Enabled ethical metrics`
         }
@@ -269,7 +269,9 @@ export default function EthicalMetrics() {
           </Accordion>
 
           {tgChannelIdError && (
-            <span style={{ fontSize: "12px", color: "red" }}>Telegram channel ID format is incorrect</span>
+            <span className="text-danger" style={{ fontSize: "12px" }}>
+              Telegram channel ID format is incorrect
+            </span>
           )}
 
           <br />
@@ -295,7 +297,11 @@ export default function EthicalMetrics() {
               )
             }
           />
-          {mailError && <span style={{ fontSize: "12px", color: "red" }}>Email format is incorrect</span>}
+          {mailError && (
+            <span className="text-danger" style={{ fontSize: "12px" }}>
+              Email format is incorrect
+            </span>
+          )}
         </Form.Group>
       ) : ethicalMetricsConfig.error ? (
         <Ok msg={"Error getting status"} style={{ margin: "auto" }} />

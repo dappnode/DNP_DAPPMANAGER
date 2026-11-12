@@ -7,7 +7,7 @@
     gap: 5px;
 
     .not-running-label {
-      color: rgb(228, 156, 0) !important;
+      color: var(--text-warning-color) !important;
       display: flex;
       align-items: center;
       background-color: transparent;

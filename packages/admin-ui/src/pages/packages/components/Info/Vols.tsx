@@ -33,7 +33,7 @@ export function Vols({ dnpName, volumes }: { dnpName: string; volumes: VolumeMap
         })
         .map(({ name, size, extra }) => (
           <>
-            <span style={{ opacity: "0.5" }}>{name}:</span> {size} {extra}
+            <span className="help-text">{name}:</span> {size} {extra}
           </>
         ))}
     />

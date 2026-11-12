@@ -48,7 +48,7 @@ p.no-p-style:last-child {
 }
 
 .section-title .pre-title {
-  opacity: 0.3;
+  color: var(--light-text-color);
   font-weight: 300;
   text-transform: "capitalize";
 }
@@ -68,7 +68,7 @@ p.no-p-style:last-child {
   font-weight: 400;
   overflow: hidden;
   text-overflow: ellipsis;
-  opacity: 0.6;
+  color: var(--light-text-color);
 }
 
 /* Table styles to have light gray separators.
@@ -210,7 +210,7 @@ p.no-p-style:last-child {
   place-items: center;
   grid-gap: var(--default-spacing);
   text-align: center;
-  opacity: 0.5;
+  color: var(--light-text-color);
 }
 
 /* Card styling for children */
@@ -239,7 +239,7 @@ p.no-p-style:last-child {
 
 /* Help text */
 .help-text {
-  color: gray;
+  color: var(--light-text-color);
   font-size: 90%;
 }
 
@@ -286,7 +286,7 @@ p.no-p-style:last-child {
 
 /* Data-heavy card sections */
 .subtle-header {
-  color: #757575;
+  color: var(--light-text-color);
   font-size: 0.88rem;
   text-transform: uppercase;
   .capitalize {

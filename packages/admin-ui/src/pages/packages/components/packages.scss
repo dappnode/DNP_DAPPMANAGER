@@ -67,7 +67,7 @@
 
   /* Customize name inside NavLink */
   a:hover {
-    color: var(--dappnode-color);
+    color: var(--dappnode-links-color);
     text-decoration: none;
     transition: color 0.2s ease;
   }
@@ -94,9 +94,13 @@
 .state-badge {
   border-radius: 6px;
   padding: 1px 5px;
-  color: white;
+  color: #061a22;
   font-size: 90%;
   text-transform: uppercase;
+
+  &.badge-danger {
+    color: white;
+  }
 }
 
 /* Modify the buttons next to tables */

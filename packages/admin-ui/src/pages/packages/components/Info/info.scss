@@ -13,11 +13,11 @@
 .links-icon {
   font-size: 1.2rem;
   margin-right: 4px;
-  color: var(--dappnode-color) !important;
+  color: var(--dappnode-links-color) !important;
 }
 
 .links-name {
-  color: var(--dappnode-color) !important;
+  color: var(--dappnode-links-color) !important;
 }
 
 .links-url {
@@ -56,7 +56,7 @@
     cursor: pointer;
     transition: color ease 150ms;
     &:hover {
-      color: black;
+      color: var(--bs-body-color);
     }
   }
 
@@ -96,7 +96,7 @@
     cursor: pointer;
     transition: color ease 150ms;
     &:hover {
-      color: black;
+      color: var(--bs-body-color);
     }
   }
 }

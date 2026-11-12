@@ -5,8 +5,8 @@
   --dappnode-shadow-main-color: #06d4e7;
   --dappnode-light-main-color: #a0bdbb;
   --dappnode-gray-main-color: #748888;
-  --dappnode-links-color: #00b1f4;
-  --dappnode-links-darker-color: #007dfc;
+  --dappnode-links-color: #005f86;
+  --dappnode-links-darker-color: #005477;
   --dappnode-complimentary-color: #bc2f39;
   // Border colors
   --border-color: #e5e5e5;
@@ -28,7 +28,7 @@
   --color-dark-tertiarytext: #cccccc; // Used by main
   --color-dark-quaternarytext: #c1c1c1; // Used by main
   --color-dark-card: #414141; // Used by cards
-  --color-dark-card-hover: #6a6a6a; // Used by cards
+  --color-dark-card-hover: #4b4b4b; // Keeps secondary text readable on hover
   --color-dark-danger-background: #8d2222; // Used by danger alerts
 
   // Buttons
@@ -44,13 +44,18 @@
   /* Shortcuts */
   --dappnode-color: var(--dappnode-strong-main-color);
   /* Text colors */
-  --light-text-color: #757575;
+  --light-text-color: #5b5b5b;
+  --text-danger-color: #ac2530;
+  --text-warning-color: #735600;
+  --text-success-color: #005f86;
+  --text-success-green-color: #176c32;
+  --primary-button-text-color: #102a36;
   /* Opacity shades */
-  --opacity-soft: 0.6;
+  --opacity-soft: 0.8;
 }
 
 .color-danger {
-  color: var(--danger-color);
+  color: var(--text-danger-color);
 }
 
 .form-label {
@@ -62,14 +67,14 @@
  */
 
 .btn-dappnode {
-  color: var(--dappnode-white-color);
+  color: var(--primary-button-text-color);
   background-color: var(--dappnode-strong-main-color);
   border-color: var(--dappnode-strong-main-color);
 
   &:hover {
     color: var(--dappnode-white-color);
-    background-color: var(--dappnode-darker-main-color);
-    border-color: var(--dappnode-darker-main-color);
+    background-color: #0066cc;
+    border-color: #0066cc;
   }
 
   &:focus,
@@ -85,24 +90,40 @@
   }
 }
 
+.btn-outline-secondary {
+  --bs-btn-color: #606870;
+}
+
+.btn-outline-danger {
+  --bs-btn-color: var(--text-danger-color);
+}
+
+.btn-outline-warning {
+  --bs-btn-color: var(--text-warning-color);
+}
+
+.btn-outline-info {
+  --bs-btn-color: var(--dappnode-links-color);
+}
+
 .btn-dappnode:not(:disabled):not(.disabled):active,
 .btn-dappnode:not(:disabled):not(.disabled).active,
 .show > .btn-dappnode.dropdown-toggle {
   color: var(--dappnode-white-color);
-  background-color: var(--dappnode-darker-main-color);
-  border-color: var(--dappnode-darker-main-color);
+  background-color: #0066cc;
+  border-color: #0066cc;
 }
 
 .btn-outline-dappnode {
-  color: var(--dappnode-strong-main-color);
+  color: var(--dappnode-links-color);
   background-color: transparent;
   background-image: none;
   border-color: var(--dappnode-strong-main-color) !important;
 
   &:hover {
     color: var(--dappnode-white-color);
-    background-color: var(--dappnode-darker-main-color);
-    border-color: var(--dappnode-darker-main-color) !important;
+    background-color: #0066cc;
+    border-color: #0066cc !important;
   }
 
   &:focus,
@@ -120,7 +141,7 @@
 .btn-outline-dappnode:not(:disabled):not(.disabled):active,
 .btn-outline-dappnode:not(:disabled):not(.disabled).active,
 .show > .btn-outline-dappnode.dropdown-toggle {
-  color: var(--dappnode-white-color);
+  color: var(--primary-button-text-color);
   background-color: var(--dappnode-strong-main-color);
   border-color: var(--dappnode-strong-main-color);
 }
@@ -147,10 +168,11 @@
 
 .Toastify__toast--success,
 .Toastify__toast--default {
-  color: var(--color-dark-maintext) !important;
+  color: var(--primary-button-text-color) !important;
   background: var(--success-color) !important;
 }
 .Toastify__toast--warning {
+  color: #433c1d !important;
   background: var(--warning-color) !important;
 }
 .Toastify__toast--error {
@@ -160,13 +182,13 @@
 /* Edit bootstrap styles */
 
 .text-danger {
-  color: var(--danger-color) !important;
+  color: var(--text-danger-color) !important;
 }
 .text-warning {
-  color: var(--warning-color) !important;
+  color: var(--text-warning-color) !important;
 }
 .text-success {
-  color: var(--success-color) !important;
+  color: var(--text-success-color) !important;
 }
 .badge-danger {
   background-color: var(--danger-color);
@@ -174,6 +196,7 @@
 .badge-secondary,
 .badge-info {
   background-color: var(--dappnode-gray-main-color);
+  color: #061a22;
 }
 .badge-warning {
   background-color: var(--warning-color);
@@ -181,9 +204,15 @@
 }
 .badge-success {
   background-color: var(--success-color);
+  color: var(--primary-button-text-color);
 }
 .alert-warning {
   color: #433c1d;
   background-color: #ffeda6;
   border-color: #ffeda6;
+}
+
+.alert a:not(.btn) {
+  color: inherit;
+  text-decoration: underline;
 }

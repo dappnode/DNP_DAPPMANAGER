@@ -199,7 +199,9 @@ export default function EnableEthicalMetrics({ onBack, onNext }: { onBack?: () =
         </Accordion>
       </div>
       {tgChannelIdError && (
-        <span style={{ fontSize: "12px", color: "red" }}>Telegram channel ID format is incorrect</span>
+        <span className="text-danger" style={{ fontSize: "12px" }}>
+          Telegram channel ID format is incorrect
+        </span>
       )}
 
       <span>Ethical metrics notifications by email</span>
@@ -211,7 +213,11 @@ export default function EnableEthicalMetrics({ onBack, onNext }: { onBack?: () =
         required={true}
         placeholder="example@email.com"
       />
-      {mailError && <span style={{ fontSize: "12px", color: "red" }}>Email format is incorrect</span>}
+      {mailError && (
+        <span className="text-danger" style={{ fontSize: "12px" }}>
+          Email format is incorrect
+        </span>
+      )}
 
       {/* This top div prevents the card from stretching vertically */}
       <div>

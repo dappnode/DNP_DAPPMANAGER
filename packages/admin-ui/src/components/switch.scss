@@ -119,7 +119,7 @@
 
   // Customizable appearance
   &.highlightOnHover {
-    opacity: 0.6;
+    color: var(--light-text-color);
     transition: opacity ease 0.15s;
     &:hover {
       opacity: 1;

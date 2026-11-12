@@ -108,7 +108,7 @@
         // Hoverable
         cursor: pointer;
         &:hover {
-          color: black;
+          text-decoration: underline;
         }
       }
     }
@@ -138,7 +138,7 @@
     }
     transition: color ease 150ms;
     &:hover {
-      color: black;
+      color: var(--bs-body-color);
     }
     align-self: flex-end;
     @media screen and (max-width: 40rem) {
@@ -168,7 +168,7 @@
         cursor: pointer;
         transition: color ease 150ms;
         &:hover {
-          color: black;
+          color: var(--bs-body-color);
         }
       }
     }

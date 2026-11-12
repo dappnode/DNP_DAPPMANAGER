@@ -12,15 +12,15 @@
   }
 
   .blue-text {
-    color: var(--dappnode-strong-main-color);
+    color: var(--dappnode-links-color);
   }
 
   .green-text {
-    color: var(--success-green-color);
+    color: var(--text-success-green-color);
   }
 
   .orange-text {
-    color: rgb(238, 163, 2);
+    color: var(--text-warning-color);
   }
 
   .info-cards-row {
@@ -58,7 +58,7 @@
         color: var(--color-text-secondary);
 
         &.color-danger {
-          color: var(--danger-color);
+          color: var(--text-danger-color);
         }
       }
       .cc-warning {
@@ -208,7 +208,7 @@
   #main {
     .network-backup-container {
       .blue-text {
-        color: var(--dappnode-strong-main-color);
+        color: var(--dappnode-links-color);
       }
 
       .color-danger {

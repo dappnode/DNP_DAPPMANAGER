@@ -10,7 +10,7 @@
     padding-left: 8px;
     padding-right: 8px;
 
-    --gray-color: #9e9e9e;
+    --gray-color: var(--light-text-color);
     border-color: var(--gray-color);
     color: var(--gray-color);
 
@@ -81,7 +81,7 @@
     }
 
     &.active {
-      color: black;
+      color: var(--bs-body-color);
       .step-label > .circle,
       .connector > span {
         border-color: var(--dappnode-color);

@@ -10,10 +10,10 @@
 }
 
 .read-more-toggle {
-  color: var(--dappnode-gray-main-color);
+  color: var(--light-text-color);
   cursor: pointer;
 
   &:hover {
-    color: var(--dappnode-strong-main-color);
+    color: var(--dappnode-links-color);
   }
 }

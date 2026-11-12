@@ -39,7 +39,7 @@
 
   .mountpoint,
   .created-at {
-    opacity: 0.6;
+    color: var(--light-text-color);
   }
   .name {
     display: grid;
@@ -64,7 +64,7 @@
       color: inherit;
       transition: color 0.2s ease;
       &:hover {
-        color: var(--dappnode-color);
+        color: var(--dappnode-links-color);
         text-decoration: none;
       }
     }
@@ -77,7 +77,7 @@
     cursor: pointer;
     transition: color ease 150ms;
     &:hover {
-      color: black;
+      color: var(--bs-body-color);
     }
     > svg {
       font-size: 16px;

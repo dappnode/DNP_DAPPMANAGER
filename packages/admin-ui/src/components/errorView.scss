@@ -17,7 +17,7 @@
 
   summary {
     margin-bottom: 1rem;
-    opacity: 0.6;
+    opacity: 0.8;
     &:hover {
       opacity: 1;
     }
@@ -28,12 +28,12 @@
     word-break: break-all;
   }
   .error {
-    color: var(--danger-color);
+    color: var(--text-danger-color);
   }
 
   .only-summary {
     margin-bottom: 1rem;
-    opacity: 0.6;
+    opacity: 0.8;
     white-space: pre-wrap;
     word-break: break-all;
   }
@@ -42,7 +42,7 @@
     pre,
     summary,
     .only-summary {
-      color: var(--danger-color);
+      color: var(--text-danger-color);
       opacity: inherit;
     }
   }

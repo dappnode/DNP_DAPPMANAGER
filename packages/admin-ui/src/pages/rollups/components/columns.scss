@@ -31,7 +31,7 @@
 
     &.isSelected {
       .title {
-        color: var(--dappnode-color) !important;
+        color: var(--dappnode-links-color) !important;
       }
 
       border-bottom: 6px solid var(--dappnode-color) !important;
@@ -51,7 +51,7 @@
       }
 
       .text-muted {
-        color: rgba(255, 255, 255, 0.6) !important;
+        color: var(--light-text-color) !important;
       }
     }
   }
@@ -114,11 +114,15 @@
       // );
       // background-color: var(--dappnode-color);
       .title {
-        color: var(--dappnode-color);
+        color: var(--dappnode-links-color);
       }
     }
 
-    transition: color 0.15s, background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
+    transition:
+      color 0.15s,
+      background-color 0.15s,
+      border-color 0.15s,
+      box-shadow 0.15s;
 
     .avatar {
       --avatar-size: 6rem;
@@ -130,7 +134,7 @@
   }
 
   .running-text {
-    color: green !important;
+    color: var(--text-success-green-color) !important;
     font-style: italic;
   }
 

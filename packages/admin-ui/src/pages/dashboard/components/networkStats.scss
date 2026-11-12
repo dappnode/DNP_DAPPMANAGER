@@ -41,7 +41,7 @@
 
         > span {
           font-size: 20px;
-          color: black;
+          color: var(--bs-body-color);
           margin-top: -5px;
         }
         .badge-status {
@@ -55,11 +55,11 @@
           border-radius: 5px;
           &.synced {
             background-color: rgb(203, 241, 203);
-            color: green;
+            color: #006b00;
           }
           &.syncing {
             background-color: rgb(255, 229, 204);
-            color: orange;
+            color: #805000;
           }
           &.offline {
             background-color: rgb(255, 204, 204);
@@ -205,11 +205,11 @@
       .network-cards-container {
         .badge-status {
           &.synced {
-            background-color: green;
+            background-color: #006b00;
             color: rgb(203, 241, 203);
           }
           &.syncing {
-            background-color: orange;
+            background-color: #805000;
             color: rgb(255, 229, 204);
           }
           &.offline {

@@ -92,6 +92,8 @@ function MainApp({ username }: { username: string }) {
 
     html.classList.add(theme);
     body.classList.add(theme);
+    // Bootstrap utilities and portals (modals, dropdowns) also need the active theme.
+    html.dataset.bsTheme = theme;
   }, [theme]);
 
   return (

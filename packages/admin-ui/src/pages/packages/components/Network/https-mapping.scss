@@ -33,12 +33,12 @@
   }
 
   .no-mappings {
-    opacity: 0.5;
+    color: var(--light-text-color);
     grid-column: 1 / -1;
   }
 
   .show-all {
-    opacity: 0.5;
+    color: var(--light-text-color);
     transition: opacity 0.2s;
     &:hover {
       opacity: 1;
