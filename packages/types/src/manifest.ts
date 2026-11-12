@@ -107,10 +107,17 @@ export interface Manifest {
   notifications?: NotificationsConfig;
 }
 
+/** Where upstream bump tooling looks for new versions; `docker` when omitted. */
+export type UpstreamProvider = "docker" | "github" | "docker_tags";
+
 export interface UpstreamItem {
   repo: string;
   version: string;
   arg: string;
+  /** Version source for upstream bumps; ignored at install. */
+  provider?: UpstreamProvider;
+  /** Regex selecting release tags; capture group 1 (or the match) is the version. Ignored at install. */
+  tagPattern?: string;
 }
 
 // Metrics
