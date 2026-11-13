@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "networks": {
+    "dnprivate_network": {
+      "subnet": "10.20.0.0/24",
+      "gateway": "10.20.0.1",
+      "ipRange": "10.20.0.128/25",
+      "fixed": {
+        "DAppNodeCore-bind.dnp.dappnode.eth": "10.20.0.2"
+      }
+    },
+    "dncore_network": {
+      "subnet": "172.33.0.0/16",
+      "gateway": "172.33.0.1",
+      "ipRange": "172.33.128.0/17",
+      "fixed": {
+        "DAppNodeCore-bind.dnp.dappnode.eth": "172.33.1.2",
+        "DAppNodeCore-dappmanager.dnp.dappnode.eth": "172.33.1.7"
+      }
+    }
+  },
+  "dynamicNetworks": [
+    "dnpublic_network",
+    "mainnet_network",
+    "hoodi_network",
+    "sepolia_network",
+    "gnosis_network",
+    "lukso_network",
+    "starknet_network",
+    "starknet_sepolia_network"
+  ]
+}

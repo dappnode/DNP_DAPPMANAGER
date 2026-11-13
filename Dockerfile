@@ -17,6 +17,7 @@ WORKDIR /app
 # Copy and build packages
 COPY package.json yarn.lock .yarnrc.yml tsconfig.json ./
 COPY packages packages
+COPY scripts scripts
 
 # Install necessary packages required by vite
 RUN apk add --no-cache python3 py3-pip build-base
@@ -51,6 +52,7 @@ COPY packages/hostScriptsServices/hostScripts hostScripts
 COPY packages/hostScriptsServices/hostServices hostServices
 COPY packages/hostScriptsServices/hostTimers hostTimers
 COPY package.json ./
+COPY scripts/docker-network-migration.ts scripts/migrate-docker-networks.sh ./scripts/
 COPY --from=build-src /app/packages ./packages
 COPY --from=build-src /app/node_modules ./node_modules
 

@@ -36,11 +36,13 @@ process.on("uncaughtException", (err) => {
 });
 
 // Graceful shutdown
-process.on("SIGINT", () => {
+const shutdown = () => {
   controller.abort();
   server.close();
   process.exit(0);
-});
+};
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);
 
 // Initialize DB must be the first step so the db has the required values
 initializeDb()
