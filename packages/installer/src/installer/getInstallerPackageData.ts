@@ -15,7 +15,8 @@ import {
   InstallPackageData,
   ContainersStatus,
   NotificationsConfig,
-  NotificationsSettingsAllDnps
+  NotificationsSettingsAllDnps,
+  SignerHoodi
 } from "@dappnode/types";
 import { getBackupPath, getDockerComposePath, getImagePath, getManifestPath, isNotFoundError } from "@dappnode/utils";
 import { gt } from "semver";
@@ -96,6 +97,10 @@ function getInstallerPackageData(
   const compose = new ComposeEditor(release.compose, { dnpName });
   compose.applyUserSettings(nextUserSet, { dnpName });
 
+  // Older signer releases do not declare BUILDER_IDS. Keep a staged handoff even
+  // if an intermediate update still omits the variable from its compose file.
+  persistBrainBuilderIds(compose, dnpName, prevUserSet);
+
   // Persist critical dappmanager env vars and volume paths across updates
   persistDappmanagerSettings(compose, dnpName, isCore);
 
@@ -127,6 +132,12 @@ function getInstallerPackageData(
     dockerTimeout,
     containersStatus
   };
+}
+
+export function persistBrainBuilderIds(compose: ComposeEditor, dnpName: string, previous: UserSettings): void {
+  if (dnpName !== SignerHoodi.Web3signer) return;
+  const builderIds = previous.environment?.brain?.BUILDER_IDS;
+  if (builderIds?.split(",").some((id) => id.trim())) compose.services().brain?.mergeEnvs({ BUILDER_IDS: builderIds });
 }
 
 /**
