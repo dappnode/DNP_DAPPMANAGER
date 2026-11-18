@@ -32,7 +32,7 @@ protected async getAll({
     return await Promise.all(
       dnpNames.map(async (dnpName) => {
         try {
-          await this.dappnodeInstaller.getRepoContract(dnpName);
+          // await this.dappnodeInstaller.getRepoContract(dnpName);
           const pkgData = await packageGetData(this.dappnodeInstaller, dnpName);
           return {
             status: "ok",
