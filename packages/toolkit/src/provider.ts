@@ -40,7 +40,7 @@ export class MultiUrlJsonRpcProvider extends JsonRpcProvider {
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   override async send(method: string, params: Array<any>): Promise<any> {
-    const errors: Array<{ url: string; error: unknown }> = [];
+    const errors: Array<{ url: string; error: unknown; message?: string }> = [];
 
     for (const ep of this.endpoints) {
       // Probe local full node health
@@ -72,7 +72,7 @@ export class MultiUrlJsonRpcProvider extends JsonRpcProvider {
    */
   private async sendRequest(
     ep: EndpointState,
-    errors: Array<{ url: string; error: unknown }>,
+    errors: Array<{ url: string; error: unknown; message?: string }>,
     method: string,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     params: Array<any>
@@ -82,15 +82,46 @@ export class MultiUrlJsonRpcProvider extends JsonRpcProvider {
       const result = await ep.provider.send(method, params);
       return result;
     } catch (err) {
-      errors.push({ url: ep.url, error: err });
+      const errorCode = this.extractErrorCode(err);
+      const errorMessage =
+        `MultiUrlJsonRpcProvider: Error querying endpoint "${ep.url}" ` +
+        `(error code: ${errorCode}) - ` +
+        `Request: method="${method}", params=${JSON.stringify(params)} - ` +
+        `Error: ${stringifyError(err)}`;
+      console.error(errorMessage);
+      errors.push({ url: ep.url, error: err, message: errorMessage });
       throw err;
     }
   }
 
   /**
+   * Extract error code from various error types
+   */
+  private extractErrorCode(err: unknown): string | number {
+    if (err instanceof Error) {
+      // Check for ethers-specific error codes
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const anyErr = err as any;
+      if (anyErr.code) return anyErr.code;
+      if (anyErr.status) return anyErr.status;
+      return "UNKNOWN";
+    }
+    if (typeof err === "object" && err !== null) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const errObj = err as any;
+      if (errObj.code) return errObj.code;
+      if (errObj.status) return errObj.status;
+    }
+    return "UNKNOWN";
+  }
+
+  /**
    * Probe beaconchain health using /eth/v1/node/syncing endpoint
    */
-  private async isBeaconHealthy(ep: EndpointState, errors: Array<{ url: string; error: unknown }>): Promise<boolean> {
+  private async isBeaconHealthy(
+    ep: EndpointState,
+    errors: Array<{ url: string; error: unknown; message?: string }>
+  ): Promise<boolean> {
     if (!ep.beaconchainUrl) return false; // No beaconchain to check
     try {
       const response = await fetch(`${ep.beaconchainUrl}/eth/v1/node/syncing`);
@@ -111,7 +142,7 @@ export class MultiUrlJsonRpcProvider extends JsonRpcProvider {
    */
   private async isExecutionHealthy(
     ep: EndpointState,
-    errors: Array<{ url: string; error: unknown }>
+    errors: Array<{ url: string; error: unknown; message?: string }>
   ): Promise<boolean> {
     try {
       const res = await ep.provider.send("eth_syncing", []);
