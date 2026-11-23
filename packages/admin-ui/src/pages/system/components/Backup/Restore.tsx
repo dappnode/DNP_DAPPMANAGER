@@ -194,8 +194,11 @@ const stepIcons: Record<string, string> = {
   skipped: "–"
 };
 
-function RestoreProgress({ status, loggedOut }: { status: FullBackupRestoreStatus; loggedOut: boolean }) {
+function RestoreProgress({ status }: { status: FullBackupRestoreStatus }) {
   const finished = status.status === "done" || status.status === "failed";
+  // Only a clone replaces the admin login, as its last step
+  const adminLoginRestored =
+    status.mode === "clone" && status.steps.some((s) => s.id === "admin-login" && s.status === "done");
   const doneCount = status.steps.filter((s) => s.status === "done" || s.status === "skipped").length;
   return (
     <div className="full-backup-progress">
@@ -212,9 +215,9 @@ function RestoreProgress({ status, loggedOut }: { status: FullBackupRestoreStatu
       {status.status === "failed" && (
         <Alert variant="danger">The restore did not complete. Check the failed steps above.</Alert>
       )}
-      {loggedOut && (
+      {adminLoginRestored && (
         <Alert variant="info">
-          The admin login was restored. Reload the page and log in with the admin password of the backed-up node.
+          The admin login was restored. From now on, log in with the admin password of the backed-up node.
         </Alert>
       )}
       {status.stoppedValidators.length > 0 && (
@@ -252,20 +255,46 @@ export function FullBackupRestore() {
   const [error, setError] = useState<Error | null>(null);
   const [inspected, setInspected] = useState<{ result: FullBackupInspectResult; fileId: string } | null>(null);
   const [started, setStarted] = useState(false);
+  // startedAt of the finished restore the user left to restore another backup
+  const [dismissed, setDismissed] = useState<string | null>(null);
 
   const status = statusRes.data;
   const running = status?.status === "running";
-  // Restoring the admin login of another node ends this session
-  const loggedOut = started && Boolean(statusRes.error);
+  // The last restore is shown until the user leaves it, also after a reload:
+  // its result is the only place that lists what failed and what was left stopped
+  const job = status && status.status !== "idle" && (running || (status.startedAt ?? "") !== dismissed) ? status : null;
+  // Poll while a restore runs, or until the one just started shows up
+  const polling = running || (started && !job);
 
   useEffect(() => {
-    if (!running && !started) return;
+    if (!polling) return;
     const interval = setInterval(() => statusRes.revalidate(), 2000);
     return () => clearInterval(interval);
-  }, [running, started, statusRes]);
+  }, [polling, statusRes]);
 
-  if (status && (running || (started && status.status !== "idle"))) {
-    return <RestoreProgress status={status} loggedOut={loggedOut} />;
+  function onChooseAnotherFile() {
+    setInspected(null);
+    setFile(null);
+    setError(null);
+  }
+
+  if (job) {
+    return (
+      <>
+        <RestoreProgress status={job} />
+        {!running && (
+          <Button
+            onClick={() => {
+              setDismissed(job.startedAt ?? "");
+              setStarted(false);
+              onChooseAnotherFile();
+            }}
+          >
+            Restore another backup
+          </Button>
+        )}
+      </>
+    );
   }
 
   async function onRead() {
@@ -300,7 +329,7 @@ export function FullBackupRestore() {
             statusRes.revalidate();
           }}
         />
-        <Button onClick={() => setInspected(null)}>Choose another file</Button>
+        <Button onClick={onChooseAnotherFile}>Choose another file</Button>
       </>
     );
   }

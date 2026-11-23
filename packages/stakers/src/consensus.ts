@@ -127,7 +127,11 @@ export class Consensus extends StakerComponent {
 
       const userSettings = await this.getUserSettings(network, currentConsensusDnpName);
 
-      await this.setStakerPkgConfig({ dnpName: currentConsensusDnpName, isInstalled, userSettings });
+      if (await this.isHeldStoppedByRestore(currentConsensusDnpName)) {
+        logs.info(`${currentConsensusDnpName} is held stopped by a full backup restore, not starting it`);
+      } else {
+        await this.setStakerPkgConfig({ dnpName: currentConsensusDnpName, isInstalled, userSettings });
+      }
 
       await this.DbHandlers[network].set(currentConsensusDnpName);
     }
