@@ -22,3 +22,18 @@ export function getNexusAuthLimiter(): express.RequestHandler {
     message: "Too many Nexus login attempts from this IP, please try again later"
   });
 }
+
+/**
+ * Strict per-IP limit for the routes that check the admin password. Only
+ * rejected attempts count, so a successful login or password change never
+ * uses up the budget
+ */
+export function getAuthLimiter(): express.RequestHandler {
+  return rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 20,
+    standardHeaders: true,
+    skipSuccessfulRequests: true,
+    message: "Too many failed attempts from this IP, please try again later"
+  });
+}

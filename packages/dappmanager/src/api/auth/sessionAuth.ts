@@ -69,6 +69,15 @@ export function parseMcpBearerToken(authHeader: string | undefined): string | nu
   return token;
 }
 
+/**
+ * Read a credential from the JSON request body. `req.body` is undefined if
+ * the request had no body, and its fields can hold any JSON value
+ */
+function readBodyString(req: Request, field: string): string | undefined {
+  const value: unknown = req.body?.[field];
+  return typeof value === "string" ? value : undefined;
+}
+
 export class AuthPasswordSession {
   sessions: SessionsManager;
   adminPasswordDb: AdminPasswordDb;
@@ -135,8 +144,8 @@ export class AuthPasswordSession {
    * - To be able to use this method call recoverAdminPassword()
    */
   registerAdmin = wrapHandler((req, res) => {
-    const username = req.body.username;
-    const password = req.body.password;
+    const username = readBodyString(req, "username");
+    const password = readBodyString(req, "password");
 
     if (!username || !password) throw new MissingCredentialsError();
     if (this.adminPasswordDb.hasSomePassword()) throw new AlreadyRegisteredError();
@@ -162,8 +171,8 @@ export class AuthPasswordSession {
    * - Any admin user can change its password
    */
   changeAdminPassword = wrapHandler((req, res) => {
-    const prevPassword = req.body.password;
-    const newPassword = req.body.newPassword;
+    const prevPassword = readBodyString(req, "password");
+    const newPassword = readBodyString(req, "newPassword");
 
     if (!prevPassword || !newPassword) throw new MissingCredentialsError();
 
@@ -186,8 +195,9 @@ export class AuthPasswordSession {
    */
   recoverAdminPassword = wrapHandler((req, res) => {
     const recoveryToken = this.recoveryDb.read();
-    if (!req.body.token) throw new MissingCredentialsError();
-    if (req.body.token !== recoveryToken) throw new WrongCredentialsError();
+    const token = readBodyString(req, "token");
+    if (!token) throw new MissingCredentialsError();
+    if (token !== recoveryToken) throw new WrongCredentialsError();
 
     this.adminPasswordDb.removeAllPasswords();
 
@@ -216,9 +226,10 @@ export class AuthPasswordSession {
    *   when the device gets removed and admin status revoked
    */
   loginAdmin = wrapHandler((req, res) => {
-    const username = req.body.username;
-    const password = req.body.password;
+    const username = readBodyString(req, "username");
+    const password = readBodyString(req, "password");
 
+    if (!username || !password) throw new MissingCredentialsError();
     this.assertPassword(username, password);
 
     this.sessions.setSession(req, { isAdmin: true, username });
