@@ -34,8 +34,13 @@ function container(dnpName: string, running = true): PackageContainer {
   } as unknown as PackageContainer;
 }
 
-function installedPkg(dnpName: string, version: string): InstalledPackageData {
-  return { dnpName, version, isCore: false, containers: [container(dnpName)] } as unknown as InstalledPackageData;
+function installedPkg(dnpName: string, version: string, running = true): InstalledPackageData {
+  return {
+    dnpName,
+    version,
+    isCore: false,
+    containers: [container(dnpName, running)]
+  } as unknown as InstalledPackageData;
 }
 
 function writePackageFiles(dnpName: string, version: string, env: Record<string, string>, stakerNetwork = false): void {
@@ -88,14 +93,19 @@ function fakeNode(initial: InstalledPackageData[]): { deps: RestoreDeps; calls: 
   const installs: UserSettings[] = [];
   const deps: RestoreDeps = {
     listPackages: async () => [...packages.values()],
-    installPackage: async ({ dnpName, version, userSettings }) => {
-      calls.push(`install ${dnpName}@${version}`);
+    installPackage: async ({ dnpName, version, userSettings, start }) => {
+      calls.push(`install ${dnpName}@${version}${start ? "" : " stopped"}`);
       installs.push(userSettings);
-      packages.set(dnpName, installedPkg(dnpName, version));
+      packages.set(dnpName, installedPkg(dnpName, version, start));
     },
-    applySettings: async ({ dnpName, userSettings }) => {
-      calls.push(`apply ${dnpName}`);
+    applySettings: async ({ dnpName, userSettings, start }) => {
+      calls.push(`apply ${dnpName}${start ? "" : " stopped"}`);
       installs.push(userSettings);
+      const pkg = packages.get(dnpName);
+      if (pkg) packages.set(dnpName, installedPkg(dnpName, pkg.version, start));
+    },
+    startPackage: async (dnpName) => {
+      calls.push(`start ${dnpName}`);
     },
     removePackage: async (dnpName) => {
       calls.push(`remove ${dnpName}`);
@@ -106,9 +116,6 @@ function fakeNode(initial: InstalledPackageData[]): { deps: RestoreDeps; calls: 
     },
     stopContainer: async (name) => {
       calls.push(`stop ${name}`);
-    },
-    startContainer: async (name) => {
-      calls.push(`start ${name}`);
     },
     getHttpsMappings: async () => [],
     addHttpsMapping: async (mapping) => {
@@ -178,16 +185,20 @@ describe("fullBackup / restore", () => {
     expect(status.status, JSON.stringify(status.steps)).to.equal("done");
     expect(status.safetySnapshot).to.equal("DNCORE/full-backup-snapshots/snapshot.dnbackup");
     expect(calls[0]).to.equal("snapshot");
-    expect(calls).to.include(`install ${app}@1.0.0`);
-    expect(calls).to.include(`install ${signer}@2.0.0`);
+    expect(calls).to.include(`install ${app}@1.0.0 stopped`);
+    expect(calls).to.include(`install ${signer}@2.0.0 stopped`);
     expect(calls).to.include(`put DAppNodePackage-${app} /data DATA-OF-DAppNodePackage-${app}`);
     expect(calls).to.include("https app");
 
     // Data is written with the package stopped; validators stay stopped
+    // Packages are installed stopped, get their data, then start; validators
+    // are never started
     const appPut = calls.indexOf(`put DAppNodePackage-${app} /data DATA-OF-DAppNodePackage-${app}`);
-    expect(calls.indexOf(`stop DAppNodePackage-${app}`)).to.be.lessThan(appPut);
-    expect(calls.indexOf(`start DAppNodePackage-${app}`)).to.be.greaterThan(appPut);
-    expect(calls).to.not.include(`start DAppNodePackage-${signer}`);
+    expect(calls.indexOf(`install ${app}@1.0.0 stopped`)).to.be.lessThan(appPut);
+    expect(calls.indexOf(`start ${app}`)).to.be.greaterThan(appPut);
+    expect(calls).to.include(`install ${signer}@2.0.0 stopped`);
+    expect(calls).to.not.include(`start ${signer}`);
+    expect(calls.some((c) => c.startsWith("stop "))).to.equal(false);
     expect(status.stoppedValidators).to.deep.equal([signer]);
 
     // Global envs baked into the compose get this node's current values, and
@@ -238,7 +249,7 @@ describe("fullBackup / restore", () => {
     expect(calls).to.include(`apply ${app}`);
     expect(calls.some((c) => c.startsWith(`put DAppNodePackage-${app}`))).to.equal(false);
     // Missing validator package: installed with its data and left stopped
-    expect(calls).to.include(`install ${signer}@2.0.0`);
+    expect(calls).to.include(`install ${signer}@2.0.0 stopped`);
     expect(status.stoppedValidators).to.deep.equal([signer]);
     // Nothing is removed and this node's settings stay
     expect(calls.some((c) => c.startsWith("remove"))).to.equal(false);
@@ -260,7 +271,9 @@ describe("fullBackup / restore", () => {
     await startRestore({ filePath: backupFile, password, mode: "clone", confirmValidatorsOff: true, deps });
     await waitForRestoreJob();
     expect(calls).to.include("remove extra.dnp.dappnode.eth");
-    expect(calls.indexOf("remove extra.dnp.dappnode.eth")).to.be.lessThan(calls.indexOf(`install ${app}@1.0.0`));
+    expect(calls.indexOf("remove extra.dnp.dappnode.eth")).to.be.lessThan(
+      calls.indexOf(`install ${app}@1.0.0 stopped`)
+    );
   });
 
   it("requires confirming that the old node is off for validator packages", async () => {

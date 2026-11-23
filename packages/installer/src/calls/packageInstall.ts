@@ -94,7 +94,9 @@ export async function packageInstall(
       await writeAndValidateFiles(packagesData, log);
 
       try {
-        await runPackages(packagesData, log);
+        await runPackages(packagesData, log, {
+          installStopped: options.INSTALL_STOPPED ? [req.name] : []
+        });
       } catch (e) {
         await rollbackPackages(packagesData, log);
         throw e;

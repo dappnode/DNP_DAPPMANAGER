@@ -555,6 +555,12 @@ export interface Routes {
       BYPASS_RESOLVER?: boolean;
       BYPASS_CORE_RESTRICTION?: boolean;
       BYPASS_SIGNED_RESTRICTION?: boolean;
+      /**
+       * Create the requested package's containers without starting them.
+       * Dependencies still start. Used by full backup restore to write the
+       * package's data before its first start
+       */
+      INSTALL_STOPPED?: boolean;
     };
   }) => Promise<void>;
 

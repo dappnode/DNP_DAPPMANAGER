@@ -5,8 +5,8 @@ import { params } from "@dappnode/params";
 import { getLogUi } from "@dappnode/logger";
 import { httpsPortal } from "@dappnode/httpsportal";
 import {
+  dockerComposeStop,
   dockerComposeUpPackage,
-  dockerContainerStart,
   dockerContainerStop,
   dockerPutArchive,
   listPackages
@@ -36,9 +36,14 @@ function pruneSnapshots(dir: string): void {
 export const restoreDeps: RestoreDeps = {
   listPackages,
 
-  async installPackage({ dnpName, version, origin, userSettings }) {
+  async installPackage({ dnpName, version, origin, userSettings, start }) {
     const install = (v: string): Promise<void> =>
-      packageInstall({ name: dnpName, version: v, userSettings: { [dnpName]: userSettings } });
+      packageInstall({
+        name: dnpName,
+        version: v,
+        userSettings: { [dnpName]: userSettings },
+        options: { INSTALL_STOPPED: !start }
+      });
     try {
       await install(version);
     } catch (e) {
@@ -48,10 +53,24 @@ export const restoreDeps: RestoreDeps = {
     }
   },
 
-  async applySettings({ dnpName, isCore, userSettings }) {
+  async applySettings({ dnpName, isCore, userSettings, start }) {
     const compose = new ComposeFileEditor(dnpName, isCore);
     compose.applyUserSettings(userSettings, { dnpName });
     compose.write();
+    if (start) {
+      await dockerComposeUpPackage({ composeArgs: { dnpName }, upAll: true });
+    } else {
+      // Recreate with the new settings, stopped, so data can be restored first
+      await dockerComposeStop(compose.composePath);
+      await dockerComposeUpPackage({
+        composeArgs: { dnpName },
+        upAll: true,
+        dockerComposeUpOptions: { noStart: true }
+      });
+    }
+  },
+
+  async startPackage(dnpName) {
     await dockerComposeUpPackage({ composeArgs: { dnpName }, upAll: true });
   },
 
@@ -65,10 +84,6 @@ export const restoreDeps: RestoreDeps = {
 
   async stopContainer(containerName) {
     await dockerContainerStop(containerName);
-  },
-
-  async startContainer(containerName) {
-    await dockerContainerStart(containerName);
   },
 
   getHttpsMappings: () => httpsPortal.getMappings(),
