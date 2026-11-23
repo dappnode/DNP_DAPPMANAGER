@@ -35,3 +35,7 @@ export const clearMainDb = dbMain.clearDb;
 export const readMainDbRaw = dbMain.readAll;
 export const readCacheDbRaw = dbCache.readAll;
 export const readNexusDbRaw = dbNexus.readAll;
+/** Raw multi-key writes, used by full backup restore. Bypass setter side effects */
+export const writeMainDbKeysRaw = dbMain.writeKeys;
+export const writeCacheDbKeysRaw = dbCache.writeKeys;
+export const writeNexusDbKeysRaw = dbNexus.writeKeys;

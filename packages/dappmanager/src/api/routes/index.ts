@@ -4,6 +4,7 @@ export * from "./download.js";
 export * from "./downloadUserActionLogs.js";
 export * from "./fileDownload.js";
 export * from "./fullBackupCreate.js";
+export * from "./fullBackupRestore.js";
 export * from "./globalEnvs.js";
 export * from "./packageManifest.js";
 export * from "./publicPackagesData.js";

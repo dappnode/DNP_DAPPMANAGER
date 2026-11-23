@@ -41,6 +41,74 @@
   }
 }
 
+.full-backup-tag {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0 0.4rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  border: var(--border-style-light);
+}
+
+.full-backup-modes {
+  margin: 1rem 0;
+
+  .form-check {
+    margin-bottom: 0.75rem;
+  }
+}
+
+.full-backup-plan {
+  margin: 1rem 0;
+
+  .full-backup-plan-skip {
+    opacity: 0.6;
+  }
+
+  .full-backup-note {
+    margin: 0;
+  }
+}
+
+.full-backup-steps {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+
+  li {
+    margin-bottom: 0.35rem;
+  }
+
+  .full-backup-step-icon {
+    display: inline-block;
+    width: 1.25rem;
+  }
+
+  .full-backup-step-done .full-backup-step-icon {
+    color: var(--success-color);
+  }
+
+  .full-backup-step-failed {
+    color: var(--danger-color);
+  }
+
+  .full-backup-step-skipped {
+    opacity: 0.6;
+  }
+
+  .full-backup-note {
+    margin: 0 0 0 1.25rem;
+  }
+}
+
+.full-backup-update-first {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .full-backup-validators {
   margin-bottom: 1rem;
 }
@@ -49,7 +117,7 @@
   margin-top: 1rem;
 }
 
-.full-backup-progress {
+.full-backup-create-progress {
   margin-top: 1rem;
 
   .progress {

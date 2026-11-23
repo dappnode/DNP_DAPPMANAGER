@@ -41,6 +41,7 @@ const dappnodeWebName = "Mock-DAppNode";
 export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   backupGet: async () => "64020f6e8d2d02aa2324dab9cd68a8ccb186e192232814f79f35d4c2fbf2d1cc",
   backupRestore: async () => {},
+  fullBackupRestoreStatus: async () => ({ status: "idle", steps: [], warnings: [], stoppedValidators: [] }),
   fullBackupInfo: async () => ({
     passwordMinLength: 10,
     packages: [

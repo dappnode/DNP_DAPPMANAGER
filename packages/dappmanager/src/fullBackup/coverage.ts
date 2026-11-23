@@ -21,6 +21,12 @@ const VALIDATOR_NAME_PATTERN =
   /(^|[.-])(web3signer|lido-csm|obol|ssv|stakewise|rocketpool|stader|diva|charon)([.-]|$)/i;
 const VALIDATOR_ITEM_PATTERN = /keystore|validator|slashing/i;
 
+/**
+ * `error` of the backup items of a validator package whose data was left out
+ * on purpose, so the validator kept running during the backup
+ */
+export const VALIDATOR_DATA_LEFT_OUT = "not included: the validator kept running";
+
 export function isValidatorPackage({ dnpName, backup }: { dnpName: string; backup: PackageBackup[] }): boolean {
   return (
     VALIDATOR_NAME_PATTERN.test(dnpName) ||

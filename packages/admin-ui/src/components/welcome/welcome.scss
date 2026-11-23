@@ -159,3 +159,18 @@
   display: grid;
   gap: 1rem;
 }
+
+.welcome-restore {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: var(--border-style-light);
+  text-align: center;
+
+  .title {
+    font-weight: 600;
+  }
+
+  .description {
+    margin: 0.5rem 0 1rem;
+  }
+}

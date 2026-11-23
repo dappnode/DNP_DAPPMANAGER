@@ -21,7 +21,9 @@ export const apiUrls = {
   fileDownload: urlJoin(apiUrl, "file-download"),
   containerLogs: urlJoin(apiUrl, "container-logs"),
   userActionLogs: urlJoin(apiUrl, "user-action-logs"),
-  fullBackup: urlJoin(apiUrl, "full-backup")
+  fullBackup: urlJoin(apiUrl, "full-backup"),
+  fullBackupInspect: urlJoin(apiUrl, "full-backup/inspect"),
+  fullBackupRestore: urlJoin(apiUrl, "full-backup/restore")
 };
 export const socketIoUrl = apiUrl;
 

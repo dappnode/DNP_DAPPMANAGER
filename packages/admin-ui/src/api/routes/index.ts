@@ -29,6 +29,14 @@ export const apiRoutes: IApiRoutes = {
     return await fetchAuthPost(apiUrls.fullBackup, data);
   },
 
+  async inspectFullBackup(data) {
+    return await fetchAuthPost(apiUrls.fullBackupInspect, data);
+  },
+
+  async restoreFullBackup(data) {
+    return await fetchAuthPost(apiUrls.fullBackupRestore, data);
+  },
+
   async uploadFile(file, onProgress) {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();

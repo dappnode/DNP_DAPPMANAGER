@@ -23,6 +23,8 @@ import { getLimiter, getViewsCounterMiddleware, getEthForwardMiddleware } from "
 import { AdminPasswordDb } from "./api/auth/adminPasswordDb.js";
 import { DeviceCalls } from "./calls/device/index.js";
 import { startHttpApi } from "./api/startHttpApi.js";
+import { resumeRestoreIfInterrupted } from "./fullBackup/restore.js";
+import { restoreDeps } from "./fullBackup/restoreDeps.js";
 import { DappNodeDirectory, DappNodeRegistry, MultiUrlJsonRpcProvider } from "@dappnode/toolkit";
 import { Consensus, Execution, MevBoost, Signer } from "@dappnode/stakers";
 
@@ -158,3 +160,10 @@ if (!params.DISABLE_HOST_SCRIPTS) {
 }
 
 postRestartPatch().catch((e) => logs.error("Error on postRestartPatch", e));
+
+// Continue a full backup restore interrupted by a dappmanager restart
+try {
+  resumeRestoreIfInterrupted(restoreDeps);
+} catch (e) {
+  logs.error("Error resuming full backup restore", e);
+}

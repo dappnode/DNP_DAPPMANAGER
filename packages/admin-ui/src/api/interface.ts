@@ -1,5 +1,11 @@
 import { Emitter } from "mitt";
-import { FullBackupCreateResult, RpcPayload, RpcResponse } from "@dappnode/types";
+import {
+  FullBackupCreateResult,
+  FullBackupInspectResult,
+  FullBackupRestoreMode,
+  RpcPayload,
+  RpcResponse
+} from "@dappnode/types";
 
 export type LoginStatus =
   | { status: "logged-in"; username: string }
@@ -36,6 +42,16 @@ export interface IApiRoutes {
     keepValidatorsStopped: boolean;
     skipValidatorData: boolean;
   }): Promise<FullBackupCreateResult>;
+  /** Decrypt the manifest of an uploaded backup and get the restore plan. Changes nothing */
+  inspectFullBackup(data: { fileId: string; password: string }): Promise<FullBackupInspectResult>;
+  /** Start restoring an uploaded backup. Requires the admin password; follow with fullBackupRestoreStatus */
+  restoreFullBackup(data: {
+    adminPassword: string;
+    fileId: string;
+    password: string;
+    mode: FullBackupRestoreMode;
+    confirmValidatorsOff: boolean;
+  }): Promise<{ ok: true }>;
 }
 
 export interface IApiRpc {
