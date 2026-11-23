@@ -39,6 +39,7 @@ export function dbFactory(dbPath: string): {
     remove: (keyArg: K) => void;
   };
   clearDb: () => void;
+  readAll: () => Record<string, unknown>;
 } {
   // Define dbPath and make sure it exists (mkdir -p)
   validatePath(dbPath);
@@ -51,6 +52,11 @@ export function dbFactory(dbPath: string): {
 
   function clearDb(): void {
     jsonFileDb.write({});
+  }
+
+  /** Raw snapshot of every key, e.g. for full backups. Returns a fresh object */
+  function readAll(): Record<string, unknown> {
+    return structuredClone(jsonFileDb.read());
   }
 
   /**
@@ -136,6 +142,7 @@ export function dbFactory(dbPath: string): {
   return {
     staticKey,
     indexedByKey,
-    clearDb
+    clearDb,
+    readAll
   };
 }

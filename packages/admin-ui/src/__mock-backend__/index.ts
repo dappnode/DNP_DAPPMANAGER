@@ -40,6 +40,51 @@ const dappnodeWebName = "Mock-DAppNode";
 export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   backupGet: async () => "64020f6e8d2d02aa2324dab9cd68a8ccb186e192232814f79f35d4c2fbf2d1cc",
   backupRestore: async () => {},
+  fullBackupInfo: async () => ({
+    passwordMinLength: 10,
+    packages: [
+      {
+        dnpName: "dappmanager.dnp.dappnode.eth",
+        version: "0.2.95",
+        isCore: true,
+        coverage: "covered",
+        backupItems: [],
+        namedVolumes: ["dappmanagerdnpdappnodeeth_data"]
+      },
+      {
+        dnpName: "bind.dnp.dappnode.eth",
+        version: "0.2.12",
+        isCore: true,
+        coverage: "stateless",
+        backupItems: [],
+        namedVolumes: []
+      },
+      {
+        dnpName: "geth.dnp.dappnode.eth",
+        version: "1.14.0",
+        isCore: false,
+        coverage: "not-covered",
+        backupItems: [],
+        namedVolumes: ["gethdnpdappnodeeth_data"]
+      },
+      {
+        dnpName: "rotki.dnp.dappnode.eth",
+        version: "1.3.0",
+        isCore: false,
+        coverage: "covered",
+        backupItems: ["data", "logs"],
+        namedVolumes: ["rotkidnpdappnodeeth_data"]
+      },
+      {
+        dnpName: "web3signer.dnp.dappnode.eth",
+        version: "2.1.0",
+        isCore: false,
+        coverage: "covered",
+        backupItems: ["keystores", "slashing-protection"],
+        namedVolumes: ["web3signerdnpdappnodeeth_data"]
+      }
+    ]
+  }),
   chainDataGet: async () => [
     {
       dnpName: "geth.dnp.dappnode.eth",

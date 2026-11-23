@@ -31,3 +31,7 @@ export const clearCacheDb = dbCache.clearDb;
 export const clearNexusDb = dbNexus.clearDb;
 /** DANGER! Calling this method will loose user data */
 export const clearMainDb = dbMain.clearDb;
+/** Raw snapshots of the DBs, used by full backups */
+export const readMainDbRaw = dbMain.readAll;
+export const readCacheDbRaw = dbCache.readAll;
+export const readNexusDbRaw = dbNexus.readAll;

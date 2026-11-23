@@ -16,6 +16,7 @@ export { disableEthicalMetrics, enableEthicalMetrics, getEthicalMetricsConfig } 
 export { disableHostScriptsGet } from "./disableHostScriptsGet.js";
 export { executionClientsGetByNetworks } from "./executionClientGet.js";
 export { fetchCoreUpdateData } from "./fetchCoreUpdateData.js";
+export { fullBackupInfo } from "./fullBackupInfo.js";
 export { fetchDirectory } from "./fetchDirectory.js";
 export { fetchDnpRequest } from "./fetchDnpRequest.js";
 export { fetchRegistry } from "./fetchRegistry.js";

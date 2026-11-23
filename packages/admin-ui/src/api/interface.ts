@@ -1,5 +1,5 @@
 import { Emitter } from "mitt";
-import { RpcPayload, RpcResponse } from "@dappnode/types";
+import { FullBackupCreateResult, RpcPayload, RpcResponse } from "@dappnode/types";
 
 export type LoginStatus =
   | { status: "logged-in"; username: string }
@@ -29,6 +29,8 @@ export interface IApiRoutes {
   containerLogsUrl(data: { containerName: string }): string;
   /** Upload file to Dappnode and get a fileId */
   uploadFile(file: File, onProgress: (data: { loaded: number; total: number }) => void): Promise<{ fileId: string }>;
+  /** Create an encrypted full backup. Requires the admin password; download it with downloadUrl */
+  createFullBackup(data: { adminPassword: string; password: string }): Promise<FullBackupCreateResult>;
 }
 
 export interface IApiRpc {

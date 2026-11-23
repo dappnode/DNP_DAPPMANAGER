@@ -246,6 +246,19 @@ export class AuthPasswordSession {
   });
 
   /**
+   * Middleware for sensitive actions, such as exporting a full backup with
+   * every secret: requires an admin session AND the admin to re-enter their
+   * password as `adminPassword` in the JSON body.
+   */
+  onlyAdminWithPasswordConfirmation = wrapHandler((req, _, next) => {
+    const sessionData = this.assertOnlyAdmin(req);
+    const password = req.body?.adminPassword;
+    if (typeof password !== "string") throw new MissingCredentialsError();
+    this.assertPassword(sessionData.username, password);
+    next();
+  });
+
+  /**
    * Middleware to protect routes only for admin browser sessions.
    */
   onlyAdmin = wrapHandler((req, _, next) => {

@@ -1,0 +1,42 @@
+.full-backup-not-covered {
+  ul {
+    margin: 0.5rem 0;
+  }
+}
+
+.full-backup-volumes,
+.full-backup-note {
+  opacity: 0.7;
+  font-size: 0.85rem;
+}
+
+.full-backup-note {
+  margin: 0.5rem 0 1rem;
+}
+
+.full-backup-strength {
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+
+  &.full-backup-strength-weak {
+    color: var(--danger-color);
+  }
+
+  &.full-backup-strength-fair {
+    color: var(--text-warning-color);
+  }
+
+  &.full-backup-strength-strong {
+    color: var(--success-color);
+  }
+}
+
+.full-backup-result {
+  .alert {
+    margin-top: 1rem;
+  }
+
+  ul {
+    margin: 0.5rem 0 0;
+  }
+}

@@ -11,6 +11,7 @@ export * from "./routes.js";
 export * from "./subscriptions.js";
 export * from "./notifications.js";
 export * from "./beaconBackup.js";
+export * from "./fullBackup.js";
 export * from "./stakingDashboard.js";
 
 // utils
