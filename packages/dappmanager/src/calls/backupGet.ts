@@ -11,6 +11,7 @@ import { shell } from "@dappnode/utils";
 import { validateBackupArray } from "../utils/index.js";
 import { PackageBackup } from "@dappnode/types";
 import { canStopForBackup, stopPackageForBackup } from "../fullBackup/packageStop.js";
+import { isValidatorPackage } from "../fullBackup/coverage.js";
 
 const tempTransferDir = params.TEMP_TRANSFER_DIR;
 
@@ -34,9 +35,10 @@ export async function backupGet({ dnpName, backup }: { dnpName: string; backup: 
   try {
     const successfulBackups: string[] = [];
     let lastError: Error | null = null;
-    // Stop the package while copying so databases are closed and validators
-    // cannot sign between the last write and the copy
-    const restart = canStopForBackup(dnp) ? await stopPackageForBackup(dnp) : null;
+    // Stop validators while copying so they cannot sign between the last
+    // write of their slashing protection and the copy
+    const validator = isValidatorPackage({ dnpName, backup });
+    const restart = validator && canStopForBackup(dnp) ? await stopPackageForBackup(dnp) : null;
     try {
       for (const { name, path: fromPath, service } of backup) {
         try {

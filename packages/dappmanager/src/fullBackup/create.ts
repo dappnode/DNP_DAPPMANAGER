@@ -202,10 +202,10 @@ async function stagePackage(ctx: StageContext, pkg: InstalledPackageData): Promi
 }
 
 /**
- * Copy the package's `backup` paths with the package gracefully stopped, so
- * databases are closed and validators cannot sign between the last write and
- * the copy. Each package is stopped only for its own copy, then restarted,
- * unless it is a validator and the admin is moving this node.
+ * Copy the package's `backup` paths. Validator packages are gracefully
+ * stopped for their own copy, so they cannot sign between the last write of
+ * their slashing protection and the copy, then restarted unless the admin is
+ * moving this node. Other packages are copied while running.
  */
 async function stageBackupItemsStopped(
   ctx: StageContext,
@@ -216,8 +216,10 @@ async function stageBackupItemsStopped(
   if (items.length === 0) return [];
   const validator = isValidatorPackage({ dnpName: pkg.dnpName, backup: items });
 
+  // Only validators are time-sensitive: their slashing protection must be
+  // exact, so they are stopped for the copy. Other packages are copied live
   let restart: RestartPackage | null = null;
-  if (canStopForBackup(pkg)) {
+  if (validator && canStopForBackup(pkg)) {
     try {
       restart = await ctx.deps.stopForBackup(pkg);
     } catch (e) {

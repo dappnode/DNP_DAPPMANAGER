@@ -223,10 +223,17 @@ describe("fullBackup / createFullBackup", () => {
     expect(listed).to.equal(false);
   });
 
-  it("stops a package only while its data is copied, then restarts it", async () => {
+  it("copies non-validator packages while running", async () => {
     const events: string[] = [];
     await createFullBackup({ password, encryptOptions: fast, deps: recordingDeps(events) });
-    expect(events).to.deep.equal([`stop ${dnpName}`, "copy /data/keys", "copy /data/missing", `restart ${dnpName}`]);
+    expect(events).to.deep.equal(["copy /data/keys", "copy /data/missing"]);
+  });
+
+  it("stops a validator only while its data is copied, then restarts it", async () => {
+    writeManifest([{ name: "slashing-protection", path: "/data/keys" }]);
+    const events: string[] = [];
+    await createFullBackup({ password, encryptOptions: fast, deps: recordingDeps(events) });
+    expect(events).to.deep.equal([`stop ${dnpName}`, "copy /data/keys", `restart ${dnpName}`]);
   });
 
   it("keeps validators stopped only when the admin is moving this node", async () => {
@@ -248,7 +255,8 @@ describe("fullBackup / createFullBackup", () => {
     expect(result.stoppedValidators).to.deep.equal([dnpName]);
   });
 
-  it("restarts the package even when copying fails", async () => {
+  it("restarts a validator even when copying fails", async () => {
+    writeManifest([{ name: "keystores", path: "/data/keys" }]);
     const events: string[] = [];
     const failing = recordingDeps(events, {
       getArchive: async () => {

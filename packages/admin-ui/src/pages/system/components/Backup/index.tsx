@@ -174,10 +174,6 @@ function CreateBackupForm({ info }: { info: FullBackupInfo }) {
         }
       >
         {hint && <div className={`full-backup-strength full-backup-strength-${hint.level}`}>{hint.text}</div>}
-        <p className="full-backup-note">
-          Packages with backup data are paused for a few seconds while their data is copied, so databases are copied in
-          a consistent state.
-        </p>
         {validators.length > 0 && (
           <Form.Check
             type="checkbox"
@@ -189,7 +185,7 @@ function CreateBackupForm({ info }: { info: FullBackupInfo }) {
               .map((pkg) => prettyDnpName(pkg.dnpName))
               .join(
                 ", "
-              )}). Validators are always stopped while copied, so their slashing protection is exact; leaving them stopped guarantees nothing is signed after it.`}
+              )}). Validators are always paused while their data is copied, so their slashing protection is exact; leaving them stopped guarantees nothing is signed after it.`}
           />
         )}
         <Button type="submit" onClick={onCreate} variant="dappnode" disabled={!isValid || reqStatus.loading}>
