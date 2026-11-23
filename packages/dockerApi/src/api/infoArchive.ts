@@ -18,6 +18,8 @@ import { docker } from "./docker.js";
 export async function dockerInfoArchive(id: string, path: string): Promise<DockerInfoArchive> {
   const container = docker.getContainer(id);
   const res = await container.infoArchive({ path });
+  // The HEAD response has no body, drain it to release the socket
+  res.resume();
   const headers = res.headers;
   const pathStatBase64 = headers["x-docker-container-path-stat"] || headers["X-DOCKER-CONTAINER-PATH-STAT"];
   const pathStatString = Buffer.from(pathStatBase64, "base64").toString("ascii");

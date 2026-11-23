@@ -6,6 +6,7 @@ export * from "./volumesData.js";
 export * from "./utils.js";
 export * from "./removeNamedVolume.js";
 export * from "./fileTransfer.js";
+export * from "./backupArchive.js";
 export * from "./cleanOldImages.js";
 export * from "./list/index.js";
 export * from "./compose/index.js";
