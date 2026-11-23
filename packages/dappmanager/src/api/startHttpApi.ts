@@ -39,6 +39,7 @@ import { ensureTempTransferDir } from "../uploads/tempTransfer.js";
 import { parseHttpUploadFile, reserveHttpUploadCapacity } from "../uploads/httpUploadGuard.js";
 import { createIpfsAvatarHandler, GetIpfsFileBytes } from "./avatar.js";
 import { requireJsonBody, sameOriginGuard, socketIoAllowRequest } from "./sameOrigin.js";
+import { getNexusAuthLimiter } from "./middlewares/requestLimit/index.js";
 
 export interface HttpApiParams extends ClientSideCookiesParams, AuthPasswordSessionParams {
   AUTH_IP_ALLOW_LOCAL_IP: boolean;
@@ -213,8 +214,10 @@ export function startHttpApi({
   );
 
   // Nexus chat proxy (Nexus API key held server-side).
+  // The login route performs an external auth exchange, so it also gets its own stricter limiter
+  const nexusAuthLimiter = getNexusAuthLimiter();
   app.get("/nexus/status", auth.onlyAdmin, nexusStatus);
-  app.post("/nexus/auth/login", requireJsonBody, auth.onlyAdmin, nexusLogin);
+  app.post("/nexus/auth/login", nexusAuthLimiter, requireJsonBody, auth.onlyAdmin, nexusLogin);
   app.post("/nexus/config", requireJsonBody, auth.onlyAdmin, nexusSetApiKey);
   app.delete("/nexus/config", requireJsonBody, auth.onlyAdmin, nexusClearApiKey);
   app.post("/nexus/private-mode", requireJsonBody, auth.onlyAdmin, nexusSetPrivateMode);
