@@ -170,6 +170,9 @@ export class AuthPasswordSession {
     const sessionData = this.assertOnlyAdmin(req);
     const username = sessionData.username;
 
+    // Require the current password so a hijacked or forged session request cannot take over the account
+    this.assertPassword(username, prevPassword);
+
     this.adminPasswordDb.setPassword(username, newPassword);
 
     res.send({ ok: true });
