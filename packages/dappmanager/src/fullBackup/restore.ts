@@ -35,13 +35,22 @@ export interface RestoreDeps {
     version: string;
     origin?: string;
     userSettings: UserSettings;
+    /** false: create the containers but do not start them */
+    start: boolean;
   }) => Promise<void>;
   /** Rewrite an installed package's compose with these settings and recreate it */
-  applySettings: (args: { dnpName: string; isCore: boolean; userSettings: UserSettings }) => Promise<void>;
+  applySettings: (args: {
+    dnpName: string;
+    isCore: boolean;
+    userSettings: UserSettings;
+    /** false: recreate the containers stopped */
+    start: boolean;
+  }) => Promise<void>;
+  /** Start all containers of a package, in compose order */
+  startPackage: (dnpName: string) => Promise<void>;
   removePackage: (dnpName: string) => Promise<void>;
   putArchive: (containerName: string, dirPath: string, tarFilePath: string) => Promise<void>;
   stopContainer: (containerName: string) => Promise<void>;
-  startContainer: (containerName: string) => Promise<void>;
   getHttpsMappings: () => Promise<FullBackupHttpsMappings>;
   addHttpsMapping: (mapping: FullBackupHttpsMappings[number]) => Promise<void>;
   /** Encrypted backup of this node, returns its path */
@@ -465,15 +474,24 @@ class RestoreContext {
       );
     }
 
+    // Never start a package before its data is in place: it would initialise
+    // fresh state (new keys, an empty slashing DB, a new tailnet device)
+    // first. A validator installed without data stays stopped too; one
+    // already running on this node whose data is kept is left as it is
+    const keepStopped = plan.restoreData || (plan.validator && plan.action === "install");
     if (plan.action === "install" || plan.action === "update") {
-      await this.deps.installPackage({ dnpName, version: entry.version, origin: entry.origin, userSettings });
+      await this.deps.installPackage({
+        dnpName,
+        version: entry.version,
+        origin: entry.origin,
+        userSettings,
+        start: !keepStopped
+      });
     } else if (installed) {
-      await this.deps.applySettings({ dnpName, isCore: entry.isCore, userSettings });
+      await this.deps.applySettings({ dnpName, isCore: entry.isCore, userSettings, start: !keepStopped });
     }
 
     if (plan.restoreData) await this.restorePackageData(entry, plan.validator);
-    // A validator installed without data stays stopped too; one already
-    // running on this node whose data is kept is left as it is
     else if (plan.validator && plan.action === "install") await this.stopPackage(dnpName);
   }
 
@@ -486,16 +504,19 @@ class RestoreContext {
   }
 
   /**
-   * Write the manifest `backup` data with the package stopped. Each item is
-   * the tar the docker archive API produced for its path, so extracting it
-   * into the parent folder puts it back at the same path. Existing files are
-   * overwritten; files that are not in the backup are left in place.
+   * Write the manifest `backup` data into the stopped package, then start it
+   * (validators stay stopped). Each item is the tar the docker archive API
+   * produced for its path, so extracting it into the parent folder puts it
+   * back at the same path. Existing files are overwritten; files that are
+   * not in the backup are left in place.
    */
   private async restorePackageData(entry: FullBackupPackageEntry, validator: boolean): Promise<void> {
     const pkg = (await this.deps.listPackages()).find((p) => p.dnpName === entry.dnpName);
-    if (!pkg) throw Error(`${entry.dnpName} is not running after install`);
-    const wasRunning = pkg.containers.filter((c) => c.running).map((c) => c.containerName);
-    for (const name of wasRunning) await this.deps.stopContainer(name);
+    if (!pkg) throw Error(`${entry.dnpName} is not installed`);
+    // Normally nothing runs here; a `pid: service:` compose may have started
+    for (const container of pkg.containers) {
+      if (container.running) await this.deps.stopContainer(container.containerName);
+    }
 
     for (const item of entry.backup) {
       const tarFile = extractedFilePath(this.dir, item.file);
@@ -514,7 +535,7 @@ class RestoreContext {
       if (!this.job.stoppedValidators.includes(entry.dnpName)) this.job.stoppedValidators.push(entry.dnpName);
       return;
     }
-    for (const name of wasRunning) await this.deps.startContainer(name);
+    await this.deps.startPackage(entry.dnpName);
   }
 
   private async restoreHttpsMappings(): Promise<void> {

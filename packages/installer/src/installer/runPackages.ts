@@ -4,7 +4,12 @@ import { restartDappmanagerPatch } from "./restartPatch.js";
 import { Log } from "@dappnode/logger";
 import { InstallPackageData } from "@dappnode/types";
 import { logs } from "@dappnode/logger";
-import { dockerComposeUpPackage, dockerComposeUp, copyFileToDockerContainer } from "@dappnode/dockerapi";
+import {
+  dockerComposeUpPackage,
+  dockerComposeUp,
+  dockerComposeStop,
+  copyFileToDockerContainer
+} from "@dappnode/dockerapi";
 import { packageToInstallHasPid } from "@dappnode/utils";
 import { httpsPortal } from "@dappnode/httpsportal";
 import { notifications } from "@dappnode/notifications";
@@ -14,8 +19,14 @@ const externalNetworkName = params.DOCKER_EXTERNAL_NETWORK_NAME;
 /**
  * Create and run each package container in series
  * The order is extremely important and should be guaranteed by `orderInstallPackages`
+ *
+ * @param installStopped dnpNames whose containers are created but not started
  */
-export async function runPackages(packagesData: InstallPackageData[], log: Log): Promise<void> {
+export async function runPackages(
+  packagesData: InstallPackageData[],
+  log: Log,
+  { installStopped = [] }: { installStopped?: string[] } = {}
+): Promise<void> {
   for (const pkg of packagesData) {
     // patch to prevent installer from crashing
     if (pkg.dnpName == params.dappmanagerDnpName) {
@@ -68,24 +79,13 @@ export async function runPackages(packagesData: InstallPackageData[], log: Log):
         }
     }
 
-    log(pkg.dnpName, "Starting package... ");
-
-    // containersStatus captures the container status before updating
-    // If previous container was exited with code === 0, do not start it
-    // DAPPMANAGER patch
-    if (pkg.dnpName === params.dappmanagerDnpName) {
-      // Note: About restartPatch, combining rm && up doesn't prevent the installer from crashing
-      await restartDappmanagerPatch({ composePath: pkg.composePath });
-      return;
+    if (installStopped.includes(pkg.dnpName)) {
+      // A compose with `pid: service:...` had to start above: stop it again
+      if (packageToInstallHasPid(pkg)) await dockerComposeStop(pkg.composePath);
+      log(pkg.dnpName, "Package installed, not started");
     } else {
-      await dockerComposeUpPackage({
-        composeArgs: { dnpName: pkg.dnpName, composePath: pkg.composePath },
-        upAll: false,
-        containersStatus: pkg.containersStatus
-      });
+      await startPackage(pkg, log);
     }
-
-    log(pkg.dnpName, "Package started");
 
     // Expose default HTTPs ports if required and connected to public network
     await httpsPortal.connectToPublicNetwork(pkg, externalNetworkName);
@@ -100,4 +100,26 @@ export async function runPackages(packagesData: InstallPackageData[], log: Log):
       logs.error(`Error updating endpoints for ${pkg.dnpName}`, error);
     }
   }
+}
+
+/**
+ * Start the package's containers. containersStatus captures the status before
+ * updating: a container that previously exited with code 0 is not started
+ */
+async function startPackage(pkg: InstallPackageData, log: Log): Promise<void> {
+  log(pkg.dnpName, "Starting package... ");
+
+  // DAPPMANAGER patch
+  if (pkg.dnpName === params.dappmanagerDnpName) {
+    // Note: About restartPatch, combining rm && up doesn't prevent the installer from crashing
+    await restartDappmanagerPatch({ composePath: pkg.composePath });
+    return;
+  }
+
+  await dockerComposeUpPackage({
+    composeArgs: { dnpName: pkg.dnpName, composePath: pkg.composePath },
+    upAll: false,
+    containersStatus: pkg.containersStatus
+  });
+  log(pkg.dnpName, "Package started");
 }
