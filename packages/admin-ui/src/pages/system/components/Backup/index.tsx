@@ -5,8 +5,14 @@ import { getCoreUpdateAvailable } from "services/coreUpdate/selectors";
 import { confirm } from "components/ConfirmDialog";
 import Alert from "react-bootstrap/esm/Alert";
 import ProgressBar from "react-bootstrap/esm/ProgressBar";
-import { apiRoutes, useApi } from "api";
-import { FullBackupCreateResult, FullBackupInfo, FullBackupPackageInfo, FullBackupProgress } from "@dappnode/types";
+import { api, apiRoutes, useApi } from "api";
+import {
+  FullBackupCreateResult,
+  FullBackupInfo,
+  FullBackupPackageInfo,
+  FullBackupPendingBackup,
+  FullBackupProgress
+} from "@dappnode/types";
 import Card from "components/Card";
 import SubTitle from "components/SubTitle";
 import Button from "components/Button";
@@ -14,6 +20,7 @@ import ErrorView from "components/ErrorView";
 import { InputForm } from "components/InputForm";
 import { renderResponse } from "components/SwrRender";
 import { prettyBytes, prettyDnpName } from "utils/format";
+import { parseStaticDate } from "utils/dates";
 import { validatePasswordsMatch } from "utils/validation";
 import newTabProps from "utils/newTabProps";
 import { ReqStatus } from "types";
@@ -99,7 +106,9 @@ function BackupProgress({ progress }: { progress?: FullBackupProgress }) {
     title = "Step 1 of 2: copying package data";
     if (step === "preparing") detail = "Saving the Dappnode's settings";
     else if (step === "stopping") detail = `Stopping ${name} (${packageCount}) so its slashing protection is exact`;
-    else if (step === "restarting") detail = `Starting ${name} again (${packageCount})`;
+    else if (step === "exporting") {
+      detail = `Removing ${name}'s keys through the Staking Brain and exporting their slashing protection (${packageCount})`;
+    } else if (step === "restarting") detail = `Starting ${name} again (${packageCount})`;
     else detail = `${name} (${packageCount})`;
     detail += ` · ${prettyBytes(copiedBytes)} copied`;
   }
@@ -143,13 +152,87 @@ function UpdateFirstNotice({ coreUpdateAvailable }: { coreUpdateAvailable: boole
   );
 }
 
-function CreateBackupForm({ info, coreUpdateAvailable }: { info: FullBackupInfo; coreUpdateAvailable: boolean }) {
+/**
+ * Backups that removed validator keys from this node stay on it until the
+ * admin confirms the file is saved: its download can fail or come late, and
+ * the backup is the only copy of those keys
+ */
+function PendingBackups({ pending, onDiscarded }: { pending: FullBackupPendingBackup[]; onDiscarded: () => void }) {
+  const [error, setError] = useState<Error>();
+
+  function onDiscard(fileName: string) {
+    confirm({
+      title: "Delete this backup from the node?",
+      text: `${fileName} holds validator keys that were removed from this Dappnode. Delete it only if you have downloaded it and stored it safely: it may be the only copy of those keys.`,
+      label: "I have the file, delete it",
+      variant: "danger",
+      onClick: async () => {
+        try {
+          setError(undefined);
+          await api.fullBackupPendingDiscard({ fileName });
+        } catch (e) {
+          setError(e);
+        }
+        onDiscarded();
+      }
+    });
+  }
+
+  if (pending.length === 0) return null;
+  return (
+    <Alert variant="warning" className="full-backup-pending">
+      <div>
+        <b>Download and store {pending.length === 1 ? "this backup" : "these backups"}.</b> Validator keys were removed
+        from this Dappnode to create {pending.length === 1 ? "it" : "them"}, so{" "}
+        {pending.length === 1 ? "it is" : "they are"} the only copy of those keys. A copy stays on this node, where you
+        can download it again, until you confirm you have the file.
+      </div>
+      <ul>
+        {pending.map(({ fileName, sizeBytes, createdAt, slashingProtectionExported }) => (
+          <li key={fileName}>
+            <div>
+              {fileName} ({prettyBytes(sizeBytes)}, {parseStaticDate(createdAt)})
+              {slashingProtectionExported
+                .filter(({ validatorCount }) => validatorCount > 0)
+                .map(
+                  ({ dnpName, validatorCount }) =>
+                    `. ${prettyDnpName(dnpName)}: ${validatorCount} validator ${validatorCount === 1 ? "key" : "keys"}`
+                )
+                .join("")}
+            </div>
+            <div className="full-backup-pending-actions">
+              <a href={apiRoutes.fullBackupPendingUrl({ fileName })} {...newTabProps} className="no-a-style">
+                <Button variant="dappnode">Download</Button>
+              </a>
+              <Button variant="outline-danger" onClick={() => onDiscard(fileName)}>
+                I have the file, delete it from this node
+              </Button>
+            </div>
+          </li>
+        ))}
+      </ul>
+      {error && <ErrorView error={error} hideIcon red />}
+    </Alert>
+  );
+}
+
+function CreateBackupForm({
+  info,
+  coreUpdateAvailable,
+  onFinished
+}: {
+  info: FullBackupInfo;
+  coreUpdateAvailable: boolean;
+  /** The request ended, with a result or not: the node may keep a new backup */
+  onFinished: () => void;
+}) {
   const navigate = useNavigate();
   const [adminPassword, setAdminPassword] = useState("");
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
   const [reqStatus, setReqStatus] = useState<ReqStatus<FullBackupCreateResult>>({});
   const validators = info.packages.filter((pkg) => pkg.validator);
+  const web3signers = info.packages.filter((pkg) => pkg.exportsSlashingProtection);
 
   // The backup goes on in the Dappnode if its request is dropped, and its
   // result is kept there: show it instead of losing it
@@ -195,6 +278,16 @@ function CreateBackupForm({ info, coreUpdateAvailable }: { info: FullBackupInfo;
     });
   }
 
+  const web3signerNames = web3signers.map((pkg) => prettyDnpName(pkg.dnpName)).join(", ");
+  const web3signerPause =
+    web3signers.length > 0
+      ? ` ${web3signerNames}: its keystores are copied but not its slashing protection, so a restore asks you to keep the old node off for at least 2 epochs before validating.`
+      : "";
+  const web3signerMove =
+    web3signers.length > 0
+      ? ` ${web3signerNames}: its keys are removed from this node through the Staking Brain and their exact slashing protection goes into the backup. This node can no longer validate with them, even if the package is started again.`
+      : "";
+
   function askAboutValidators() {
     if (validators.length === 0) return void create({});
     // Whether validators are interrupted, and whether the backup can safely
@@ -205,7 +298,7 @@ function CreateBackupForm({ info, coreUpdateAvailable }: { info: FullBackupInfo;
       list: [
         {
           title: "Pause, copy, and keep validating here",
-          body: "Each one stops while its data is copied, usually a minute or two (it may miss a few attestations), then starts again. Never run this backup's validators on another node while this one is on: the same keys on two nodes get slashed."
+          body: `Each one stops while its data is copied, usually a minute or two (it may miss a few attestations), then starts again. Never run this backup's validators on another node while this one is on: the same keys on two nodes get slashed.${web3signerPause}`
         },
         {
           title: "Leave validators out of the backup",
@@ -213,7 +306,7 @@ function CreateBackupForm({ info, coreUpdateAvailable }: { info: FullBackupInfo;
         },
         {
           title: "I am moving or reinstalling this Dappnode",
-          body: "They stop for the copy and stay stopped, so nothing is signed after the backup. Restore it on the new node and start them there. If you change your mind, start them again from their package page."
+          body: `They stop for the copy and stay stopped, so nothing is signed after the backup. Restore it on the new node and start them there. If you change your mind, start them again from their package page.${web3signerMove}`
         }
       ],
       buttons: [
@@ -255,6 +348,7 @@ function CreateBackupForm({ info, coreUpdateAvailable }: { info: FullBackupInfo;
     } finally {
       revalidateStatus();
     }
+    onFinished();
   }
 
   function onCreateAnother() {
@@ -264,7 +358,15 @@ function CreateBackupForm({ info, coreUpdateAvailable }: { info: FullBackupInfo;
 
   const result = reqStatus.result ?? last?.result;
   if (result) {
-    const { fileId, fileName, sizeBytes, warnings, stoppedValidators, skippedValidators = [] } = result;
+    const {
+      fileId,
+      fileName,
+      sizeBytes,
+      warnings,
+      stoppedValidators,
+      slashingProtectionExported,
+      skippedValidators = []
+    } = result;
     return (
       <div className="full-backup-result">
         <Alert variant="success">
@@ -295,6 +397,28 @@ function CreateBackupForm({ info, coreUpdateAvailable }: { info: FullBackupInfo;
               node while this one is on: the same keys on two nodes get slashed.
             </Alert>
           )
+        )}
+        {slashingProtectionExported.length > 0 && (
+          <Alert variant="warning">
+            <div>
+              Validator keys removed from this node, with their exact slashing protection stored in the backup. This
+              node no longer validates with them, even if the package is started again:
+            </div>
+            <ul>
+              {slashingProtectionExported.map(({ dnpName, validatorCount }) => (
+                <li key={dnpName}>
+                  {prettyDnpName(dnpName)}: {validatorCount} validator {validatorCount === 1 ? "key" : "keys"}
+                </li>
+              ))}
+            </ul>
+            <div>Restoring this backup imports them with that slashing protection.</div>
+            {slashingProtectionExported.some(({ validatorCount }) => validatorCount > 0) && (
+              <div>
+                This backup is the only copy of those keys: a copy stays on this node, listed on this page, until you
+                confirm you have the file.
+              </div>
+            )}
+          </Alert>
         )}
         {warnings.length > 0 && (
           <Alert variant="warning">
@@ -383,17 +507,24 @@ function CreateBackupForm({ info, coreUpdateAvailable }: { info: FullBackupInfo;
 
 export function FullBackup() {
   const infoRes = useApi.fullBackupInfo();
+  const pendingRes = useApi.fullBackupPendingGet();
   const coreUpdateAvailable = useSelector(getCoreUpdateAvailable);
 
   return (
     <>
       <SubTitle>Full backup</SubTitle>
       <Card spacing>
+        <PendingBackups pending={pendingRes.data ?? []} onDiscarded={pendingRes.revalidate} />
+        {pendingRes.error && <ErrorView error={pendingRes.error} hideIcon red />}
         {renderResponse(infoRes, ["Checking installed packages"], (info) => (
           <>
             <UpdateFirstNotice coreUpdateAvailable={coreUpdateAvailable} />
             <CoverageSummary packages={info.packages} />
-            <CreateBackupForm info={info} coreUpdateAvailable={coreUpdateAvailable} />
+            <CreateBackupForm
+              info={info}
+              coreUpdateAvailable={coreUpdateAvailable}
+              onFinished={pendingRes.revalidate}
+            />
           </>
         ))}
       </Card>

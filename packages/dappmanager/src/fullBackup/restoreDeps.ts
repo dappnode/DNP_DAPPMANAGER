@@ -19,6 +19,7 @@ import { packageInstall } from "../calls/packageInstall.js";
 import { packageRemove } from "../calls/packageRemove.js";
 import { writeFullBackup } from "./create.js";
 import { RestoreDeps } from "./restore.js";
+import { createBrainClient, waitForBrain } from "./web3signer.js";
 
 const SNAPSHOTS_KEPT = 2;
 const PROGRESS_LOG_ID = "full-backup-restore";
@@ -114,5 +115,7 @@ export const restoreDeps: RestoreDeps = {
   refreshGlobalEnvFile: () => db.writeGlobalEnvsToEnvFile(),
   applyStakerSelections: () => createStakerNetworkAndConnectStakerPkgs(execution, consensus, signer, mevBoost),
   progress: getLogUi(PROGRESS_LOG_ID),
-  clearProgress: () => logUiClear({ id: PROGRESS_LOG_ID })
+  clearProgress: () => logUiClear({ id: PROGRESS_LOG_ID }),
+  brainClient: createBrainClient,
+  waitForBrain: (client) => waitForBrain(client)
 };

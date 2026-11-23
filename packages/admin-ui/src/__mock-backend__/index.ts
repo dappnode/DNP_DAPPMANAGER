@@ -42,6 +42,15 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   backupGet: async () => "64020f6e8d2d02aa2324dab9cd68a8ccb186e192232814f79f35d4c2fbf2d1cc",
   backupRestore: async () => {},
   fullBackupRestoreStatus: async () => ({ status: "idle", steps: [], warnings: [], stoppedValidators: [] }),
+  fullBackupPendingGet: async () => [
+    {
+      fileName: "dappnode-backup-2026-11-22T18-40-00Z-9f3c.dnbackup",
+      sizeBytes: 1843200,
+      createdAt: "2026-11-22T18:40:00.000Z",
+      slashingProtectionExported: [{ dnpName: "web3signer.dnp.dappnode.eth", validatorCount: 4 }]
+    }
+  ],
+  fullBackupPendingDiscard: async () => {},
   fullBackupUploadDiscard: async () => {},
   fullBackupInfo: async () => ({
     passwordMinLength: 10,
@@ -52,6 +61,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
         isCore: true,
         coverage: "covered",
         validator: false,
+        exportsSlashingProtection: false,
         backupItems: [],
         namedVolumes: ["dappmanagerdnpdappnodeeth_data"]
       },
@@ -61,6 +71,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
         isCore: true,
         coverage: "stateless",
         validator: false,
+        exportsSlashingProtection: false,
         backupItems: [],
         namedVolumes: []
       },
@@ -70,6 +81,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
         isCore: false,
         coverage: "not-covered",
         validator: false,
+        exportsSlashingProtection: false,
         backupItems: [],
         namedVolumes: ["gethdnpdappnodeeth_data"]
       },
@@ -79,6 +91,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
         isCore: false,
         coverage: "covered",
         validator: false,
+        exportsSlashingProtection: false,
         backupItems: ["data", "logs"],
         namedVolumes: ["rotkidnpdappnodeeth_data"]
       },
@@ -88,7 +101,8 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
         isCore: false,
         coverage: "covered",
         validator: true,
-        backupItems: ["keystores", "slashing-protection"],
+        exportsSlashingProtection: true,
+        backupItems: ["keystores", "brain-db"],
         namedVolumes: ["web3signerdnpdappnodeeth_data"]
       }
     ]

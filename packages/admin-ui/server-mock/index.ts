@@ -50,6 +50,7 @@ startHttpApi({
     fileDownload: () => {},
     fullBackupCreate: () => {},
     fullBackupInspect: () => {},
+    fullBackupPendingDownload: () => {},
     fullBackupRestore: () => {},
     globalEnvs: () => {},
     packageManifest: () => {},

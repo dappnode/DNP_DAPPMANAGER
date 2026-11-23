@@ -56,7 +56,7 @@ import { TrustedReleaseKey } from "./pkg.js";
 import { OptimismConfigSet, OptimismConfigGet } from "./rollups.js";
 import { Network, StakerConfigGet, StakerConfigSet } from "./stakers.js";
 import { BeaconBackupActivationParams, BeaconBackupNetworkStatus } from "./beaconBackup.js";
-import { FullBackupInfo, FullBackupRestoreStatus, FullBackupStatus } from "./fullBackup.js";
+import { FullBackupInfo, FullBackupPendingBackup, FullBackupRestoreStatus, FullBackupStatus } from "./fullBackup.js";
 import {
   DashboardSupportedNetwork,
   NodeStatusByNetwork,
@@ -103,6 +103,18 @@ export interface Routes {
    * started with POST /full-backup/restore, which requires the admin password
    */
   fullBackupRestoreStatus: () => Promise<FullBackupRestoreStatus>;
+
+  /**
+   * Backups kept on this node because they removed validator keys from it.
+   * Each one is downloaded with GET /full-backup/pending/:fileName
+   */
+  fullBackupPendingGet: () => Promise<FullBackupPendingBackup[]>;
+
+  /**
+   * Deletes the copy of a backup kept on this node. Only once the admin has
+   * saved the file: it may be the only copy of the validator keys in it
+   */
+  fullBackupPendingDiscard: (kwargs: { fileName: string }) => Promise<void>;
 
   /**
    * Deletes a backup uploaded to restore it. Uploads are kept so a mistyped
@@ -983,6 +995,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   backupRestore: {},
   fullBackupInfo: {},
   fullBackupRestoreStatus: {},
+  fullBackupPendingGet: {},
+  fullBackupPendingDiscard: { log: true },
   fullBackupUploadDiscard: { log: true },
   fullBackupStatus: {},
   chainDataGet: {},

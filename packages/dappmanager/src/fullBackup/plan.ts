@@ -9,6 +9,7 @@ import {
   FullBackupRestorePlan
 } from "@dappnode/types";
 import { isValidatorPackage, VALIDATOR_DATA_LEFT_OUT } from "./coverage.js";
+import { isWeb3signerPackage } from "./web3signer.js";
 
 export { isValidatorPackage };
 
@@ -42,7 +43,35 @@ function compareVersions(installed: string, backup: string): number | null {
   return semver.compare(installed, backup);
 }
 
+/**
+ * Web3Signer: a backup made to move or reinstall the node holds the exact
+ * slashing protection of its keys, which are imported through the Staking
+ * Brain whatever the installed version, since they were removed from the
+ * old node. Other backups hold the keystores without slashing protection
+ */
 function planBackupPackage(
+  pkg: FullBackupPackageEntry,
+  installed: InstalledPackageSummary | undefined,
+  mode: FullBackupRestoreMode
+): FullBackupRestorePackagePlan {
+  const plan = planPackageAction(pkg, installed, mode);
+  if (!isWeb3signerPackage(pkg.dnpName)) return plan;
+  if (!pkg.slashingProtection) return { ...plan, slashingProtection: "missing" };
+
+  const validatorKeyCount = pkg.slashingProtection.pubkeys.length;
+  const withSlashing: FullBackupRestorePackagePlan = { ...plan, slashingProtection: "included", validatorKeyCount };
+  if (plan.action === "skip" || plan.action === "remove") return withSlashing;
+  return {
+    ...withSlashing,
+    restoreData: validatorKeyCount > 0,
+    reason:
+      validatorKeyCount > 0
+        ? `Its ${validatorKeyCount} validator keys are imported through the Staking Brain with the exact slashing protection from the backup, then it is stopped`
+        : "The backed-up node had no validator keys in it"
+  };
+}
+
+function planPackageAction(
   pkg: FullBackupPackageEntry,
   installed: InstalledPackageSummary | undefined,
   mode: FullBackupRestoreMode
@@ -141,6 +170,14 @@ export function planRestore({
     }
     if (pkg.coverage === "not-covered") {
       warnings.push(`${pkg.dnpName}: its data was not in the backup, only its configuration is restored`);
+    }
+  }
+
+  for (const plan of packages) {
+    if (plan.slashingProtection === "missing" && plan.restoreData) {
+      warnings.push(
+        `${plan.dnpName}: this backup has no slashing protection for its validators (it was not made with "I am moving or reinstalling this Dappnode"). Their keys are restored and the package stays stopped: start it only after the old node has been off for at least 2 epochs (about 13 minutes on Ethereum), or with doppelganger protection enabled in your consensus client.`
+      );
     }
   }
 

@@ -17,6 +17,12 @@ export interface FullBackupPackageInfo {
   coverage: FullBackupCoverage;
   /** Holds validator keys or slashing protection */
   validator: boolean;
+  /**
+   * Web3Signer: a backup made when moving or reinstalling this node removes
+   * its validator keys through the Staking Brain and stores their exact
+   * slashing protection
+   */
+  exportsSlashingProtection: boolean;
   /** Names of the manifest `backup` items */
   backupItems: string[];
   /** Named volumes of the package, for reference and future opt-in volume backups */
@@ -39,6 +45,11 @@ export interface FullBackupCreateResult {
   /** Validator packages left stopped because the user is moving this node */
   stoppedValidators: string[];
   /**
+   * Web3Signer packages whose validator keys were removed from this node
+   * and whose slashing protection is in the backup
+   */
+  slashingProtectionExported: { dnpName: string; validatorCount: number }[];
+  /**
    * Validator packages whose data (keys and slashing protection) was left
    * out so they kept validating without a pause. Only their settings are in
    * the backup
@@ -47,14 +58,42 @@ export interface FullBackupCreateResult {
 }
 
 /**
+ * A backup kept on the node because it removed validator keys from it: it
+ * is the only copy of them until the admin has saved the file and discards
+ * this one. Download it with GET /full-backup/pending/:fileName
+ */
+export interface FullBackupPendingBackup {
+  fileName: string;
+  sizeBytes: number;
+  createdAt: string;
+  slashingProtectionExported: FullBackupCreateResult["slashingProtectionExported"];
+}
+
+/**
+ * Exact slashing protection of a Web3Signer package, exported when its keys
+ * were deleted through the Staking Brain (keymanager API) for a backup made
+ * to move or reinstall the node. After that delete the backed-up node can no
+ * longer sign with these keys
+ */
+export interface FullBackupSlashingProtection {
+  source: "staking-brain";
+  /** Archive path of the EIP-3076 interchange JSON, absent if there were no keys */
+  file?: string;
+  /** Validator public keys removed from the backed-up node, 0x-prefixed lowercase */
+  pubkeys: string[];
+}
+
+/**
  * What a backup being created is doing:
  * - preparing: checking disk space and saving the dappmanager's settings
  * - stopping: stopping a validator so its slashing protection is exact
+ * - exporting: removing a Web3Signer's keys through its Staking Brain and
+ *   exporting their slashing protection, for a backup made to move the node
  * - copying: copying a package's `backup` data
  * - restarting: starting a validator again after its copy
  * - archiving: compressing and encrypting everything into the backup file
  */
-export type FullBackupStep = "preparing" | "stopping" | "copying" | "restarting" | "archiving";
+export type FullBackupStep = "preparing" | "stopping" | "exporting" | "copying" | "restarting" | "archiving";
 
 export interface FullBackupProgress {
   step: FullBackupStep;
@@ -112,6 +151,12 @@ export interface FullBackupPackageEntry {
     userSettings: string;
   };
   backup: FullBackupItemEntry[];
+  /**
+   * Web3Signer only, in backups made to move or reinstall the node. When
+   * present, restore imports the keys through the Staking Brain with this
+   * slashing protection instead of writing the keystore files back
+   */
+  slashingProtection?: FullBackupSlashingProtection;
 }
 
 /**
@@ -172,6 +217,15 @@ export interface FullBackupRestorePackagePlan {
   restoreData: boolean;
   /** Holds validator keys or slashing protection: stays stopped after restore */
   validator: boolean;
+  /**
+   * Web3Signer only
+   * - included: keys are imported through the Staking Brain with the exact
+   *   slashing protection exported when the backup was made
+   * - missing: the backup holds the keystores but no slashing protection
+   */
+  slashingProtection?: "included" | "missing";
+  /** Web3Signer with slashing protection: number of validator keys to import */
+  validatorKeyCount?: number;
   reason?: string;
 }
 

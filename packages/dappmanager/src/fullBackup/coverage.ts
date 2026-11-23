@@ -8,6 +8,7 @@ import {
   Manifest,
   PackageBackup
 } from "@dappnode/types";
+import { isWeb3signerPackage } from "./web3signer.js";
 
 /**
  * Packages that hold validator keys or slashing protection. Running the same
@@ -72,6 +73,7 @@ export function getPackageBackupInfo(pkg: InstalledPackageData, manifest: Manife
     isCore: pkg.isCore,
     coverage: getCoverage(pkg, manifest),
     validator: isValidatorPackage({ dnpName: pkg.dnpName, backup: manifest?.backup ?? [] }),
+    exportsSlashingProtection: isWeb3signerPackage(pkg.dnpName) && (manifest?.backup ?? []).length > 0,
     backupItems: (manifest?.backup ?? []).map((item) => item.name),
     namedVolumes: getNamedVolumes(pkg)
   };

@@ -21,6 +21,17 @@ import { mainDbIncludedKeys, cacheDbIncludedKeys, nexusDbIncludedKeys, pickKeys 
 import { planRestore } from "./plan.js";
 import { extractBackup, extractedFilePath, readExtractedJson } from "./read.js";
 import { validateBackupPassword } from "./create.js";
+import {
+  BrainClient,
+  findWeb3signerItems,
+  importKeysThroughBrain,
+  interchangePubkeys,
+  isInterchange,
+  readBackedUpKeys,
+  shortPubkey,
+  someOf,
+  stoppedKeyServices
+} from "./web3signer.js";
 
 const AUTO_UPDATE_SETTINGS_KEY = "auto-update-settings";
 
@@ -72,6 +83,10 @@ export interface RestoreDeps {
    */
   applyStakerSelections: () => Promise<void>;
   progress: (dnpName: string, message: string) => void;
+  /** Staking Brain of a Web3Signer package */
+  brainClient: (dnpName: string) => BrainClient;
+  /** Resolves once the brain answers, right after the package was installed */
+  waitForBrain: (client: BrainClient) => Promise<void>;
   /** Remove every `progress` message from the UI */
   clearProgress: () => void;
 }
@@ -598,6 +613,13 @@ class RestoreContext {
       );
     }
 
+    // A Web3Signer that had no keys when it was backed up has nothing to
+    // import: it is restored like any other validator, without its data,
+    // which leaves one that already runs on this node as it is
+    if (entry.slashingProtection && entry.slashingProtection.pubkeys.length > 0) {
+      return this.restoreWeb3signerThroughBrain(entry, plan.action, installed, userSettings);
+    }
+
     // Never start a package before its data is in place: it would initialise
     // fresh state (new keys, an empty slashing DB, a new tailnet device)
     // first. A validator installed without data stays stopped too; one
@@ -619,6 +641,112 @@ class RestoreContext {
 
     if (plan.restoreData) await this.restorePackageData(entry, plan.validator);
     else if (plan.validator && plan.action === "install") await this.stopPackage(dnpName);
+  }
+
+  /**
+   * Web3Signer from a backup made to move or reinstall a node: its keys were
+   * removed from the old node with their exact slashing protection. The
+   * keystore files are not written back, since Web3Signer would load them
+   * without it. The package runs with no new keys (nothing to sign), the
+   * keys are imported through the Staking Brain with the slashing
+   * protection, tags and fee recipients from the backup, and the package is
+   * stopped so the user starts it consciously.
+   *
+   * The brain DB is not restored: the brain deletes DB entries whose key is
+   * not in Web3Signer, and the import rebuilds them.
+   */
+  private async restoreWeb3signerThroughBrain(
+    entry: FullBackupPackageEntry,
+    action: FullBackupRestorePackagePlan["action"],
+    installed: InstalledPackageData | undefined,
+    userSettings: UserSettings
+  ): Promise<void> {
+    const { dnpName } = entry;
+    // A stopped Web3Signer on this node may hold keys that run elsewhere:
+    // never start it on the user's behalf. Installing or configuring it
+    // below starts every service, so each one the import needs must run now
+    const stopped = installed ? stoppedKeyServices(installed) : [];
+    if (stopped.length > 0) {
+      throw Error(
+        `${dnpName} is stopped on this node (${stopped.join(", ")} not running). Start it and restore again, so the backup's validator keys can be imported through its Staking Brain`
+      );
+    }
+    if (action === "install" || action === "update") {
+      await this.deps.installPackage({
+        dnpName,
+        version: entry.version,
+        origin: entry.origin,
+        userSettings,
+        start: true
+      });
+    } else {
+      await this.deps.applySettings({ dnpName, isCore: entry.isCore, userSettings, start: true });
+    }
+
+    try {
+      await this.importValidatorKeys(entry);
+    } finally {
+      await this.stopPackage(dnpName);
+    }
+  }
+
+  private async importValidatorKeys(entry: FullBackupPackageEntry): Promise<void> {
+    const { dnpName } = entry;
+    const pubkeys = entry.slashingProtection?.pubkeys ?? [];
+    if (pubkeys.length === 0) return;
+
+    const interchange = readExtractedJson<unknown>(this.dir, entry.slashingProtection?.file, null);
+    if (!isInterchange(interchange)) {
+      throw Error(`${dnpName}: the slashing protection is missing from the backup, no keys imported`);
+    }
+    const { keystores: keystoresItem, brainDb } = findWeb3signerItems(entry.backup);
+    const keystoresTar = extractedFilePath(this.dir, keystoresItem?.file);
+    if (!keystoresItem || !keystoresTar) throw Error(`${dnpName}: the keystores are missing from the backup`);
+
+    const { keystores, settings } = await readBackedUpKeys({
+      keystoresTar,
+      keystoresPath: keystoresItem.path,
+      brainDbTar: extractedFilePath(this.dir, brainDb?.file)
+    });
+    const missing = pubkeys.filter((pubkey) => !keystores.has(pubkey));
+    // Web3Signer exports no entry for a key that has never signed: such a
+    // key is imported, but not reported as protected
+    const covered = interchangePubkeys(interchange);
+    const withoutHistory = pubkeys.filter((pubkey) => keystores.has(pubkey) && !covered.has(pubkey));
+
+    const client = this.deps.brainClient(dnpName);
+    await this.deps.waitForBrain(client);
+    const result = await importKeysThroughBrain(client, {
+      keystores: pubkeys.flatMap((pubkey) => keystores.get(pubkey) ?? []),
+      settings,
+      interchange
+    });
+
+    if (withoutHistory.length > 0) {
+      this.job.warnings.push(
+        `${dnpName}: the backup holds no slashing protection for ${withoutHistory.length} of its validator keys (${someOf(withoutHistory.map(shortPubkey))}): Web3Signer had no signing history for them when they were removed from the old node. That is right only if they have never validated.`
+      );
+    }
+    if (result.duplicates.length > 0) {
+      this.job.warnings.push(
+        `${dnpName}: ${result.duplicates.length} validator keys were already loaded in this node's Web3Signer (${someOf(result.duplicates.map(shortPubkey))}). Web3Signer does not import slashing protection for keys it already has, so the backup's slashing protection was not applied to them, unless an earlier attempt of this restore imported them. Otherwise start the package only after the old node has been off for at least 2 epochs (about 13 minutes on Ethereum).`
+      );
+    }
+
+    if (result.withoutSettings.length > 0) {
+      this.job.warnings.push(
+        `${dnpName}: ${result.withoutSettings.length} validator keys had no tag or fee recipient in the backed-up Staking Brain; they were imported as "solo" with the burn address as fee recipient. Set their fee recipient in the Staking Brain before starting the package.`
+      );
+    }
+    const problems = [
+      ...result.failed,
+      ...missing.map((pubkey) => `${pubkey}: keystore or password not in the backup`)
+    ];
+    if (problems.length > 0) {
+      throw Error(
+        `${result.imported.length} of ${pubkeys.length} validator keys imported with their slashing protection. Not imported: ${problems.join("; ")}`
+      );
+    }
   }
 
   private async stopPackage(dnpName: string): Promise<void> {

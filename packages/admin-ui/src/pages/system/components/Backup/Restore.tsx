@@ -67,6 +67,26 @@ function formatAuthError(e: Error): Error {
   return e.message === "WRONG_CREDENTIALS" ? Error("Wrong admin password") : e;
 }
 
+function DataCell({ pkg }: { pkg: FullBackupRestorePackagePlan }) {
+  if (pkg.slashingProtection === "included" && pkg.restoreData) {
+    return (
+      <>
+        {pkg.validatorKeyCount} validator {pkg.validatorKeyCount === 1 ? "key" : "keys"} imported
+        <div className="full-backup-slashing-included">With exact slashing protection</div>
+      </>
+    );
+  }
+  if (pkg.slashingProtection === "missing" && pkg.restoreData) {
+    return (
+      <>
+        Restored
+        <div className="full-backup-slashing-missing">No slashing protection</div>
+      </>
+    );
+  }
+  return <>{pkg.restoreData ? "Restored" : "-"}</>;
+}
+
 function PlanTable({ packages }: { packages: FullBackupRestorePackagePlan[] }) {
   return (
     <div className="full-backup-plan">
@@ -91,7 +111,9 @@ function PlanTable({ packages }: { packages: FullBackupRestorePackagePlan[] }) {
               <td>{actionLabels[pkg.action]}</td>
               <td>{pkg.backupVersion ?? "-"}</td>
               <td>{pkg.installedVersion ?? "-"}</td>
-              <td>{pkg.restoreData ? "Restored" : "-"}</td>
+              <td>
+                <DataCell pkg={pkg} />
+              </td>
             </tr>
           ))}
         </tbody>
