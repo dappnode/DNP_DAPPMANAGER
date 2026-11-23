@@ -90,6 +90,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
       }
     ]
   }),
+  fullBackupStatus: async () => ({ inProgress: false }),
   chainDataGet: async () => [
     {
       dnpName: "geth.dnp.dappnode.eth",

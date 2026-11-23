@@ -40,6 +40,21 @@ export interface FullBackupCreateResult {
   stoppedValidators: string[];
 }
 
+/**
+ * Whether a full backup is being created, and how the last one ended. Lets
+ * the UI recover a result whose HTTP response was lost
+ */
+export interface FullBackupStatus {
+  inProgress: boolean;
+  /** Last backup since the dappmanager started, kept while its download link is valid */
+  last?: {
+    finishedAt: string;
+    /** Absent if the backup failed */
+    result?: FullBackupCreateResult;
+    error?: string;
+  };
+}
+
 /** Manifest `backup` item and where its data was stored inside the archive */
 export interface FullBackupItemEntry extends PackageBackup {
   /** Archive path of the tar produced by the docker archive API, absent if it failed */

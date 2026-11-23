@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Alert from "react-bootstrap/esm/Alert";
 import Form from "react-bootstrap/esm/Form";
 import { apiRoutes, useApi } from "api";
@@ -70,6 +70,21 @@ function CreateBackupForm({ info }: { info: FullBackupInfo }) {
   const [reqStatus, setReqStatus] = useState<ReqStatus<FullBackupCreateResult>>({});
   const validators = info.packages.filter((pkg) => pkg.validator);
 
+  // The backup goes on in the Dappnode if its request is dropped, and its
+  // result is kept there: show it instead of losing it
+  const statusRes = useApi.fullBackupStatus();
+  const revalidateStatus = statusRes.revalidate;
+  const runningElsewhere = Boolean(statusRes.data?.inProgress) && !reqStatus.loading;
+  /** `finishedAt` of an earlier backup, not to be shown again */
+  const [dismissed, setDismissed] = useState<string>();
+  const last = statusRes.data?.last?.finishedAt === dismissed ? undefined : statusRes.data?.last;
+
+  useEffect(() => {
+    if (!runningElsewhere) return;
+    const interval = setInterval(() => revalidateStatus(), 2000);
+    return () => clearInterval(interval);
+  }, [runningElsewhere, revalidateStatus]);
+
   const lengthError =
     password.length < info.passwordMinLength
       ? `The backup password must be at least ${info.passwordMinLength} characters long`
@@ -81,6 +96,7 @@ function CreateBackupForm({ info }: { info: FullBackupInfo }) {
   async function onCreate() {
     if (!isValid) return;
     try {
+      setDismissed(statusRes.data?.last?.finishedAt);
       setReqStatus({ loading: true });
       const result = await apiRoutes.createFullBackup({ adminPassword, password, keepValidatorsStopped });
       setReqStatus({ result });
@@ -91,15 +107,24 @@ function CreateBackupForm({ info }: { info: FullBackupInfo }) {
     } catch (e) {
       const message = e.message === "WRONG_CREDENTIALS" ? "Wrong admin password" : e.message;
       setReqStatus({ error: Error(message) });
+    } finally {
+      revalidateStatus();
     }
   }
 
-  if (reqStatus.result) {
-    const { fileId, fileName, sizeBytes, warnings, stoppedValidators } = reqStatus.result;
+  function onCreateAnother() {
+    setDismissed(statusRes.data?.last?.finishedAt);
+    setReqStatus({});
+  }
+
+  const result = reqStatus.result ?? last?.result;
+  if (result) {
+    const { fileId, fileName, sizeBytes, warnings, stoppedValidators } = result;
     return (
       <div className="full-backup-result">
         <Alert variant="success">
-          Backup ready: {fileName} ({prettyBytes(sizeBytes)}). The download starts automatically.
+          Backup ready: {fileName} ({prettyBytes(sizeBytes)}).
+          {reqStatus.result && " The download starts automatically."}
         </Alert>
         <a href={apiRoutes.downloadUrl({ fileId })} {...newTabProps} className="no-a-style">
           <Button variant="dappnode">Download backup</Button>
@@ -128,9 +153,13 @@ function CreateBackupForm({ info }: { info: FullBackupInfo }) {
           Store the file and its password separately. Without the password the backup cannot be opened, and it cannot be
           recovered.
         </Alert>
+        <Button onClick={onCreateAnother}>Create another backup</Button>
       </div>
     );
   }
+
+  // A dropped request leaves a network error here: the Dappnode knows how the backup really ended
+  const error = last?.error ? Error(`The backup failed: ${last.error}`) : reqStatus.error;
 
   return (
     <>
@@ -188,11 +217,22 @@ function CreateBackupForm({ info }: { info: FullBackupInfo }) {
               )}). Validators are always paused while their data is copied, so their slashing protection is exact; leaving them stopped guarantees nothing is signed after it.`}
           />
         )}
-        <Button type="submit" onClick={onCreate} variant="dappnode" disabled={!isValid || reqStatus.loading}>
-          {reqStatus.loading ? "Creating backup..." : "Create backup"}
+        <Button
+          type="submit"
+          onClick={onCreate}
+          variant="dappnode"
+          disabled={!isValid || reqStatus.loading || runningElsewhere}
+        >
+          {reqStatus.loading || runningElsewhere ? "Creating backup..." : "Create backup"}
         </Button>
       </InputForm>
-      {reqStatus.error && <ErrorView error={reqStatus.error} hideIcon red />}
+      {runningElsewhere ? (
+        <Alert variant="info" className="full-backup-running">
+          A backup is being created. Its result will show here when it finishes.
+        </Alert>
+      ) : (
+        error && <ErrorView error={error} hideIcon red />
+      )}
     </>
   );
 }

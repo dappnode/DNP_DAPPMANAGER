@@ -5,10 +5,16 @@ import { Readable } from "stream";
 import { pipeline } from "stream/promises";
 import tar from "tar-stream";
 import { expect } from "chai";
+import sinon from "sinon";
 import * as db from "@dappnode/db";
 import { params } from "@dappnode/params";
 import { FullBackupManifest, InstalledPackageData, PackageContainer } from "@dappnode/types";
-import { createFullBackup, FullBackupDeps, MANIFEST_ARCHIVE_PATH } from "../../../src/fullBackup/create.js";
+import {
+  createFullBackup,
+  FullBackupDeps,
+  getFullBackupStatus,
+  MANIFEST_ARCHIVE_PATH
+} from "../../../src/fullBackup/create.js";
 import { createDecryptStream, EncryptOptions } from "../../../src/fullBackup/format.js";
 import { canStopForBackup } from "../../../src/fullBackup/packageStop.js";
 
@@ -101,7 +107,7 @@ describe("fullBackup / createFullBackup", () => {
   beforeEach(() => {
     db.clearMainDb();
     db.clearCacheDb();
-    fs.rmSync(params.TEMP_TRANSFER_DIR, { recursive: true, force: true });
+    fs.rmSync(params.FULL_BACKUP_DIR, { recursive: true, force: true });
     fs.mkdirSync(repoDir, { recursive: true });
     fs.writeFileSync(
       path.join(repoDir, "docker-compose.yml"),
@@ -123,9 +129,10 @@ describe("fullBackup / createFullBackup", () => {
   });
 
   afterEach(() => {
+    sinon.restore();
     db.clearMainDb();
     db.clearCacheDb();
-    fs.rmSync(params.TEMP_TRANSFER_DIR, { recursive: true, force: true });
+    fs.rmSync(params.FULL_BACKUP_DIR, { recursive: true, force: true });
     fs.rmSync(repoDir, { recursive: true, force: true });
   });
 
@@ -148,7 +155,8 @@ describe("fullBackup / createFullBackup", () => {
     expect(result.warnings).to.have.length(1);
     expect(result.warnings[0]).to.include("missing").and.include("does not exist");
     const filePath = db.fileTransferPath.get(result.fileId);
-    expect(filePath).to.equal(path.join(params.TEMP_TRANSFER_DIR, result.fileName));
+    // Not in the temp transfer dir, which other calls delete as a whole
+    expect(filePath).to.equal(path.join(params.FULL_BACKUP_DIR, result.fileName));
     expect(fs.statSync(filePath as string).size).to.equal(result.sizeBytes);
 
     const entries = await readBackup(filePath as string);
@@ -188,7 +196,7 @@ describe("fullBackup / createFullBackup", () => {
 
     // Secrets never appear in plaintext and staging files are removed
     expect(fs.readFileSync(filePath as string).includes(Buffer.from("telegram-secret"))).to.equal(false);
-    expect(fs.readdirSync(params.TEMP_TRANSFER_DIR)).to.deep.equal([result.fileName]);
+    expect(fs.readdirSync(params.FULL_BACKUP_DIR)).to.deep.equal([result.fileName]);
   });
 
   it("reports packages with volumes and no backup paths as not covered", async () => {
@@ -255,6 +263,167 @@ describe("fullBackup / createFullBackup", () => {
     expect(result.stoppedValidators).to.deep.equal([dnpName]);
   });
 
+  it("does not report a validator as stopped when it could not be stopped", async () => {
+    writeManifest([{ name: "slashing-protection", path: "/data/keys" }]);
+    const events: string[] = [];
+    const result = await createFullBackup({
+      password,
+      keepValidatorsStopped: true,
+      encryptOptions: fast,
+      deps: recordingDeps(events, {
+        stopForBackup: async () => {
+          throw Error("docker compose stop failed");
+        }
+      })
+    });
+    expect(events).to.deep.equal(["copy /data/keys"]);
+    expect(result.stoppedValidators).to.deep.equal([]);
+    expect(result.warnings.some((w) => w.includes("docker compose stop failed"))).to.equal(true);
+    expect(result.warnings.some((w) => w.includes("was NOT left stopped"))).to.equal(true);
+  });
+
+  it("keeps a validator stopped even if it declares no backup paths", async () => {
+    const signer = { ...pkg, dnpName: "web3signer.dnp.dappnode.eth" };
+    const listPackages = async (): Promise<InstalledPackageData[]> => [signer];
+
+    const events: string[] = [];
+    const running = await createFullBackup({
+      password,
+      encryptOptions: fast,
+      deps: recordingDeps(events, { listPackages })
+    });
+    expect(events).to.deep.equal([]);
+    expect(running.stoppedValidators).to.deep.equal([]);
+
+    const result = await createFullBackup({
+      password,
+      keepValidatorsStopped: true,
+      encryptOptions: fast,
+      deps: recordingDeps(events, { listPackages })
+    });
+    expect(events).to.deep.equal([`stop ${signer.dnpName}`]);
+    expect(result.stoppedValidators).to.deep.equal([signer.dnpName]);
+  });
+
+  it("restarts the validators it left stopped when the backup fails afterwards", async () => {
+    writeManifest([{ name: "slashing-protection", path: "/data/keys" }]);
+    const events: string[] = [];
+    try {
+      await createFullBackup({
+        password,
+        keepValidatorsStopped: true,
+        // Rejected when the archive is written, after every package was staged
+        encryptOptions: { kdf: { log2N: 99, r: 8, p: 1 } },
+        deps: recordingDeps(events)
+      });
+      throw Error("Expected an error");
+    } catch (e) {
+      expect((e as Error).message).to.match(/Unsupported scrypt cost/);
+    }
+    expect(events).to.deep.equal([`stop ${dnpName}`, "copy /data/keys", `restart ${dnpName}`]);
+  });
+
+  it("names the validators that could not be restarted after a failed backup", async () => {
+    writeManifest([{ name: "slashing-protection", path: "/data/keys" }]);
+    const failing = {
+      ...deps,
+      stopForBackup: async () => async () => {
+        throw Error("docker compose start failed");
+      }
+    };
+    try {
+      await createFullBackup({
+        password,
+        keepValidatorsStopped: true,
+        encryptOptions: { kdf: { log2N: 99, r: 8, p: 1 } },
+        deps: failing
+      });
+      throw Error("Expected an error");
+    } catch (e) {
+      expect((e as Error).message)
+        .to.match(/Unsupported scrypt cost/)
+        .and.match(/could not be started again/)
+        .and.include(dnpName);
+    }
+    expect(getFullBackupStatus().last?.error).to.include(dnpName);
+  });
+
+  it("stops copying when the disk cannot hold the staged data twice", async () => {
+    writeManifest([{ name: "slashing-protection", path: "/data/keys" }]);
+    // Enough for the check before staging, not for the 17 bytes of /data/keys and their archive
+    const free = 1024 * 1024 * 1024 + 5;
+    sinon.stub(fs.promises, "statfs").resolves({ bavail: free, bsize: 1 } as fs.StatsFs);
+    const events: string[] = [];
+    try {
+      await createFullBackup({
+        password,
+        keepValidatorsStopped: true,
+        encryptOptions: fast,
+        deps: recordingDeps(events)
+      });
+      throw Error("Expected an error");
+    } catch (e) {
+      expect((e as Error).message)
+        .to.match(/Not enough free disk space/)
+        .and.include(`"slashing-protection" of ${dnpName}`);
+    }
+    // Nothing is left on disk and the validator runs again
+    expect(fs.readdirSync(params.FULL_BACKUP_DIR)).to.deep.equal([]);
+    expect(events).to.deep.equal([`stop ${dnpName}`, "copy /data/keys", `restart ${dnpName}`]);
+  });
+
+  it("removes what earlier backups left behind, but not a backup that can still be downloaded", async () => {
+    fs.mkdirSync(path.join(params.FULL_BACKUP_DIR, "full-backup-stale"), { recursive: true });
+    const expired = path.join(params.FULL_BACKUP_DIR, "expired.dnbackup");
+    fs.writeFileSync(expired, "old");
+    const hourAgo = new Date(Date.now() - 60 * 60 * 1000);
+    fs.utimesSync(expired, hourAgo, hourAgo);
+
+    const first = await createFullBackup({ password, encryptOptions: fast, deps });
+    expect(fs.readdirSync(params.FULL_BACKUP_DIR)).to.deep.equal([first.fileName]);
+    const second = await createFullBackup({ password, encryptOptions: fast, deps });
+    expect(fs.readdirSync(params.FULL_BACKUP_DIR).sort()).to.deep.equal([first.fileName, second.fileName].sort());
+  });
+
+  it("keeps the state and the last result for a UI that lost the response", async () => {
+    let inProgressWhileCopying = false;
+    const spyDeps = recordingDeps([], {
+      getArchive: async (containerName, archivePath) => {
+        inProgressWhileCopying = getFullBackupStatus().inProgress && !getFullBackupStatus().last;
+        return deps.getArchive(containerName, archivePath);
+      }
+    });
+    const result = await createFullBackup({ password, encryptOptions: fast, deps: spyDeps });
+    expect(inProgressWhileCopying).to.equal(true);
+    const status = getFullBackupStatus();
+    expect(status.inProgress).to.equal(false);
+    expect(status.last?.result).to.deep.equal(result);
+    expect(status.last?.error).to.equal(undefined);
+
+    try {
+      await createFullBackup({
+        password,
+        encryptOptions: fast,
+        deps: {
+          ...deps,
+          listPackages: async () => {
+            throw Error("docker is down");
+          }
+        }
+      });
+      throw Error("Expected an error");
+    } catch (e) {
+      expect((e as Error).message).to.equal("docker is down");
+    }
+    expect(getFullBackupStatus()).to.deep.include({ inProgress: false });
+    expect(getFullBackupStatus().last).to.include({ error: "docker is down" });
+    expect(getFullBackupStatus().last?.result).to.equal(undefined);
+
+    // The download link of the last backup has expired
+    sinon.useFakeTimers({ now: Date.now() + 31 * 60 * 1000, toFake: ["Date"] });
+    expect(getFullBackupStatus()).to.deep.equal({ inProgress: false });
+  });
+
   it("restarts a validator even when copying fails", async () => {
     writeManifest([{ name: "keystores", path: "/data/keys" }]);
     const events: string[] = [];
@@ -297,7 +466,7 @@ describe("fullBackup / createFullBackup", () => {
     } catch (e) {
       expect((e as Error).message).to.equal("docker is down");
     }
-    expect(fs.readdirSync(params.TEMP_TRANSFER_DIR)).to.deep.equal([]);
+    expect(fs.readdirSync(params.FULL_BACKUP_DIR)).to.deep.equal([]);
     // A following backup works, so the in-progress lock was released
     await createFullBackup({ password, encryptOptions: fast, deps });
   });

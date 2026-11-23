@@ -77,8 +77,12 @@ export function dockerComposeRm(dcPath: string): Promise<string> {
   return execDockerCompose(dcPath, "rm", { force: true, stop: true });
 }
 
-export function dockerComposeStart(dcPath: string): Promise<string> {
-  return execDockerCompose(dcPath, "start");
+/**
+ * Starts the existing containers of all services, or of `serviceNames` and
+ * the services they depend on, in dependency order
+ */
+export function dockerComposeStart(dcPath: string, serviceNames?: string[]): Promise<string> {
+  return execDockerCompose(dcPath, "start", undefined, serviceNames);
 }
 
 /**

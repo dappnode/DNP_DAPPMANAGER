@@ -21,6 +21,7 @@ packages/*/test_files/*
 packages/*/test_mountpoints_*/
 packages/*/test_mountpoints_*/*
 .temp-transfer
+.full-backup
 
 # Built schemas
 packages/common/src/validation/schemas

@@ -1,7 +1,7 @@
 import { params } from "@dappnode/params";
-import { dockerComposeStart, dockerComposeStop, dockerContainerStart } from "@dappnode/dockerapi";
+import { dockerComposeStart, dockerComposeStop, listPackageNoThrow } from "@dappnode/dockerapi";
 import { getDockerComposePath } from "@dappnode/utils";
-import { InstalledPackageData } from "@dappnode/types";
+import { InstalledPackageData, PackageContainer } from "@dappnode/types";
 
 /**
  * Packages that are never stopped to copy their backup data, even if that
@@ -19,6 +19,24 @@ export function canStopForBackup(pkg: Pick<InstalledPackageData, "dnpName" | "is
 /** Starts again exactly the containers a stop took down */
 export type RestartPackage = () => Promise<void>;
 
+/** Docker calls, injectable for tests */
+export interface PackageStopDocker {
+  composeStop: typeof dockerComposeStop;
+  composeStart: typeof dockerComposeStart;
+  listPackage: typeof listPackageNoThrow;
+}
+
+const defaultDocker: PackageStopDocker = {
+  composeStop: dockerComposeStop,
+  composeStart: dockerComposeStart,
+  listPackage: listPackageNoThrow
+};
+
+/** Runs now, or comes back by itself: docker starts a `restarting` container again */
+function isActive(container: Pick<PackageContainer, "running" | "state">): boolean {
+  return container.running || container.state === "restarting";
+}
+
 /**
  * Gracefully stop a package so its backup data can be copied consistently:
  * databases are closed and validators can no longer sign. Uses
@@ -26,23 +44,44 @@ export type RestartPackage = () => Promise<void>;
  * and waits for each service's `stop_grace_period`; a manifest
  * `dockerTimeout` is passed as the timeout when set.
  *
- * Returns how to restart it, or null if nothing was running.
+ * Resolves only once no container of the package runs: returns how to
+ * restart it, or null if nothing was running. If the stop fails, the
+ * containers it did stop are started again before the error is thrown.
  */
-export async function stopPackageForBackup(pkg: InstalledPackageData): Promise<RestartPackage | null> {
-  const running = pkg.containers.filter((c) => c.running);
-  if (running.length === 0) return null;
-
+export async function stopPackageForBackup(
+  pkg: InstalledPackageData,
+  docker: PackageStopDocker = defaultDocker
+): Promise<RestartPackage | null> {
+  const active = pkg.containers.filter(isActive);
   const composePath = getDockerComposePath(pkg.dnpName, pkg.isCore);
-  const timeouts = pkg.containers.map((c) => c.dockerTimeout).filter((t): t is number => typeof t === "number");
-  await dockerComposeStop(composePath, timeouts.length > 0 ? { timeout: Math.max(...timeouts) } : {});
+  // `docker compose start` follows `depends_on` and `pid: service:` order,
+  // which starting the containers one by one does not. Naming the services
+  // keeps the ones the user had stopped stopped, unless a named one depends
+  // on them
+  const services = active.map((c) => c.serviceName);
+  const restart: RestartPackage | null =
+    active.length > 0
+      ? async () => {
+          await docker.composeStart(composePath, services);
+        }
+      : null;
 
-  const allWereRunning = running.length === pkg.containers.length;
-  return async () => {
-    if (allWereRunning) {
-      await dockerComposeStart(composePath);
-    } else {
-      // Keep containers the user had stopped stopped
-      for (const container of running) await dockerContainerStart(container.containerName);
+  try {
+    if (active.length > 0) {
+      const timeouts = pkg.containers.map((c) => c.dockerTimeout).filter((t): t is number => typeof t === "number");
+      await docker.composeStop(composePath, timeouts.length > 0 ? { timeout: Math.max(...timeouts) } : {});
     }
-  };
+    const stopped = await docker.listPackage({ dnpName: pkg.dnpName });
+    const stillActive = (stopped?.containers ?? []).filter(isActive).map((c) => c.serviceName);
+    if (stillActive.length > 0) throw Error(`these services are still running: ${stillActive.join(", ")}`);
+  } catch (e) {
+    // A stop that failed part-way has taken some containers down
+    try {
+      if (restart) await restart();
+    } catch (restartError) {
+      throw Error(`${e.message}. It could not be started again, start it from its page: ${restartError.message}`);
+    }
+    throw e;
+  }
+  return restart;
 }
