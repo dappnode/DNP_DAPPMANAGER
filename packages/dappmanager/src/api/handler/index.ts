@@ -69,9 +69,11 @@ function tryToParseRpcRequest(body: any): { method?: string; params?: any[] } {
 
 function formatErrors(errors: Array<ErrorObject> | null | undefined, method: string): string {
   const dataVar = `root_prop`;
-  const toReplace = `${dataVar}.${method}`;
+  // Ajv v8 error paths are `${dataVar}${instancePath}` with "/"-separated instance paths
+  const toReplace = `${dataVar}/${method}`;
   const errorsText = ajv.errorsText(errors, { separator: "\n", dataVar });
-  return "Validation error:\n" + errorsText.replace(new RegExp(toReplace, "g"), "params");
+  // Plain string replacement: `method` comes from the request, so it must not be compiled into a RegExp
+  return "Validation error:\n" + errorsText.replaceAll(toReplace, "params");
 }
 
 /**
