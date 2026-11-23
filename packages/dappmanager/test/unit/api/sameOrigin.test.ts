@@ -3,6 +3,7 @@ import os from "os";
 import path from "path";
 import http from "http";
 import { AddressInfo } from "net";
+import type express from "express";
 import { expect } from "chai";
 import type { EventBus } from "@dappnode/eventbus";
 import type { Routes } from "@dappnode/types";
@@ -163,9 +164,10 @@ describe("api / sameOrigin", () => {
         SESSIONS_MAX_TTL_MS: 60_000,
         SESSIONS_TTL_MS: 60_000
       };
-      const echoBody: http.RequestListener = (req, res) => {
-        const body = (req as unknown as { body: unknown }).body;
-        res.end(JSON.stringify({ bodyType: typeof body, body }));
+      // Report how the body was parsed without reflecting request data
+      const describeBody: express.RequestHandler = (req, res) => {
+        const body: unknown = req.body;
+        res.json({ bodyType: typeof body, bodyLength: typeof body === "string" ? body.length : null });
       };
       const notUsed = (): void => {
         throw Error("not used");
@@ -177,7 +179,7 @@ describe("api / sameOrigin", () => {
         logs: { debug: () => {}, info: () => {}, warn: () => {}, error: () => {} },
         routes: {
           containerLogs: notUsed,
-          dataSend: echoBody,
+          dataSend: describeBody,
           download: notUsed,
           downloadUserActionLogs: notUsed,
           downloadWireguardConfig: notUsed,
@@ -187,7 +189,7 @@ describe("api / sameOrigin", () => {
           packageManifest: notUsed,
           metrics: notUsed,
           publicPackagesData: notUsed,
-          sign: echoBody,
+          sign: describeBody,
           upload: notUsed
         },
         limiterMiddleware: noop,
@@ -283,7 +285,7 @@ describe("api / sameOrigin", () => {
       for (const route of ["/sign", "/data-send?key=k"]) {
         const res = await post(route, { "content-type": "text/plain" }, "some data");
         expect(res.status, route).to.equal(200);
-        expect(JSON.parse(res.body), route).to.deep.equal({ bodyType: "string", body: "some data" });
+        expect(JSON.parse(res.body), route).to.deep.equal({ bodyType: "string", bodyLength: "some data".length });
       }
     });
 
