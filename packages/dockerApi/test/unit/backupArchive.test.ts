@@ -1,13 +1,18 @@
 import "mocha";
 import { expect } from "chai";
+import crypto from "crypto";
 import fs from "fs";
 import os from "os";
 import path from "path";
+import zlib from "zlib";
 import { execFileSync } from "child_process";
+import { once } from "events";
 import { Readable } from "stream";
 import tar from "tar-stream";
+import { docker } from "../../src/api/docker.js";
 import {
   backupItemToContainerPath,
+  dockerPutBackupItem,
   readBackupArchive,
   renameTarRoot,
   tarCopyEntries,
@@ -15,20 +20,42 @@ import {
   writeBackupArchive
 } from "../../src/backupArchive.js";
 
-type TestEntry = { header: tar.Headers & { pax?: Record<string, string> }; content?: string };
+type TestEntry = {
+  header: tar.Headers & { pax?: Record<string, string> };
+  content?: string;
+  /** pax records with values that are not UTF-8, which tar-stream cannot write from `header.pax` */
+  rawPax?: Record<string, Buffer>;
+};
 
 const mtime = new Date("2024-01-02T03:04:05Z");
 
 /** Builds a tar in memory */
 async function buildTar(entries: TestEntry[]): Promise<Buffer> {
   const pack = tar.pack();
-  for (const { header, content } of entries) {
-    await new Promise<void>((resolve, reject) =>
-      pack.entry({ mtime, ...header }, content ?? "", (err) => (err ? reject(err) : resolve()))
+  // Large entries wait for the pack to be read
+  const reading = streamToBuffer(pack);
+  const addEntry = (header: tar.Headers, content: string | Buffer): Promise<void> =>
+    new Promise((resolve, reject) =>
+      pack.entry({ mtime, ...header }, content, (err) => (err ? reject(err) : resolve()))
     );
+  for (const { header, content, rawPax } of entries) {
+    if (rawPax) await addEntry({ name: "PaxHeader", type: "pax-header" }, encodeRawPax(rawPax));
+    await addEntry(header, content ?? "");
   }
   pack.finalize();
-  return streamToBuffer(pack);
+  return reading;
+}
+
+/** Encodes pax records "<length> <key>=<value>\n", where length is the one of the whole record */
+function encodeRawPax(records: Record<string, Buffer>): Buffer {
+  return Buffer.concat(
+    Object.entries(records).map(([key, value]) => {
+      const record = Buffer.concat([Buffer.from(` ${key}=`), value, Buffer.from("\n")]);
+      let length = record.length;
+      while (length !== record.length + String(length).length) length++;
+      return Buffer.concat([Buffer.from(String(length)), record]);
+    })
+  );
 }
 
 /** Reads all entries of a tar with their headers and contents */
@@ -156,6 +183,37 @@ describe("dockerApi > backupArchive", () => {
       expect(header.pax).to.deep.include({ uid: "299593", gid: "299594" });
     });
 
+    it("renames the root of the archive of a path ending in /.", async () => {
+      // GET /containers/{id}/archive?path=/data/keys/.
+      const input = await buildTar([
+        { header: { name: "./", type: "directory", mode: 0o700, uid: 1000, gid: 100 } },
+        { header: { name: "./key1.json", type: "file", mode: 0o600, uid: 1000, gid: 100 }, content: "secret" },
+        { header: { name: "./hardlink", type: "link", linkname: "./key1.json", uid: 1000, gid: 100 } },
+        { header: { name: "./sub/", type: "directory", uid: 1000, gid: 100 } },
+        { header: { name: "./sub/.hidden", type: "file", uid: 1000, gid: 100 }, content: "x" }
+      ]);
+      const entries = await copyTar(input, renameTarRoot("keys"));
+      expect(entries.map((e) => [e.header.name, e.header.uid, e.header.mode])).to.deep.equal([
+        ["keys/", 1000, 0o700],
+        ["keys/key1.json", 1000, 0o600],
+        ["keys/hardlink", 1000, 0o644],
+        ["keys/sub/", 1000, 0o755],
+        ["keys/sub/.hidden", 1000, 0o644]
+      ]);
+      expect(entries[2].header.linkname).to.equal("keys/key1.json");
+    });
+
+    it("renames the root of the archive of the path /", async () => {
+      // GET /containers/{id}/archive?path=/
+      const input = await buildTar([
+        { header: { name: "/", type: "directory" } },
+        { header: { name: "/etc/", type: "directory" } },
+        { header: { name: "/etc/hosts", type: "file" }, content: "hosts" }
+      ]);
+      const entries = await copyTar(input, renameTarRoot("root"));
+      expect(entries.map((e) => e.header.name)).to.deep.equal(["root/", "root/etc/", "root/etc/hosts"]);
+    });
+
     it("rejects archives with more than one top level entry", async () => {
       const input = await buildTar([
         { header: { name: "a", type: "file" }, content: "a" },
@@ -214,9 +272,90 @@ describe("dockerApi > backupArchive", () => {
       ]);
     });
 
+    it("places only the contents of a directory item when it is extracted in its own directory", async () => {
+      const entries = await copyTar(
+        await buildTar(backupEntries),
+        backupItemToContainerPath("keys", "/data/keys", "/data/keys")
+      );
+      // No entry for the existing /data/keys, which would change its owner and mode
+      expect(entries.map((e) => [e.header.name, e.header.type, e.header.uid])).to.deep.equal([
+        ["key1.json", "file", 1000],
+        ["hardlink", "link", 1000]
+      ]);
+      expect(entries[1].header.linkname).to.equal("key1.json");
+    });
+
+    it("rejects a file item extracted in an existing directory", async () => {
+      const pack = tar.pack();
+      pack.resume();
+      const error = await tarCopyEntries(
+        Readable.from([await buildTar(backupEntries)]),
+        pack,
+        backupItemToContainerPath("config", "/app/config", "/app/config")
+      ).catch((e) => e);
+      expect(error).to.be.instanceOf(Error);
+      expect(error.message).to.include("config is not a directory in the backup");
+    });
+
+    it("places items whose name starts with dots", async () => {
+      const entries = await copyTar(
+        await buildTar(backupEntries),
+        backupItemToContainerPath("config", "/data/..config", "/data")
+      );
+      expect(entries.map((e) => e.header.name)).to.deep.equal(["..config"]);
+    });
+
     it("rejects a base dir that does not contain the item", () => {
       expect(() => backupItemToContainerPath("keys", "/data/keys", "/other")).to.throw("is not inside");
-      expect(() => backupItemToContainerPath("keys", "/data", "/data")).to.throw("is not inside");
+      expect(() => backupItemToContainerPath("keys", "/data", "/data/keys")).to.throw("is not inside");
+    });
+  });
+
+  describe("tarCopyEntries with bytes that are not UTF-8", () => {
+    // tar-stream reads pax records and names as UTF-8 strings
+    const xattr = "SCHILY.xattr.security.capability";
+    // setcap cap_net_bind_service+ep and cap_setuid+ep
+    const capNetBindService = Buffer.from("0100000200040000000000000000000000000000", "hex");
+    const capSetuid = Buffer.from("0100000280000000000000000000000000000000", "hex");
+
+    it("keeps binary xattrs that are valid UTF-8 and drops the ones that are not", async () => {
+      const input = await buildTar([
+        { header: { name: "keys/", type: "directory" } },
+        {
+          header: { name: "keys/bind", type: "file", mode: 0o755 },
+          content: "a",
+          rawPax: { [xattr]: capNetBindService }
+        },
+        { header: { name: "keys/setuid", type: "file", mode: 0o755 }, content: "b", rawPax: { [xattr]: capSetuid } }
+      ]);
+      const entries = await copyTar(input, renameTarRoot("item"));
+      expect(entries.map((e) => [e.header.name, e.content])).to.deep.equal([
+        ["item/", ""],
+        ["item/bind", "a"],
+        ["item/setuid", "b"]
+      ]);
+      const paxOf = (i: number): Record<string, string> => entries[i].header.pax ?? {};
+      expect(Buffer.from(paxOf(1)[xattr]).toString("hex")).to.equal(capNetBindService.toString("hex"));
+      // Docker rejects the whole archive on a capability changed by the UTF-8 decoding
+      expect(paxOf(2)).to.not.have.property(xattr);
+    });
+
+    it("rejects file names that are not valid UTF-8 instead of renaming them", async () => {
+      const latin1Name = (name: string): TestEntry["rawPax"] => ({ path: Buffer.from(name, "latin1") });
+      const input = await buildTar([
+        { header: { name: "keys/", type: "directory" } },
+        { header: { name: "keys/cafe.txt", type: "file" }, content: "a", rawPax: latin1Name("keys/caf\xe9.txt") },
+        { header: { name: "other", type: "file" }, content: "b" }
+      ]);
+      const pack = tar.pack();
+      pack.resume();
+      const error = await tarCopyEntries(Readable.from([input]), pack, renameTarRoot("item")).catch((e) => e);
+      expect(error).to.be.instanceOf(Error);
+      expect(error.message).to.include("not valid UTF-8: keys/caf");
+
+      // Entries of other items do not prevent restoring an item
+      const entries = await copyTar(input, backupItemToContainerPath("other", "/app/other", "/app"));
+      expect(entries.map((e) => e.header.name)).to.deep.equal(["other"]);
     });
   });
 
@@ -291,6 +430,124 @@ describe("dockerApi > backupArchive", () => {
       const backupFile = path.join(tmpDir, "plain.tar");
       fs.writeFileSync(backupFile, await buildTar([{ header: { name: "config", type: "file" }, content: "a" }]));
       expect([...(await tarListTopLevelNames(readBackupArchive(backupFile)))]).to.deep.equal(["config"]);
+    });
+
+    it("rejects backups compressed with xz, bzip2 or zstd naming the compression", () => {
+      const magics = { xz: "fd377a585a0000", bzip2: "425a6839314159", zstd: "28b52ffd0458" };
+      for (const [name, magic] of Object.entries(magics)) {
+        const backupFile = path.join(tmpDir, `${name}_backup.tar.xz`);
+        fs.writeFileSync(backupFile, Buffer.concat([Buffer.from(magic, "hex"), crypto.randomBytes(1024)]));
+        expect(() => readBackupArchive(backupFile)).to.throw(`Unsupported backup compression ${name}`);
+      }
+    });
+
+    it("reads uncompressed tar backups whose first entry name looks like a compression magic", async () => {
+      const backupFile = path.join(tmpDir, "plain.tar");
+      fs.writeFileSync(backupFile, await buildTar([{ header: { name: "BZh91AY", type: "file" }, content: "a" }]));
+      expect([...(await tarListTopLevelNames(readBackupArchive(backupFile)))]).to.deep.equal(["BZh91AY"]);
+    });
+
+    it("closes the backup file when the stream is destroyed before its end", async () => {
+      // Random content does not compress, so the file is larger than what the streams buffer
+      const content = crypto.randomBytes(2 * 1024 * 1024).toString("hex");
+      const backupFile = path.join(tmpDir, "big_backup.tar.xz");
+      fs.writeFileSync(
+        backupFile,
+        zlib.gzipSync(await buildTar([{ header: { name: "data", type: "file" }, content }]))
+      );
+
+      const createReadStream = fs.createReadStream;
+      let file: fs.ReadStream | null = null;
+      fs.createReadStream = ((...args: Parameters<typeof createReadStream>) =>
+        (file = createReadStream(...args))) as typeof createReadStream;
+      let stream: Readable;
+      try {
+        stream = readBackupArchive(backupFile) as Readable;
+      } finally {
+        fs.createReadStream = createReadStream;
+      }
+
+      await once(stream, "data");
+      // As `pipeline` does when the consumer of the tar fails
+      stream.destroy();
+      await once(stream, "close");
+      expect(file!.destroyed).to.equal(true);
+      expect(file!.readableEnded).to.equal(false);
+    });
+  });
+
+  describe("dockerPutBackupItem", () => {
+    // Go's os.ModeDir, as in the path stat of the docker API
+    const dirMode = 0x80000000 | 0o755;
+    const backupEntries: TestEntry[] = [
+      { header: { name: "config", type: "file", mode: 0o600, uid: 1000, gid: 1000 }, content: "a: 1" },
+      // Root owned, as in backups created by older versions
+      { header: { name: "keys/", type: "directory", mode: 0o755 } },
+      { header: { name: "keys/key1.json", type: "file", mode: 0o644 }, content: "secret" }
+    ];
+
+    type PutArchive = { path: string; noOverwriteDirNonDir?: boolean; names: string[] };
+    let backupFile: string;
+    let puts: PutArchive[];
+    const getContainer = docker.getContainer;
+
+    /** Fakes the archive API of a container with the given paths and modes */
+    function fakeContainer(modes: Record<string, number>): void {
+      docker.getContainer = (() => ({
+        infoArchive: async ({ path: statPath }: { path: string }) => {
+          if (!(statPath in modes)) throw Object.assign(Error("Could not find the file"), { statusCode: 404 });
+          const stat = Buffer.from(JSON.stringify({ mode: modes[statPath] })).toString("base64");
+          return { resume: () => undefined, headers: { "x-docker-container-path-stat": stat } };
+        },
+        putArchive: async (file: NodeJS.ReadableStream, options: Omit<PutArchive, "names">) => {
+          const names = (await readTar(file)).map((e) => e.header.name);
+          puts.push({ ...options, names });
+        }
+      })) as unknown as typeof getContainer;
+    }
+
+    beforeEach(async () => {
+      puts = [];
+      backupFile = path.join(tmpDir, "backup.tar.xz");
+      fs.writeFileSync(backupFile, zlib.gzipSync(await buildTar(backupEntries)));
+    });
+    afterEach(() => {
+      docker.getContainer = getContainer;
+    });
+
+    it("extracts the contents of a directory item in its existing directory", async () => {
+      fakeContainer({ "/data": dirMode, "/data/keys": 0x80000000 | 0o700 });
+      // "/data/keys/." is the directory "/data/keys"
+      for (const itemPath of ["/data/keys", "/data/keys/.", "/data/keys/"])
+        await dockerPutBackupItem("container", backupFile, { name: "keys", itemPath });
+      // Without an entry for /data/keys, which keeps its owner and mode
+      const put: PutArchive = { path: "/data/keys", noOverwriteDirNonDir: true, names: ["key1.json"] };
+      expect(puts).to.deep.equal([put, put, put]);
+    });
+
+    it("extracts a directory item that does not exist in its closest existing parent", async () => {
+      fakeContainer({ "/data": dirMode });
+      await dockerPutBackupItem("container", backupFile, { name: "keys", itemPath: "/data/validator/keys/." });
+      expect(puts).to.deep.equal([
+        { path: "/data", noOverwriteDirNonDir: true, names: ["validator/keys/", "validator/keys/key1.json"] }
+      ]);
+    });
+
+    it("extracts a file item in its directory, to replace the existing file", async () => {
+      fakeContainer({ "/app": dirMode, "/app/config.yml": 0o644 });
+      await dockerPutBackupItem("container", backupFile, { name: "config", itemPath: "/app/config.yml" });
+      expect(puts).to.deep.equal([{ path: "/app", noOverwriteDirNonDir: true, names: ["config.yml"] }]);
+    });
+
+    it("rejects a file item whose path is an existing directory", async () => {
+      fakeContainer({ "/app": dirMode, "/app/data": dirMode });
+      const error = await dockerPutBackupItem("container", backupFile, { name: "config", itemPath: "/app/data" }).catch(
+        (e) => e
+      );
+      expect(error).to.be.instanceOf(Error);
+      expect(error.message).to.include("config is not a directory in the backup");
+      // Nothing is written in the directory
+      expect(puts.flatMap((put) => put.names)).to.deep.equal([]);
     });
   });
 });

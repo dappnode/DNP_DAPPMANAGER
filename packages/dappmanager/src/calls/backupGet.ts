@@ -45,7 +45,9 @@ export async function backupGet({ dnpName, backup }: { dnpName: string; backup: 
         await dockerGetBackupItem(container.containerName, fromPath, toPath);
         successfulBackups.push(name);
       } catch (e) {
-        lastError = e.statusCode === 404 ? Error(`path ${fromPath} does not exist`) : e;
+        // Docker also answers 404 "No such container" if the container does not exist
+        const pathNotFound = e.statusCode === 404 && e.message.includes("Could not find the file");
+        lastError = pathNotFound ? Error(`path ${fromPath} does not exist`) : e;
         logs.error("Error getting backup", { dnpName, name, fromPath }, e);
       }
     }
