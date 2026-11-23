@@ -10,6 +10,7 @@ import { params } from "@dappnode/params";
 import { FullBackupManifest, InstalledPackageData, PackageContainer } from "@dappnode/types";
 import { createFullBackup, FullBackupDeps, MANIFEST_ARCHIVE_PATH } from "../../../src/fullBackup/create.js";
 import { createDecryptStream, EncryptOptions } from "../../../src/fullBackup/format.js";
+import { canStopForBackup } from "../../../src/fullBackup/packageStop.js";
 
 const fast: EncryptOptions = { kdf: { log2N: 14, r: 8, p: 1 } };
 const password = "backup password 123";
@@ -37,8 +38,34 @@ const deps: FullBackupDeps = {
     if (archivePath === "/data/keys") return Readable.from([Buffer.from("TAR-BYTES-OF-KEYS")]);
     throw Object.assign(Error("not found"), { statusCode: 404 });
   },
-  getHttpsMappings: async () => [{ fromSubdomain: "app", dnpName, serviceName: dnpName, port: 80, external: true }]
+  getHttpsMappings: async () => [{ fromSubdomain: "app", dnpName, serviceName: dnpName, port: 80, external: true }],
+  stopForBackup: async () => async () => undefined
 };
+
+/** Deps that record the order of stops, copies and restarts */
+function recordingDeps(events: string[], overrides: Partial<FullBackupDeps> = {}): FullBackupDeps {
+  return {
+    ...deps,
+    getArchive: async (containerName, archivePath) => {
+      events.push(`copy ${archivePath}`);
+      return deps.getArchive(containerName, archivePath);
+    },
+    stopForBackup: async (p) => {
+      events.push(`stop ${p.dnpName}`);
+      return async () => {
+        events.push(`restart ${p.dnpName}`);
+      };
+    },
+    ...overrides
+  };
+}
+
+function writeManifest(backup: { name: string; path: string }[]): void {
+  fs.writeFileSync(
+    path.join(repoDir, "dappnode_package.json"),
+    JSON.stringify({ name: dnpName, version: "1.2.3", backup })
+  );
+}
 
 /** Decrypt, gunzip and untar a backup into { path: content } in archive order */
 async function readBackup(filePath: string, pass = password): Promise<Map<string, Buffer>> {
@@ -194,6 +221,59 @@ describe("fullBackup / createFullBackup", () => {
       expect((e as Error).message).to.match(/at least 10 characters/);
     }
     expect(listed).to.equal(false);
+  });
+
+  it("stops a package only while its data is copied, then restarts it", async () => {
+    const events: string[] = [];
+    await createFullBackup({ password, encryptOptions: fast, deps: recordingDeps(events) });
+    expect(events).to.deep.equal([`stop ${dnpName}`, "copy /data/keys", "copy /data/missing", `restart ${dnpName}`]);
+  });
+
+  it("keeps validators stopped only when the admin is moving this node", async () => {
+    writeManifest([{ name: "slashing-protection", path: "/data/keys" }]);
+
+    const events: string[] = [];
+    const restarted = await createFullBackup({ password, encryptOptions: fast, deps: recordingDeps(events) });
+    expect(events).to.include(`restart ${dnpName}`);
+    expect(restarted.stoppedValidators).to.deep.equal([]);
+
+    const kept: string[] = [];
+    const result = await createFullBackup({
+      password,
+      keepValidatorsStopped: true,
+      encryptOptions: fast,
+      deps: recordingDeps(kept)
+    });
+    expect(kept).to.deep.equal([`stop ${dnpName}`, "copy /data/keys"]);
+    expect(result.stoppedValidators).to.deep.equal([dnpName]);
+  });
+
+  it("restarts the package even when copying fails", async () => {
+    const events: string[] = [];
+    const failing = recordingDeps(events, {
+      getArchive: async () => {
+        throw Error("docker archive failed");
+      }
+    });
+    const result = await createFullBackup({ password, encryptOptions: fast, deps: failing });
+    expect(events).to.deep.equal([`stop ${dnpName}`, `restart ${dnpName}`]);
+    expect(result.warnings.some((w) => w.includes("docker archive failed"))).to.equal(true);
+  });
+
+  it("never stops system packages, the dappmanager or Tailscale", () => {
+    expect(canStopForBackup({ dnpName, isCore: false })).to.equal(true);
+    expect(canStopForBackup({ dnpName: "wireguard.dnp.dappnode.eth", isCore: true })).to.equal(false);
+    expect(canStopForBackup({ dnpName: "dappmanager.dnp.dappnode.eth", isCore: true })).to.equal(false);
+    expect(canStopForBackup({ dnpName: "tailscale.dnp.dappnode.eth", isCore: false })).to.equal(false);
+  });
+
+  it("skips SQLite side files that are absent because the database was closed cleanly", async () => {
+    writeManifest([
+      { name: "db", path: "/data/keys" },
+      { name: "db-wal", path: "/data/app.db-wal" }
+    ]);
+    const result = await createFullBackup({ password, encryptOptions: fast, deps });
+    expect(result.warnings).to.deep.equal([]);
   });
 
   it("removes partial output and releases the lock when a step fails", async () => {

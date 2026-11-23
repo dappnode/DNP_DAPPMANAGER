@@ -1,7 +1,29 @@
 import fs from "fs";
 import { params } from "@dappnode/params";
 import { getManifestPath, isNotFoundError, yamlParse } from "@dappnode/utils";
-import { FullBackupCoverage, FullBackupPackageInfo, InstalledPackageData, Manifest } from "@dappnode/types";
+import {
+  FullBackupCoverage,
+  FullBackupPackageInfo,
+  InstalledPackageData,
+  Manifest,
+  PackageBackup
+} from "@dappnode/types";
+
+/**
+ * Packages that hold validator keys or slashing protection. Running the same
+ * keys on two nodes gets validators slashed, so their backups are taken with
+ * the package stopped and a restore keeps them stopped until the user starts
+ * them
+ */
+const VALIDATOR_NAME_PATTERN = /web3signer|lido-csm|obol|ssv|stakewise|rocketpool|stader|diva|charon/i;
+const VALIDATOR_ITEM_PATTERN = /keystore|validator|slashing/i;
+
+export function isValidatorPackage({ dnpName, backup }: { dnpName: string; backup: PackageBackup[] }): boolean {
+  return (
+    VALIDATOR_NAME_PATTERN.test(dnpName) ||
+    backup.some((item) => VALIDATOR_ITEM_PATTERN.test(item.name) || VALIDATOR_ITEM_PATTERN.test(item.path))
+  );
+}
 
 /**
  * Read the manifest stored at install time. Returns null if it is missing,
@@ -40,6 +62,7 @@ export function getPackageBackupInfo(pkg: InstalledPackageData, manifest: Manife
     version: pkg.version,
     isCore: pkg.isCore,
     coverage: getCoverage(pkg, manifest),
+    validator: isValidatorPackage({ dnpName: pkg.dnpName, backup: manifest?.backup ?? [] }),
     backupItems: (manifest?.backup ?? []).map((item) => item.name),
     namedVolumes: getNamedVolumes(pkg)
   };

@@ -24,7 +24,8 @@ import { getVersionData } from "../utils/getVersionData.js";
 import { createFileTransferId, ensureTempTransferDir, registerTempTransferFile } from "../uploads/tempTransfer.js";
 import { createEncryptStream, EncryptOptions } from "./format.js";
 import { cacheDbIncludedKeys, mainDbIncludedKeys, nexusDbIncludedKeys, pickKeys } from "./dbKeys.js";
-import { getCoverage, getNamedVolumes, readInstalledManifest } from "./coverage.js";
+import { getCoverage, getNamedVolumes, isValidatorPackage, readInstalledManifest } from "./coverage.js";
+import { canStopForBackup, RestartPackage, stopPackageForBackup } from "./packageStop.js";
 
 export const FULL_BACKUP_PASSWORD_MIN_LENGTH = 10;
 const FULL_BACKUP_PASSWORD_MAX_LENGTH = 1024;
@@ -41,13 +42,31 @@ export interface FullBackupDeps {
   listPackages: () => Promise<InstalledPackageData[]>;
   getArchive: (containerName: string, path: string) => Promise<NodeJS.ReadableStream>;
   getHttpsMappings: () => Promise<FullBackupHttpsMappings>;
+  /** Gracefully stop a package before copying its data; returns how to restart it */
+  stopForBackup: (pkg: InstalledPackageData) => Promise<RestartPackage | null>;
 }
 
 const defaultDeps: FullBackupDeps = {
   listPackages,
   getArchive: dockerGetArchive,
-  getHttpsMappings: () => httpsPortal.getMappings()
+  getHttpsMappings: () => httpsPortal.getMappings(),
+  stopForBackup: stopPackageForBackup
 };
+
+/**
+ * SQLite side files: present only while the database is open. A cleanly
+ * stopped package has none, which is not an error
+ */
+const OPTIONAL_SIDE_FILE = /-(wal|shm|journal)$/;
+
+interface StageContext {
+  deps: FullBackupDeps;
+  staging: Staging;
+  warnings: string[];
+  /** The admin is moving or reinstalling this node: validators stay stopped */
+  keepValidatorsStopped: boolean;
+  stoppedValidators: string[];
+}
 
 export function validateBackupPassword(password: unknown): asserts password is string {
   if (typeof password !== "string") throw Error("Backup password is required");
@@ -129,6 +148,10 @@ async function stageBackupItems(
       const archive = await deps.getArchive(container.containerName, item.path);
       entry.file = await staging.writeStream(`packages/${pkg.dnpName}/backup/${item.name}.tar`, archive);
     } catch (e) {
+      if (e.statusCode === 404 && OPTIONAL_SIDE_FILE.test(item.path)) {
+        entry.error = "not present (database closed cleanly)";
+        continue;
+      }
       const reason = e.statusCode === 404 ? `path ${item.path} does not exist` : e.message;
       entry.error = reason;
       warnings.push(`${pkg.dnpName}: could not back up "${item.name}": ${reason}`);
@@ -138,12 +161,8 @@ async function stageBackupItems(
   return entries;
 }
 
-async function stagePackage(
-  deps: FullBackupDeps,
-  staging: Staging,
-  pkg: InstalledPackageData,
-  warnings: string[]
-): Promise<FullBackupPackageEntry | null> {
+async function stagePackage(ctx: StageContext, pkg: InstalledPackageData): Promise<FullBackupPackageEntry | null> {
+  const { staging, warnings } = ctx;
   if (!SAFE_SEGMENT.test(pkg.dnpName)) {
     warnings.push(`Skipped package with unexpected name "${pkg.dnpName}"`);
     return null;
@@ -178,8 +197,49 @@ async function stagePackage(
       manifest: staging.copyIfExists(`${base}/dappnode_package.json`, getManifestPath(pkg.dnpName, pkg.isCore)),
       userSettings: staging.writeJson(`${base}/user-settings.json`, userSettings)
     },
-    backup: await stageBackupItems(deps, staging, pkg, manifest, warnings)
+    backup: await stageBackupItemsStopped(ctx, pkg, manifest)
   };
+}
+
+/**
+ * Copy the package's `backup` paths with the package gracefully stopped, so
+ * databases are closed and validators cannot sign between the last write and
+ * the copy. Each package is stopped only for its own copy, then restarted,
+ * unless it is a validator and the admin is moving this node.
+ */
+async function stageBackupItemsStopped(
+  ctx: StageContext,
+  pkg: InstalledPackageData,
+  manifest: Manifest | null
+): Promise<FullBackupItemEntry[]> {
+  const items = manifest?.backup ?? [];
+  if (items.length === 0) return [];
+  const validator = isValidatorPackage({ dnpName: pkg.dnpName, backup: items });
+
+  let restart: RestartPackage | null = null;
+  if (canStopForBackup(pkg)) {
+    try {
+      restart = await ctx.deps.stopForBackup(pkg);
+    } catch (e) {
+      ctx.warnings.push(`${pkg.dnpName}: could not be stopped, its data was copied while running: ${e.message}`);
+    }
+  }
+
+  try {
+    return await stageBackupItems(ctx.deps, ctx.staging, pkg, manifest, ctx.warnings);
+  } finally {
+    if (validator && ctx.keepValidatorsStopped) {
+      ctx.stoppedValidators.push(pkg.dnpName);
+    } else if (restart) {
+      try {
+        await restart();
+      } catch (e) {
+        ctx.warnings.push(
+          `${pkg.dnpName}: could not be restarted after the backup, start it from its page: ${e.message}`
+        );
+      }
+    }
+  }
 }
 
 async function stageHttpsMappings(
@@ -263,10 +323,13 @@ function backupFileName(date: Date, id: string): string {
  */
 export async function createFullBackup({
   password,
+  keepValidatorsStopped = false,
   encryptOptions,
   deps = defaultDeps
 }: {
   password: string;
+  /** The admin is moving or reinstalling this node: leave validators stopped */
+  keepValidatorsStopped?: boolean;
   /** For tests only: cheaper KDF parameters */
   encryptOptions?: EncryptOptions;
   deps?: FullBackupDeps;
@@ -291,9 +354,10 @@ export async function createFullBackup({
     const dappmanagerFiles = stageDappmanagerFiles(staging);
     dappmanagerFiles.httpsMappings = await stageHttpsMappings(deps, staging, warnings);
 
+    const ctx: StageContext = { deps, staging, warnings, keepValidatorsStopped, stoppedValidators: [] };
     const packages: FullBackupPackageEntry[] = [];
     for (const pkg of await deps.listPackages()) {
-      const entry = await stagePackage(deps, staging, pkg, warnings);
+      const entry = await stagePackage(ctx, pkg);
       if (entry) packages.push(entry);
     }
     packages.sort((a, b) => a.dnpName.localeCompare(b.dnpName));
@@ -314,7 +378,7 @@ export async function createFullBackup({
 
     const { size } = fs.statSync(outPath);
     logs.info(`Full backup created: ${packages.length} packages, ${size} bytes, ${warnings.length} warnings`);
-    return { fileId, fileName, sizeBytes: size, warnings };
+    return { fileId, fileName, sizeBytes: size, warnings, stoppedValidators: ctx.stoppedValidators };
   } catch (e) {
     fs.rmSync(outPath, { force: true });
     throw e;

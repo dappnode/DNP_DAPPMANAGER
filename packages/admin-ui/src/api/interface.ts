@@ -30,7 +30,11 @@ export interface IApiRoutes {
   /** Upload file to Dappnode and get a fileId */
   uploadFile(file: File, onProgress: (data: { loaded: number; total: number }) => void): Promise<{ fileId: string }>;
   /** Create an encrypted full backup. Requires the admin password; download it with downloadUrl */
-  createFullBackup(data: { adminPassword: string; password: string }): Promise<FullBackupCreateResult>;
+  createFullBackup(data: {
+    adminPassword: string;
+    password: string;
+    keepValidatorsStopped: boolean;
+  }): Promise<FullBackupCreateResult>;
 }
 
 export interface IApiRpc {

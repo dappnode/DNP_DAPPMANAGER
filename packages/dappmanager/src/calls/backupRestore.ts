@@ -8,6 +8,7 @@ import { packageRestart } from "./packageRestart.js";
 import { shell } from "@dappnode/utils";
 import { validateBackupArray } from "../utils/index.js";
 import { PackageBackup } from "@dappnode/types";
+import { canStopForBackup, RestartPackage, stopPackageForBackup } from "../fullBackup/packageStop.js";
 
 const tempTransferDir = params.TEMP_TRANSFER_DIR;
 
@@ -59,6 +60,21 @@ export async function backupRestore({
 
     const successfulBackups: string[] = [];
     let lastError: Error | null = null;
+
+    // Create the target folders while the package runs (docker exec needs a
+    // running container), then stop it so the files are not replaced under a
+    // running process: a database closing on restart could otherwise
+    // overwrite or delete the restored files (e.g. SQLite removing its -wal)
+    for (const { path: toPath, service } of backup) {
+      const container = dnp.containers.find((c) => !service || c.serviceName === service);
+      if (!container?.running) continue;
+      await shell(`docker exec ${container.containerName} mkdir -p ${path.parse(toPath).dir}`).catch((e) =>
+        logs.warn(`Could not create ${path.parse(toPath).dir} in ${container.containerName}: ${e.message}`)
+      );
+    }
+    let restart: RestartPackage | null = null;
+    if (canStopForBackup(dnp)) restart = await stopPackageForBackup(dnp);
+
     for (const { name, path: toPath, service } of backup) {
       try {
         const container = dnp.containers.find((c) => !service || c.serviceName === service);
@@ -68,10 +84,6 @@ export async function backupRestore({
         const fromPath = path.join(backupDir, name);
         // lstatSync throws if path does not exist, so must call existsSync first
         if (!fs.existsSync(fromPath)) throw Error(`path ${fromPath} does not exist`);
-
-        // Make sure the base dir exists on the container (will throw otherwise)
-        const toPathDir = path.parse(toPath).dir;
-        await shell(`docker exec ${containerName} mkdir -p ${toPathDir}`);
 
         if (fs.lstatSync(fromPath).isDirectory()) {
           await shell(`docker cp ${fromPath}/. ${containerName}:${toPath}`);
@@ -85,6 +97,11 @@ export async function backupRestore({
       }
     }
 
+    // Start again what was running. Packages that cannot be stopped for a
+    // restore are restarted so the file changes take effect
+    if (restart) await restart();
+    else if (!canStopForBackup(dnp)) await packageRestart({ dnpName });
+
     if (!successfulBackups.length && lastError) {
       lastError.message = `Could not unbackup any item: ${lastError.message}`;
       throw lastError;
@@ -93,9 +110,6 @@ export async function backupRestore({
     // Clean intermediate file
     await shell(`rm -rf ${backupDir}`);
     await shell(`rm -rf ${backupDirCompressed}`);
-
-    // Restart package so the file changes take effect
-    await packageRestart({ dnpName });
   } catch (e) {
     // In case of error delete all intermediate files to keep the disk space clean
     await shell(`rm -rf ${tempTransferDir}`);

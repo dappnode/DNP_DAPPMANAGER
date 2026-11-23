@@ -10,6 +10,7 @@ import { listPackage } from "@dappnode/dockerapi";
 import { shell } from "@dappnode/utils";
 import { validateBackupArray } from "../utils/index.js";
 import { PackageBackup } from "@dappnode/types";
+import { canStopForBackup, stopPackageForBackup } from "../fullBackup/packageStop.js";
 
 const tempTransferDir = params.TEMP_TRANSFER_DIR;
 
@@ -33,19 +34,26 @@ export async function backupGet({ dnpName, backup }: { dnpName: string; backup: 
   try {
     const successfulBackups: string[] = [];
     let lastError: Error | null = null;
-    for (const { name, path: fromPath, service } of backup) {
-      try {
-        const container = dnp.containers.find((c) => !service || c.serviceName === service);
-        if (!container) throw Error(`No container found for service ${service}`);
+    // Stop the package while copying so databases are closed and validators
+    // cannot sign between the last write and the copy
+    const restart = canStopForBackup(dnp) ? await stopPackageForBackup(dnp) : null;
+    try {
+      for (const { name, path: fromPath, service } of backup) {
+        try {
+          const container = dnp.containers.find((c) => !service || c.serviceName === service);
+          if (!container) throw Error(`No container found for service ${service}`);
 
-        const toPath = path.join(backupDir, name);
+          const toPath = path.join(backupDir, name);
 
-        await shell(`docker cp ${container.containerName}:${fromPath} ${toPath}`);
-        successfulBackups.push(name);
-      } catch (e) {
-        if (e.message.includes("No such container:path")) lastError = Error(`path ${fromPath} does not exist`);
-        logs.error("Error getting backup", { dnpName, name, fromPath }, e);
+          await shell(`docker cp ${container.containerName}:${fromPath} ${toPath}`);
+          successfulBackups.push(name);
+        } catch (e) {
+          if (e.message.includes("No such container:path")) lastError = Error(`path ${fromPath} does not exist`);
+          logs.error("Error getting backup", { dnpName, name, fromPath }, e);
+        }
       }
+    } finally {
+      if (restart) await restart();
     }
 
     if (!successfulBackups.length && lastError) {

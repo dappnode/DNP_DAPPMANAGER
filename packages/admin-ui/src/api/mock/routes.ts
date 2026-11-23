@@ -26,14 +26,15 @@ export const apiRoutes: IApiRoutes = {
     return generateDownloadUrl(`Sample container logs ${containerName}`);
   },
 
-  async createFullBackup({ adminPassword }) {
+  async createFullBackup({ adminPassword, keepValidatorsStopped }) {
     await new Promise((r) => setTimeout(r, 1500));
     if (adminPassword !== "dappnode") throw Error("WRONG_CREDENTIALS");
     return {
       fileId: "64020f6e8d2d02aa2324dab9cd68a8ccb186e192232814f79f35d4c2fbf2d1cc",
       fileName: "dappnode-backup-2026-11-23T10-15-00Z-1a2b.dnbackup",
       sizeBytes: 1843200,
-      warnings: ['rotki.dnp.dappnode.eth: could not back up "logs": path /data/logs does not exist']
+      warnings: ['rotki.dnp.dappnode.eth: could not back up "logs": path /data/logs does not exist'],
+      stoppedValidators: keepValidatorsStopped ? ["web3signer.dnp.dappnode.eth"] : []
     };
   },
 

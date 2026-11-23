@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Alert from "react-bootstrap/esm/Alert";
+import Form from "react-bootstrap/esm/Form";
 import { apiRoutes, useApi } from "api";
 import { FullBackupCreateResult, FullBackupInfo, FullBackupPackageInfo } from "@dappnode/types";
 import Card from "components/Card";
@@ -65,7 +66,9 @@ function CreateBackupForm({ info }: { info: FullBackupInfo }) {
   const [adminPassword, setAdminPassword] = useState("");
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
+  const [keepValidatorsStopped, setKeepValidatorsStopped] = useState(false);
   const [reqStatus, setReqStatus] = useState<ReqStatus<FullBackupCreateResult>>({});
+  const validators = info.packages.filter((pkg) => pkg.validator);
 
   const lengthError =
     password.length < info.passwordMinLength
@@ -79,7 +82,7 @@ function CreateBackupForm({ info }: { info: FullBackupInfo }) {
     if (!isValid) return;
     try {
       setReqStatus({ loading: true });
-      const result = await apiRoutes.createFullBackup({ adminPassword, password });
+      const result = await apiRoutes.createFullBackup({ adminPassword, password, keepValidatorsStopped });
       setReqStatus({ result });
       setAdminPassword("");
       setPassword("");
@@ -92,7 +95,7 @@ function CreateBackupForm({ info }: { info: FullBackupInfo }) {
   }
 
   if (reqStatus.result) {
-    const { fileId, fileName, sizeBytes, warnings } = reqStatus.result;
+    const { fileId, fileName, sizeBytes, warnings, stoppedValidators } = reqStatus.result;
     return (
       <div className="full-backup-result">
         <Alert variant="success">
@@ -104,6 +107,13 @@ function CreateBackupForm({ info }: { info: FullBackupInfo }) {
         <div className="full-backup-note">
           Allow browser pop-ups or click download. The download link works once and expires in 30 minutes.
         </div>
+        {stoppedValidators.length > 0 && (
+          <Alert variant="warning">
+            These validators are stopped and stay stopped, so this backup holds their exact slashing protection:{" "}
+            {stoppedValidators.map(prettyDnpName).join(", ")}. Do not start them on this node again if you restore the
+            backup elsewhere.
+          </Alert>
+        )}
         {warnings.length > 0 && (
           <Alert variant="warning">
             <div>Some items could not be backed up:</div>
@@ -164,6 +174,24 @@ function CreateBackupForm({ info }: { info: FullBackupInfo }) {
         }
       >
         {hint && <div className={`full-backup-strength full-backup-strength-${hint.level}`}>{hint.text}</div>}
+        <p className="full-backup-note">
+          Packages with backup data are paused for a few seconds while their data is copied, so databases are copied in
+          a consistent state.
+        </p>
+        {validators.length > 0 && (
+          <Form.Check
+            type="checkbox"
+            id="full-backup-keep-validators-stopped"
+            className="full-backup-keep-stopped"
+            checked={keepValidatorsStopped}
+            onChange={(e) => setKeepValidatorsStopped(e.target.checked)}
+            label={`I am moving or reinstalling this Dappnode: keep validators stopped after the backup (${validators
+              .map((pkg) => prettyDnpName(pkg.dnpName))
+              .join(
+                ", "
+              )}). Validators are always stopped while copied, so their slashing protection is exact; leaving them stopped guarantees nothing is signed after it.`}
+          />
+        )}
         <Button type="submit" onClick={onCreate} variant="dappnode" disabled={!isValid || reqStatus.loading}>
           {reqStatus.loading ? "Creating backup..." : "Create backup"}
         </Button>

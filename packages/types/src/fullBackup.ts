@@ -15,6 +15,8 @@ export interface FullBackupPackageInfo {
   version: string;
   isCore: boolean;
   coverage: FullBackupCoverage;
+  /** Holds validator keys or slashing protection */
+  validator: boolean;
   /** Names of the manifest `backup` items */
   backupItems: string[];
   /** Named volumes of the package, for reference and future opt-in volume backups */
@@ -34,6 +36,8 @@ export interface FullBackupCreateResult {
   sizeBytes: number;
   /** Non-fatal problems, e.g. a declared backup path that does not exist */
   warnings: string[];
+  /** Validator packages left stopped because the user is moving this node */
+  stoppedValidators: string[];
 }
 
 /** Manifest `backup` item and where its data was stored inside the archive */

@@ -48,6 +48,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
         version: "0.2.95",
         isCore: true,
         coverage: "covered",
+        validator: false,
         backupItems: [],
         namedVolumes: ["dappmanagerdnpdappnodeeth_data"]
       },
@@ -56,6 +57,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
         version: "0.2.12",
         isCore: true,
         coverage: "stateless",
+        validator: false,
         backupItems: [],
         namedVolumes: []
       },
@@ -64,6 +66,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
         version: "1.14.0",
         isCore: false,
         coverage: "not-covered",
+        validator: false,
         backupItems: [],
         namedVolumes: ["gethdnpdappnodeeth_data"]
       },
@@ -72,6 +75,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
         version: "1.3.0",
         isCore: false,
         coverage: "covered",
+        validator: false,
         backupItems: ["data", "logs"],
         namedVolumes: ["rotkidnpdappnodeeth_data"]
       },
@@ -80,6 +84,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
         version: "2.1.0",
         isCore: false,
         coverage: "covered",
+        validator: true,
         backupItems: ["keystores", "slashing-protection"],
         namedVolumes: ["web3signerdnpdappnodeeth_data"]
       }
