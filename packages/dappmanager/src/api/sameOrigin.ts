@@ -19,6 +19,10 @@ import type express from "express";
 export const CROSS_ORIGIN_REQUEST_REJECTED = "CROSS_ORIGIN_REQUEST_REJECTED";
 export const UNSUPPORTED_CONTENT_TYPE = "UNSUPPORTED_CONTENT_TYPE";
 
+const PROXY_HINT =
+  "If you reach the admin UI through your own reverse proxy, configure it to forward the original Host header " +
+  "(nginx: `proxy_set_header Host $host;`) and, if it terminates TLS, `X-Forwarded-Proto`";
+
 const safeMethods = new Set(["GET", "HEAD", "OPTIONS"]);
 
 export type SameOriginCheck = { allowed: true } | { allowed: false; reason: string };
@@ -29,16 +33,14 @@ function firstHeader(value: string | string[] | undefined): string | undefined {
 }
 
 /**
- * Schemes the browser may have used to reach this server. The HTTPS portal
- * terminates TLS and forwards to the dappmanager over plain HTTP, keeping the
- * browser's `Host` (`proxy_set_header Host $host`) and adding
- * `X-Forwarded-Proto: https`.
+ * Scheme the browser used to reach this server. The dappmanager only listens
+ * on plain HTTP, unless a proxy terminated TLS: the HTTPS portal forwards
+ * keeping the browser's `Host` (`proxy_set_header Host $host`) and adding
+ * `X-Forwarded-Proto: https`. Then only an `https:` origin is the same origin.
  */
-function getAllowedSchemes(headers: IncomingHttpHeaders): Set<string> {
-  const schemes = new Set(["http:"]);
+function getRequestScheme(headers: IncomingHttpHeaders): string {
   const forwardedProto = firstHeader(headers["x-forwarded-proto"])?.split(",")[0]?.trim().toLowerCase();
-  if (forwardedProto === "https" || forwardedProto === "http") schemes.add(`${forwardedProto}:`);
-  return schemes;
+  return forwardedProto === "https" ? "https:" : "http:";
 }
 
 /**
@@ -56,7 +58,7 @@ function isOwnOrigin(origin: string, headers: IncomingHttpHeaders): boolean {
     return false;
   }
 
-  return originUrl.host.toLowerCase() === host && getAllowedSchemes(headers).has(originUrl.protocol);
+  return originUrl.host.toLowerCase() === host && originUrl.protocol === getRequestScheme(headers);
 }
 
 /**
@@ -83,7 +85,13 @@ export function checkSameOrigin(headers: IncomingHttpHeaders, allowedOrigins: re
 
   if (origin) {
     if (isOwnOrigin(origin, headers)) return { allowed: true };
-    return { allowed: false, reason: `Origin ${origin}` };
+    // Also reached by an admin behind their own reverse proxy if it rewrites `Host`. The server cannot
+    // tell that apart from a foreign origin, so say what the proxy must forward instead of guessing
+    const receivedAt = `${getRequestScheme(headers)}//${firstHeader(headers.host) ?? ""}`;
+    return {
+      allowed: false,
+      reason: `Origin ${origin} is not ${receivedAt}, where this request was received. ${PROXY_HINT}`
+    };
   }
 
   return { allowed: true };
@@ -107,16 +115,37 @@ export function sameOriginGuard(allowedOrigins: readonly string[]): express.Requ
 }
 
 /**
+ * Engine.io answers a polling handshake as JSONP (`___eio[<j>](...)`) if its
+ * URL has a `j` query parameter. A `<script src>` can then read the session id
+ * from another origin and drive the session with form POSTs. Over plain HTTP
+ * that script request has neither `Origin` nor `Sec-Fetch-Site`, exactly like
+ * the admin UI's own same-origin polling handshake, so the headers cannot
+ * tell them apart. No supported client uses JSONP.
+ */
+function isJsonpHandshake(req: IncomingMessage): boolean {
+  // Engine.io parses the query into `_query` before calling `allowRequest` and picks the transport from it
+  const engineQuery = (req as IncomingMessage & { _query?: Record<string, unknown> })._query;
+  if (engineQuery) return Object.hasOwn(engineQuery, "j");
+
+  try {
+    return new URL(req.url ?? "", "http://localhost").searchParams.has("j");
+  } catch {
+    return true;
+  }
+}
+
+/**
  * Socket.io `allowRequest` option. WebSocket handshakes are not subject to
  * CORS, so without this any same-site page could open the RPC socket with
- * the admin's cookie. Engine.io calls it for every new connection handshake.
+ * the admin's cookie. Engine.io calls it for every new connection handshake,
+ * and not again for the requests that follow with the session id.
  */
 export function socketIoAllowRequest(
   allowedOrigins: readonly string[]
 ): (req: IncomingMessage, callback: (err: string | null | undefined, success: boolean) => void) => void {
   return (req, callback) => {
     const check = checkSameOrigin(req.headers, allowedOrigins);
-    if (check.allowed) callback(null, true);
+    if (check.allowed && !isJsonpHandshake(req)) callback(null, true);
     else callback(CROSS_ORIGIN_REQUEST_REJECTED, false);
   };
 }

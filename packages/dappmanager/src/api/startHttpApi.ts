@@ -7,7 +7,7 @@ import cors from "cors";
 import { Server } from "socket.io";
 import path from "path";
 import { toSocketIoHandler, wrapHandler } from "./utils.js";
-import { AuthPasswordSession, AuthPasswordSessionParams } from "./auth/index.js";
+import { AuthPasswordSession, AuthPasswordSessionParams, parseMcpBearerToken } from "./auth/index.js";
 import { AdminPasswordDb } from "./auth/adminPasswordDb.js";
 import { ClientSideCookies, ClientSideCookiesParams } from "./sessions/index.js";
 import { mapSubscriptionsToEventBus } from "./subscriptions.js";
@@ -39,7 +39,7 @@ import { ensureTempTransferDir } from "../uploads/tempTransfer.js";
 import { parseHttpUploadFile, reserveHttpUploadCapacity } from "../uploads/httpUploadGuard.js";
 import { createIpfsAvatarHandler, GetIpfsFileBytes } from "./avatar.js";
 import { requireJsonBody, sameOriginGuard, socketIoAllowRequest } from "./sameOrigin.js";
-import { getNexusAuthLimiter } from "./middlewares/requestLimit/index.js";
+import { getAuthLimiter, getNexusAuthLimiter } from "./middlewares/requestLimit/index.js";
 
 export interface HttpApiParams extends ClientSideCookiesParams, AuthPasswordSessionParams {
   AUTH_IP_ALLOW_LOCAL_IP: boolean;
@@ -124,11 +124,18 @@ export function startHttpApi({
   // CSRF protection: reject state-changing requests the browser reports as not same-origin.
   // The SameSite=Strict session cookie does not cover same-site origins such as other
   // HTTPS portal subdomains (https://<sub>.<hash>.dyndns.dappnode.io)
-  app.use(sameOriginGuard(params.HTTP_CORS_WHITELIST));
+  const sameOrigin = sameOriginGuard(params.HTTP_CORS_WHITELIST);
+  // Except for MCP clients that send their own `Origin`: the MCP bearer key is not an ambient
+  // credential, a browser cannot attach it to a forged request. A /mcp request that presents one
+  // and carries no cookie can only pass `onlyAdminOrMcpApiKey` with a valid key
+  const isMcpPath = (req: express.Request): boolean => req.path === "/mcp" || req.path === "/mcp/";
+  const isMcpBearerRequest = (req: express.Request): boolean =>
+    isMcpPath(req) && req.headers.cookie === undefined && parseMcpBearerToken(req.headers.authorization) !== null;
+  app.use((req, res, next) => (isMcpBearerRequest(req) ? next() : sameOrigin(req, res, next)));
   app.use(compression());
   const skipMcpBodyParser = (handler: RequestHandler): RequestHandler => {
     return (req, res, next) => {
-      if (req.path === "/mcp" || req.path === "/mcp/") return next();
+      if (isMcpPath(req)) return next();
       return handler(req, res, next);
     };
   };
@@ -181,15 +188,18 @@ export function startHttpApi({
     }
   });
 
+  // /change-pass checks the current password, so it gets a strict limiter of failed attempts. It goes
+  // after the session check, so only requests with a valid session count.
+  // TODO: /login has no limiter. It is unauthenticated and clients behind the same proxy share one IP,
+  // so a per-IP limit would let anyone on that proxy lock the admin out of logging in
   app.post("/login-status", requireJsonBody, auth.loginAdminStatus);
   app.post("/login", requireJsonBody, auth.loginAdmin);
   app.post("/logout", requireJsonBody, auth.logoutAdmin);
-  app.post("/change-pass", requireJsonBody, auth.changeAdminPassword);
+  app.post("/change-pass", requireJsonBody, auth.onlyAdmin, getAuthLimiter(), auth.changeAdminPassword);
   app.post("/register", requireJsonBody, auth.registerAdmin);
   app.post("/recover-pass", requireJsonBody, auth.recoverAdminPassword);
 
   // Limit requests per IP for NON AUTH methods
-  // TODO: implement a more sophisticated rate limiter for auth methods
   app.use(limiterMiddleware);
 
   // Ping - health check
@@ -214,10 +224,11 @@ export function startHttpApi({
   );
 
   // Nexus chat proxy (Nexus API key held server-side).
-  // The login route performs an external auth exchange, so it also gets its own stricter limiter
+  // The login route performs an external auth exchange, so it also gets its own stricter limiter.
+  // It goes after the session check so requests without a session cannot use up the admin's budget
   const nexusAuthLimiter = getNexusAuthLimiter();
   app.get("/nexus/status", auth.onlyAdmin, nexusStatus);
-  app.post("/nexus/auth/login", nexusAuthLimiter, requireJsonBody, auth.onlyAdmin, nexusLogin);
+  app.post("/nexus/auth/login", requireJsonBody, auth.onlyAdmin, nexusAuthLimiter, nexusLogin);
   app.post("/nexus/config", requireJsonBody, auth.onlyAdmin, nexusSetApiKey);
   app.delete("/nexus/config", requireJsonBody, auth.onlyAdmin, nexusClearApiKey);
   app.post("/nexus/private-mode", requireJsonBody, auth.onlyAdmin, nexusSetPrivateMode);

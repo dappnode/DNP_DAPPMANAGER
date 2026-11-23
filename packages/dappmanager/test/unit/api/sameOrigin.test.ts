@@ -1,20 +1,14 @@
-import fs from "fs";
-import os from "os";
-import path from "path";
 import http from "http";
-import { AddressInfo } from "net";
-import type express from "express";
 import { expect } from "chai";
-import type { EventBus } from "@dappnode/eventbus";
-import type { Routes } from "@dappnode/types";
+import * as db from "@dappnode/db";
 import {
   checkSameOrigin,
   CROSS_ORIGIN_REQUEST_REJECTED,
   socketIoAllowRequest,
   UNSUPPORTED_CONTENT_TYPE
 } from "../../../src/api/sameOrigin.js";
-import { startHttpApi } from "../../../src/api/startHttpApi.js";
-import { AdminPasswordDb } from "../../../src/api/auth/adminPasswordDb.js";
+import { hashMcpApiKey } from "../../../src/api/auth/mcpApiKeyHash.js";
+import { startTestHttpApi, TestHttpApi } from "./startTestHttpApi.js";
 
 const whitelist = ["http://localhost:3000", "http://my.dappnode"];
 const pwaHost = "pwa.abcdef1234.dyndns.dappnode.io";
@@ -76,6 +70,21 @@ describe("api / sameOrigin", () => {
         allowed: true
       },
       {
+        id: "HTTP Origin behind the HTTPS portal (X-Forwarded-Proto https)",
+        headers: { origin: `http://${pwaHost}`, host: pwaHost, "x-forwarded-proto": "https" },
+        allowed: false
+      },
+      {
+        id: "HTTPS Origin behind two proxies (X-Forwarded-Proto https, http)",
+        headers: { origin: `https://${pwaHost}`, host: pwaHost, "x-forwarded-proto": "https, http" },
+        allowed: true
+      },
+      {
+        id: "HTTP Origin with X-Forwarded-Proto http",
+        headers: { origin: "http://dappnode.local", host: "dappnode.local", "x-forwarded-proto": "http" },
+        allowed: true
+      },
+      {
         id: "HTTPS Origin without X-Forwarded-Proto",
         headers: { origin: `https://${pwaHost}`, host: pwaHost },
         allowed: false
@@ -107,12 +116,27 @@ describe("api / sameOrigin", () => {
         expect(checkSameOrigin(headers, whitelist).allowed).to.equal(allowed);
       });
     }
+
+    it("tells an admin behind a Host-rewriting proxy what the proxy must forward", () => {
+      const check = checkSameOrigin({ origin: "http://node.lan", host: "my.dappnode" }, whitelist);
+      if (check.allowed) throw Error("expected a rejection");
+      expect(check.reason).to.include("Origin http://node.lan is not http://my.dappnode");
+      expect(check.reason).to.include("proxy_set_header Host $host;");
+    });
+
+    it("does not add the proxy hint when the browser reports the request as same-site", () => {
+      const check = checkSameOrigin({ "sec-fetch-site": "same-site", origin: evilOrigin, host: pwaHost }, whitelist);
+      expect(check).to.deep.equal({ allowed: false, reason: "Sec-Fetch-Site same-site" });
+    });
   });
 
   describe("socketIoAllowRequest", () => {
-    function allowRequest(headers: http.IncomingHttpHeaders): { err: string | null | undefined; success: boolean } {
+    function allowRequest(
+      headers: http.IncomingHttpHeaders,
+      req: { url?: string; _query?: Record<string, string> } = {}
+    ): { err: string | null | undefined; success: boolean } {
       let result: { err: string | null | undefined; success: boolean } | undefined;
-      socketIoAllowRequest(whitelist)({ headers } as http.IncomingMessage, (err, success) => {
+      socketIoAllowRequest(whitelist)({ headers, ...req } as http.IncomingMessage, (err, success) => {
         result = { err, success };
       });
       if (!result) throw Error("allowRequest callback not called");
@@ -140,79 +164,43 @@ describe("api / sameOrigin", () => {
     it("rejects foreign Origin handshakes from browsers without Sec-Fetch-Site", () => {
       expect(allowRequest({ origin: evilOrigin, host: pwaHost }).success).to.equal(false);
     });
+
+    it("accepts polling handshakes without a JSONP callback", () => {
+      const url = "/socket.io/?EIO=4&transport=polling&t=abcj";
+      expect(allowRequest({}, { url }).success).to.equal(true);
+      expect(allowRequest({}, { url, _query: { EIO: "4", transport: "polling", t: "abcj" } }).success).to.equal(true);
+    });
+
+    it("rejects JSONP polling handshakes, which a <script src> can read from another origin", () => {
+      const sameOriginHeaders = { "sec-fetch-site": "same-origin", origin: "http://my.dappnode" };
+      for (const headers of [{}, sameOriginHeaders]) {
+        for (const jsonpQuery of ["j=0", "j=", "j", "%6A=0", "j=0&j=1"]) {
+          const url = `/socket.io/?EIO=4&transport=polling&${jsonpQuery}`;
+          expect(allowRequest(headers, { url }), url).to.deep.equal({
+            err: CROSS_ORIGIN_REQUEST_REJECTED,
+            success: false
+          });
+        }
+        // As parsed by engine.io before it calls allowRequest
+        expect(allowRequest(headers, { _query: { EIO: "4", transport: "polling", j: "0" } }).success).to.equal(false);
+      }
+    });
   });
 
   describe("startHttpApi", function () {
     this.timeout(20000);
 
-    let server: http.Server;
+    let api: TestHttpApi;
     let baseUrl: string;
     let host: string;
-    let tmpDir: string;
 
     before(async () => {
-      tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "dappmanager-same-origin-test-"));
-      const params = {
-        AUTH_IP_ALLOW_LOCAL_IP: false,
-        HTTP_API_PORT: 0,
-        UI_FILES_PATH: tmpDir,
-        HTTP_CORS_WHITELIST: whitelist,
-        ADMIN_RECOVERY_FILE: path.join(tmpDir, "recovery.txt"),
-        SESSIONS_SECRET_FILE: path.join(tmpDir, "sessions-secret.txt"),
-        ADMIN_PASSWORDS_JSON_FILE: path.join(tmpDir, "passwords.json"),
-        ADMIN_STATUS_JSON_FILE: path.join(tmpDir, "status.json"),
-        SESSIONS_MAX_TTL_MS: 60_000,
-        SESSIONS_TTL_MS: 60_000
-      };
-      // Report how the body was parsed without reflecting request data
-      const describeBody: express.RequestHandler = (req, res) => {
-        const body: unknown = req.body;
-        res.json({ bodyType: typeof body, bodyLength: typeof body === "string" ? body.length : null });
-      };
-      const notUsed = (): void => {
-        throw Error("not used");
-      };
-      const noop = (_req: unknown, _res: unknown, next: () => void): void => next();
-
-      server = startHttpApi({
-        params,
-        logs: { debug: () => {}, info: () => {}, warn: () => {}, error: () => {} },
-        routes: {
-          containerLogs: notUsed,
-          dataSend: describeBody,
-          download: notUsed,
-          downloadUserActionLogs: notUsed,
-          downloadWireguardConfig: notUsed,
-          env: notUsed,
-          fileDownload: notUsed,
-          globalEnvs: notUsed,
-          packageManifest: notUsed,
-          metrics: notUsed,
-          publicPackagesData: notUsed,
-          sign: describeBody,
-          upload: notUsed
-        },
-        limiterMiddleware: noop,
-        counterViewsMiddleware: noop,
-        ethForwardMiddleware: noop,
-        routesLogger: {},
-        methods: {} as Routes,
-        subscriptionsLogger: {},
-        adminPasswordDb: new AdminPasswordDb(params),
-        eventBus: fakeEventBus,
-        isNewDappmanagerVersion: () => false,
-        getIpfsFileBytes: async () => new Uint8Array()
-      });
-      if (!server.listening) await new Promise((resolve) => server.once("listening", resolve));
-      const { port } = server.address() as AddressInfo;
-      host = `127.0.0.1:${port}`;
-      baseUrl = `http://${host}`;
+      api = await startTestHttpApi(whitelist);
+      ({ baseUrl, host } = api);
     });
 
     after(async () => {
-      server.closeAllConnections();
-      await new Promise((resolve) => server.close(resolve));
-      fs.rmSync(tmpDir, { recursive: true, force: true });
+      await api.close();
     });
 
     async function post(
@@ -279,6 +267,9 @@ describe("api / sameOrigin", () => {
       );
       expect(res.status).to.equal(403);
       expect(res.body).to.include(CROSS_ORIGIN_REQUEST_REJECTED);
+      // Same response an admin gets behind a reverse proxy that rewrites Host
+      expect(JSON.parse(res.body).error.message).to.include(`is not http://${host}, where this request was received`);
+      expect(res.body).to.include("proxy_set_header Host $host;");
     });
 
     it("keeps text/plain package routes working for non-browser clients", async () => {
@@ -301,13 +292,86 @@ describe("api / sameOrigin", () => {
       expect(await handshake({ "sec-fetch-site": "same-origin", origin: baseUrl })).to.equal(200);
       expect(await handshake({ origin: `http://${host}` })).to.equal(200);
     });
+
+    it("rejects JSONP Socket.io handshakes, with or without browser headers", async () => {
+      const handshake = async (query: string, headers: Record<string, string> = {}): Promise<[number, string]> => {
+        const res = await fetch(`${baseUrl}/socket.io/?EIO=4&transport=polling${query}`, { headers });
+        return [res.status, await res.text()];
+      };
+
+      // The admin UI's own polling handshake over plain HTTP carries neither Origin nor Sec-Fetch-Site
+      const [status, body] = await handshake("");
+      expect(status).to.equal(200);
+      expect(body.startsWith('0{"sid":')).to.equal(true);
+
+      const headerSets: Record<string, string>[] = [{}, { "sec-fetch-site": "same-origin", origin: baseUrl }];
+      for (const query of ["&j=0", "&j=", "&j", "&%6A=0", "&j=0&j=1"]) {
+        for (const headers of headerSets) {
+          const [status, body] = await handshake(query, headers);
+          expect(status, query).to.equal(403);
+          expect(body, query).to.not.include("___eio");
+        }
+      }
+    });
+
+    describe("MCP bearer key requests", () => {
+      const mcpKey = "mcp-secret";
+      const initialize = JSON.stringify({
+        jsonrpc: "2.0",
+        id: 1,
+        method: "initialize",
+        params: { protocolVersion: "2025-03-26", capabilities: {}, clientInfo: { name: "test", version: "1" } }
+      });
+      const mcpHeaders = {
+        "content-type": "application/json",
+        accept: "application/json, text/event-stream",
+        origin: "app://mcp-client"
+      };
+
+      before(() => {
+        db.clearMainDb();
+        db.mcpApiKey.set(hashMcpApiKey(mcpKey));
+      });
+
+      after(() => {
+        db.clearMainDb();
+      });
+
+      it("lets an MCP client that sends its own Origin authenticate with the key", async () => {
+        const res = await post("/mcp", { ...mcpHeaders, authorization: `Bearer ${mcpKey}` }, initialize);
+        expect(res.status).to.equal(200);
+        expect(res.body).to.include('"serverInfo"');
+      });
+
+      it("still checks the key", async () => {
+        const res = await post("/mcp", { ...mcpHeaders, authorization: "Bearer wrong-key" }, initialize);
+        expect(res.status).to.equal(401);
+        expect(res.body).to.include("NOT_REGISTERED");
+      });
+
+      it("rejects a cross-origin /mcp request without a bearer key", async () => {
+        const res = await post("/mcp", mcpHeaders, initialize);
+        expect(res.status).to.equal(403);
+        expect(res.body).to.include(CROSS_ORIGIN_REQUEST_REJECTED);
+      });
+
+      it("rejects a cross-origin /mcp request that carries a cookie, even with a bearer key", async () => {
+        const res = await post(
+          "/mcp",
+          { ...mcpHeaders, authorization: `Bearer ${mcpKey}`, cookie: "session=x; session.sig=y" },
+          initialize
+        );
+        expect(res.status).to.equal(403);
+        expect(res.body).to.include(CROSS_ORIGIN_REQUEST_REJECTED);
+      });
+
+      it("does not exempt other routes that receive a bearer key", async () => {
+        for (const route of ["/rpc", "/login", "/register", "/mcp/other"]) {
+          const res = await post(route, { ...mcpHeaders, authorization: `Bearer ${mcpKey}` }, initialize);
+          expect(res.status, route).to.equal(403);
+          expect(res.body, route).to.include(CROSS_ORIGIN_REQUEST_REJECTED);
+        }
+      });
+    });
   });
 });
-
-// mapSubscriptionsToEventBus only registers listeners and emits initial requests
-const fakeEventBus = new Proxy(
-  {},
-  {
-    get: () => ({ on: () => {}, emit: () => {} })
-  }
-) as unknown as EventBus;
