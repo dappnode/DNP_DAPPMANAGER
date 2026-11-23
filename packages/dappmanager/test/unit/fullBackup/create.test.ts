@@ -146,10 +146,10 @@ describe("fullBackup / createFullBackup", () => {
     for (const archivePath of referenced) expect(entries.has(archivePath as string), archivePath).to.equal(true);
 
     expect(entries.get(`packages/${dnpName}/backup/keys.tar`)?.toString()).to.equal("TAR-BYTES-OF-KEYS");
-    expect(json(entries, `packages/${dnpName}/user-settings.json`)).to.have.nested.property(
-      `environment.${dnpName.replace(/\./g, "\\.")}.FOO`,
-      "bar"
-    );
+    const userSettings = json(entries, `packages/${dnpName}/user-settings.json`) as {
+      environment?: Record<string, Record<string, string>>;
+    };
+    expect(userSettings.environment?.[dnpName]?.FOO).to.equal("bar");
 
     const mainDb = json(entries, "dappmanager/maindb.json");
     expect(mainDb).to.include({ "dappnode-web-name": "my node", "telegram-token": "telegram-secret" });
