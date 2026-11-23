@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
 import { sidenavItems, fundedBy, premiumLabel } from "./navbarItems";
 import logoWide from "img/dappnode-logo-wide-min.png";
@@ -6,7 +7,8 @@ import logoWideDark from "img/dappnode-logo-wide-min-dark.png";
 import logomin from "img/dappnode-logo-only.png";
 import { AppContext } from "../../App";
 import "./sidebar.scss";
-import { api } from "api";
+import { coreDnpName } from "params";
+import { getDnpInstalled } from "services/dnpInstalled/selectors";
 
 if (!Array.isArray(sidenavItems)) throw Error("sidenavItems must be an array");
 if (!Array.isArray(fundedBy)) throw Error("fundedBy must be an array");
@@ -14,13 +16,9 @@ if (!Array.isArray(fundedBy)) throw Error("fundedBy must be an array");
 export default function SideBar({ screenWidth }: { screenWidth: number }) {
   const { theme } = React.useContext(AppContext);
 
-  const [coreVersion, setCoreVersion] = useState("");
-  useEffect(() => {
-    async function getCoreVersion(): Promise<void> {
-      setCoreVersion(await api.getCoreVersion());
-    }
-    getCoreVersion();
-  }, []);
+  // Read from the installed packages store, which the packages subscription
+  // refreshes after every install, so a core update shows without a reload
+  const coreVersion = useSelector(getDnpInstalled).find((dnp) => dnp.dnpName === coreDnpName)?.version ?? "";
 
   return (
     <div id="sidebar">
