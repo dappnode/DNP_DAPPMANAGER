@@ -141,3 +141,82 @@ export type FullBackupUserSettings = UserSettings;
 
 /** Content of https-mappings.json inside the archive */
 export type FullBackupHttpsMappings = HttpsPortalMapping[];
+
+/**
+ * Restore
+ * - merge: install and configure the backup's packages on this node, keep
+ *   this node's identity, admin login and system settings
+ * - clone: make this node as close as possible to the backed-up one:
+ *   identity, admin login and system settings too, and remove packages that
+ *   are not in the backup (their volumes are kept)
+ */
+export type FullBackupRestoreMode = "merge" | "clone";
+
+/**
+ * - install: not installed here, install the backup's version
+ * - update: installed at an older version, update to the backup's version
+ * - apply-settings: installed at the same version, apply the backup's settings
+ * - keep-newer: installed at a newer version, keep it and apply settings that still fit
+ * - skip: not restored, see reason
+ * - remove: clone only, installed here but not in the backup
+ */
+export type FullBackupRestoreAction = "install" | "update" | "apply-settings" | "keep-newer" | "skip" | "remove";
+
+export interface FullBackupRestorePackagePlan {
+  dnpName: string;
+  action: FullBackupRestoreAction;
+  backupVersion: string | null;
+  installedVersion: string | null;
+  isCore: boolean;
+  /** Whether the manifest `backup` data from the file is written into the package */
+  restoreData: boolean;
+  /** Holds validator keys or slashing protection: stays stopped after restore */
+  validator: boolean;
+  reason?: string;
+}
+
+export interface FullBackupRestorePlan {
+  mode: FullBackupRestoreMode;
+  packages: FullBackupRestorePackagePlan[];
+  /** Applied to this node's dappmanager */
+  restoresIdentity: boolean;
+  restoresAdminLogin: boolean;
+  restoresSystemSettings: boolean;
+  warnings: string[];
+}
+
+export interface FullBackupInspectResult {
+  createdAt: string;
+  dappmanagerVersion?: string;
+  arch: string;
+  packageCount: number;
+  /** When non-empty the backup cannot be restored on this node */
+  blockers: string[];
+  /** True if any package holds validator keys: the old node must be off */
+  requiresValidatorConfirmation: boolean;
+  /** Suggested mode: clone when this node has no packages of its own yet */
+  suggestedMode: FullBackupRestoreMode;
+  plans: { merge: FullBackupRestorePlan; clone: FullBackupRestorePlan };
+}
+
+export type FullBackupRestoreStepStatus = "pending" | "running" | "done" | "failed" | "skipped";
+
+export interface FullBackupRestoreStep {
+  id: string;
+  title: string;
+  status: FullBackupRestoreStepStatus;
+  error?: string;
+}
+
+export interface FullBackupRestoreStatus {
+  status: "idle" | "running" | "done" | "failed";
+  mode?: FullBackupRestoreMode;
+  startedAt?: string;
+  finishedAt?: string;
+  steps: FullBackupRestoreStep[];
+  warnings: string[];
+  /** Path on the host of the backup taken of this node before restoring */
+  safetySnapshot?: string;
+  /** Validator packages restored and left stopped on purpose */
+  stoppedValidators: string[];
+}

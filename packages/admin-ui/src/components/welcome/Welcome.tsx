@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { getDnpInstalled } from "services/dnpInstalled/selectors";
 import { getNewFeatureIds } from "services/dappnodeStatus/selectors";
 import { api } from "api";
 // Components
@@ -61,6 +63,10 @@ function getRouteIdComponent(routeId: NewFeatureId): React.FC<RouteProps> | unde
  */
 export default function Welcome() {
   const featureIds = useSelector(getNewFeatureIds);
+  const dnpInstalled = useSelector(getDnpInstalled);
+  const navigate = useNavigate();
+  // A node with only system packages was just installed: offer restoring a backup
+  const isFreshNode = dnpInstalled.length > 0 && dnpInstalled.every((dnp) => dnp.isCore);
   const [routeN, setRouteN] = useState(0);
   const [status, setStatus] = useState<Status>("finished");
   // featureIds must be frozen during a welcome wizard flow
@@ -78,9 +84,16 @@ export default function Welcome() {
     if (render) routes.push({ featureId, render });
   }
 
+  // Leave the wizard without marking features as seen: a clone restore brings
+  // back the backed-up node's onboarding state, otherwise it shows again later
+  function onRestore() {
+    setStatus("finished");
+    navigate("/system/backup");
+  }
+
   // Append first and last view to make the UX less abrupt
   const routesWithStartFinish = [
-    { render: (props: RouteProps) => <Start {...props} /> },
+    { render: (props: RouteProps) => <Start {...props} onRestore={isFreshNode ? onRestore : undefined} /> },
     ...routes,
     { render: (props: RouteProps) => <Finished {...props} /> }
   ];

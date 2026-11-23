@@ -17,6 +17,7 @@ export { disableHostScriptsGet } from "./disableHostScriptsGet.js";
 export { executionClientsGetByNetworks } from "./executionClientGet.js";
 export { fetchCoreUpdateData } from "./fetchCoreUpdateData.js";
 export { fullBackupInfo } from "./fullBackupInfo.js";
+export { fullBackupRestoreStatus } from "./fullBackupRestoreStatus.js";
 export { fullBackupStatus } from "./fullBackupStatus.js";
 export { fetchDirectory } from "./fetchDirectory.js";
 export { fetchDnpRequest } from "./fetchDnpRequest.js";

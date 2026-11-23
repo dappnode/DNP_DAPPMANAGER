@@ -1,4 +1,8 @@
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { getCoreUpdateAvailable } from "services/coreUpdate/selectors";
+import { confirm } from "components/ConfirmDialog";
 import Alert from "react-bootstrap/esm/Alert";
 import ProgressBar from "react-bootstrap/esm/ProgressBar";
 import { apiRoutes, useApi } from "api";
@@ -7,13 +11,13 @@ import Card from "components/Card";
 import SubTitle from "components/SubTitle";
 import Button from "components/Button";
 import ErrorView from "components/ErrorView";
-import { confirm } from "components/ConfirmDialog";
 import { InputForm } from "components/InputForm";
 import { renderResponse } from "components/SwrRender";
 import { prettyBytes, prettyDnpName } from "utils/format";
 import { validatePasswordsMatch } from "utils/validation";
 import newTabProps from "utils/newTabProps";
 import { ReqStatus } from "types";
+import { FullBackupRestore } from "./Restore";
 import "./backup.scss";
 
 /**
@@ -73,7 +77,7 @@ function formatElapsed(ms: number): string {
 function BackupProgress({ progress }: { progress?: FullBackupProgress }) {
   if (!progress) {
     return (
-      <div className="full-backup-progress">
+      <div className="full-backup-create-progress">
         <div>Starting the backup...</div>
         <ProgressBar now={100} animated striped />
       </div>
@@ -101,7 +105,7 @@ function BackupProgress({ progress }: { progress?: FullBackupProgress }) {
   }
 
   return (
-    <div className="full-backup-progress">
+    <div className="full-backup-create-progress">
       <div>{title}</div>
       <ProgressBar now={percent} label={`${Math.floor(percent)}%`} animated striped />
       <div className="full-backup-note">
@@ -111,7 +115,36 @@ function BackupProgress({ progress }: { progress?: FullBackupProgress }) {
   );
 }
 
-function CreateBackupForm({ info }: { info: FullBackupInfo }) {
+const systemUpdatePath = "/system/update";
+
+/**
+ * Backups made on the latest version restore with the fewest migrations:
+ * the restoring node installs this version or newer
+ */
+function UpdateFirstNotice({ coreUpdateAvailable }: { coreUpdateAvailable: boolean }) {
+  const navigate = useNavigate();
+  if (!coreUpdateAvailable) {
+    return (
+      <div className="full-backup-note">
+        Your Dappnode is up to date. Keeping it updated before each backup makes restoring smoother.
+      </div>
+    );
+  }
+  return (
+    <Alert variant="warning" className="full-backup-update-first">
+      <div>
+        <b>A Dappnode update is available.</b> Update before creating a backup: a backup made on the latest version
+        restores with fewer surprises, and a node can only restore backups from its own version or older.
+      </div>
+      <Button variant="dappnode" onClick={() => navigate(systemUpdatePath)}>
+        Go to update
+      </Button>
+    </Alert>
+  );
+}
+
+function CreateBackupForm({ info, coreUpdateAvailable }: { info: FullBackupInfo; coreUpdateAvailable: boolean }) {
+  const navigate = useNavigate();
   const [adminPassword, setAdminPassword] = useState("");
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
@@ -147,6 +180,22 @@ function CreateBackupForm({ info }: { info: FullBackupInfo }) {
 
   function onCreate() {
     if (!isValid) return;
+    if (!coreUpdateAvailable) {
+      askAboutValidators();
+      return;
+    }
+    confirm({
+      title: "Update Dappnode first?",
+      text: "A Dappnode update is available. Backups made on the latest version restore with fewer surprises, and the node you restore on must run this version or newer. We recommend updating first and then creating the backup.",
+      buttons: [
+        // The dialog closes after this handler: open the next one after it
+        { label: "Back up anyway", variant: "outline-secondary", onClick: () => setTimeout(askAboutValidators) },
+        { label: "Update first", variant: "dappnode", onClick: () => navigate(systemUpdatePath) }
+      ]
+    });
+  }
+
+  function askAboutValidators() {
     if (validators.length === 0) return void create({});
     // Whether validators are interrupted, and whether the backup can safely
     // be restored elsewhere, depends on this: ask explicitly, every time
@@ -334,6 +383,7 @@ function CreateBackupForm({ info }: { info: FullBackupInfo }) {
 
 export function FullBackup() {
   const infoRes = useApi.fullBackupInfo();
+  const coreUpdateAvailable = useSelector(getCoreUpdateAvailable);
 
   return (
     <>
@@ -341,10 +391,16 @@ export function FullBackup() {
       <Card spacing>
         {renderResponse(infoRes, ["Checking installed packages"], (info) => (
           <>
+            <UpdateFirstNotice coreUpdateAvailable={coreUpdateAvailable} />
             <CoverageSummary packages={info.packages} />
-            <CreateBackupForm info={info} />
+            <CreateBackupForm info={info} coreUpdateAvailable={coreUpdateAvailable} />
           </>
         ))}
+      </Card>
+
+      <SubTitle>Restore</SubTitle>
+      <Card spacing>
+        <FullBackupRestore />
       </Card>
     </>
   );

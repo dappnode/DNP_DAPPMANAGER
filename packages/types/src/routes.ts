@@ -56,7 +56,7 @@ import { TrustedReleaseKey } from "./pkg.js";
 import { OptimismConfigSet, OptimismConfigGet } from "./rollups.js";
 import { Network, StakerConfigGet, StakerConfigSet } from "./stakers.js";
 import { BeaconBackupActivationParams, BeaconBackupNetworkStatus } from "./beaconBackup.js";
-import { FullBackupInfo, FullBackupStatus } from "./fullBackup.js";
+import { FullBackupInfo, FullBackupRestoreStatus, FullBackupStatus } from "./fullBackup.js";
 import {
   DashboardSupportedNetwork,
   NodeStatusByNetwork,
@@ -97,6 +97,12 @@ export interface Routes {
    * which requires the admin password.
    */
   fullBackupInfo: () => Promise<FullBackupInfo>;
+
+  /**
+   * Status of the current or last full backup restore. The restore itself is
+   * started with POST /full-backup/restore, which requires the admin password
+   */
+  fullBackupRestoreStatus: () => Promise<FullBackupRestoreStatus>;
 
   /**
    * Whether a full backup is being created and how the last one ended, for
@@ -964,6 +970,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   backupGet: {},
   backupRestore: {},
   fullBackupInfo: {},
+  fullBackupRestoreStatus: {},
   fullBackupStatus: {},
   chainDataGet: {},
   changeIpfsTimeout: {},

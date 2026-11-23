@@ -27,7 +27,13 @@ import { getVersionData } from "../utils/getVersionData.js";
 import { createFileTransferId, registerTempTransferFile, TEMP_TRANSFER_TTL_MS } from "../uploads/tempTransfer.js";
 import { createEncryptStream, EncryptOptions } from "./format.js";
 import { cacheDbIncludedKeys, mainDbIncludedKeys, nexusDbIncludedKeys, pickKeys } from "./dbKeys.js";
-import { getCoverage, getNamedVolumes, isValidatorPackage, readInstalledManifest } from "./coverage.js";
+import {
+  getCoverage,
+  getNamedVolumes,
+  isValidatorPackage,
+  readInstalledManifest,
+  VALIDATOR_DATA_LEFT_OUT
+} from "./coverage.js";
 import { canStopForBackup, RestartPackage, stopPackageForBackup } from "./packageStop.js";
 
 export const FULL_BACKUP_PASSWORD_MIN_LENGTH = 10;
@@ -277,7 +283,7 @@ async function stageBackupItemsStopped(
     // Left out as a whole: restoring keys without their exact slashing
     // protection is what stopping validators for the copy avoids
     if (items.length > 0) ctx.skippedValidators.push(pkg.dnpName);
-    return items.map((item) => ({ ...item, error: "not included: the validator kept running" }));
+    return items.map((item) => ({ ...item, error: VALIDATOR_DATA_LEFT_OUT }));
   }
   const keepStopped = validator && ctx.keepValidatorsStopped;
   if (items.length === 0 && !keepStopped) return [];
@@ -437,19 +443,20 @@ function backupFileName(date: Date, id: string): string {
 }
 
 /**
- * Create an encrypted full backup of this DAppNode: dappmanager settings,
- * identity, admin credentials and every installed package's files, user
- * settings and manifest-declared `backup` data. Volumes are not included.
- * The result is registered for download through /download/:fileId.
+ * Write an encrypted full backup of this DAppNode to `outDir`: dappmanager
+ * settings, identity, admin credentials and every installed package's files,
+ * user settings and manifest-declared `backup` data. Volumes are not included.
  */
-export async function createFullBackup({
+export async function writeFullBackup({
   password,
+  outDir,
   keepValidatorsStopped = false,
   skipValidatorData = false,
   encryptOptions,
   deps = defaultDeps
 }: {
   password: string;
+  outDir: string;
   /** The admin is moving or reinstalling this node: leave validators stopped */
   keepValidatorsStopped?: boolean;
   /**
@@ -460,14 +467,20 @@ export async function createFullBackup({
   /** For tests only: cheaper KDF parameters */
   encryptOptions?: EncryptOptions;
   deps?: FullBackupDeps;
-}): Promise<FullBackupCreateResult> {
+}): Promise<{
+  filePath: string;
+  fileName: string;
+  sizeBytes: number;
+  warnings: string[];
+  stoppedValidators: string[];
+  skippedValidators: string[];
+}> {
   validateBackupPassword(password);
   if (keepValidatorsStopped && skipValidatorData) {
     throw Error("Validators cannot be both left out of the backup and kept stopped");
   }
   if (backupInProgress) throw Error("A backup is already being created");
   backupInProgress = true;
-  lastBackup = undefined;
 
   const id = crypto.randomBytes(8).toString("hex");
   const createdAt = new Date();
@@ -486,7 +499,7 @@ export async function createFullBackup({
   });
   // The download route names the file after its basename
   const fileName = backupFileName(createdAt, id);
-  const outPath = path.join(params.FULL_BACKUP_DIR, fileName);
+  const outPath = path.join(outDir, fileName);
   const ctx: StageContext = {
     deps,
     staging,
@@ -500,9 +513,12 @@ export async function createFullBackup({
   };
 
   try {
+    // Staged in FULL_BACKUP_DIR whatever `outDir` is. Only that dir is swept: `outDir` can hold other files
     fs.mkdirSync(params.FULL_BACKUP_DIR, { recursive: true, mode: 0o700 });
     removeStaleFiles(params.FULL_BACKUP_DIR);
+    fs.mkdirSync(outDir, { recursive: true, mode: 0o700 });
     await assertFreeDiskSpace(params.FULL_BACKUP_DIR);
+    await assertFreeDiskSpace(outDir);
     fs.mkdirSync(staging.dir, { recursive: true, mode: 0o700 });
 
     const { warnings } = ctx;
@@ -537,21 +553,16 @@ export async function createFullBackup({
       progress.archivedBytes += bytes;
     });
 
-    const fileId = createFileTransferId();
-    registerTempTransferFile(fileId, outPath);
-
     const { size } = fs.statSync(outPath);
-    logs.info(`Full backup created: ${packages.length} packages, ${size} bytes, ${warnings.length} warnings`);
-    const result = {
-      fileId,
+    logs.info(`Full backup written: ${packages.length} packages, ${size} bytes, ${warnings.length} warnings`);
+    return {
+      filePath: outPath,
       fileName,
       sizeBytes: size,
       warnings,
       stoppedValidators: ctx.stoppedValidators,
       skippedValidators: ctx.skippedValidators
     };
-    lastBackup = { finishedAt: new Date().toISOString(), result };
-    return result;
   } catch (e) {
     fs.rmSync(outPath, { force: true });
     const notStarted = await restartStoppedValidators(ctx);
@@ -561,11 +572,40 @@ export async function createFullBackup({
             `${e.message}. These validators were stopped for the backup and could not be started again, start them from their page: ${notStarted.join(", ")}`
           )
         : e;
-    lastBackup = { finishedAt: new Date().toISOString(), error: error.message };
     throw error;
   } finally {
     fs.rmSync(staging.dir, { recursive: true, force: true });
     currentProgress = undefined;
     backupInProgress = false;
+  }
+}
+
+/**
+ * Create a full backup and register it for download through /download/:fileId
+ */
+export async function createFullBackup(args: {
+  password: string;
+  keepValidatorsStopped?: boolean;
+  skipValidatorData?: boolean;
+  encryptOptions?: EncryptOptions;
+  deps?: FullBackupDeps;
+}): Promise<FullBackupCreateResult> {
+  validateBackupPassword(args.password);
+  if (backupInProgress) throw Error("A backup is already being created");
+  // Only backups made for download are reported by getFullBackupStatus, not the snapshot a restore takes
+  lastBackup = undefined;
+  try {
+    const { filePath, ...written } = await writeFullBackup({
+      ...args,
+      outDir: params.FULL_BACKUP_DIR
+    });
+    const fileId = createFileTransferId();
+    registerTempTransferFile(fileId, filePath);
+    const result = { fileId, ...written };
+    lastBackup = { finishedAt: new Date().toISOString(), result };
+    return result;
+  } catch (e) {
+    lastBackup = { finishedAt: new Date().toISOString(), error: e.message };
+    throw e;
   }
 }

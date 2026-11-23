@@ -40,6 +40,7 @@ export function dbFactory(dbPath: string): {
   };
   clearDb: () => void;
   readAll: () => Record<string, unknown>;
+  writeKeys: (values: Record<string, unknown>) => void;
 } {
   // Define dbPath and make sure it exists (mkdir -p)
   validatePath(dbPath);
@@ -57,6 +58,14 @@ export function dbFactory(dbPath: string): {
   /** Raw snapshot of every key, e.g. for full backups. Returns a fresh object */
   function readAll(): Record<string, unknown> {
     return structuredClone(jsonFileDb.read());
+  }
+
+  /**
+   * Write several raw keys at once, keeping the others. Bypasses setter side
+   * effects such as global env propagation: callers must refresh them
+   */
+  function writeKeys(values: Record<string, unknown>): void {
+    jsonFileDb.write({ ...jsonFileDb.read(), ...values });
   }
 
   /**
@@ -143,6 +152,7 @@ export function dbFactory(dbPath: string): {
     staticKey,
     indexedByKey,
     clearDb,
-    readAll
+    readAll,
+    writeKeys
   };
 }
