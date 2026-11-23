@@ -29,6 +29,10 @@ export const apiRoutes: IApiRoutes = {
     return await fetchAuthPost(apiUrls.fullBackup, data);
   },
 
+  fullBackupPendingUrl({ fileName }) {
+    return urlJoin(apiUrls.fullBackupPending, encodeURIComponent(fileName));
+  },
+
   async inspectFullBackup(data) {
     return await fetchAuthPost(apiUrls.fullBackupInspect, data);
   },

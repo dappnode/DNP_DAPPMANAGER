@@ -18,6 +18,7 @@ import {
   FullBackupItemEntry,
   FullBackupManifest,
   FullBackupPackageEntry,
+  FullBackupSlashingProtection,
   FullBackupProgress,
   FullBackupStatus,
   InstalledPackageData,
@@ -35,6 +36,24 @@ import {
   VALIDATOR_DATA_LEFT_OUT
 } from "./coverage.js";
 import { canStopForBackup, RestartPackage, stopPackageForBackup } from "./packageStop.js";
+import {
+  BrainClient,
+  createBrainClient,
+  exportSlashingProtection,
+  findWeb3signerItems,
+  importKeysThroughBrain,
+  interchangePubkeys,
+  isWeb3signerPackage,
+  listKeysInBackup,
+  readBackedUpKeys,
+  SlashingExportError,
+  SlashingInterchange,
+  someOf,
+  shortPubkey,
+  stoppedKeyServices,
+  waitForBrain
+} from "./web3signer.js";
+import { getPendingBackupDir, keepPendingBackup } from "./pending.js";
 
 export const FULL_BACKUP_PASSWORD_MIN_LENGTH = 10;
 const FULL_BACKUP_PASSWORD_MAX_LENGTH = 1024;
@@ -68,13 +87,18 @@ export interface FullBackupDeps {
   getHttpsMappings: () => Promise<FullBackupHttpsMappings>;
   /** Gracefully stop a package before copying its data; returns how to restart it */
   stopForBackup: (pkg: InstalledPackageData) => Promise<RestartPackage | null>;
+  /** Staking Brain of a Web3Signer package */
+  brainClient: (dnpName: string) => BrainClient;
+  waitForBrain: (client: BrainClient) => Promise<void>;
 }
 
 const defaultDeps: FullBackupDeps = {
   listPackages,
   getArchive: dockerGetArchive,
   getHttpsMappings: () => httpsPortal.getMappings(),
-  stopForBackup: stopPackageForBackup
+  stopForBackup: stopPackageForBackup,
+  brainClient: createBrainClient,
+  waitForBrain: (client) => waitForBrain(client)
 };
 
 /**
@@ -95,8 +119,22 @@ interface StageContext {
   skippedValidators: string[];
   /** How to start again the validators this backup left stopped, if it fails */
   restartOnFailure: { dnpName: string; restart: RestartPackage }[];
+  /** Web3Signer packages whose keys were deleted, to put them back if the backup fails */
+  slashingExports: SlashingExport[];
   /** Updated as the backup goes, read by getFullBackupStatus */
   progress: FullBackupProgress;
+}
+
+interface SlashingExport {
+  pkg: InstalledPackageData;
+  keystoresTar: string;
+  keystoresPath: string;
+  brainDbTar: string | null;
+  /** Keys that may no longer be loaded in Web3Signer */
+  deleted: string[];
+  interchange: SlashingInterchange | null;
+  /** Set once the package was stopped after the export */
+  restart: RestartPackage | null;
 }
 
 /** The disk cannot hold the backup: unlike a failed item, this stops the backup */
@@ -142,6 +180,11 @@ class Staging {
     if (!fs.existsSync(from)) return undefined;
     fs.copyFileSync(from, this.target(archivePath));
     return archivePath;
+  }
+
+  /** Host path of a staged file */
+  sourcePath(archivePath: string): string {
+    return path.join(this.dir, archivePath);
   }
 
   async writeStream(archivePath: string, stream: NodeJS.ReadableStream): Promise<string> {
@@ -247,6 +290,7 @@ async function stagePackage(ctx: StageContext, pkg: InstalledPackageData): Promi
     warnings.push(`${pkg.dnpName}: could not read user settings: ${e.message}`);
   }
 
+  const { backup, slashingProtection } = await stagePackageData(ctx, pkg, manifest);
   return {
     dnpName: pkg.dnpName,
     version: pkg.version,
@@ -261,8 +305,244 @@ async function stagePackage(ctx: StageContext, pkg: InstalledPackageData): Promi
       manifest: staging.copyIfExists(`${base}/dappnode_package.json`, getManifestPath(pkg.dnpName, pkg.isCore)),
       userSettings: staging.writeJson(`${base}/user-settings.json`, userSettings)
     },
-    backup: await stageBackupItemsStopped(ctx, pkg, manifest)
+    backup,
+    ...(slashingProtection ? { slashingProtection } : {})
   };
+}
+
+async function stagePackageData(
+  ctx: StageContext,
+  pkg: InstalledPackageData,
+  manifest: Manifest | null
+): Promise<{ backup: FullBackupItemEntry[]; slashingProtection?: FullBackupSlashingProtection }> {
+  if (exportsSlashingProtection(ctx, pkg, manifest)) return stageWeb3signerForMove(ctx, pkg, manifest);
+  return { backup: await stageBackupItemsStopped(ctx, pkg, manifest) };
+}
+
+/**
+ * A Web3Signer whose keys this backup removes through its Staking Brain.
+ * One without manifest `backup` items is copied like any other package
+ */
+function exportsSlashingProtection(ctx: StageContext, pkg: InstalledPackageData, manifest: Manifest | null): boolean {
+  return (
+    ctx.keepValidatorsStopped &&
+    isWeb3signerPackage(pkg.dnpName) &&
+    canStopForBackup(pkg) &&
+    (manifest?.backup ?? []).length > 0
+  );
+}
+
+/**
+ * Before anything is stopped or deleted, check that every Web3Signer that
+ * will export its slashing protection runs and its brain answers
+ */
+async function checkWeb3signersCanExport(ctx: StageContext, packages: InstalledPackageData[]): Promise<void> {
+  if (!ctx.keepValidatorsStopped) return;
+  for (const pkg of packages) {
+    let manifest: Manifest | null = null;
+    try {
+      manifest = readInstalledManifest(pkg.dnpName, pkg.isCore);
+    } catch {
+      // Reported when the package is staged, which then copies it like any other
+    }
+    if (!exportsSlashingProtection(ctx, pkg, manifest)) continue;
+    const stopped = stoppedKeyServices(pkg);
+    if (stopped.length > 0) {
+      throw Error(
+        `${pkg.dnpName} is not running (${stopped.join(", ")}). It must run so its validator keys can be removed and their slashing protection exported: start it, or create the backup without "I am moving or reinstalling this Dappnode"`
+      );
+    }
+    try {
+      await ctx.deps.brainClient(pkg.dnpName).listKeys();
+    } catch (e) {
+      throw Error(`The Staking Brain of ${pkg.dnpName} is not reachable, nothing was changed: ${e.message}`);
+    }
+  }
+}
+
+/**
+ * Web3Signer when moving or reinstalling this node. Its slashing protection
+ * lives in Postgres, so instead of copying it:
+ * 1. Copy the keystores and the brain DB while it runs: the delete removes
+ *    the keystore files
+ * 2. Check that the copy restores every key loaded in Web3Signer, or stop
+ *    here: a key that is not in it would be lost
+ * 3. Delete those keys through the Staking Brain. Web3Signer returns the
+ *    EIP-3076 interchange of the deleted keys, exact at that moment, and
+ *    this node can no longer sign with them, even if restarted
+ * 4. Store the interchange and stop the package
+ */
+async function stageWeb3signerForMove(
+  ctx: StageContext,
+  pkg: InstalledPackageData,
+  manifest: Manifest | null
+): Promise<{ backup: FullBackupItemEntry[]; slashingProtection: FullBackupSlashingProtection }> {
+  const backup = await stageBackupItems(ctx.deps, ctx.staging, pkg, manifest, ctx.warnings);
+  const failed = backup.filter((item) => !item.file);
+  const { keystores, brainDb } = findWeb3signerItems(backup);
+  if (failed.length > 0 || !keystores?.file) {
+    throw Error(
+      `${pkg.dnpName}: could not copy ${failed.map((item) => item.name).join(", ") || "its keystores"}, so its validator keys were not removed. ${failed.map((item) => item.error).join("; ")}`
+    );
+  }
+
+  const exported: SlashingExport = {
+    pkg,
+    keystoresTar: ctx.staging.sourcePath(keystores.file),
+    keystoresPath: keystores.path,
+    brainDbTar: brainDb?.file ? ctx.staging.sourcePath(brainDb.file) : null,
+    deleted: [],
+    interchange: null,
+    restart: null
+  };
+  ctx.slashingExports.push(exported);
+
+  const client = ctx.deps.brainClient(pkg.dnpName);
+  let pubkeys: string[];
+  try {
+    pubkeys = await listKeysInBackup(client, exported);
+  } catch (e) {
+    throw Error(
+      `${pkg.dnpName}: ${e.message}. Nothing was removed from it: create the backup without "I am moving or reinstalling this Dappnode"`
+    );
+  }
+
+  let result: Awaited<ReturnType<typeof exportSlashingProtection>>;
+  try {
+    exported.deleted = pubkeys;
+    ctx.progress.step = "exporting";
+    result = await exportSlashingProtection(client, pubkeys);
+  } catch (e) {
+    if (e instanceof SlashingExportError) {
+      exported.deleted = e.deletedPubkeys;
+      exported.interchange = e.interchange;
+    }
+    throw Error(`${pkg.dnpName}: ${e.message}`);
+  }
+  exported.deleted = result.pubkeys;
+  exported.interchange = result.interchange;
+
+  const file = result.interchange
+    ? ctx.staging.writeJson(`packages/${pkg.dnpName}/slashing-protection.json`, result.interchange)
+    : undefined;
+  logs.info(
+    `Full backup: removed ${result.pubkeys.length} validator keys from ${pkg.dnpName} and exported their slashing protection`
+  );
+  if (result.withoutHistory.length > 0) {
+    ctx.warnings.push(
+      `${pkg.dnpName}: Web3Signer had no signing history for ${result.withoutHistory.length} of the removed validator keys (${someOf(result.withoutHistory.map(shortPubkey))}), so the backup holds no slashing protection for them. That is right only if they have never validated`
+    );
+  }
+  if (result.notRemoved.length > 0) {
+    ctx.warnings.push(
+      `${pkg.dnpName}: ${result.notRemoved.length} validator keys were added to it while the backup was running (${someOf(result.notRemoved.map(shortPubkey))}). They are not in the backup and were not removed from this node`
+    );
+  }
+
+  // Nothing can sign with the removed keys any more; stop it anyway, like other validators
+  try {
+    ctx.progress.step = "stopping";
+    exported.restart = await ctx.deps.stopForBackup(pkg);
+    ctx.stoppedValidators.push(pkg.dnpName);
+  } catch (e) {
+    ctx.warnings.push(`${pkg.dnpName}: could not be stopped after removing its validator keys: ${e.message}`);
+  }
+
+  return {
+    backup,
+    slashingProtection: { source: "staking-brain", ...(file ? { file } : {}), pubkeys: result.pubkeys }
+  };
+}
+
+/** What was kept of a Web3Signer's removed keys, for the admin */
+function describeRescue(exported: SlashingExport, interchangeSaved: boolean): string {
+  const kept = ["keystores", ...(exported.brainDbTar ? ["Staking Brain DB"] : [])];
+  if (!exported.interchange) return `${kept.join(" and ")} (their slashing protection was not exported)`;
+  if (!interchangeSaved) return `${kept.join(" and ")} (their slashing protection could not be saved)`;
+  const covered = interchangePubkeys(exported.interchange);
+  const count = exported.deleted.filter((pubkey) => covered.has(pubkey)).length;
+  const slashing =
+    count === exported.deleted.length
+      ? "slashing protection"
+      : `the slashing protection of ${count} of them (none was exported for the rest)`;
+  return `${kept.join(", ")} and ${slashing}`;
+}
+
+/**
+ * The backup failed after a Web3Signer's keys were deleted: import them back
+ * with their slashing protection so this node is as before. If that fails
+ * too, keep the keystores, brain DB and interchange in DNCORE so the keys
+ * are not lost; if they cannot be copied there either, the staged copies
+ * are the last ones and must stay (`keepStaging`). Returns a message for
+ * the error shown to the admin.
+ */
+async function undoSlashingExport(
+  deps: FullBackupDeps,
+  exported: SlashingExport
+): Promise<{ message: string; keepStaging: boolean }> {
+  const { dnpName } = exported.pkg;
+  const count = exported.deleted.length;
+  try {
+    if (exported.restart) await exported.restart();
+    const client = deps.brainClient(dnpName);
+    await deps.waitForBrain(client);
+    const { keystores, settings } = await readBackedUpKeys(exported);
+    const missing = exported.deleted.filter((pubkey) => !keystores.has(pubkey));
+    // A key reported as duplicate is still loaded: it never left this Web3Signer
+    const result = await importKeysThroughBrain(client, {
+      keystores: exported.deleted.flatMap((pubkey) => keystores.get(pubkey) ?? []),
+      settings,
+      interchange: exported.interchange
+    });
+    const failed = [...result.failed, ...missing.map((pubkey) => `${pubkey}: keystore not found`)];
+    if (failed.length > 0) throw Error(failed.join("; "));
+    return {
+      message: `${dnpName}: its ${count} validator keys were imported back and it was restarted.`,
+      keepStaging: false
+    };
+  } catch (e) {
+    const lost = `${dnpName}: ${count} validator keys were removed from it and could not be imported back (${e.message}).`;
+    const advice = "import them through the Staking Brain before validating with them again.";
+    const saveInterchange = (dir: string): void => {
+      if (!exported.interchange) return;
+      fs.writeFileSync(path.join(dir, "slashing-protection.json"), JSON.stringify(exported.interchange), {
+        mode: 0o600
+      });
+    };
+
+    const rescueDir = path.join(params.DNCORE_DIR, "full-backup-rescue", `${dnpName}-${Date.now()}`);
+    try {
+      fs.mkdirSync(rescueDir, { recursive: true, mode: 0o700 });
+      fs.copyFileSync(exported.keystoresTar, path.join(rescueDir, "keystores.tar"));
+      if (exported.brainDbTar) fs.copyFileSync(exported.brainDbTar, path.join(rescueDir, "brain-db.tar"));
+      saveInterchange(rescueDir);
+      return {
+        message: `${lost} Their ${describeRescue(exported, true)} were kept in DNCORE/full-backup-rescue/${path.basename(rescueDir)}: ${advice}`,
+        keepStaging: false
+      };
+    } catch (copyError) {
+      logs.error(`Full backup: could not keep the removed keys of ${dnpName} in ${rescueDir}`, copyError);
+      // No incomplete copy next to the complete one. The staged files are
+      // now the last copy: they stay where they are
+      try {
+        fs.rmSync(rescueDir, { recursive: true, force: true });
+      } catch {
+        // Nothing was written there
+      }
+      const stagedDir = path.resolve(path.dirname(exported.keystoresTar));
+      let interchangeSaved = true;
+      try {
+        saveInterchange(stagedDir);
+      } catch (writeError) {
+        interchangeSaved = false;
+        logs.error(`Full backup: could not save the slashing protection of ${dnpName}`, writeError);
+      }
+      return {
+        message: `${lost} They could not be copied to DNCORE/full-backup-rescue (${copyError.message}). Their ${describeRescue(exported, interchangeSaved)} were left in ${stagedDir} inside the dappmanager, a temporary folder that a dappmanager update deletes: copy them out of it now, then ${advice}`,
+        keepStaging: true
+      };
+    }
+  }
 }
 
 /**
@@ -372,15 +652,20 @@ async function assertFreeDiskSpace(dir: string, stagedBytes = 0): Promise<void> 
   }
 }
 
+/** Marks a staging dir that holds the last copy of validator keys removed from this node */
+const KEPT_STAGING_MARKER = "KEEP-removed-validator-keys";
+
 /**
  * Remove what earlier backups left behind if the dappmanager restarted before
- * their cleanup: staging dirs, and files whose download link has expired
+ * their cleanup: staging dirs, and files whose download link has expired.
+ * Never a staging dir kept because it holds the last copy of removed keys
  */
 function removeStaleFiles(dir: string): void {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const entryPath = path.join(dir, entry.name);
     const stats = fs.statSync(entryPath, { throwIfNoEntry: false });
     if (!stats) continue;
+    if (entry.isDirectory() && fs.existsSync(path.join(entryPath, KEPT_STAGING_MARKER))) continue;
     if (entry.isDirectory() || Date.now() - stats.mtimeMs > TEMP_TRANSFER_TTL_MS) {
       fs.rmSync(entryPath, { recursive: true, force: true });
     }
@@ -451,6 +736,7 @@ export async function writeFullBackup({
   password,
   outDir,
   keepValidatorsStopped = false,
+  pendingDir,
   skipValidatorData = false,
   encryptOptions,
   deps = defaultDeps
@@ -459,6 +745,12 @@ export async function writeFullBackup({
   outDir: string;
   /** The admin is moving or reinstalling this node: leave validators stopped */
   keepValidatorsStopped?: boolean;
+  /**
+   * Where to keep a copy of a backup that removed validator keys from this
+   * node, until the admin discards it. If it cannot be kept, the backup
+   * fails and the keys are imported back
+   */
+  pendingDir?: string;
   /**
    * Do not interrupt validators: leave their keys and slashing protection
    * out of the backup, which then only restores their settings
@@ -473,6 +765,7 @@ export async function writeFullBackup({
   sizeBytes: number;
   warnings: string[];
   stoppedValidators: string[];
+  slashingProtectionExported: FullBackupCreateResult["slashingProtectionExported"];
   skippedValidators: string[];
 }> {
   validateBackupPassword(password);
@@ -509,8 +802,10 @@ export async function writeFullBackup({
     stoppedValidators: [],
     skippedValidators: [],
     restartOnFailure: [],
+    slashingExports: [],
     progress
   };
+  let keepStaging = false;
 
   try {
     // Staged in FULL_BACKUP_DIR whatever `outDir` is. Only that dir is swept: `outDir` can hold other files
@@ -522,11 +817,12 @@ export async function writeFullBackup({
     fs.mkdirSync(staging.dir, { recursive: true, mode: 0o700 });
 
     const { warnings } = ctx;
+    const installed = await deps.listPackages();
+    await checkWeb3signersCanExport(ctx, installed);
     const dappmanagerFiles = stageDappmanagerFiles(staging);
     dappmanagerFiles.httpsMappings = await stageHttpsMappings(deps, staging, warnings);
 
     const packages: FullBackupPackageEntry[] = [];
-    const installed = await deps.listPackages();
     progress.packagesTotal = installed.length;
     for (const pkg of installed) {
       progress.step = "copying";
@@ -555,26 +851,57 @@ export async function writeFullBackup({
 
     const { size } = fs.statSync(outPath);
     logs.info(`Full backup written: ${packages.length} packages, ${size} bytes, ${warnings.length} warnings`);
+    const slashingProtectionExported = packages.flatMap((pkg) =>
+      pkg.slashingProtection ? [{ dnpName: pkg.dnpName, validatorCount: pkg.slashingProtection.pubkeys.length }] : []
+    );
+    // This file is now the only copy of the removed keys and their slashing
+    // protection: keep it on the node, the download can fail or come late
+    if (pendingDir && ctx.slashingExports.some((exported) => exported.deleted.length > 0)) {
+      keepPendingBackup(pendingDir, outPath, {
+        fileName,
+        sizeBytes: size,
+        createdAt: manifest.createdAt,
+        slashingProtectionExported
+      });
+    }
     return {
       filePath: outPath,
       fileName,
       sizeBytes: size,
       warnings,
       stoppedValidators: ctx.stoppedValidators,
+      slashingProtectionExported,
       skippedValidators: ctx.skippedValidators
     };
   } catch (e) {
     fs.rmSync(outPath, { force: true });
+    const removed = ctx.slashingExports.filter((exported) => exported.deleted.length > 0);
+    // Until each undo has put the keys somewhere else, the staged copies may be the last ones
+    keepStaging = removed.length > 0;
+    const undone: Awaited<ReturnType<typeof undoSlashingExport>>[] = [];
+    for (const exported of removed) undone.push(await undoSlashingExport(deps, exported));
+    keepStaging = undone.some((undo) => undo.keepStaging);
     const notStarted = await restartStoppedValidators(ctx);
-    const error =
-      notStarted.length > 0
-        ? Error(
-            `${e.message}. These validators were stopped for the backup and could not be started again, start them from their page: ${notStarted.join(", ")}`
-          )
-        : e;
-    throw error;
+    const details = [
+      ...undone.map((undo) => undo.message),
+      ...(notStarted.length > 0
+        ? [
+            `These validators were stopped for the backup and could not be started again, start them from their page: ${notStarted.join(", ")}`
+          ]
+        : [])
+    ];
+    throw details.length > 0 ? Error(`${e.message}. ${details.join(" ")}`) : e;
   } finally {
-    fs.rmSync(staging.dir, { recursive: true, force: true });
+    if (keepStaging) {
+      // The next backup sweeps this folder: mark the dir so it is left alone
+      try {
+        fs.writeFileSync(path.join(staging.dir, KEPT_STAGING_MARKER), "", { mode: 0o600 });
+      } catch (markError) {
+        logs.error(`Full backup: could not mark ${staging.dir} to be kept`, markError);
+      }
+    } else {
+      fs.rmSync(staging.dir, { recursive: true, force: true });
+    }
     currentProgress = undefined;
     backupInProgress = false;
   }
@@ -597,7 +924,8 @@ export async function createFullBackup(args: {
   try {
     const { filePath, ...written } = await writeFullBackup({
       ...args,
-      outDir: params.FULL_BACKUP_DIR
+      outDir: params.FULL_BACKUP_DIR,
+      pendingDir: getPendingBackupDir()
     });
     const fileId = createFileTransferId();
     registerTempTransferFile(fileId, filePath);

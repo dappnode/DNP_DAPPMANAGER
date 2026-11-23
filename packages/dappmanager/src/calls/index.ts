@@ -18,6 +18,7 @@ export { executionClientsGetByNetworks } from "./executionClientGet.js";
 export { fetchCoreUpdateData } from "./fetchCoreUpdateData.js";
 export { fullBackupInfo } from "./fullBackupInfo.js";
 export { fullBackupRestoreStatus } from "./fullBackupRestoreStatus.js";
+export { fullBackupPendingGet, fullBackupPendingDiscard } from "./fullBackupPending.js";
 export { fullBackupUploadDiscard } from "./fullBackupUploadDiscard.js";
 export { fullBackupStatus } from "./fullBackupStatus.js";
 export { fetchDirectory } from "./fetchDirectory.js";

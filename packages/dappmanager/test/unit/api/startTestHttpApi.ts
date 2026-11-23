@@ -56,6 +56,7 @@ export async function startTestHttpApi(corsWhitelist: string[]): Promise<TestHtt
       fileDownload: notUsed,
       fullBackupCreate: notUsed,
       fullBackupInspect: notUsed,
+      fullBackupPendingDownload: notUsed,
       fullBackupRestore: notUsed,
       globalEnvs: notUsed,
       packageManifest: notUsed,

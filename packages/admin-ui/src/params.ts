@@ -23,6 +23,7 @@ export const apiUrls = {
   userActionLogs: urlJoin(apiUrl, "user-action-logs"),
   fullBackup: urlJoin(apiUrl, "full-backup"),
   fullBackupInspect: urlJoin(apiUrl, "full-backup/inspect"),
+  fullBackupPending: urlJoin(apiUrl, "full-backup/pending"),
   fullBackupRestore: urlJoin(apiUrl, "full-backup/restore")
 };
 export const socketIoUrl = apiUrl;

@@ -45,7 +45,11 @@ const deps: FullBackupDeps = {
     throw Object.assign(Error("not found"), { statusCode: 404 });
   },
   getHttpsMappings: async () => [{ fromSubdomain: "app", dnpName, serviceName: dnpName, port: 80, external: true }],
-  stopForBackup: async () => async () => undefined
+  stopForBackup: async () => async () => undefined,
+  brainClient: () => {
+    throw Error("No Staking Brain in this test");
+  },
+  waitForBrain: async () => undefined
 };
 
 /** Deps that record the order of stops, copies and restarts */
@@ -383,6 +387,17 @@ describe("fullBackup / createFullBackup", () => {
     expect(fs.readdirSync(params.FULL_BACKUP_DIR)).to.deep.equal([first.fileName]);
     const second = await createFullBackup({ password, encryptOptions: fast, deps });
     expect(fs.readdirSync(params.FULL_BACKUP_DIR).sort()).to.deep.equal([first.fileName, second.fileName].sort());
+  });
+
+  it("never removes a staging dir kept as the last copy of removed validator keys", async () => {
+    const kept = path.join(params.FULL_BACKUP_DIR, "full-backup-kept");
+    fs.mkdirSync(kept, { recursive: true });
+    fs.writeFileSync(path.join(kept, "KEEP-removed-validator-keys"), "");
+    fs.writeFileSync(path.join(kept, "keystores.tar"), "keys");
+
+    const { fileName } = await createFullBackup({ password, encryptOptions: fast, deps });
+    expect(fs.readdirSync(params.FULL_BACKUP_DIR).sort()).to.deep.equal([fileName, "full-backup-kept"].sort());
+    expect(fs.readFileSync(path.join(kept, "keystores.tar"), "utf8")).to.equal("keys");
   });
 
   it("keeps the state and the last result for a UI that lost the response", async () => {

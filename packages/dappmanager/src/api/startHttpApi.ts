@@ -58,6 +58,7 @@ export interface HttpRoutes {
   fileDownload: RequestHandler<{ containerName: string }>;
   fullBackupCreate: RequestHandler;
   fullBackupInspect: RequestHandler;
+  fullBackupPendingDownload: RequestHandler<{ fileName: string }>;
   fullBackupRestore: RequestHandler;
   globalEnvs: RequestHandler<{ name: string }>;
   packageManifest: RequestHandler<{ dnpName: string }>;
@@ -215,6 +216,7 @@ export function startHttpApi({
   app.get("/download/:fileId", auth.onlyAdmin, routes.download);
   app.post("/full-backup", auth.onlyAdminWithPasswordConfirmation, routes.fullBackupCreate);
   app.post("/full-backup/inspect", auth.onlyAdmin, routes.fullBackupInspect);
+  app.get("/full-backup/pending/:fileName", auth.onlyAdmin, routes.fullBackupPendingDownload);
   app.post("/full-backup/restore", auth.onlyAdminWithPasswordConfirmation, routes.fullBackupRestore);
   app.get("/user-action-logs", auth.onlyAdmin, routes.downloadUserActionLogs);
   app.get("/avatar/ipfs/:cid", auth.onlyAdmin, createIpfsAvatarHandler(getIpfsFileBytes));

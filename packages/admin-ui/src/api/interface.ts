@@ -42,6 +42,8 @@ export interface IApiRoutes {
     keepValidatorsStopped: boolean;
     skipValidatorData: boolean;
   }): Promise<FullBackupCreateResult>;
+  /** URL to download a backup kept on the node (fullBackupPendingGet). Works any number of times */
+  fullBackupPendingUrl(data: { fileName: string }): string;
   /** Decrypt the manifest of an uploaded backup and get the restore plan. Changes nothing */
   inspectFullBackup(data: { fileId: string; password: string }): Promise<FullBackupInspectResult>;
   /** Start restoring an uploaded backup. Requires the admin password; follow with fullBackupRestoreStatus */

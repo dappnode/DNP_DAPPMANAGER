@@ -83,7 +83,12 @@ async function createBackupFile(): Promise<string> {
   const deps: FullBackupDeps = {
     listPackages: async () => [installedPkg(app, "1.0.0"), installedPkg(signer, "2.0.0")],
     getArchive: async (containerName) => Readable.from([Buffer.from(`DATA-OF-${containerName}`)]),
-    getHttpsMappings: async () => [{ fromSubdomain: "app", dnpName: app, serviceName: app, port: 80, external: false }]
+    getHttpsMappings: async () => [{ fromSubdomain: "app", dnpName: app, serviceName: app, port: 80, external: false }],
+    stopForBackup: async () => async () => undefined,
+    brainClient: () => {
+      throw Error("No Staking Brain in this test");
+    },
+    waitForBrain: async () => undefined
   };
   const { filePath } = await writeFullBackup({ password, outDir, encryptOptions: fast, deps });
   return filePath;
@@ -155,7 +160,11 @@ function fakeNode(initial: InstalledPackageData[]): {
     progress: () => undefined,
     clearProgress: () => {
       calls.push("clear-progress");
-    }
+    },
+    brainClient: () => {
+      throw Error("No Staking Brain in this test");
+    },
+    waitForBrain: async () => undefined
   };
   return { deps, calls, installs, atInstall };
 }
