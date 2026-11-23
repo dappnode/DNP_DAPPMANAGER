@@ -1,6 +1,7 @@
 import semver from "semver";
 import {
   FullBackupInspectResult,
+  FullBackupItemEntry,
   FullBackupManifest,
   FullBackupPackageEntry,
   FullBackupRestoreMode,
@@ -20,6 +21,15 @@ export interface InstalledPackageSummary {
   dnpName: string;
   version: string;
   isCore: boolean;
+}
+
+/**
+ * SQLite side files (-wal, -shm, -journal) only exist while the database is
+ * open. Backup creation records one that was absent with this error and no
+ * file: nothing was lost, so it is not reported as a failed item
+ */
+function isAbsentSideFile(item: FullBackupItemEntry): boolean {
+  return /-(wal|shm|journal)$/.test(item.path) && Boolean(item.error?.startsWith("not present"));
 }
 
 function hasBackupData(pkg: FullBackupPackageEntry): boolean {
@@ -123,7 +133,9 @@ export function planRestore({
         `${pkg.dnpName}: its validator keys and slashing protection were left out of this backup so it kept validating. Import them again after the restore`
       );
     }
-    const failed = pkg.backup.filter((item) => !item.file && item.error !== VALIDATOR_DATA_LEFT_OUT);
+    const failed = pkg.backup.filter(
+      (item) => !item.file && !isAbsentSideFile(item) && item.error !== VALIDATOR_DATA_LEFT_OUT
+    );
     if (failed.length > 0) {
       warnings.push(`${pkg.dnpName}: ${failed.map((item) => item.name).join(", ")} could not be backed up originally`);
     }

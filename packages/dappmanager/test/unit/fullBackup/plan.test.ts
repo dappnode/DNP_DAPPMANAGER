@@ -102,6 +102,31 @@ describe("fullBackup / plan", () => {
     expect(plan.warnings[0]).to.include("could not be backed up originally");
   });
 
+  it("does not warn about SQLite side files that were absent at backup time", () => {
+    const plan = planRestore({
+      manifest: manifest([
+        pkg("a.dnp.dappnode.eth", "1.0.0", {
+          backup: [
+            { name: "db", path: "/data/app.db", file: "packages/a.dnp.dappnode.eth/backup/db.tar" },
+            { name: "db-wal", path: "/data/app.db-wal", error: "not present (database closed cleanly)" },
+            { name: "db-shm", path: "/data/app.db-shm", error: "not present (database closed cleanly)" }
+          ]
+        }),
+        // A side file that failed for another reason is still reported
+        pkg("b.dnp.dappnode.eth", "1.0.0", {
+          backup: [
+            { name: "db", path: "/data/app.db", file: "packages/b.dnp.dappnode.eth/backup/db.tar" },
+            { name: "db-wal", path: "/data/app.db-wal", error: "socket hang up" }
+          ]
+        })
+      ]),
+      installed: [],
+      mode: "clone"
+    });
+    expect(plan.warnings).to.deep.equal(["b.dnp.dappnode.eth: db-wal could not be backed up originally"]);
+    expect(plan.packages[0]).to.include({ action: "install", restoreData: true });
+  });
+
   it("says when a validator's keys were left out on purpose, instead of reporting a failure", () => {
     const plan = planRestore({
       manifest: manifest([

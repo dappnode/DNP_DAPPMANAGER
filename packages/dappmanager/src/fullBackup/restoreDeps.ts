@@ -2,22 +2,26 @@ import fs from "fs";
 import path from "path";
 import * as db from "@dappnode/db";
 import { params } from "@dappnode/params";
-import { getLogUi } from "@dappnode/logger";
+import { getLogUi, logUiClear } from "@dappnode/logger";
 import { httpsPortal } from "@dappnode/httpsportal";
 import {
   dockerComposeStop,
   dockerComposeUpPackage,
   dockerContainerStop,
+  dockerInfoArchive,
   dockerPutArchive,
   listPackages
 } from "@dappnode/dockerapi";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
+import { createStakerNetworkAndConnectStakerPkgs } from "@dappnode/daemons";
+import { consensus, execution, mevBoost, signer } from "../index.js";
 import { packageInstall } from "../calls/packageInstall.js";
 import { packageRemove } from "../calls/packageRemove.js";
 import { writeFullBackup } from "./create.js";
 import { RestoreDeps } from "./restore.js";
 
 const SNAPSHOTS_KEPT = 2;
+const PROGRESS_LOG_ID = "full-backup-restore";
 
 export function getSnapshotDir(): string {
   return path.join(params.DNCORE_DIR, "full-backup-snapshots");
@@ -78,8 +82,18 @@ export const restoreDeps: RestoreDeps = {
     await packageRemove({ dnpName, deleteVolumes: false });
   },
 
-  async putArchive(containerName, dirPath, tarFilePath) {
-    await dockerPutArchive(containerName, dirPath, fs.createReadStream(tarFilePath));
+  async pathExists(containerName, containerPath) {
+    try {
+      await dockerInfoArchive(containerName, containerPath);
+      return true;
+    } catch (e) {
+      if (e.statusCode === 404) return false;
+      throw e;
+    }
+  },
+
+  async putArchive(containerName, dirPath, tar) {
+    await dockerPutArchive(containerName, dirPath, typeof tar === "string" ? fs.createReadStream(tar) : tar);
   },
 
   async stopContainer(containerName) {
@@ -98,5 +112,7 @@ export const restoreDeps: RestoreDeps = {
 
   getGlobalEnvs: () => db.computeGlobalEnvsFromDb(true) as Record<string, unknown>,
   refreshGlobalEnvFile: () => db.writeGlobalEnvsToEnvFile(),
-  progress: getLogUi("full-backup-restore")
+  applyStakerSelections: () => createStakerNetworkAndConnectStakerPkgs(execution, consensus, signer, mevBoost),
+  progress: getLogUi(PROGRESS_LOG_ID),
+  clearProgress: () => logUiClear({ id: PROGRESS_LOG_ID })
 };

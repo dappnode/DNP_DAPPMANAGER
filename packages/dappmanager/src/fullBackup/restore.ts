@@ -1,5 +1,7 @@
 import fs from "fs";
 import path from "path";
+import { pipeline } from "stream/promises";
+import tar from "tar-stream";
 import * as db from "@dappnode/db";
 import { params } from "@dappnode/params";
 import { logs } from "@dappnode/logger";
@@ -49,7 +51,13 @@ export interface RestoreDeps {
   /** Start all containers of a package, in compose order */
   startPackage: (dnpName: string) => Promise<void>;
   removePackage: (dnpName: string) => Promise<void>;
-  putArchive: (containerName: string, dirPath: string, tarFilePath: string) => Promise<void>;
+  /** Whether a path exists inside a container, running or not */
+  pathExists: (containerName: string, containerPath: string) => Promise<boolean>;
+  /**
+   * Extract a tar, given as a file path or as its content, into a folder of
+   * a container, running or not. The folder must exist
+   */
+  putArchive: (containerName: string, dirPath: string, tar: string | Buffer) => Promise<void>;
   stopContainer: (containerName: string) => Promise<void>;
   getHttpsMappings: () => Promise<FullBackupHttpsMappings>;
   addHttpsMapping: (mapping: FullBackupHttpsMappings[number]) => Promise<void>;
@@ -58,12 +66,25 @@ export interface RestoreDeps {
   /** Current values of the global envs, prefixed with _DAPPNODE_GLOBAL_ */
   getGlobalEnvs: () => Record<string, unknown>;
   refreshGlobalEnvFile: () => void;
+  /**
+   * Apply the staker selections in the DB as the staker daemon does: connect
+   * the selected clients and update the packages that use them
+   */
+  applyStakerSelections: () => Promise<void>;
   progress: (dnpName: string, message: string) => void;
+  /** Remove every `progress` message from the UI */
+  clearProgress: () => void;
 }
 
 interface RestoreJob extends FullBackupRestoreStatus {
   status: "running" | "done" | "failed";
   mode: FullBackupRestoreMode;
+  /**
+   * What each package step does, decided when the restore started. The steps
+   * never plan again from the node's state: after a restart mid-step the
+   * package is already installed, stopped and still without its data
+   */
+  packagePlans: FullBackupRestorePackagePlan[];
   /** Auto-update settings before the restore paused them */
   previousAutoUpdateSettings: unknown;
 }
@@ -75,6 +96,8 @@ const jobPath = (): string => path.join(getRestoreDir(), "job.json");
 const extractDir = (): string => path.join(getRestoreDir(), "extracted");
 
 let runningJob: Promise<void> | null = null;
+/** startRestore is extracting a backup and has not registered its job yet */
+let starting = false;
 
 function readJob(): RestoreJob | null {
   try {
@@ -94,7 +117,7 @@ function saveJob(job: RestoreJob): void {
 export function getRestoreStatus(): FullBackupRestoreStatus {
   const job = readJob();
   if (!job) return { status: "idle", steps: [], warnings: [], stoppedValidators: [] };
-  const { previousAutoUpdateSettings: _omit, ...status } = job;
+  const { previousAutoUpdateSettings: _omit, packagePlans: _plans, ...status } = job;
   return status;
 }
 
@@ -104,7 +127,7 @@ export async function waitForRestoreJob(): Promise<void> {
 }
 
 export function isRestoreRunning(): boolean {
-  return runningJob !== null || readJob()?.status === "running";
+  return runningJob !== null || starting || readJob()?.status === "running";
 }
 
 /** Decrypted backup content must not stay on disk once the job ends */
@@ -187,6 +210,73 @@ function isEmptySelection(value: unknown): boolean {
   return value === undefined || value === null || value === false || value === "";
 }
 
+/** Add or remove a package from the ones nothing but this restore or the user may start */
+function holdStopped(dnpName: string, held: boolean): void {
+  const others = db.fullBackupRestoreHeldStopped.get().filter((name) => name !== dnpName);
+  db.fullBackupRestoreHeldStopped.set(held ? [...others, dnpName] : others);
+}
+
+// Package data
+// ============
+
+/** Owner of the first entry of a tar: the file or folder a backup item holds */
+async function readTarOwner(tarFile: string): Promise<{ uid: number; gid: number }> {
+  const extract = tar.extract();
+  const done = new Error("first entry read");
+  let owner = { uid: 0, gid: 0 };
+  extract.on("entry", (header, stream) => {
+    owner = { uid: header.uid ?? 0, gid: header.gid ?? 0 };
+    stream.resume();
+    // Stop reading: the rest of the tar is not needed
+    extract.destroy(done);
+  });
+  try {
+    await pipeline(fs.createReadStream(tarFile), extract);
+  } catch (e) {
+    if (e !== done) throw e;
+  }
+  return owner;
+}
+
+/** Tar of nested folders: ["a", "b"] holds the entries a and a/b */
+async function packDirectories(names: string[], owner: { uid: number; gid: number }): Promise<Buffer> {
+  const pack = tar.pack();
+  for (let depth = 1; depth <= names.length; depth++) {
+    pack.entry({ name: names.slice(0, depth).join("/"), type: "directory", mode: 0o755, ...owner });
+  }
+  pack.finalize();
+  const chunks: Buffer[] = [];
+  for await (const chunk of pack) chunks.push(chunk as Buffer);
+  return Buffer.concat(chunks);
+}
+
+/**
+ * Create `dirPath` inside a container if it is missing. The docker archive
+ * API only extracts into an existing folder, and a package installed stopped
+ * has not run the entrypoint that normally creates its data folders. `exec
+ * mkdir` needs a running container, so the missing folders are extracted
+ * into the nearest existing one, owned by the owner of the item to restore
+ * (the package's own user) with mode 755.
+ */
+export async function ensureContainerDir(
+  deps: Pick<RestoreDeps, "pathExists" | "putArchive">,
+  containerName: string,
+  dirPath: string,
+  itemTarFile: string
+): Promise<void> {
+  const missing: string[] = [];
+  let existing = path.posix.normalize(dirPath);
+  while (!(await deps.pathExists(containerName, existing))) {
+    const parent = path.posix.dirname(existing);
+    if (parent === existing) break;
+    missing.unshift(path.posix.basename(existing));
+    existing = parent;
+  }
+  if (missing.length === 0) return;
+  const owner = await readTarOwner(itemTarFile);
+  await deps.putArchive(containerName, existing, await packDirectories(missing, owner));
+}
+
 // Job
 // ===
 
@@ -224,15 +314,40 @@ export async function startRestore({
   if (mode !== "merge" && mode !== "clone") throw Error(`Unknown restore mode ${mode}`);
   if (isRestoreRunning()) throw Error("A restore is already running");
 
-  cleanupExtracted();
-  fs.mkdirSync(getRestoreDir(), { recursive: true, mode: 0o700 });
-  let manifest: FullBackupManifest;
+  // Claimed before the first await: a second request arriving while this one
+  // extracts would wipe the folder both extract into
+  starting = true;
   try {
-    manifest = await extractBackup(filePath, password, extractDir());
+    const job = await prepareJob({ filePath, password, mode, confirmValidatorsOff, deps });
+    runningJob = runJob(job, deps, password).finally(() => {
+      runningJob = null;
+    });
   } catch (e) {
+    // No job is left to remove the decrypted backup when it ends
     cleanupExtracted();
     throw e;
+  } finally {
+    starting = false;
   }
+}
+
+/** Extract the backup, plan the restore and save it as the running job */
+async function prepareJob({
+  filePath,
+  password,
+  mode,
+  confirmValidatorsOff,
+  deps
+}: {
+  filePath: string;
+  password: string;
+  mode: FullBackupRestoreMode;
+  confirmValidatorsOff: boolean;
+  deps: RestoreDeps;
+}): Promise<RestoreJob> {
+  cleanupExtracted();
+  fs.mkdirSync(getRestoreDir(), { recursive: true, mode: 0o700 });
+  const manifest = await extractBackup(filePath, password, extractDir());
 
   const installed = (await deps.listPackages()).map((p) => ({
     dnpName: p.dnpName,
@@ -241,7 +356,6 @@ export async function startRestore({
   }));
   const plan = planRestore({ manifest, installed, mode });
   if (!confirmValidatorsOff && plan.packages.some((p) => p.validator && p.action !== "skip" && p.action !== "remove")) {
-    cleanupExtracted();
     throw Error("This backup contains validator keys: confirm that the old node is switched off");
   }
 
@@ -256,16 +370,16 @@ export async function startRestore({
     startedAt: new Date().toISOString(),
     warnings: [...plan.warnings],
     stoppedValidators: [],
+    packagePlans: packageSteps,
     previousAutoUpdateSettings: db.readMainDbRaw()[AUTO_UPDATE_SETTINGS_KEY] ?? {},
     steps: [
       { id: "extract", title: "Decrypt and verify backup", status: "done" },
       step("snapshot", "Back up this node first"),
       step("pause-auto-updates", "Pause auto-updates"),
-      step(
-        "dappmanager-settings",
-        mode === "clone" ? "Restore dappmanager settings and identity" : "Restore staker selections"
-      ),
+      ...(mode === "clone" ? [step("dappmanager-settings", "Restore dappmanager settings and identity")] : []),
       ...packageSteps.map((p) => step(`package:${p.dnpName}`, `${actionTitles[p.action]} ${p.dnpName}`)),
+      // After the packages: the staker daemon unselects a client that is not installed
+      step("staker-selections", "Restore staker selections"),
       step("https-mappings", "Restore HTTPS mappings"),
       step("finish", "Resume auto-updates"),
       // Last: afterwards this session may need to log in with the old password
@@ -273,10 +387,7 @@ export async function startRestore({
     ]
   };
   saveJob(job);
-
-  runningJob = runJob(job, deps, password).finally(() => {
-    runningJob = null;
-  });
+  return job;
 }
 
 /**
@@ -338,6 +449,7 @@ async function runJob(job: RestoreJob, deps: RestoreDeps, password: string | nul
     job.finishedAt = new Date().toISOString();
     saveJob(job);
     cleanupExtracted();
+    deps.clearProgress();
   }
 }
 
@@ -363,6 +475,8 @@ class RestoreContext {
         return this.pauseAutoUpdates();
       case "dappmanager-settings":
         return this.restoreDappmanagerSettings();
+      case "staker-selections":
+        return this.restoreStakerSelections();
       case "https-mappings":
         return this.restoreHttpsMappings();
       case "admin-login":
@@ -399,33 +513,49 @@ class RestoreContext {
     this.deps.refreshGlobalEnvFile();
   }
 
+  /** Clone only. Staker selections are restored after their packages */
   private restoreDappmanagerSettings(): void {
-    const restoredNames = new Set(this.planFor().map((p) => p.dnpName));
-    if (this.job.mode === "clone") {
-      // Auto-updates stay paused until the last step
-      const { [AUTO_UPDATE_SETTINGS_KEY]: _later, ...mainDb } = pickKeys(this.backupMainDb, mainDbIncludedKeys);
-      db.writeMainDbKeysRaw(mainDb);
-      const cacheDb = readExtractedJson(this.dir, this.manifest.dappmanagerFiles.cacheDb, {});
-      db.writeCacheDbKeysRaw(pickKeys(cacheDb, cacheDbIncludedKeys));
-      const nexusDb = readExtractedJson<Record<string, unknown>>(this.dir, this.manifest.dappmanagerFiles.nexusDb, {});
-      const history = (pickKeys(nexusDb, nexusDbIncludedKeys)["nexus-chat-history"] ?? {}) as object;
-      const currentHistory = (db.readNexusDbRaw()["nexus-chat-history"] ?? {}) as object;
-      db.writeNexusDbKeysRaw({ "nexus-chat-history": { ...currentHistory, ...history } });
-    } else {
-      // Merge: take a staker selection only where this node has none and the
-      // selected package is restored, never replace this node's choice
-      const current = db.readMainDbRaw();
-      const values: Record<string, unknown> = {};
-      for (const key of stakerKeys) {
-        const value = this.backupMainDb[key];
-        if (!(key in this.backupMainDb) || isEmptySelection(value)) continue;
-        if (!isEmptySelection(current[key])) continue;
-        if (typeof value === "string" && !restoredNames.has(value)) continue;
-        values[key] = value;
-      }
-      db.writeMainDbKeysRaw(values);
-    }
+    // Auto-updates stay paused until the last step
+    const { [AUTO_UPDATE_SETTINGS_KEY]: _later, ...mainDb } = pickKeys(this.backupMainDb, mainDbIncludedKeys);
+    for (const key of stakerKeys) delete mainDb[key];
+    db.writeMainDbKeysRaw(mainDb);
+    const cacheDb = readExtractedJson(this.dir, this.manifest.dappmanagerFiles.cacheDb, {});
+    db.writeCacheDbKeysRaw(pickKeys(cacheDb, cacheDbIncludedKeys));
+    const nexusDb = readExtractedJson<Record<string, unknown>>(this.dir, this.manifest.dappmanagerFiles.nexusDb, {});
+    const history = (pickKeys(nexusDb, nexusDbIncludedKeys)["nexus-chat-history"] ?? {}) as object;
+    const currentHistory = (db.readNexusDbRaw()["nexus-chat-history"] ?? {}) as object;
+    db.writeNexusDbKeysRaw({ "nexus-chat-history": { ...currentHistory, ...history } });
     this.deps.refreshGlobalEnvFile();
+  }
+
+  /**
+   * Clone takes the backup's staker selections. Merge takes one only where
+   * this node has none, never replacing this node's choice. Either way a
+   * client is only selected once its package step has succeeded: the staker
+   * daemon unselects a client that is not installed
+   */
+  private async restoreStakerSelections(): Promise<void> {
+    const doneSteps = new Set(this.job.steps.filter((s) => s.status === "done").map((s) => s.id));
+    const restored = new Set(
+      this.job.packagePlans
+        .filter((p) => p.action !== "remove" && doneSteps.has(`package:${p.dnpName}`))
+        .map((p) => p.dnpName)
+    );
+    const current = db.readMainDbRaw();
+    const values: Record<string, unknown> = {};
+    for (const key of stakerKeys) {
+      if (!(key in this.backupMainDb)) continue;
+      const value = this.backupMainDb[key];
+      if (this.job.mode === "merge" && (isEmptySelection(value) || !isEmptySelection(current[key]))) continue;
+      if (typeof value === "string" && value && !restored.has(value)) continue;
+      if (value === current[key] || (isEmptySelection(value) && isEmptySelection(current[key]))) continue;
+      values[key] = value;
+    }
+    if (Object.keys(values).length === 0) return;
+    db.writeMainDbKeysRaw(values);
+    this.deps.refreshGlobalEnvFile();
+    // The packages were installed before these selections existed
+    await this.deps.applyStakerSelections();
   }
 
   /** Packages whose staker role conflicts with this node's own selection */
@@ -435,27 +565,21 @@ class RestoreContext {
     const current = db.readMainDbRaw();
     for (const key of stakerKeys) {
       const backupValue = this.backupMainDb[key];
+      // No selection on this node is not a conflict: the backup's one is taken after the packages
+      if (isEmptySelection(current[key])) continue;
       if (typeof backupValue === "string" && backupValue && current[key] !== backupValue) conflicts.add(backupValue);
     }
     return conflicts;
   }
 
-  private planFor(): FullBackupRestorePackagePlan[] {
-    return planRestore({ manifest: this.manifest, installed: [], mode: this.job.mode }).packages;
-  }
-
   private async restorePackage(dnpName: string): Promise<void> {
-    const installedPackages = await this.deps.listPackages();
-    const installed = installedPackages.find((p) => p.dnpName === dnpName);
-    const plan = planRestore({
-      manifest: this.manifest,
-      installed: installedPackages.map((p) => ({ dnpName: p.dnpName, version: p.version, isCore: p.isCore })),
-      mode: this.job.mode
-    }).packages.find((p) => p.dnpName === dnpName);
-    if (!plan || plan.action === "skip") return;
+    const plan = this.job.packagePlans.find((p) => p.dnpName === dnpName);
+    if (!plan) throw Error(`No restore plan for ${dnpName}`);
+    const installed = (await this.deps.listPackages()).find((p) => p.dnpName === dnpName);
 
     if (plan.action === "remove") {
-      await this.deps.removePackage(dnpName);
+      // Already removed when this step runs again after an interruption
+      if (installed) await this.deps.removePackage(dnpName);
       return;
     }
 
@@ -479,6 +603,8 @@ class RestoreContext {
     // first. A validator installed without data stays stopped too; one
     // already running on this node whose data is kept is left as it is
     const keepStopped = plan.restoreData || (plan.validator && plan.action === "install");
+    // Staker code must not start it either, see db.fullBackupRestoreHeldStopped
+    holdStopped(dnpName, keepStopped);
     if (plan.action === "install" || plan.action === "update") {
       await this.deps.installPackage({
         dnpName,
@@ -528,13 +654,16 @@ class RestoreContext {
         );
         continue;
       }
-      await this.deps.putArchive(container.containerName, path.posix.dirname(item.path), tarFile);
+      const dirPath = path.posix.dirname(item.path);
+      await ensureContainerDir(this.deps, container.containerName, dirPath, tarFile);
+      await this.deps.putArchive(container.containerName, dirPath, tarFile);
     }
 
     if (validator) {
       if (!this.job.stoppedValidators.includes(entry.dnpName)) this.job.stoppedValidators.push(entry.dnpName);
       return;
     }
+    holdStopped(entry.dnpName, false);
     await this.deps.startPackage(entry.dnpName);
   }
 

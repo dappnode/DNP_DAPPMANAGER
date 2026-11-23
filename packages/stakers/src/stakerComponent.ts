@@ -6,6 +6,7 @@ import { InstalledPackageData, StakerItem, UserSettings, Network } from "@dappno
 import { getIsInstalled, getIsUpdated, getIsRunning, fileToGatewayUrl } from "@dappnode/utils";
 import { lt } from "semver";
 import { params } from "@dappnode/params";
+import * as db from "@dappnode/db";
 
 export class StakerComponent {
   protected dappnodeInstaller: DappnodeInstaller;
@@ -107,6 +108,19 @@ protected async getAll({
     const dnp = await listPackageNoThrow({ dnpName });
 
     return Boolean(dnp);
+  }
+
+  /**
+   * A full backup restore installs packages stopped until their data is
+   * written, and leaves validators stopped for the user to start: starting
+   * one here would initialise fresh state or run keys that may still be live
+   * on the old node. Once any of its containers runs, the restore or the
+   * user has started it and it is handled as usual
+   */
+  protected async isHeldStoppedByRestore(dnpName: string): Promise<boolean> {
+    if (!db.fullBackupRestoreHeldStopped.get().includes(dnpName)) return false;
+    const dnp = await listPackageNoThrow({ dnpName });
+    return !dnp?.containers.some((container) => container.running);
   }
 
   protected getComposeRootNetworks(network: Network): NonNullable<UserSettings["networks"]>["rootNetworks"] {

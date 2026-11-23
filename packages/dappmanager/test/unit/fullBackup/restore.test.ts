@@ -2,12 +2,15 @@ import fs from "fs";
 import path from "path";
 import { Readable } from "stream";
 import { expect } from "chai";
+import tar from "tar-stream";
 import * as db from "@dappnode/db";
 import { params } from "@dappnode/params";
 import { FullBackupRestorePackagePlan, InstalledPackageData, PackageContainer, UserSettings } from "@dappnode/types";
 import { FullBackupDeps, writeFullBackup } from "../../../src/fullBackup/create.js";
 import { EncryptOptions } from "../../../src/fullBackup/format.js";
+import { extractBackup } from "../../../src/fullBackup/read.js";
 import {
+  ensureContainerDir,
   getRestoreDir,
   getRestoreStatus,
   orderPackageSteps,
@@ -86,16 +89,34 @@ async function createBackupFile(): Promise<string> {
   return filePath;
 }
 
+const EXECUTION_KEY = "execution-client-mainnet";
+
+/** What the node looked like when a package was installed */
+interface InstallSnapshot {
+  executionClient: unknown;
+  heldStopped: string[];
+}
+
 /** Fake node: records every effect the restore performs */
-function fakeNode(initial: InstalledPackageData[]): { deps: RestoreDeps; calls: string[]; installs: UserSettings[] } {
+function fakeNode(initial: InstalledPackageData[]): {
+  deps: RestoreDeps;
+  calls: string[];
+  installs: UserSettings[];
+  atInstall: Record<string, InstallSnapshot>;
+} {
   const packages = new Map(initial.map((p) => [p.dnpName, p]));
   const calls: string[] = [];
   const installs: UserSettings[] = [];
+  const atInstall: Record<string, InstallSnapshot> = {};
   const deps: RestoreDeps = {
     listPackages: async () => [...packages.values()],
     installPackage: async ({ dnpName, version, userSettings, start }) => {
       calls.push(`install ${dnpName}@${version}${start ? "" : " stopped"}`);
       installs.push(userSettings);
+      atInstall[dnpName] = {
+        executionClient: db.readMainDbRaw()[EXECUTION_KEY],
+        heldStopped: db.fullBackupRestoreHeldStopped.get()
+      };
       packages.set(dnpName, installedPkg(dnpName, version, start));
     },
     applySettings: async ({ dnpName, userSettings, start }) => {
@@ -105,12 +126,13 @@ function fakeNode(initial: InstalledPackageData[]): { deps: RestoreDeps; calls: 
       if (pkg) packages.set(dnpName, installedPkg(dnpName, pkg.version, start));
     },
     startPackage: async (dnpName) => {
-      calls.push(`start ${dnpName}`);
+      calls.push(`start ${dnpName}${db.fullBackupRestoreHeldStopped.get().includes(dnpName) ? " while held" : ""}`);
     },
     removePackage: async (dnpName) => {
       calls.push(`remove ${dnpName}`);
       packages.delete(dnpName);
     },
+    pathExists: async () => true,
     putArchive: async (containerName, dirPath, tarFile) => {
       calls.push(`put ${containerName} ${dirPath} ${fs.readFileSync(tarFile, "utf8")}`);
     },
@@ -127,9 +149,41 @@ function fakeNode(initial: InstalledPackageData[]): { deps: RestoreDeps; calls: 
     },
     getGlobalEnvs: () => ({ _DAPPNODE_GLOBAL_DOMAIN: "new.dyndns.dappnode.io" }),
     refreshGlobalEnvFile: () => undefined,
-    progress: () => undefined
+    applyStakerSelections: async () => {
+      calls.push("apply-staker-selections");
+    },
+    progress: () => undefined,
+    clearProgress: () => {
+      calls.push("clear-progress");
+    }
   };
-  return { deps, calls, installs };
+  return { deps, calls, installs, atInstall };
+}
+
+/** A tar like the docker archive API returns for one file */
+async function writeItemTar(filePath: string, owner: { uid: number; gid: number }): Promise<void> {
+  const pack = tar.pack();
+  pack.entry({ name: path.basename(filePath), mode: 0o600, ...owner }, "SECRET");
+  pack.finalize();
+  const chunks: Buffer[] = [];
+  for await (const chunk of pack) chunks.push(chunk as Buffer);
+  fs.writeFileSync(filePath, Buffer.concat(chunks));
+}
+
+async function listTarEntries(data: Buffer): Promise<string[]> {
+  const entries: string[] = [];
+  const extract = tar.extract();
+  extract.on("entry", (header, stream, next) => {
+    entries.push(`${header.type} ${header.name} ${header.mode?.toString(8)} ${header.uid}:${header.gid}`);
+    stream.on("end", next);
+    stream.resume();
+  });
+  await new Promise<void>((resolve, reject) => {
+    extract.on("finish", resolve);
+    extract.on("error", reject);
+    extract.end(data);
+  });
+  return entries;
 }
 
 async function expectRejects(promise: Promise<unknown>, message: RegExp): Promise<void> {
@@ -176,13 +230,14 @@ describe("fullBackup / restore", () => {
   it("clones a node onto a fresh one", async () => {
     db.dappnodeWebName.set("fresh node");
     db.writeMainDbKeysRaw({ "auto-update-settings": { "my-packages": { enabled: false } } });
-    const { deps, calls, installs } = fakeNode([]);
+    const { deps, calls, installs, atInstall } = fakeNode([]);
 
     await startRestore({ filePath: backupFile, password, mode: "clone", confirmValidatorsOff: true, deps });
     await waitForRestoreJob();
 
     const status = getRestoreStatus();
     expect(status.status, JSON.stringify(status.steps)).to.equal("done");
+    expect(status).to.not.have.property("packagePlans");
     expect(status.safetySnapshot).to.equal("DNCORE/full-backup-snapshots/snapshot.dnbackup");
     expect(calls[0]).to.equal("snapshot");
     expect(calls).to.include(`install ${app}@1.0.0 stopped`);
@@ -200,6 +255,18 @@ describe("fullBackup / restore", () => {
     expect(calls).to.not.include(`start ${signer}`);
     expect(calls.some((c) => c.startsWith("stop "))).to.equal(false);
     expect(status.stoppedValidators).to.deep.equal([signer]);
+
+    // While a package waits for its data nothing else may start it; a
+    // validator stays held after the restore
+    expect(atInstall[app].heldStopped).to.include(app);
+    expect(calls).to.include(`start ${app}`);
+    expect(db.fullBackupRestoreHeldStopped.get()).to.deep.equal([signer]);
+
+    // A staker client is selected only once its package is installed, and
+    // the selection is then applied to the packages
+    expect(atInstall[app].executionClient).to.equal(undefined);
+    expect(calls.indexOf("apply-staker-selections")).to.be.greaterThan(calls.indexOf(`start ${app}`));
+    expect(calls[calls.length - 1]).to.equal("clear-progress");
 
     // Global envs baked into the compose get this node's current values, and
     // a clone keeps the staker network
@@ -266,6 +333,40 @@ describe("fullBackup / restore", () => {
     expect(installs.find((s) => s.environment?.[app])?.networks).to.equal(undefined);
   });
 
+  it("merges the backup's staker selection into a node that has none", async () => {
+    const { deps, calls, installs } = fakeNode([]);
+    await startRestore({ filePath: backupFile, password, mode: "merge", confirmValidatorsOff: true, deps });
+    await waitForRestoreJob();
+
+    const status = getRestoreStatus();
+    expect(status.status, JSON.stringify(status.steps)).to.equal("done");
+    expect(status.steps.map((s) => s.id)).to.not.include("dappmanager-settings");
+    // No selection on this node is not a conflict: the client keeps its staker network
+    expect(status.warnings.some((w) => w.includes("without its staker role"))).to.equal(false);
+    const appSettings = installs.find((s) => s.environment?.[app]);
+    expect(appSettings?.networks?.serviceNetworks?.[app]).to.have.property("mainnet_network");
+    expect(db.readMainDbRaw()[EXECUTION_KEY]).to.equal(app);
+    expect(calls).to.include("apply-staker-selections");
+  });
+
+  it("does not select a staker client whose package could not be restored", async () => {
+    const { deps, calls } = fakeNode([]);
+    const installPackage = deps.installPackage;
+    deps.installPackage = async (args) => {
+      if (args.dnpName === app) throw Error("release not found");
+      await installPackage(args);
+    };
+    await startRestore({ filePath: backupFile, password, mode: "clone", confirmValidatorsOff: true, deps });
+    await waitForRestoreJob();
+
+    const status = getRestoreStatus();
+    expect(status.status).to.equal("failed");
+    expect(status.steps.find((s) => s.id === `package:${app}`)?.error).to.equal("release not found");
+    expect(status.steps.find((s) => s.id === "staker-selections")?.status).to.equal("done");
+    expect(db.readMainDbRaw()[EXECUTION_KEY]).to.equal(undefined);
+    expect(calls).to.not.include("apply-staker-selections");
+  });
+
   it("removes packages that are not in the backup when cloning", async () => {
     const { deps, calls } = fakeNode([installedPkg("extra.dnp.dappnode.eth", "1.0.0")]);
     await startRestore({ filePath: backupFile, password, mode: "clone", confirmValidatorsOff: true, deps });
@@ -284,6 +385,33 @@ describe("fullBackup / restore", () => {
     );
     expect(calls).to.deep.equal([]);
     expect(getRestoreStatus().status).to.equal("idle");
+    expect(fs.existsSync(path.join(getRestoreDir(), "extracted"))).to.equal(false);
+  });
+
+  it("removes the decrypted backup when the restore cannot be planned", async () => {
+    const { deps } = fakeNode([]);
+    deps.listPackages = async () => {
+      throw Error("docker is not responding");
+    };
+    await expectRejects(
+      startRestore({ filePath: backupFile, password, mode: "clone", confirmValidatorsOff: true, deps }),
+      /docker is not responding/
+    );
+    expect(fs.existsSync(path.join(getRestoreDir(), "extracted"))).to.equal(false);
+    expect(getRestoreStatus().status).to.equal("idle");
+  });
+
+  it("rejects a second restore requested while the first one is extracting", async () => {
+    const { deps, calls } = fakeNode([]);
+    const args = { filePath: backupFile, password, mode: "clone" as const, confirmValidatorsOff: true, deps };
+    const first = startRestore(args);
+    await expectRejects(startRestore(args), /already running/);
+    await first;
+    await waitForRestoreJob();
+
+    const status = getRestoreStatus();
+    expect(status.status, JSON.stringify(status.steps)).to.equal("done");
+    expect(calls.filter((c) => c === "snapshot")).to.have.length(1);
   });
 
   it("rejects a wrong password before changing anything", async () => {
@@ -325,6 +453,82 @@ describe("fullBackup / restore", () => {
     expect(status.status).to.equal("failed");
     expect(status.steps[1].error).to.include("before anything was changed");
     expect(calls).to.deep.equal([]);
+  });
+
+  it("resumes with the stored plan when packages were installed before the interruption", async () => {
+    fs.mkdirSync(getRestoreDir(), { recursive: true });
+    await extractBackup(backupFile, password, path.join(getRestoreDir(), "extracted"));
+    const plan = (dnpName: string, version: string, validator: boolean): FullBackupRestorePackagePlan => ({
+      dnpName,
+      action: "install",
+      backupVersion: version,
+      installedVersion: null,
+      isCore: false,
+      restoreData: true,
+      validator
+    });
+    const stepIds = ["extract", "snapshot", "pause-auto-updates", "dappmanager-settings", `package:${app}`];
+    fs.writeFileSync(
+      path.join(getRestoreDir(), "job.json"),
+      JSON.stringify({
+        status: "running",
+        mode: "clone",
+        packagePlans: [plan(app, "1.0.0", false), plan(signer, "2.0.0", true)],
+        previousAutoUpdateSettings: {},
+        steps: [
+          ...stepIds.map((id) => ({ id, title: id, status: id === `package:${app}` ? "running" : "done" })),
+          { id: `package:${signer}`, title: "x", status: "pending" },
+          { id: "finish", title: "x", status: "pending" }
+        ],
+        warnings: [],
+        stoppedValidators: []
+      })
+    );
+    // Both were created stopped, and dappmanager restarted before their data was written
+    const { deps, calls } = fakeNode([installedPkg(app, "1.0.0", false), installedPkg(signer, "2.0.0", false)]);
+    resumeRestoreIfInterrupted(deps);
+    await waitForRestoreJob();
+
+    const status = getRestoreStatus();
+    expect(status.status, JSON.stringify(status.steps)).to.equal("done");
+    expect(calls.filter((c) => c !== "clear-progress")).to.deep.equal([
+      `install ${app}@1.0.0 stopped`,
+      `put DAppNodePackage-${app} /data DATA-OF-DAppNodePackage-${app}`,
+      `start ${app}`,
+      `install ${signer}@2.0.0 stopped`,
+      `put DAppNodePackage-${signer} /data DATA-OF-DAppNodePackage-${signer}`
+    ]);
+    expect(status.stoppedValidators).to.deep.equal([signer]);
+    expect(db.fullBackupRestoreHeldStopped.get()).to.deep.equal([signer]);
+  });
+
+  it("creates the missing parent folders of a backup path before extracting into it", async () => {
+    const tarFile = path.join(outDir, "secret_ed25519.tar");
+    await writeItemTar(tarFile, { uid: 1000, gid: 1001 });
+    const existing = new Set(["/", "/data"]);
+    const puts: { dirPath: string; entries: string[] }[] = [];
+    const deps: Pick<RestoreDeps, "pathExists" | "putArchive"> = {
+      pathExists: async (_containerName, containerPath) => existing.has(containerPath),
+      putArchive: async (_containerName, dirPath, data) => {
+        puts.push({ dirPath, entries: await listTarEntries(data as Buffer) });
+      }
+    };
+
+    await ensureContainerDir(deps, "DAppNodePackage-polkadot", "/data/chains/polkadot/network", tarFile);
+    expect(puts).to.deep.equal([
+      {
+        dirPath: "/data",
+        entries: [
+          "directory chains 755 1000:1001",
+          "directory chains/polkadot 755 1000:1001",
+          "directory chains/polkadot/network 755 1000:1001"
+        ]
+      }
+    ]);
+
+    // Nothing to create when the folder exists
+    await ensureContainerDir(deps, "DAppNodePackage-polkadot", "/data", tarFile);
+    expect(puts).to.have.length(1);
   });
 
   it("orders removals, then system packages, then dependencies before dependants", () => {

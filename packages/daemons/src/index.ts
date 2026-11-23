@@ -44,6 +44,8 @@ export function startDaemons(
 
 export { startAvahiDaemon } from "./avahi/index.js";
 
+export { createStakerNetworkAndConnectStakerPkgs } from "./dockerNetworkConfigs/createStakerNetworkAndConnectStakerPkgs.js";
+
 export { throttledNatRenewal } from "./natRenewal/index.js";
 
 export { getPortsToOpen } from "./natRenewal/getPortsToOpen.js";

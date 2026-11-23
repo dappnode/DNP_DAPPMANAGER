@@ -78,6 +78,7 @@ export const mainDbExcludedKeys: Record<string, string> = {
   "password-is-secure": "describes the host OS user password",
   "is-dappnode-aws": "detected once on the running machine",
   "imported-installation-staticIp": "describes the host installation",
+  "full-backup-restore-held-stopped": "state of a restore on this node",
   "fullnode-domain-target": "legacy, unused",
   "ethical-metrics-mail": "legacy, migrated into notifications",
   "ethical-metrics-status": "legacy, migrated into notifications"

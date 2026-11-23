@@ -97,7 +97,11 @@ export class Execution extends StakerComponent {
 
       const userSettings = await this.getUserSettings(network, currentExecutionDnpName);
 
-      await this.setStakerPkgConfig({ dnpName: currentExecutionDnpName, isInstalled, userSettings });
+      if (await this.isHeldStoppedByRestore(currentExecutionDnpName)) {
+        logs.info(`${currentExecutionDnpName} is held stopped by a full backup restore, not starting it`);
+      } else {
+        await this.setStakerPkgConfig({ dnpName: currentExecutionDnpName, isInstalled, userSettings });
+      }
 
       await this.DbHandlers[network].set(currentExecutionDnpName);
     }
