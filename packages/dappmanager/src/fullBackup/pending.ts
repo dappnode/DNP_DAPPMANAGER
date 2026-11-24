@@ -67,16 +67,26 @@ export function listPendingBackups(dir = getPendingBackupDir()): FullBackupPendi
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
+/**
+ * Name of a pending backup as listed in `dir`. The requested name is only
+ * compared against the listing, never used to build a path, so a request
+ * can only reach files that are already in the pending directory
+ */
+function findPendingBackup(fileName: unknown, dir: string): string {
+  if (typeof fileName !== "string" || !BACKUP_FILE.test(fileName)) throw Error("Invalid backup file name");
+  const kept = fs.existsSync(dir) ? fs.readdirSync(dir).find((f) => BACKUP_FILE.test(f) && f === fileName) : undefined;
+  if (!kept) throw Error(`No backup named ${fileName} is kept on this node`);
+  return kept;
+}
+
 /** Path of a pending backup, to download it. Throws if there is none with that name */
 export function getPendingBackupPath(fileName: unknown, dir = getPendingBackupDir()): string {
-  if (typeof fileName !== "string" || !BACKUP_FILE.test(fileName)) throw Error("Invalid backup file name");
-  const filePath = path.join(dir, fileName);
-  if (!fs.existsSync(filePath)) throw Error(`No backup named ${fileName} is kept on this node`);
-  return filePath;
+  return path.join(dir, findPendingBackup(fileName, dir));
 }
 
 /** The admin has the file, or does not want it: delete the copy kept on this node */
 export function discardPendingBackup(fileName: unknown, dir = getPendingBackupDir()): void {
-  fs.rmSync(getPendingBackupPath(fileName, dir));
-  fs.rmSync(infoPath(dir, fileName as string), { force: true });
+  const kept = findPendingBackup(fileName, dir);
+  fs.rmSync(path.join(dir, kept));
+  fs.rmSync(infoPath(dir, kept), { force: true });
 }
