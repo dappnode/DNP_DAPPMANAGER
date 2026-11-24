@@ -168,7 +168,6 @@ function Relay({
 
 // Utils
 
-// bloxroute (maxprofit) is OFAC compliant as of Dec 2023: https://x.com/bloXrouteLabs/status/1736819783520092357
 // Info on all relays specs: https://github.com/eth-educators/ethstaker-guides/blob/main/MEV-relay-list.md
 const getDefaultRelays = (network: Network): RelayIface[] => {
   switch (network) {
