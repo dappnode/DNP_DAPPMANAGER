@@ -3,7 +3,7 @@ import Alert from "react-bootstrap/esm/Alert";
 import Form from "react-bootstrap/esm/Form";
 import ProgressBar from "react-bootstrap/esm/ProgressBar";
 import Table from "react-bootstrap/esm/Table";
-import { apiRoutes, useApi } from "api";
+import { api, apiRoutes, useApi } from "api";
 import {
   FullBackupInspectResult,
   FullBackupRestoreMode,
@@ -13,7 +13,7 @@ import {
 import Button from "components/Button";
 import ErrorView from "components/ErrorView";
 import { InputForm } from "components/InputForm";
-import { prettyDnpName } from "utils/format";
+import { prettyBytes, prettyDnpName } from "utils/format";
 
 const actionLabels: Record<FullBackupRestorePackagePlan["action"], string> = {
   install: "Install",
@@ -30,6 +30,38 @@ const modeDescriptions: Record<FullBackupRestoreMode, string> = {
   clone:
     "Make this node a copy of the backed-up one: identity, admin login, settings and package data. Packages that are not in the backup are removed (their volumes are kept). The old node must stay off."
 };
+
+/** A backup file uploaded to this Dappnode, kept so a wrong password can be retried without uploading it again */
+interface UploadedBackup {
+  fileId: string;
+  name: string;
+  size: number;
+  uploadedAt: number;
+}
+
+const UPLOAD_STORAGE_KEY = "full-backup-restore-upload";
+// The Dappnode deletes uploads after 30 minutes: forget them a bit earlier
+const UPLOAD_TTL_MS = 25 * 60 * 1000;
+
+/** The upload of this browser tab, also after a reload */
+function loadUpload(): UploadedBackup | null {
+  try {
+    const saved = JSON.parse(sessionStorage.getItem(UPLOAD_STORAGE_KEY) ?? "null");
+    if (saved && typeof saved.fileId === "string" && Date.now() - saved.uploadedAt < UPLOAD_TTL_MS) return saved;
+  } catch {
+    // Storage unavailable: the file is uploaded again
+  }
+  return null;
+}
+
+function saveUpload(upload: UploadedBackup | null): void {
+  try {
+    if (upload) sessionStorage.setItem(UPLOAD_STORAGE_KEY, JSON.stringify(upload));
+    else sessionStorage.removeItem(UPLOAD_STORAGE_KEY);
+  } catch {
+    // Storage unavailable: the upload is kept for this page view only
+  }
+}
 
 function formatAuthError(e: Error): Error {
   return e.message === "WRONG_CREDENTIALS" ? Error("Wrong admin password") : e;
@@ -249,6 +281,7 @@ function RestoreProgress({ status }: { status: FullBackupRestoreStatus }) {
 export function FullBackupRestore() {
   const statusRes = useApi.fullBackupRestoreStatus();
   const [file, setFile] = useState<File | null>(null);
+  const [uploaded, setUploadedState] = useState<UploadedBackup | null>(loadUpload);
   const [password, setPassword] = useState("");
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [reading, setReading] = useState(false);
@@ -272,10 +305,19 @@ export function FullBackupRestore() {
     return () => clearInterval(interval);
   }, [polling, statusRes]);
 
-  function onChooseAnotherFile() {
+  function setUploaded(upload: UploadedBackup | null) {
+    saveUpload(upload);
+    setUploadedState(upload);
+  }
+
+  /** Delete the uploaded file from the Dappnode, to choose another one or to leave */
+  async function onRemoveUpload() {
+    const upload = uploaded;
+    setUploaded(null);
     setInspected(null);
     setFile(null);
     setError(null);
+    if (upload) await api.fullBackupUploadDiscard({ fileId: upload.fileId }).catch((e) => setError(e));
   }
 
   if (job) {
@@ -287,7 +329,7 @@ export function FullBackupRestore() {
             onClick={() => {
               setDismissed(job.startedAt ?? "");
               setStarted(false);
-              onChooseAnotherFile();
+              void onRemoveUpload();
             }}
           >
             Restore another backup
@@ -298,19 +340,31 @@ export function FullBackupRestore() {
   }
 
   async function onRead() {
-    if (!file || !password) return;
+    if (!password || (!file && !uploaded)) return;
     try {
       setError(null);
       setReading(true);
-      setUploadProgress(0);
-      const { fileId } = await apiRoutes.uploadFile(file, ({ loaded, total }) =>
-        setUploadProgress(Math.round((100 * loaded) / total))
-      );
-      setUploadProgress(null);
-      const result = await apiRoutes.inspectFullBackup({ fileId, password });
-      setInspected({ result, fileId });
+      // Upload once: a wrong password is retried on the uploaded file
+      let upload = uploaded;
+      if (!upload && file) {
+        setUploadProgress(0);
+        const { fileId } = await apiRoutes.uploadFile(file, ({ loaded, total }) =>
+          setUploadProgress(Math.round((100 * loaded) / total))
+        );
+        setUploadProgress(null);
+        upload = { fileId, name: file.name, size: file.size, uploadedAt: Date.now() };
+        setUploaded(upload);
+      }
+      if (!upload) return;
+      const result = await apiRoutes.inspectFullBackup({ fileId: upload.fileId, password });
+      setInspected({ result, fileId: upload.fileId });
     } catch (e) {
-      setError(e);
+      if (/Uploaded backup not found/.test(e.message)) {
+        setUploaded(null);
+        setError(Error("The uploaded backup was deleted from the Dappnode after 30 minutes. Choose the file again."));
+      } else {
+        setError(e);
+      }
     } finally {
       setReading(false);
       setUploadProgress(null);
@@ -325,11 +379,13 @@ export function FullBackupRestore() {
           fileId={inspected.fileId}
           password={password}
           onStarted={() => {
+            // The Dappnode deleted the upload once it extracted it
+            setUploaded(null);
             setStarted(true);
             statusRes.revalidate();
           }}
         />
-        <Button onClick={onChooseAnotherFile}>Choose another file</Button>
+        <Button onClick={onRemoveUpload}>Remove upload and choose another file</Button>
       </>
     );
   }
@@ -343,14 +399,26 @@ export function FullBackupRestore() {
         </div>
       )}
       <p>Restore a .dnbackup file. Nothing changes until you review what the restore will do and confirm it.</p>
-      <Form.Group controlId="full-backup-restore-file">
-        <Form.Label>Backup file</Form.Label>
-        <Form.Control
-          type="file"
-          accept=".dnbackup"
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFile(e.target.files?.[0] ?? null)}
-        />
-      </Form.Group>
+      {uploaded ? (
+        <div className="full-backup-upload">
+          <div>
+            Backup file: <b>{uploaded.name}</b> ({prettyBytes(uploaded.size)}), uploaded to your Dappnode
+            <div className="full-backup-note">
+              It is kept there for 30 minutes, so you can retry the password without uploading it again.
+            </div>
+          </div>
+          <Button onClick={onRemoveUpload}>Remove upload</Button>
+        </div>
+      ) : (
+        <Form.Group controlId="full-backup-restore-file">
+          <Form.Label>Backup file</Form.Label>
+          <Form.Control
+            type="file"
+            accept=".dnbackup"
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFile(e.target.files?.[0] ?? null)}
+          />
+        </Form.Group>
+      )}
       <InputForm
         fields={[
           {
@@ -364,7 +432,12 @@ export function FullBackupRestore() {
           }
         ]}
       >
-        <Button type="submit" variant="dappnode" onClick={onRead} disabled={!file || !password || reading}>
+        <Button
+          type="submit"
+          variant="dappnode"
+          onClick={onRead}
+          disabled={(!file && !uploaded) || !password || reading}
+        >
           {reading ? "Reading backup..." : "Read backup"}
         </Button>
       </InputForm>

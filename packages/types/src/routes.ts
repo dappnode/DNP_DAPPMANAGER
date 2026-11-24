@@ -105,6 +105,12 @@ export interface Routes {
   fullBackupRestoreStatus: () => Promise<FullBackupRestoreStatus>;
 
   /**
+   * Deletes a backup uploaded to restore it. Uploads are kept so a mistyped
+   * password can be retried, and are otherwise deleted after 30 minutes
+   */
+  fullBackupUploadDiscard: (kwargs: { fileId: string }) => Promise<void>;
+
+  /**
    * Whether a full backup is being created and how the last one ended, for
    * when the response of POST /full-backup was lost
    */
@@ -977,6 +983,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   backupRestore: {},
   fullBackupInfo: {},
   fullBackupRestoreStatus: {},
+  fullBackupUploadDiscard: { log: true },
   fullBackupStatus: {},
   chainDataGet: {},
   changeIpfsTimeout: {},
