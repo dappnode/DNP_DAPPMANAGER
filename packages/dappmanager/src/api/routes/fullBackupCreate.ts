@@ -2,7 +2,7 @@ import { wrapHandler } from "../utils.js";
 import { createFullBackup } from "../../fullBackup/create.js";
 
 /**
- * POST /full-backup { adminPassword, password, keepValidatorsStopped? }
+ * POST /full-backup { adminPassword, password, keepValidatorsStopped?, skipValidatorData? }
  *
  * Mounted behind auth.onlyAdminWithPasswordConfirmation, which checks
  * `adminPassword`: the backup contains every secret on this DAppNode.
@@ -14,7 +14,8 @@ export const fullBackupCreate = wrapHandler(async (req, res) => {
     res.send(
       await createFullBackup({
         password: req.body?.password,
-        keepValidatorsStopped: req.body?.keepValidatorsStopped === true
+        keepValidatorsStopped: req.body?.keepValidatorsStopped === true,
+        skipValidatorData: req.body?.skipValidatorData === true
       })
     );
   } catch (e) {

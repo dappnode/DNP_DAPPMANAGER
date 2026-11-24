@@ -34,6 +34,7 @@ export interface IApiRoutes {
     adminPassword: string;
     password: string;
     keepValidatorsStopped: boolean;
+    skipValidatorData: boolean;
   }): Promise<FullBackupCreateResult>;
 }
 

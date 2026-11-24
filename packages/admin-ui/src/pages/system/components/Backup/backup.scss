@@ -41,10 +41,22 @@
   }
 }
 
-.full-backup-keep-stopped {
+.full-backup-validators {
   margin-bottom: 1rem;
 }
 
 .full-backup-running {
   margin-top: 1rem;
+}
+
+.full-backup-progress {
+  margin-top: 1rem;
+
+  .progress {
+    margin: 0.5rem 0 0.25rem;
+  }
+
+  .full-backup-note {
+    margin: 0;
+  }
 }

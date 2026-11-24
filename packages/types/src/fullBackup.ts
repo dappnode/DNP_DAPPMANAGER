@@ -38,14 +38,47 @@ export interface FullBackupCreateResult {
   warnings: string[];
   /** Validator packages left stopped because the user is moving this node */
   stoppedValidators: string[];
+  /**
+   * Validator packages whose data (keys and slashing protection) was left
+   * out so they kept validating without a pause. Only their settings are in
+   * the backup
+   */
+  skippedValidators: string[];
 }
 
 /**
- * Whether a full backup is being created, and how the last one ended. Lets
- * the UI recover a result whose HTTP response was lost
+ * What a backup being created is doing:
+ * - preparing: checking disk space and saving the dappmanager's settings
+ * - stopping: stopping a validator so its slashing protection is exact
+ * - copying: copying a package's `backup` data
+ * - restarting: starting a validator again after its copy
+ * - archiving: compressing and encrypting everything into the backup file
+ */
+export type FullBackupStep = "preparing" | "stopping" | "copying" | "restarting" | "archiving";
+
+export interface FullBackupProgress {
+  step: FullBackupStep;
+  startedAt: string;
+  /** Package being stopped, copied or restarted */
+  dnpName?: string;
+  packagesDone: number;
+  packagesTotal: number;
+  /** Bytes of package data copied so far */
+  copiedBytes: number;
+  /** While archiving: bytes written into the backup file, of `archiveTotalBytes` */
+  archivedBytes: number;
+  archiveTotalBytes: number;
+}
+
+/**
+ * Whether a full backup is being created, what it is doing, and how the last
+ * one ended. Lets the UI show progress and recover a result whose HTTP
+ * response was lost
  */
 export interface FullBackupStatus {
   inProgress: boolean;
+  /** Set while a backup is being created */
+  progress?: FullBackupProgress;
   /** Last backup since the dappmanager started, kept while its download link is valid */
   last?: {
     finishedAt: string;

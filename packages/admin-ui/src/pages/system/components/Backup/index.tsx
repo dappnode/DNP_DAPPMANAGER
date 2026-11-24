@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import Alert from "react-bootstrap/esm/Alert";
-import Form from "react-bootstrap/esm/Form";
+import ProgressBar from "react-bootstrap/esm/ProgressBar";
 import { apiRoutes, useApi } from "api";
-import { FullBackupCreateResult, FullBackupInfo, FullBackupPackageInfo } from "@dappnode/types";
+import { FullBackupCreateResult, FullBackupInfo, FullBackupPackageInfo, FullBackupProgress } from "@dappnode/types";
 import Card from "components/Card";
 import SubTitle from "components/SubTitle";
 import Button from "components/Button";
 import ErrorView from "components/ErrorView";
+import { confirm } from "components/ConfirmDialog";
 import { InputForm } from "components/InputForm";
 import { renderResponse } from "components/SwrRender";
 import { prettyBytes, prettyDnpName } from "utils/format";
@@ -62,11 +63,58 @@ function CoverageSummary({ packages }: { packages: FullBackupPackageInfo[] }) {
   );
 }
 
+function formatElapsed(ms: number): string {
+  const seconds = Math.max(0, Math.floor(ms / 1000));
+  const minutes = Math.floor(seconds / 60);
+  return minutes > 0 ? `${minutes} min ${seconds % 60} s` : `${seconds} s`;
+}
+
+/** Live progress of the backup being created, from fullBackupStatus */
+function BackupProgress({ progress }: { progress?: FullBackupProgress }) {
+  if (!progress) {
+    return (
+      <div className="full-backup-progress">
+        <div>Starting the backup...</div>
+        <ProgressBar now={100} animated striped />
+      </div>
+    );
+  }
+
+  const { step, dnpName, packagesDone, packagesTotal, copiedBytes, archivedBytes, archiveTotalBytes } = progress;
+  const name = dnpName ? prettyDnpName(dnpName) : "";
+  const packageCount = `${Math.min(packagesDone + 1, packagesTotal)} of ${packagesTotal}`;
+  let title: string;
+  let detail: string | null = null;
+  let percent: number;
+  if (step === "archiving") {
+    percent = archiveTotalBytes > 0 ? (100 * archivedBytes) / archiveTotalBytes : 100;
+    title = "Step 2 of 2: compressing and encrypting the backup file";
+    detail = `${prettyBytes(archivedBytes)} of ${prettyBytes(archiveTotalBytes)}`;
+  } else {
+    percent = packagesTotal > 0 ? (100 * packagesDone) / packagesTotal : 0;
+    title = "Step 1 of 2: copying package data";
+    if (step === "preparing") detail = "Saving the Dappnode's settings";
+    else if (step === "stopping") detail = `Stopping ${name} (${packageCount}) so its slashing protection is exact`;
+    else if (step === "restarting") detail = `Starting ${name} again (${packageCount})`;
+    else detail = `${name} (${packageCount})`;
+    detail += ` · ${prettyBytes(copiedBytes)} copied`;
+  }
+
+  return (
+    <div className="full-backup-progress">
+      <div>{title}</div>
+      <ProgressBar now={percent} label={`${Math.floor(percent)}%`} animated striped />
+      <div className="full-backup-note">
+        {detail} · running for {formatElapsed(Date.now() - Date.parse(progress.startedAt))}
+      </div>
+    </div>
+  );
+}
+
 function CreateBackupForm({ info }: { info: FullBackupInfo }) {
   const [adminPassword, setAdminPassword] = useState("");
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
-  const [keepValidatorsStopped, setKeepValidatorsStopped] = useState(false);
   const [reqStatus, setReqStatus] = useState<ReqStatus<FullBackupCreateResult>>({});
   const validators = info.packages.filter((pkg) => pkg.validator);
 
@@ -75,15 +123,17 @@ function CreateBackupForm({ info }: { info: FullBackupInfo }) {
   const statusRes = useApi.fullBackupStatus();
   const revalidateStatus = statusRes.revalidate;
   const runningElsewhere = Boolean(statusRes.data?.inProgress) && !reqStatus.loading;
+  const creating = Boolean(reqStatus.loading) || runningElsewhere;
   /** `finishedAt` of an earlier backup, not to be shown again */
   const [dismissed, setDismissed] = useState<string>();
   const last = statusRes.data?.last?.finishedAt === dismissed ? undefined : statusRes.data?.last;
 
+  // Follow the progress of a backup, created from this page or elsewhere
   useEffect(() => {
-    if (!runningElsewhere) return;
-    const interval = setInterval(() => revalidateStatus(), 2000);
+    if (!creating) return;
+    const interval = setInterval(() => revalidateStatus(), 1000);
     return () => clearInterval(interval);
-  }, [runningElsewhere, revalidateStatus]);
+  }, [creating, revalidateStatus]);
 
   const lengthError =
     password.length < info.passwordMinLength
@@ -93,12 +143,58 @@ function CreateBackupForm({ info }: { info: FullBackupInfo }) {
   const isValid = adminPassword && password && password2 === password && !lengthError && !matchError;
   const hint = password && !lengthError ? passwordStrengthHint(password) : null;
 
-  async function onCreate() {
+  const validatorNames = validators.map((pkg) => prettyDnpName(pkg.dnpName)).join(", ");
+
+  function onCreate() {
     if (!isValid) return;
+    if (validators.length === 0) return void create({});
+    // Whether validators are interrupted, and whether the backup can safely
+    // be restored elsewhere, depends on this: ask explicitly, every time
+    confirm({
+      title: "Validators on this Dappnode",
+      text: `Their keys and slashing protection must be copied with the validators stopped, so the backup holds exactly what they last signed. What should happen to **${validatorNames}**?`,
+      list: [
+        {
+          title: "Pause, copy, and keep validating here",
+          body: "Each one stops while its data is copied, usually a minute or two (it may miss a few attestations), then starts again. Never run this backup's validators on another node while this one is on: the same keys on two nodes get slashed."
+        },
+        {
+          title: "Leave validators out of the backup",
+          body: "They keep validating without any pause. The backup has their settings but not their keys or slashing protection: after a restore, import the keys again with their slashing protection."
+        },
+        {
+          title: "I am moving or reinstalling this Dappnode",
+          body: "They stop for the copy and stay stopped, so nothing is signed after the backup. Restore it on the new node and start them there. If you change your mind, start them again from their package page."
+        }
+      ],
+      buttons: [
+        { label: "Pause and copy", variant: "dappnode", onClick: () => void create({}) },
+        {
+          label: "Leave them out",
+          variant: "outline-dappnode",
+          onClick: () => void create({ skipValidatorData: true })
+        },
+        { label: "Stop, I'm moving", variant: "danger", onClick: () => void create({ keepValidatorsStopped: true }) }
+      ]
+    });
+  }
+
+  async function create({
+    keepValidatorsStopped = false,
+    skipValidatorData = false
+  }: {
+    keepValidatorsStopped?: boolean;
+    skipValidatorData?: boolean;
+  }) {
     try {
       setDismissed(statusRes.data?.last?.finishedAt);
       setReqStatus({ loading: true });
-      const result = await apiRoutes.createFullBackup({ adminPassword, password, keepValidatorsStopped });
+      const result = await apiRoutes.createFullBackup({
+        adminPassword,
+        password,
+        keepValidatorsStopped,
+        skipValidatorData
+      });
       setReqStatus({ result });
       setAdminPassword("");
       setPassword("");
@@ -119,7 +215,7 @@ function CreateBackupForm({ info }: { info: FullBackupInfo }) {
 
   const result = reqStatus.result ?? last?.result;
   if (result) {
-    const { fileId, fileName, sizeBytes, warnings, stoppedValidators } = result;
+    const { fileId, fileName, sizeBytes, warnings, stoppedValidators, skippedValidators = [] } = result;
     return (
       <div className="full-backup-result">
         <Alert variant="success">
@@ -132,12 +228,24 @@ function CreateBackupForm({ info }: { info: FullBackupInfo }) {
         <div className="full-backup-note">
           Allow browser pop-ups or click download. The download link works once and expires in 30 minutes.
         </div>
-        {stoppedValidators.length > 0 && (
-          <Alert variant="warning">
-            These validators are stopped and stay stopped, so this backup holds their exact slashing protection:{" "}
-            {stoppedValidators.map(prettyDnpName).join(", ")}. Do not start them on this node again if you restore the
-            backup elsewhere.
+        {stoppedValidators.length > 0 ? (
+          <Alert variant="danger" className="full-backup-validators">
+            <b>Validators stopped: {stoppedValidators.map(prettyDnpName).join(", ")}.</b> They stay stopped, so this
+            backup holds their exact slashing protection. Start them on the node you restore the backup on, not here.
           </Alert>
+        ) : skippedValidators.length > 0 ? (
+          <Alert variant="warning" className="full-backup-validators">
+            <b>Validators not in this backup: {skippedValidators.map(prettyDnpName).join(", ")}.</b> They kept
+            validating. The backup has their settings only: keep their keystores and slashing protection backed up
+            separately.
+          </Alert>
+        ) : (
+          validators.length > 0 && (
+            <Alert variant="warning" className="full-backup-validators">
+              <b>Validators still running here: {validatorNames}.</b> Never run this backup&apos;s validators on another
+              node while this one is on: the same keys on two nodes get slashed.
+            </Alert>
+          )
         )}
         {warnings.length > 0 && (
           <Alert variant="warning">
@@ -204,35 +312,22 @@ function CreateBackupForm({ info }: { info: FullBackupInfo }) {
       >
         {hint && <div className={`full-backup-strength full-backup-strength-${hint.level}`}>{hint.text}</div>}
         {validators.length > 0 && (
-          <Form.Check
-            type="checkbox"
-            id="full-backup-keep-validators-stopped"
-            className="full-backup-keep-stopped"
-            checked={keepValidatorsStopped}
-            onChange={(e) => setKeepValidatorsStopped(e.target.checked)}
-            label={`I am moving or reinstalling this Dappnode: keep validators stopped after the backup (${validators
-              .map((pkg) => prettyDnpName(pkg.dnpName))
-              .join(
-                ", "
-              )}). Validators are always paused while their data is copied, so their slashing protection is exact; leaving them stopped guarantees nothing is signed after it.`}
-          />
+          <Alert variant="warning" className="full-backup-validators">
+            <b>Validators: {validatorNames}.</b> When you create the backup, you choose whether to pause them to include
+            their keys and slashing protection, or to leave them out so they keep validating.
+          </Alert>
         )}
-        <Button
-          type="submit"
-          onClick={onCreate}
-          variant="dappnode"
-          disabled={!isValid || reqStatus.loading || runningElsewhere}
-        >
-          {reqStatus.loading || runningElsewhere ? "Creating backup..." : "Create backup"}
+        <Button type="submit" onClick={onCreate} variant="dappnode" disabled={!isValid || creating}>
+          {creating ? "Creating backup..." : "Create backup"}
         </Button>
       </InputForm>
-      {runningElsewhere ? (
+      {creating && <BackupProgress progress={statusRes.data?.progress} />}
+      {runningElsewhere && (
         <Alert variant="info" className="full-backup-running">
           A backup is being created. Its result will show here when it finishes.
         </Alert>
-      ) : (
-        error && <ErrorView error={error} hideIcon red />
       )}
+      {!creating && error && <ErrorView error={error} hideIcon red />}
     </>
   );
 }

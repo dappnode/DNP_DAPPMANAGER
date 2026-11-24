@@ -2,6 +2,7 @@ import { BeaconBackupNetworkStatus, IpfsClientTarget, PortProtocol, Routes } fro
 import { autoUpdate } from "./autoUpdate";
 import { devices } from "./devices";
 import { fetchPkgsData } from "./fetchPkgsData";
+import { mockFullBackupStatus } from "./fullBackup";
 import { httpsPortal } from "./httpsPortal";
 import { localProxying } from "./localProxying";
 import { notifications } from "./notifications";
@@ -90,7 +91,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
       }
     ]
   }),
-  fullBackupStatus: async () => ({ inProgress: false }),
+  fullBackupStatus: async () => mockFullBackupStatus(),
   chainDataGet: async () => [
     {
       dnpName: "geth.dnp.dappnode.eth",

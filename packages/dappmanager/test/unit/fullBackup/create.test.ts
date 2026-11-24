@@ -8,7 +8,7 @@ import { expect } from "chai";
 import sinon from "sinon";
 import * as db from "@dappnode/db";
 import { params } from "@dappnode/params";
-import { FullBackupManifest, InstalledPackageData, PackageContainer } from "@dappnode/types";
+import { FullBackupManifest, FullBackupProgress, InstalledPackageData, PackageContainer } from "@dappnode/types";
 import {
   createFullBackup,
   FullBackupDeps,
@@ -422,6 +422,62 @@ describe("fullBackup / createFullBackup", () => {
     // The download link of the last backup has expired
     sinon.useFakeTimers({ now: Date.now() + 31 * 60 * 1000, toFake: ["Date"] });
     expect(getFullBackupStatus()).to.deep.equal({ inProgress: false });
+  });
+
+  it("leaves validators untouched and their data out when asked to", async () => {
+    writeManifest([
+      { name: "keystores", path: "/data/keys" },
+      { name: "slashing-protection", path: "/data/missing" }
+    ]);
+    const events: string[] = [];
+    const result = await createFullBackup({
+      password,
+      skipValidatorData: true,
+      encryptOptions: fast,
+      deps: recordingDeps(events)
+    });
+    expect(events).to.deep.equal([]);
+    expect(result).to.deep.include({ skippedValidators: [dnpName], stoppedValidators: [], warnings: [] });
+
+    const entries = await readBackup(db.fileTransferPath.get(result.fileId) as string);
+    const manifest = json(entries, "backup-manifest.json") as unknown as FullBackupManifest;
+    const backup = manifest.packages[0].backup;
+    expect(backup.map((item) => item.file)).to.deep.equal([undefined, undefined]);
+    expect(backup[0].error).to.match(/kept running/);
+    // Its settings are still there
+    expect(entries.has(`packages/${dnpName}/user-settings.json`)).to.equal(true);
+  });
+
+  it("refuses to both leave validators out and keep them stopped", async () => {
+    try {
+      await createFullBackup({ password, keepValidatorsStopped: true, skipValidatorData: true, deps });
+      throw Error("Expected an error");
+    } catch (e) {
+      expect((e as Error).message).to.match(/both left out of the backup and kept stopped/);
+    }
+    expect(getFullBackupStatus().inProgress).to.equal(false);
+  });
+
+  it("reports its progress while it runs and clears it when done", async () => {
+    writeManifest([{ name: "slashing-protection", path: "/data/keys" }]);
+    const seen: FullBackupProgress[] = [];
+    const snapshot = (): void => {
+      const { progress } = getFullBackupStatus();
+      if (progress) seen.push(progress);
+    };
+    const spyDeps = recordingDeps([], {
+      getHttpsMappings: async () => (snapshot(), deps.getHttpsMappings()),
+      stopForBackup: async () => (snapshot(), async () => snapshot()),
+      getArchive: async (containerName, archivePath) => (snapshot(), deps.getArchive(containerName, archivePath))
+    });
+    const result = await createFullBackup({ password, encryptOptions: fast, deps: spyDeps });
+
+    expect(seen.map((p) => p.step)).to.deep.equal(["preparing", "stopping", "copying", "restarting"]);
+    expect(seen[1]).to.deep.include({ dnpName, packagesDone: 0, packagesTotal: 1, copiedBytes: 0 });
+    expect(seen[3]).to.deep.include({ dnpName, copiedBytes: "TAR-BYTES-OF-KEYS".length });
+    expect(Date.parse(seen[0].startedAt)).to.be.closeTo(Date.now(), 60_000);
+    expect(result.sizeBytes).to.be.greaterThan(0);
+    expect(getFullBackupStatus().progress).to.equal(undefined);
   });
 
   it("restarts a validator even when copying fails", async () => {

@@ -18,6 +18,7 @@ import {
   FullBackupItemEntry,
   FullBackupManifest,
   FullBackupPackageEntry,
+  FullBackupProgress,
   FullBackupStatus,
   InstalledPackageData,
   Manifest
@@ -39,13 +40,19 @@ export const MANIFEST_ARCHIVE_PATH = "backup-manifest.json";
 const SAFE_SEGMENT = /^(?!\.{1,2}$)[A-Za-z0-9._-]{1,200}$/;
 
 let backupInProgress = false;
+/** What the backup being created is doing, polled by the UI */
+let currentProgress: FullBackupProgress | undefined;
 /** How the last backup ended, for a UI that lost the response of its request */
 let lastBackup: FullBackupStatus["last"];
 
 export function getFullBackupStatus(): FullBackupStatus {
   // The file of the last backup is deleted when its download link expires
   const expired = lastBackup && Date.now() - Date.parse(lastBackup.finishedAt) > TEMP_TRANSFER_TTL_MS;
-  return { inProgress: backupInProgress, ...(lastBackup && !expired ? { last: lastBackup } : {}) };
+  return {
+    inProgress: backupInProgress,
+    ...(currentProgress ? { progress: { ...currentProgress } } : {}),
+    ...(lastBackup && !expired ? { last: lastBackup } : {})
+  };
 }
 
 /** External effects, injectable for tests */
@@ -76,9 +83,14 @@ interface StageContext {
   warnings: string[];
   /** The admin is moving or reinstalling this node: validators stay stopped */
   keepValidatorsStopped: boolean;
+  /** Validators are not interrupted: their data is left out of the backup */
+  skipValidatorData: boolean;
   stoppedValidators: string[];
+  skippedValidators: string[];
   /** How to start again the validators this backup left stopped, if it fails */
   restartOnFailure: { dnpName: string; restart: RestartPackage }[];
+  /** Updated as the backup goes, read by getFullBackupStatus */
+  progress: FullBackupProgress;
 }
 
 /** The disk cannot hold the backup: unlike a failed item, this stops the backup */
@@ -101,7 +113,11 @@ class Staging {
   private stagedBytes = 0;
   private nextDiskSpaceCheck = DISK_SPACE_CHECK_INTERVAL_BYTES;
 
-  constructor(readonly dir: string) {}
+  /** `onCopied` is called with the size of each chunk of package data copied */
+  constructor(
+    readonly dir: string,
+    private readonly onCopied: (bytes: number) => void = () => undefined
+  ) {}
 
   private target(archivePath: string): string {
     const sourcePath = path.join(this.dir, archivePath);
@@ -143,6 +159,7 @@ class Staging {
     return new Transform({
       transform: (chunk: Buffer, _encoding, callback) => {
         this.stagedBytes += chunk.length;
+        this.onCopied(chunk.length);
         if (this.stagedBytes < this.nextDiskSpaceCheck) return callback(null, chunk);
         this.nextDiskSpaceCheck = this.stagedBytes + DISK_SPACE_CHECK_INTERVAL_BYTES;
         check().then(() => callback(null, chunk), callback);
@@ -256,6 +273,12 @@ async function stageBackupItemsStopped(
 ): Promise<FullBackupItemEntry[]> {
   const items = manifest?.backup ?? [];
   const validator = isValidatorPackage({ dnpName: pkg.dnpName, backup: items });
+  if (validator && ctx.skipValidatorData) {
+    // Left out as a whole: restoring keys without their exact slashing
+    // protection is what stopping validators for the copy avoids
+    if (items.length > 0) ctx.skippedValidators.push(pkg.dnpName);
+    return items.map((item) => ({ ...item, error: "not included: the validator kept running" }));
+  }
   const keepStopped = validator && ctx.keepValidatorsStopped;
   if (items.length === 0 && !keepStopped) return [];
 
@@ -264,6 +287,7 @@ async function stageBackupItemsStopped(
   let stopped = false;
   let restart: RestartPackage | null = null;
   if (validator && canStopForBackup(pkg)) {
+    ctx.progress.step = "stopping";
     try {
       restart = await ctx.deps.stopForBackup(pkg);
       stopped = true;
@@ -273,6 +297,7 @@ async function stageBackupItemsStopped(
   }
 
   try {
+    ctx.progress.step = "copying";
     return await stageBackupItems(ctx.deps, ctx.staging, pkg, manifest, ctx.warnings);
   } finally {
     if (keepStopped && stopped) {
@@ -283,6 +308,7 @@ async function stageBackupItemsStopped(
         `${pkg.dnpName}: was NOT left stopped. Stop it from its page before you run its validators on another node`
       );
     } else if (restart) {
+      ctx.progress.step = "restarting";
       try {
         await restart();
       } catch (e) {
@@ -360,7 +386,9 @@ async function writeArchive(
   manifest: FullBackupManifest,
   staging: Staging,
   password: string,
-  encryptOptions?: EncryptOptions
+  encryptOptions?: EncryptOptions,
+  /** Called with the size of each chunk of staged data written into the archive */
+  onArchived: (bytes: number) => void = () => undefined
 ): Promise<void> {
   const pack = tar.pack();
   const encrypt = await createEncryptStream(password, encryptOptions);
@@ -383,6 +411,7 @@ async function writeArchive(
       const entry = pack.entry({ name, size, mode: 0o600, mtime }, (err) => (err ? reject(err) : resolve()));
       const source = fs.createReadStream(sourcePath);
       source.on("error", reject);
+      source.on("data", (chunk) => onArchived(chunk.length));
       source.pipe(entry);
     });
 
@@ -416,24 +445,45 @@ function backupFileName(date: Date, id: string): string {
 export async function createFullBackup({
   password,
   keepValidatorsStopped = false,
+  skipValidatorData = false,
   encryptOptions,
   deps = defaultDeps
 }: {
   password: string;
   /** The admin is moving or reinstalling this node: leave validators stopped */
   keepValidatorsStopped?: boolean;
+  /**
+   * Do not interrupt validators: leave their keys and slashing protection
+   * out of the backup, which then only restores their settings
+   */
+  skipValidatorData?: boolean;
   /** For tests only: cheaper KDF parameters */
   encryptOptions?: EncryptOptions;
   deps?: FullBackupDeps;
 }): Promise<FullBackupCreateResult> {
   validateBackupPassword(password);
+  if (keepValidatorsStopped && skipValidatorData) {
+    throw Error("Validators cannot be both left out of the backup and kept stopped");
+  }
   if (backupInProgress) throw Error("A backup is already being created");
   backupInProgress = true;
   lastBackup = undefined;
 
   const id = crypto.randomBytes(8).toString("hex");
-  const staging = new Staging(path.join(params.FULL_BACKUP_DIR, `full-backup-${id}`));
   const createdAt = new Date();
+  const progress: FullBackupProgress = {
+    step: "preparing",
+    startedAt: createdAt.toISOString(),
+    packagesDone: 0,
+    packagesTotal: 0,
+    copiedBytes: 0,
+    archivedBytes: 0,
+    archiveTotalBytes: 0
+  };
+  currentProgress = progress;
+  const staging = new Staging(path.join(params.FULL_BACKUP_DIR, `full-backup-${id}`), (bytes) => {
+    progress.copiedBytes += bytes;
+  });
   // The download route names the file after its basename
   const fileName = backupFileName(createdAt, id);
   const outPath = path.join(params.FULL_BACKUP_DIR, fileName);
@@ -442,8 +492,11 @@ export async function createFullBackup({
     staging,
     warnings: [],
     keepValidatorsStopped,
+    skipValidatorData,
     stoppedValidators: [],
-    restartOnFailure: []
+    skippedValidators: [],
+    restartOnFailure: [],
+    progress
   };
 
   try {
@@ -457,10 +510,16 @@ export async function createFullBackup({
     dappmanagerFiles.httpsMappings = await stageHttpsMappings(deps, staging, warnings);
 
     const packages: FullBackupPackageEntry[] = [];
-    for (const pkg of await deps.listPackages()) {
+    const installed = await deps.listPackages();
+    progress.packagesTotal = installed.length;
+    for (const pkg of installed) {
+      progress.step = "copying";
+      progress.dnpName = pkg.dnpName;
       const entry = await stagePackage(ctx, pkg);
       if (entry) packages.push(entry);
+      progress.packagesDone++;
     }
+    progress.dnpName = undefined;
     packages.sort((a, b) => a.dnpName.localeCompare(b.dnpName));
 
     const manifest: FullBackupManifest = {
@@ -472,14 +531,25 @@ export async function createFullBackup({
       packages
     };
 
-    await writeArchive(outPath, manifest, staging, password, encryptOptions);
+    progress.step = "archiving";
+    progress.archiveTotalBytes = staging.files.reduce((total, file) => total + fs.statSync(file.sourcePath).size, 0);
+    await writeArchive(outPath, manifest, staging, password, encryptOptions, (bytes) => {
+      progress.archivedBytes += bytes;
+    });
 
     const fileId = createFileTransferId();
     registerTempTransferFile(fileId, outPath);
 
     const { size } = fs.statSync(outPath);
     logs.info(`Full backup created: ${packages.length} packages, ${size} bytes, ${warnings.length} warnings`);
-    const result = { fileId, fileName, sizeBytes: size, warnings, stoppedValidators: ctx.stoppedValidators };
+    const result = {
+      fileId,
+      fileName,
+      sizeBytes: size,
+      warnings,
+      stoppedValidators: ctx.stoppedValidators,
+      skippedValidators: ctx.skippedValidators
+    };
     lastBackup = { finishedAt: new Date().toISOString(), result };
     return result;
   } catch (e) {
@@ -495,6 +565,7 @@ export async function createFullBackup({
     throw error;
   } finally {
     fs.rmSync(staging.dir, { recursive: true, force: true });
+    currentProgress = undefined;
     backupInProgress = false;
   }
 }
