@@ -54,6 +54,7 @@ export async function startTestHttpApi(corsWhitelist: string[]): Promise<TestHtt
       downloadWireguardConfig: notUsed,
       env: notUsed,
       fileDownload: notUsed,
+      fullBackupCreate: notUsed,
       globalEnvs: notUsed,
       packageManifest: notUsed,
       metrics: notUsed,
