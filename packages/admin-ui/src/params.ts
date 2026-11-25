@@ -118,7 +118,7 @@ export const docsUrl = {
 };
 
 export const forumUrl = {
-  telegramHowTo: "https://forum.dappnode.io/t/set-up-your-dappnode-telegram-bot/816/4",
+  telegramHowTo: "https://forum.dappnode.io/t/set-up-your-dappnode-telegram-bot/816",
   ipfsRemoteHowTo: "https://forum.dappnode.io/t/how-to-use-dappnode-ipfs-remote/1295",
   expandFileSystemHowTo: "https://forum.dappnode.io/t/how-to-expand-your-dappnode-filesystem-space/1296"
 };

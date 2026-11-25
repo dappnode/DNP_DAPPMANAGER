@@ -10,6 +10,46 @@ const coreName = params.coreDnpName;
 const defaultVersion = "*";
 
 /**
+ * Resolves the releases that a core update would install.
+ *
+ * Core pins exact versions of its dependencies. If one of them was updated on
+ * its own (e.g. a dappmanager patch released ahead of core), the full dappGet
+ * resolver throws ErrorDappGetDowngrade. Core updates are installed with
+ * BYPASS_RESOLVER, which skips dependencies that are already newer, so a
+ * downgrade conflict does not mean core is up to date. In that case resolve
+ * the same way the install does, against a concrete core version.
+ */
+export async function resolveCoreReleases(
+  dappnodeInstaller: DappnodeInstaller,
+  coreVersion: string
+): Promise<PackageRelease[]> {
+  try {
+    const { releases } = await dappnodeInstaller.getReleasesResolved({
+      name: coreName,
+      ver: coreVersion
+    });
+    return releases;
+  } catch (e) {
+    if (!(e instanceof ErrorDappGetDowngrade)) throw e;
+
+    logs.info(
+      `Core update to ${coreVersion} conflicts with installed ${e.dnpName}@${e.dnpVersion}, checking the core package without the resolver`
+    );
+
+    // dappGetBasic compares exact versions: a range such as "*" would always look like an update
+    const { version: targetCoreVersion } = await dappnodeInstaller.getVersionAndIpfsHash({
+      dnpNameOrHash: coreName,
+      version: coreVersion
+    });
+    const { releases } = await dappnodeInstaller.getReleasesResolved(
+      { name: coreName, ver: targetCoreVersion },
+      { BYPASS_RESOLVER: true }
+    );
+    return releases;
+  }
+}
+
+/**
  * Fetches the core update data, if available
  */
 export async function getCoreUpdateData(
@@ -22,23 +62,7 @@ export async function getCoreUpdateData(
    * - Check that all core DNPs to be updated have exactly an updateType of "patch"
    */
 
-  let releases: PackageRelease[];
-  try {
-    const dappgetResult = await dappnodeInstaller.getReleasesResolved({
-      name: coreName,
-      ver: coreVersion
-    });
-    releases = dappgetResult.releases;
-  } catch (e) {
-    if (e instanceof ErrorDappGetDowngrade) {
-      logs.debug(
-        `Core update to ${coreVersion} would cause a downgrade for ${e.dnpName} from ${e.dnpVersion}, assuming core is updated`
-      );
-      return { available: false };
-    } else {
-      throw e;
-    }
-  }
+  const releases = await resolveCoreReleases(dappnodeInstaller, coreVersion);
 
   if (releases.length === 0) {
     return { available: false };
