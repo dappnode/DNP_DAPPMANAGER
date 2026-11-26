@@ -460,6 +460,42 @@ volumes:
       expect(() => validateManifestSchema(manifest)).to.not.throw();
     });
 
+    it("should allow upstream bump metadata (provider, tagPattern)", () => {
+      const manifest: Manifest = {
+        name: "example.dnp.dappnode.eth",
+        version: "1.0.0",
+        description: "A sample DAppNode package",
+        type: "service",
+        license: "MIT",
+        upstream: [
+          {
+            repo: "ethereum-optimism/optimism",
+            version: "v1.20.1",
+            arg: "OP_NODE_VERSION",
+            provider: "github",
+            tagPattern: "^op-node/v(.+)$"
+          }
+        ]
+      };
+
+      expect(() => validateManifestSchema(manifest)).to.not.throw();
+    });
+
+    it("should not allow non-string upstream bump metadata", () => {
+      const manifest = {
+        name: "example.dnp.dappnode.eth",
+        version: "1.0.0",
+        description: "A sample DAppNode package",
+        type: "service",
+        license: "MIT",
+        upstream: [
+          { repo: "ethereum/go-ethereum", version: "1.9.24", arg: "GETH_VERSION", tagPattern: { regex: "^v" } }
+        ]
+      } as unknown as Manifest;
+
+      expect(() => validateManifestSchema(manifest)).to.throw();
+    });
+
     it("should allow a manifest with the upstream settings defined as separate strings", () => {
       const manifest: Manifest = {
         name: "example.dnp.dappnode.eth",
