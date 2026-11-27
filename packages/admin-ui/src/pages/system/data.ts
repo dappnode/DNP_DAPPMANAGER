@@ -21,7 +21,8 @@ export const subPaths = {
   profile: "profile",
   advanced: "advanced",
   host: "host",
-  app: "app"
+  app: "app",
+  backup: "backup"
 };
 
 // Computed paths

@@ -56,6 +56,7 @@ import { TrustedReleaseKey } from "./pkg.js";
 import { OptimismConfigSet, OptimismConfigGet } from "./rollups.js";
 import { Network, StakerConfigGet, StakerConfigSet } from "./stakers.js";
 import { BeaconBackupActivationParams, BeaconBackupNetworkStatus } from "./beaconBackup.js";
+import { FullBackupInfo, FullBackupStatus } from "./fullBackup.js";
 import {
   DashboardSupportedNetwork,
   NodeStatusByNetwork,
@@ -88,6 +89,20 @@ export interface Routes {
    * @returns fileId = "64020f6e8d2d02aa2324dab9cd68a8ccb186e192232814f79f35d4c2fbf2d1cc"
    */
   backupRestore: (kwargs: { dnpName: string; backup: PackageBackup[]; fileId: string }) => Promise<void>;
+
+  /**
+   * Returns what a full backup of this DAppNode would contain: every installed
+   * package and whether its non-reproducible data is covered by manifest
+   * `backup` paths. The backup itself is created with POST /full-backup,
+   * which requires the admin password.
+   */
+  fullBackupInfo: () => Promise<FullBackupInfo>;
+
+  /**
+   * Whether a full backup is being created and how the last one ended, for
+   * when the response of POST /full-backup was lost
+   */
+  fullBackupStatus: () => Promise<FullBackupStatus>;
 
   /**
    * Returns chain data for all installed packages declared as chains
@@ -948,6 +963,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   autoUpdateSettingsEdit: {},
   backupGet: {},
   backupRestore: {},
+  fullBackupInfo: {},
+  fullBackupStatus: {},
   chainDataGet: {},
   changeIpfsTimeout: {},
   cleanCache: {},

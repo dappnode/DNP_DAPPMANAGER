@@ -493,6 +493,7 @@ __metadata:
     "@types/multicodec": "npm:^2.1.0"
     "@types/semver": "npm:^7.8.0"
     "@types/sinon": "npm:^22.0.2"
+    "@types/tar-stream": "npm:2.2.3"
     ajv: "npm:^8.20.0"
     async-retry: "npm:^1.3.3"
     bcryptjs: "npm:^2.4.3"
@@ -522,6 +523,7 @@ __metadata:
     socket.io: "npm:^4.8.4"
     socket.io-client: "npm:^4.8.4"
     systeminformation: "npm:^5.33.13"
+    tar-stream: "npm:2.2.0"
     typescript: "npm:5.9.3"
     zod: "npm:^4.6.7"
   languageName: unknown

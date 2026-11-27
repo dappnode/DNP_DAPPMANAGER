@@ -12,6 +12,7 @@ import SystemInfo from "./SystemInfo";
 import Profile from "./Profile";
 import { Network } from "./Network";
 import { Advanced } from "./Advanced";
+import { FullBackup } from "./Backup";
 import { SectionNavigator } from "components/SectionNavigator";
 import Host from "./Host";
 import { useApi } from "api";
@@ -64,6 +65,11 @@ const SystemRoot: React.FC = () => {
       name: "Security",
       subPath: subPaths.security,
       element: <Security />
+    },
+    {
+      name: "Backup",
+      subPath: subPaths.backup,
+      element: <FullBackup />
     },
     // Remove host section if host scripts are disabled
     ...(disableHostScripts.data

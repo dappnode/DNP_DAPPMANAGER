@@ -56,6 +56,7 @@ export interface HttpRoutes {
   downloadWireguardConfig: RequestHandler<{ device: string }>;
   env: RequestHandler<{ dnpName: string; envName: string }>;
   fileDownload: RequestHandler<{ containerName: string }>;
+  fullBackupCreate: RequestHandler;
   globalEnvs: RequestHandler<{ name: string }>;
   packageManifest: RequestHandler<{ dnpName: string }>;
   metrics: RequestHandler;
@@ -210,6 +211,7 @@ export function startHttpApi({
   app.get("/container-logs/:containerName", auth.onlyAdmin, routes.containerLogs);
   app.get("/file-download/:containerName", auth.onlyAdmin, routes.fileDownload);
   app.get("/download/:fileId", auth.onlyAdmin, routes.download);
+  app.post("/full-backup", auth.onlyAdminWithPasswordConfirmation, routes.fullBackupCreate);
   app.get("/user-action-logs", auth.onlyAdmin, routes.downloadUserActionLogs);
   app.get("/avatar/ipfs/:cid", auth.onlyAdmin, createIpfsAvatarHandler(getIpfsFileBytes));
   // Keep capacity reservation and multipart parsing after authentication so

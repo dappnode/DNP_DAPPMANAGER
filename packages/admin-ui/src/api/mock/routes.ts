@@ -1,5 +1,6 @@
 import { IApiRoutes } from "api/interface";
 import newTabProps from "utils/newTabProps";
+import { runMockFullBackup } from "../../__mock-backend__/fullBackup";
 
 // For mock return: "data:text/csv;charset=utf-8;base64,dddddd"
 
@@ -24,6 +25,20 @@ export const apiRoutes: IApiRoutes = {
 
   containerLogsUrl({ containerName }) {
     return generateDownloadUrl(`Sample container logs ${containerName}`);
+  },
+
+  async createFullBackup({ adminPassword, keepValidatorsStopped, skipValidatorData }) {
+    await new Promise((r) => setTimeout(r, 500));
+    if (adminPassword !== "dappnode") throw Error("WRONG_CREDENTIALS");
+    await runMockFullBackup();
+    return {
+      fileId: "64020f6e8d2d02aa2324dab9cd68a8ccb186e192232814f79f35d4c2fbf2d1cc",
+      fileName: "dappnode-backup-2026-11-23T10-15-00Z-1a2b.dnbackup",
+      sizeBytes: 1843200,
+      warnings: ['rotki.dnp.dappnode.eth: could not back up "logs": path /data/logs does not exist'],
+      stoppedValidators: keepValidatorsStopped ? ["web3signer.dnp.dappnode.eth"] : [],
+      skippedValidators: skipValidatorData ? ["web3signer.dnp.dappnode.eth"] : []
+    };
   },
 
   async uploadFile(file, onProgress) {

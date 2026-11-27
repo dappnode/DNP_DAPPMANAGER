@@ -10,6 +10,8 @@ import { dockerGetBackupItem, listPackage, writeBackupArchive } from "@dappnode/
 import { shell } from "@dappnode/utils";
 import { validateBackupArray } from "../utils/index.js";
 import { PackageBackup } from "@dappnode/types";
+import { canStopForBackup, stopPackageForBackup } from "../fullBackup/packageStop.js";
+import { isValidatorPackage } from "../fullBackup/coverage.js";
 
 const tempTransferDir = params.TEMP_TRANSFER_DIR;
 
@@ -34,22 +36,30 @@ export async function backupGet({ dnpName, backup }: { dnpName: string; backup: 
   try {
     const successfulBackups: string[] = [];
     let lastError: Error | null = null;
-    for (const { name, path: fromPath, service } of backup) {
-      try {
-        const container = dnp.containers.find((c) => !service || c.serviceName === service);
-        if (!container) throw Error(`No container found for service ${service}`);
+    // Stop validators while copying so they cannot sign between the last
+    // write of their slashing protection and the copy
+    const validator = isValidatorPackage({ dnpName, backup });
+    const restart = validator && canStopForBackup(dnp) ? await stopPackageForBackup(dnp) : null;
+    try {
+      for (const { name, path: fromPath, service } of backup) {
+        try {
+          const container = dnp.containers.find((c) => !service || c.serviceName === service);
+          if (!container) throw Error(`No container found for service ${service}`);
 
-        const toPath = path.join(backupDir, `${name}.tar`);
+          const toPath = path.join(backupDir, `${name}.tar`);
 
-        // The docker archive API keeps the owner and permissions of the files
-        await dockerGetBackupItem(container.containerName, fromPath, toPath);
-        successfulBackups.push(name);
-      } catch (e) {
-        // Docker also answers 404 "No such container" if the container does not exist
-        const pathNotFound = e.statusCode === 404 && e.message.includes("Could not find the file");
-        lastError = pathNotFound ? Error(`path ${fromPath} does not exist`) : e;
-        logs.error("Error getting backup", { dnpName, name, fromPath }, e);
+          // The docker archive API keeps the owner and permissions of the files
+          await dockerGetBackupItem(container.containerName, fromPath, toPath);
+          successfulBackups.push(name);
+        } catch (e) {
+          // Docker also answers 404 "No such container" if the container does not exist
+          const pathNotFound = e.statusCode === 404 && e.message.includes("Could not find the file");
+          lastError = pathNotFound ? Error(`path ${fromPath} does not exist`) : e;
+          logs.error("Error getting backup", { dnpName, name, fromPath }, e);
+        }
       }
+    } finally {
+      if (restart) await restart();
     }
 
     if (!successfulBackups.length && lastError) {

@@ -20,7 +20,8 @@ export const apiUrls = {
   downloadWireguardConfig: urlJoin(apiUrl, "wireguard-config"),
   fileDownload: urlJoin(apiUrl, "file-download"),
   containerLogs: urlJoin(apiUrl, "container-logs"),
-  userActionLogs: urlJoin(apiUrl, "user-action-logs")
+  userActionLogs: urlJoin(apiUrl, "user-action-logs"),
+  fullBackup: urlJoin(apiUrl, "full-backup")
 };
 export const socketIoUrl = apiUrl;
 

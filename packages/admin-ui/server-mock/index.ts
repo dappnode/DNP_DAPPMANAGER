@@ -48,6 +48,7 @@ startHttpApi({
     downloadUserActionLogs: () => {},
     env: () => {},
     fileDownload: () => {},
+    fullBackupCreate: () => {},
     globalEnvs: () => {},
     packageManifest: () => {},
     metrics: () => {},

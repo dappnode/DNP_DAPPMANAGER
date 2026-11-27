@@ -1,6 +1,7 @@
 import { IApiRoutes } from "api/interface";
 import { apiUrls } from "params";
 import { urlJoin } from "utils/url";
+import { fetchAuthPost } from "api/auth";
 
 export const apiRoutes: IApiRoutes = {
   fileDownloadUrl({ containerName, path }) {
@@ -22,6 +23,10 @@ export const apiRoutes: IApiRoutes = {
 
   containerLogsUrl({ containerName }) {
     return urlJoin(apiUrls.containerLogs, containerName);
+  },
+
+  async createFullBackup(data) {
+    return await fetchAuthPost(apiUrls.fullBackup, data);
   },
 
   async uploadFile(file, onProgress) {

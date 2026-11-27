@@ -51,6 +51,9 @@ export const params = {
 
   // Temp transfer dir must not be in a volume
   TEMP_TRANSFER_DIR: path.join("./", ".temp-transfer"),
+  // Full backups are staged and written here, apart from the temp transfer
+  // dir, which other calls delete as a whole. Must not be in a volume either
+  FULL_BACKUP_DIR: path.join("./", ".full-backup"),
   // Must NOT be an absolute path to work from inside the DAPPMANAGER and out
   /** Relative path to global ENVs from a core DNP docker-compose */
   GLOBAL_ENVS_PATH_FOR_CORE: path.relative(DNCORE_DIR, GLOBAL_ENVS_PATH),
