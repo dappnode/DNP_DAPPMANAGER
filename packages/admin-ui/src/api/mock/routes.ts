@@ -88,7 +88,7 @@ export const apiRoutes: IApiRoutes = {
     };
     const web3signerHoodi = { restoreData: true, validator: true, slashingProtection: "missing" as const };
     const warnings = [
-      "geth.dnp.dappnode.eth: its data was not in the backup, only its configuration is restored",
+      "Only the configuration is restored, the data was not in the backup: geth",
       'web3signer-hoodi.dnp.dappnode.eth: this backup has no slashing protection for its validators (it was not made with "I am moving or reinstalling this Dappnode"). Their keys are restored and the package stays stopped: start it only after the old node has been off for at least 2 epochs (about 13 minutes on Ethereum), or with doppelganger protection enabled in your consensus client.'
     ];
     return {
