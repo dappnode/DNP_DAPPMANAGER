@@ -36,7 +36,7 @@ export const fullBackupInspect = wrapHandler(async (req, res) => {
 });
 
 /**
- * POST /full-backup/restore { adminPassword, fileId, password, mode, confirmValidatorsOff }
+ * POST /full-backup/restore { adminPassword, fileId, password, mode, restoreDataFor?, confirmValidatorsOff }
  *
  * Mounted behind auth.onlyAdminWithPasswordConfirmation. Verifies the whole
  * file, then starts the restore in the background: follow it with the
@@ -44,7 +44,7 @@ export const fullBackupInspect = wrapHandler(async (req, res) => {
  */
 export const fullBackupRestore = wrapHandler(async (req, res) => {
   try {
-    const { fileId, password, mode, confirmValidatorsOff } = req.body ?? {};
+    const { fileId, password, mode, restoreDataFor, confirmValidatorsOff } = req.body ?? {};
     if (typeof password !== "string") throw Error("Backup password is required");
     const filePath = uploadedFilePath(fileId);
     const inspected = inspectBackup({
@@ -59,6 +59,7 @@ export const fullBackupRestore = wrapHandler(async (req, res) => {
       filePath,
       password,
       mode,
+      restoreDataFor,
       confirmValidatorsOff: confirmValidatorsOff === true,
       deps: restoreDeps
     });

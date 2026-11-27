@@ -85,6 +85,31 @@ describe("fullBackup / plan", () => {
     expect(plan.restoresIdentity && plan.restoresAdminLogin && plan.restoresSystemSettings).to.equal(true);
   });
 
+  it("merge restores the data of the packages the user selects", () => {
+    const plan = planRestore({
+      manifest: backup,
+      installed: node,
+      mode: "merge",
+      restoreDataFor: ["same.dnp.dappnode.eth", "older-here.dnp.dappnode.eth", "newer-here.dnp.dappnode.eth"]
+    });
+    expect(actions(plan)).to.include({
+      // Not selected: installed without its data
+      "new.dnp.dappnode.eth": "install",
+      "same.dnp.dappnode.eth": "apply-settings+data",
+      "older-here.dnp.dappnode.eth": "update+data",
+      // Never selectable: older software must not run on newer data
+      "newer-here.dnp.dappnode.eth": "keep-newer"
+    });
+    const selectable = plan.packages.filter((p) => p.dataSelectable).map((p) => p.dnpName);
+    expect(selectable).to.deep.equal(["new.dnp.dappnode.eth", "older-here.dnp.dappnode.eth", "same.dnp.dappnode.eth"]);
+  });
+
+  it("ignores a data selection when cloning", () => {
+    const plan = planRestore({ manifest: backup, installed: node, mode: "clone", restoreDataFor: [] });
+    expect(actions(plan)["same.dnp.dappnode.eth"]).to.equal("apply-settings+data");
+    expect(plan.packages.some((p) => p.dataSelectable)).to.equal(false);
+  });
+
   it("lists packages whose data was not backed up in one warning", () => {
     const plan = planRestore({
       manifest: manifest([

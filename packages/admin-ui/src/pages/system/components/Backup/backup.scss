@@ -68,6 +68,16 @@
   .full-backup-note {
     margin: 0;
   }
+
+  > .full-backup-note {
+    margin-bottom: 0.5rem;
+  }
+
+  .full-backup-data-check {
+    margin: 0;
+    white-space: nowrap;
+    font-weight: normal;
+  }
 }
 
 .full-backup-steps {

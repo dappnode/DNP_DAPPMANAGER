@@ -58,6 +58,7 @@ export const apiRoutes: IApiRoutes = {
       installedVersion: string | null,
       extra: {
         restoreData?: boolean;
+        dataSelectable?: boolean;
         validator?: boolean;
         isCore?: boolean;
         reason?: string;
@@ -71,6 +72,7 @@ export const apiRoutes: IApiRoutes = {
       installedVersion,
       isCore: extra.isCore ?? false,
       restoreData: extra.restoreData ?? false,
+      dataSelectable: extra.dataSelectable,
       validator: extra.validator ?? false,
       slashingProtection: extra.slashingProtection,
       validatorKeyCount: extra.validatorKeyCount,
@@ -118,10 +120,16 @@ export const apiRoutes: IApiRoutes = {
             pkg("geth.dnp.dappnode.eth", "keep-newer", "1.14.0", "1.15.0", {
               reason: "This node runs a newer version (1.15.0); its data is kept"
             }),
-            pkg("rotki.dnp.dappnode.eth", "install", "1.3.0", null, { restoreData: true }),
-            pkg("lighthouse.dnp.dappnode.eth", "apply-settings", "5.1.0", "5.1.0"),
+            pkg("rotki.dnp.dappnode.eth", "install", "1.3.0", null, { restoreData: true, dataSelectable: true }),
+            pkg("lighthouse.dnp.dappnode.eth", "apply-settings", "5.1.0", "5.1.0", {
+              validator: true,
+              dataSelectable: true
+            }),
             pkg("web3signer.dnp.dappnode.eth", "install", "2.1.0", null, web3signerMainnet),
-            pkg("web3signer-hoodi.dnp.dappnode.eth", "install", "0.1.5", null, web3signerHoodi)
+            pkg("web3signer-hoodi.dnp.dappnode.eth", "install", "0.1.5", null, {
+              ...web3signerHoodi,
+              dataSelectable: true
+            })
           ]
         },
         clone: {

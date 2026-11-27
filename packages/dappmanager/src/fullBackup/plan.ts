@@ -59,7 +59,12 @@ function planBackupPackage(
   if (!pkg.slashingProtection) return { ...plan, slashingProtection: "missing" };
 
   const validatorKeyCount = pkg.slashingProtection.pubkeys.length;
-  const withSlashing: FullBackupRestorePackagePlan = { ...plan, slashingProtection: "included", validatorKeyCount };
+  const withSlashing: FullBackupRestorePackagePlan = {
+    ...plan,
+    slashingProtection: "included",
+    validatorKeyCount,
+    dataSelectable: false
+  };
   if (plan.action === "skip" || plan.action === "remove") return withSlashing;
   return {
     ...withSlashing,
@@ -100,10 +105,14 @@ function planPackageAction(
   if (pkg.isCore && mode === "merge") return skip("System package, kept as configured on this node");
 
   const withData = hasBackupData(pkg);
-  if (!installed) return { ...base, action: "install", restoreData: withData };
+  // Restore packages lets the user choose package by package whether the
+  // backup's data is written; exact clone always writes it
+  const dataSelectable = mode === "merge" && withData;
+  if (!installed) return { ...base, action: "install", restoreData: withData, dataSelectable };
 
-  // Data of an installed package is only replaced when cloning: merge keeps
-  // what is already running on this node
+  // By default the data of an installed package is only replaced when
+  // cloning: merge keeps what is already running on this node unless the
+  // user selects it
   const replaceData = mode === "clone" && withData;
   const comparison = compareVersions(installed.version, pkg.version);
   if (comparison === null) {
@@ -114,8 +123,8 @@ function planPackageAction(
       reason: "Versions cannot be compared, data on this node is kept"
     };
   }
-  if (comparison === 0) return { ...base, action: "apply-settings", restoreData: replaceData };
-  if (comparison < 0) return { ...base, action: "update", restoreData: replaceData };
+  if (comparison === 0) return { ...base, action: "apply-settings", restoreData: replaceData, dataSelectable };
+  if (comparison < 0) return { ...base, action: "update", restoreData: replaceData, dataSelectable };
   return {
     ...base,
     action: "keep-newer",
@@ -132,17 +141,27 @@ function shortName(dnpName: string): string {
 export function planRestore({
   manifest,
   installed,
-  mode
+  mode,
+  restoreDataFor
 }: {
   manifest: FullBackupManifest;
   installed: InstalledPackageSummary[];
   mode: FullBackupRestoreMode;
+  /**
+   * Restore packages only: the packages whose data the user selected. Applies
+   * to packages with `dataSelectable`; undefined keeps the defaults
+   */
+  restoreDataFor?: string[];
 }): FullBackupRestorePlan {
   const installedByName = new Map(installed.map((pkg) => [pkg.dnpName, pkg]));
   const backupNames = new Set(manifest.packages.map((pkg) => pkg.dnpName));
   const warnings: string[] = [];
+  const selected = mode === "merge" && restoreDataFor ? new Set(restoreDataFor) : null;
 
-  const packages = manifest.packages.map((pkg) => planBackupPackage(pkg, installedByName.get(pkg.dnpName), mode));
+  const packages = manifest.packages.map((pkg) => {
+    const plan = planBackupPackage(pkg, installedByName.get(pkg.dnpName), mode);
+    return selected && plan.dataSelectable ? { ...plan, restoreData: selected.has(plan.dnpName) } : plan;
+  });
 
   if (mode === "clone") {
     for (const pkg of installed) {

@@ -52,6 +52,8 @@ export interface IApiRoutes {
     fileId: string;
     password: string;
     mode: FullBackupRestoreMode;
+    /** Restore packages only: packages whose backed-up data is written */
+    restoreDataFor?: string[];
     confirmValidatorsOff: boolean;
   }): Promise<{ ok: true }>;
 }

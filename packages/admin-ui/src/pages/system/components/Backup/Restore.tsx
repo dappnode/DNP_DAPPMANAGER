@@ -26,7 +26,7 @@ const actionLabels: Record<FullBackupRestorePackagePlan["action"], string> = {
 
 const modeDescriptions: Record<FullBackupRestoreMode, string> = {
   merge:
-    "Install the backup's packages on this node. This node keeps its identity, admin login, settings and the data of packages it already has.",
+    "Install the backup's packages on this node and restore the data you select. This node keeps its identity, admin login and settings.",
   clone:
     "Make this node a copy of the backed-up one: identity, admin login, settings and package data. Packages that are not in the backup are removed (their volumes are kept). The old node must stay off."
 };
@@ -67,7 +67,8 @@ function formatAuthError(e: Error): Error {
   return e.message === "WRONG_CREDENTIALS" ? Error("Wrong admin password") : e;
 }
 
-function DataCell({ pkg }: { pkg: FullBackupRestorePackagePlan }) {
+/** What happens to the data of a package that is not selectable */
+function DataResult({ pkg }: { pkg: FullBackupRestorePackagePlan }) {
   if (pkg.slashingProtection === "included" && pkg.restoreData) {
     return (
       <>
@@ -87,9 +88,72 @@ function DataCell({ pkg }: { pkg: FullBackupRestorePackagePlan }) {
   return <>{pkg.restoreData ? "Restored" : "-"}</>;
 }
 
-function PlanTable({ packages }: { packages: FullBackupRestorePackagePlan[] }) {
+/** Restore packages: which packages get their backed-up data */
+interface DataSelection {
+  selected: Set<string>;
+  onChange: (selected: Set<string>) => void;
+}
+
+function DataChoice({
+  pkg,
+  checked,
+  onChange
+}: {
+  pkg: FullBackupRestorePackagePlan;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}) {
+  let note: React.ReactNode = null;
+  if (!checked) {
+    note = <div className="full-backup-note">{pkg.installedVersion ? "Keeps this node's data" : "Starts empty"}</div>;
+  } else if (pkg.validator && pkg.installedVersion) {
+    note = <div className="full-backup-slashing-missing">Replaces this node&apos;s validator data</div>;
+  } else if (pkg.slashingProtection === "missing") {
+    note = <div className="full-backup-slashing-missing">No slashing protection</div>;
+  }
+  return (
+    <>
+      <Form.Check
+        type="checkbox"
+        className="full-backup-data-check"
+        id={`full-backup-data-${pkg.dnpName}`}
+        label="Restore"
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+      />
+      {note}
+    </>
+  );
+}
+
+function PlanTable({
+  packages,
+  selection
+}: {
+  packages: FullBackupRestorePackagePlan[];
+  /** Absent for an exact clone, which restores all data */
+  selection?: DataSelection;
+}) {
+  const selectable = selection ? packages.filter((pkg) => pkg.dataSelectable).map((pkg) => pkg.dnpName) : [];
+  const selectedCount = selection ? selectable.filter((name) => selection.selected.has(name)).length : 0;
+  const allSelected = selectable.length > 0 && selectedCount === selectable.length;
+
+  function toggle(dnpName: string, checked: boolean) {
+    if (!selection) return;
+    const next = new Set(selection.selected);
+    if (checked) next.add(dnpName);
+    else next.delete(dnpName);
+    selection.onChange(next);
+  }
+
   return (
     <div className="full-backup-plan">
+      {selection && selectable.length > 0 && (
+        <div className="full-backup-note">
+          Choose under Data which packages get the data from the backup. The others keep what they have on this node, or
+          start empty if they are new.
+        </div>
+      )}
       <Table size="sm" responsive>
         <thead>
           <tr>
@@ -97,7 +161,22 @@ function PlanTable({ packages }: { packages: FullBackupRestorePackagePlan[] }) {
             <th>Action</th>
             <th>Backup</th>
             <th>This node</th>
-            <th>Data</th>
+            <th>
+              Data
+              {selection && selectable.length > 0 && (
+                <Form.Check
+                  type="checkbox"
+                  className="full-backup-data-check"
+                  id="full-backup-data-all"
+                  label="Select all"
+                  checked={allSelected}
+                  ref={(el: HTMLInputElement | null) => {
+                    if (el) el.indeterminate = selectedCount > 0 && !allSelected;
+                  }}
+                  onChange={(e) => selection.onChange(new Set(e.target.checked ? selectable : []))}
+                />
+              )}
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -112,7 +191,15 @@ function PlanTable({ packages }: { packages: FullBackupRestorePackagePlan[] }) {
               <td>{pkg.backupVersion ?? "-"}</td>
               <td>{pkg.installedVersion ?? "-"}</td>
               <td>
-                <DataCell pkg={pkg} />
+                {selection && pkg.dataSelectable ? (
+                  <DataChoice
+                    pkg={pkg}
+                    checked={selection.selected.has(pkg.dnpName)}
+                    onChange={(checked) => toggle(pkg.dnpName, checked)}
+                  />
+                ) : (
+                  <DataResult pkg={pkg} />
+                )}
               </td>
             </tr>
           ))}
@@ -134,6 +221,10 @@ function RestorePlan({
   onStarted: () => void;
 }) {
   const [mode, setMode] = useState<FullBackupRestoreMode>(inspected.suggestedMode);
+  // Packages not on this node yet start selected, installed ones keep their data
+  const [dataSelected, setDataSelected] = useState(
+    () => new Set(inspected.plans.merge.packages.filter((p) => p.dataSelectable && p.restoreData).map((p) => p.dnpName))
+  );
   const [validatorsOff, setValidatorsOff] = useState(false);
   const [adminPassword, setAdminPassword] = useState("");
   const [starting, setStarting] = useState(false);
@@ -148,7 +239,14 @@ function RestorePlan({
     try {
       setStarting(true);
       setError(null);
-      await apiRoutes.restoreFullBackup({ adminPassword, fileId, password, mode, confirmValidatorsOff: validatorsOff });
+      await apiRoutes.restoreFullBackup({
+        adminPassword,
+        fileId,
+        password,
+        mode,
+        restoreDataFor: mode === "merge" ? [...dataSelected] : undefined,
+        confirmValidatorsOff: validatorsOff
+      });
       onStarted();
     } catch (e) {
       setError(formatAuthError(e));
@@ -188,7 +286,10 @@ function RestorePlan({
         ))}
       </Form.Group>
 
-      <PlanTable packages={plan.packages} />
+      <PlanTable
+        packages={plan.packages}
+        selection={mode === "merge" ? { selected: dataSelected, onChange: setDataSelected } : undefined}
+      />
 
       {plan.warnings.length > 0 && (
         <Alert variant="warning">
