@@ -124,6 +124,11 @@ function planPackageAction(
   };
 }
 
+/** "geth" for "geth.dnp.dappnode.eth", to list many packages in one line */
+function shortName(dnpName: string): string {
+  return dnpName.replace(/\.dnp\.dappnode\.eth$/, "");
+}
+
 export function planRestore({
   manifest,
   installed,
@@ -155,6 +160,7 @@ export function planRestore({
     }
   }
 
+  const notCovered: string[] = [];
   for (const pkg of manifest.packages) {
     const leftOut = pkg.backup.filter((item) => item.error === VALIDATOR_DATA_LEFT_OUT);
     if (leftOut.length > 0) {
@@ -168,9 +174,10 @@ export function planRestore({
     if (failed.length > 0) {
       warnings.push(`${pkg.dnpName}: ${failed.map((item) => item.name).join(", ")} could not be backed up originally`);
     }
-    if (pkg.coverage === "not-covered") {
-      warnings.push(`${pkg.dnpName}: its data was not in the backup, only its configuration is restored`);
-    }
+    if (pkg.coverage === "not-covered") notCovered.push(shortName(pkg.dnpName));
+  }
+  if (notCovered.length > 0) {
+    warnings.push(`Only the configuration is restored, the data was not in the backup: ${notCovered.join(", ")}`);
   }
 
   for (const plan of packages) {

@@ -85,6 +85,18 @@ describe("fullBackup / plan", () => {
     expect(plan.restoresIdentity && plan.restoresAdminLogin && plan.restoresSystemSettings).to.equal(true);
   });
 
+  it("lists packages whose data was not backed up in one warning", () => {
+    const plan = planRestore({
+      manifest: manifest([
+        pkg("a.dnp.dappnode.eth", "1.0.0", { coverage: "not-covered", backup: [] }),
+        pkg("b.dnp.dappnode.eth", "1.0.0", { coverage: "not-covered", backup: [] })
+      ]),
+      installed: [],
+      mode: "merge"
+    });
+    expect(plan.warnings).to.deep.equal(["Only the configuration is restored, the data was not in the backup: a, b"]);
+  });
+
   it("never restores data over a newer version", () => {
     for (const mode of ["merge", "clone"] as const) {
       const plan = planRestore({ manifest: backup, installed: node, mode });
