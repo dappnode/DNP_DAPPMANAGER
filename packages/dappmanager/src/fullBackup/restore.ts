@@ -316,24 +316,33 @@ export async function startRestore({
   filePath,
   password,
   mode,
+  restoreDataFor,
   confirmValidatorsOff,
   deps
 }: {
   filePath: string;
   password: string;
   mode: FullBackupRestoreMode;
+  /** Restore packages only: packages whose data the user selected, see planRestore */
+  restoreDataFor?: string[];
   confirmValidatorsOff: boolean;
   deps: RestoreDeps;
 }): Promise<void> {
   validateBackupPassword(password);
   if (mode !== "merge" && mode !== "clone") throw Error(`Unknown restore mode ${mode}`);
+  if (
+    restoreDataFor !== undefined &&
+    !(Array.isArray(restoreDataFor) && restoreDataFor.every((n) => typeof n === "string"))
+  ) {
+    throw Error("restoreDataFor must be a list of package names");
+  }
   if (isRestoreRunning()) throw Error("A restore is already running");
 
   // Claimed before the first await: a second request arriving while this one
   // extracts would wipe the folder both extract into
   starting = true;
   try {
-    const job = await prepareJob({ filePath, password, mode, confirmValidatorsOff, deps });
+    const job = await prepareJob({ filePath, password, mode, restoreDataFor, confirmValidatorsOff, deps });
     runningJob = runJob(job, deps, password).finally(() => {
       runningJob = null;
     });
@@ -351,12 +360,15 @@ async function prepareJob({
   filePath,
   password,
   mode,
+  restoreDataFor,
   confirmValidatorsOff,
   deps
 }: {
   filePath: string;
   password: string;
   mode: FullBackupRestoreMode;
+  /** Restore packages only: packages whose data the user selected, see planRestore */
+  restoreDataFor?: string[];
   confirmValidatorsOff: boolean;
   deps: RestoreDeps;
 }): Promise<RestoreJob> {
@@ -369,7 +381,7 @@ async function prepareJob({
     version: p.version,
     isCore: p.isCore
   }));
-  const plan = planRestore({ manifest, installed, mode });
+  const plan = planRestore({ manifest, installed, mode, restoreDataFor });
   if (!confirmValidatorsOff && plan.packages.some((p) => p.validator && p.action !== "skip" && p.action !== "remove")) {
     throw Error("This backup contains validator keys: confirm that the old node is switched off");
   }

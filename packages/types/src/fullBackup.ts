@@ -215,6 +215,11 @@ export interface FullBackupRestorePackagePlan {
   isCore: boolean;
   /** Whether the manifest `backup` data from the file is written into the package */
   restoreData: boolean;
+  /**
+   * Restore packages (merge) only: the user chooses whether the data is
+   * written, `restoreData` is the default choice
+   */
+  dataSelectable?: boolean;
   /** Holds validator keys or slashing protection: stays stopped after restore */
   validator: boolean;
   /**
