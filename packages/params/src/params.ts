@@ -229,7 +229,9 @@ export const params = {
   vpnDataVolume: "dncore_vpndnpdappnodeeth_data",
   wireguardContainerName: "DAppNodeCore-wireguard.wireguard.dnp.dappnode.eth",
   restartContainerName: "DAppNodeTool-restart.dnp.dappnode.eth",
-  restartDnpVolumes: [`${DAPPNODE_CORE_DIR}:${DNCORE_DIR}`, "/var/run/docker.sock:/var/run/docker.sock"], // Important: restart container needs access to the docker socket and the DNCORE_DIR to restart itself
+  // Important: restart container needs access to the docker socket and the DNCORE_DIR to restart itself.
+  // Docker rejects a relative mount path, and DNCORE_DIR is relative when TEST is set, so resolve it
+  restartDnpVolumes: [`${DAPPNODE_CORE_DIR}:${path.resolve(DNCORE_DIR)}`, "/var/run/docker.sock:/var/run/docker.sock"],
   corePackagesThatMustBeRunning: ["bind.dnp.dappnode.eth", "dappmanager.dnp.dappnode.eth"],
   corePackagesNotAutoupdatable: [
     "core.dnp.dappnode.eth",
