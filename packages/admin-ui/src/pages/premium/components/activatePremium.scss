@@ -66,7 +66,7 @@
           flex-direction: row;
           align-items: center;
           background-color: var(--color-light-background-main);
-          border-radius: 10px;
+          border-radius: var(--radius-md);
           padding: 20px;
           gap: 20px;
 
@@ -100,7 +100,7 @@
           justify-content: center;
           gap: 30px;
           border: 1px solid var(--color-light-border);
-          border-radius: 10px;
+          border-radius: var(--radius-md);
           > div {
             text-align: center;
             > b {

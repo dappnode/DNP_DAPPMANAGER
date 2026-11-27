@@ -31,10 +31,8 @@
 
 /* Remember specificity order rules to override bootstrap */
 .sidenav-item {
-  border-left: 5px solid transparent;
   color: black;
   text-decoration: none;
-  transition: all 0.5s;
   /* Try to standarize this size */
   font-size: 0.8rem;
 
@@ -50,25 +48,31 @@
     /* All transitions have to be specified with commas in a single transition property */
     transition:
       background 150ms ease,
-      color 150ms ease,
-      border 150ms ease;
+      color 150ms ease;
+    svg {
+      transition: opacity 150ms ease;
+    }
   }
   &.selectable:hover,
   &.selectable.active {
     color: black;
-    font-weight: 600;
     text-decoration: none;
   }
   &.selectable:hover {
     background-color: var(--color-light-background-main);
   }
+  /* Current page: a brand-tinted pill with a full-strength icon */
   &.selectable.active {
-    background-color: var(--color-light-border);
+    color: var(--nav-active-color);
+    background-color: var(--nav-active-background);
+    font-weight: 600;
   }
 
-  &.selectable:hover svg,
-  &.selectable.active svg {
+  &.selectable:hover svg {
     opacity: 0.7;
+  }
+  &.selectable.active svg {
+    opacity: 1;
   }
 
   &.selectable svg {
@@ -166,10 +170,6 @@
   .funded-by-logo-dark {
     max-width: 60%;
     max-height: 60%;
-  }
-
-  .sidenav-item {
-    border: 0;
   }
 
   #sidebar .sidebar-media-footer {

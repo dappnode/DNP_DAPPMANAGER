@@ -34,8 +34,8 @@
       margin-bottom: 1.5rem;
       padding: 1rem;
       background-color: var(--background-secondary);
-      border-left: 4px solid var(--warning-color);
-      border-radius: 4px;
+      border-left: 3px solid #e0a800;
+      border-radius: var(--radius-md);
 
       p {
         margin-bottom: 0.75rem;
@@ -62,7 +62,7 @@
       padding: 1.5rem;
       background-color: var(--background-secondary);
       border: 2px solid var(--border-color);
-      border-radius: 8px;
+      border-radius: var(--radius-md);
 
       .disclaimer-checkbox-label {
         display: flex;
@@ -101,12 +101,12 @@
 
     &::-webkit-scrollbar-track {
       background: var(--background-secondary);
-      border-radius: 4px;
+      border-radius: var(--radius-sm);
     }
 
     &::-webkit-scrollbar-thumb {
       background: var(--border-color);
-      border-radius: 4px;
+      border-radius: var(--radius-sm);
 
       &:hover {
         background: var(--text-tertiary);
@@ -153,7 +153,7 @@ html.dark {
     .modal-body {
       .disclaimer-intro {
         background-color: var(--color-dark-background-main);
-        border-left-color: var(--warning-color);
+        border-left-color: #e0a800;
 
         p,
         strong {

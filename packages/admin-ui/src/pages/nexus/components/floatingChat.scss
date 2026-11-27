@@ -12,7 +12,7 @@
   z-index: var(--z-index-chat);
   width: var(--nexus-floating-bubble-size);
   height: var(--nexus-floating-bubble-size);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   border: none;
   background: linear-gradient(135deg, var(--dappnode-strong-main-color), var(--dappnode-darker-main-color));
   color: white;
@@ -36,9 +36,9 @@
   position: fixed;
   z-index: var(--z-index-chat);
   background: var(--color-light-background-sidebar-topbar, #fff);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--border-color);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-lg);
   overflow: hidden;
   transition: opacity 0.15s ease;
 
@@ -100,7 +100,7 @@
     right: var(--nexus-floating-offset);
     bottom: calc(var(--nexus-floating-panel-bottom) + env(safe-area-inset-bottom));
     left: calc(var(--sidenav-collapsed-width) + var(--nexus-floating-offset));
-    border-radius: 12px;
+    border-radius: var(--radius-md);
   }
 }
 

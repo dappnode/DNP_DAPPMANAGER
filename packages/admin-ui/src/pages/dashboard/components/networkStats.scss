@@ -52,7 +52,7 @@
           min-width: 60px;
 
           padding: 2px;
-          border-radius: 5px;
+          border-radius: var(--radius-sm);
           &.synced {
             background-color: rgb(203, 241, 203);
             color: #006b00;
@@ -88,7 +88,7 @@
         .network-card-icon {
           svg {
             padding: 3px;
-            border-radius: 5px;
+            border-radius: var(--radius-sm);
 
             &.health-icon {
               color: #0084ff;
@@ -160,7 +160,7 @@
           gap: 5px;
           padding: 10px;
           background-color: var(--color-light-background-main);
-          border-radius: 10px;
+          border-radius: var(--radius-md);
           font-style: italic;
           align-items: center;
 

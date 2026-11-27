@@ -23,7 +23,6 @@ body {
   #sidebar {
     background-color: var(--color-light-background-sidebar-topbar);
     border-right: var(--border-style-light);
-    box-shadow: rgba(0, 0, 0, 0.1) 1px 0px 15px;
   }
   #topbar {
     background-color: var(--color-light-background-main);
@@ -48,6 +47,14 @@ body.dark {
   --text-success-green-color: #a3cfbb;
   --eth-multi-client-description-color: var(--color-dark-quaternarytext);
   --bs-code-color: #ffa9d1;
+  --bs-body-bg: var(--color-dark-background-main);
+  --bs-border-color: var(--color-dark-border);
+  --border-color: var(--color-dark-border);
+  --focus-ring-color: #5cd3ff;
+  --nav-active-color: #8fe0ff;
+  --nav-active-background: rgba(0, 177, 244, 0.16);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.45), 0 24px 64px rgba(0, 0, 0, 0.35);
 }
 #dark.body {
   background-color: var(--color-dark-background-main);
@@ -119,11 +126,11 @@ body.dark {
     input.custom-file-input,
     label.custom-file-label,
     select {
-      background-color: #605f5fd6;
+      background-color: var(--color-dark-card-hover);
       color: white;
-      border: none;
+      border: 1px solid var(--color-dark-border);
       &::placeholder {
-        color: rgba(255, 255, 255, 0.85);
+        color: rgba(255, 255, 255, 0.65);
       }
     }
     a.btn-outline-secondary,
@@ -133,8 +140,8 @@ body.dark {
     }
 
     .input-group-text {
-      background-color: #4b4a4a;
-      border: none;
+      background-color: var(--color-dark-card);
+      border: 1px solid var(--color-dark-border);
       color: #d9d6d6;
     }
 
@@ -145,6 +152,7 @@ body.dark {
     // CARDS
     .card {
       background-color: var(--color-dark-card);
+      border-color: var(--color-dark-border);
     }
     .horizontal-navbar .item:not(.active) {
       color: var(--color-dark-quaternarytext);
@@ -166,7 +174,7 @@ body.dark {
   }
   #sidebar {
     background-color: var(--color-dark-background-sidebar);
-    box-shadow: rgba(0, 0, 0, 0.1) 1px 0px 15px;
+    border-right: var(--border-style-dark);
     .nav a,
     .nav .sidenav-item,
     .sidebar-media-footer {
@@ -177,10 +185,12 @@ body.dark {
     }
     .sidenav-item {
       &.selectable:hover {
+        color: var(--color-dark-maintext);
         background-color: var(--color-dark-background-main);
       }
       &.selectable.active {
-        background-color: var(--color-dark-card);
+        color: var(--nav-active-color);
+        background-color: var(--nav-active-background);
       }
     }
   }
@@ -198,7 +208,8 @@ body.dark {
         &.show {
           background-color: var(--color-dark-card);
           color: var(--color-dark-maintext);
-          box-shadow: 0 10px 10px rgba(0, 0, 0, 0.4);
+          border-color: var(--color-dark-border);
+          box-shadow: var(--shadow-lg);
         }
       }
     }

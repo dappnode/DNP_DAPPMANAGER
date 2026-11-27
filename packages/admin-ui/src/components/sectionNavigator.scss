@@ -21,7 +21,7 @@
     }
 
     // Remove the border (outline) on click
-    &:focus {
+    &:focus:not(:focus-visible) {
       outline: none;
     }
   }

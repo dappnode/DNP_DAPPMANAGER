@@ -2,7 +2,7 @@ import React from "react";
 import BootstrapCard from "react-bootstrap/Card";
 import { joinCssClass } from "utils/css";
 
-const shadowStyle = { boxShadow: "1px 1px 15px 0 rgba(0, 0, 0, 0.07)" };
+const shadowStyle = { boxShadow: "var(--shadow-sm)" };
 
 interface CardProps {
   shadow?: boolean;

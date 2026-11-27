@@ -17,7 +17,7 @@
 .accordion-notifications-wrapper {
   span {
     padding: 5px;
-    border-radius: 5px;
+    border-radius: var(--radius-sm);
     &.light {
       background-color: lightgray;
     }

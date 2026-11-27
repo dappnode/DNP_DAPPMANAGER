@@ -36,7 +36,7 @@
 
     .state-badge {
       height: 1rem;
-      border-radius: 1rem;
+      border-radius: var(--radius-lg);
       .content {
         display: none;
       }
@@ -54,7 +54,7 @@
 
   .avatar {
     width: 2rem;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
   }
 
   .actions-icon-group {
@@ -92,7 +92,7 @@
 }
 
 .state-badge {
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   padding: 1px 5px;
   color: #061a22;
   font-size: 90%;

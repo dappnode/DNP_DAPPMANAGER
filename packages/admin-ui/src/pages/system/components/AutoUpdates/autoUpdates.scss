@@ -13,7 +13,7 @@
 .auto-updates-section {
   padding: var(--default-spacing);
   border: var(--border-style);
-  border-radius: 0.35rem;
+  border-radius: var(--radius-sm);
 
   & + & {
     margin-top: var(--default-spacing);
@@ -72,7 +72,7 @@
   justify-content: space-between;
   padding: 0.75rem;
   border: var(--border-style);
-  border-radius: 0.25rem;
+  border-radius: var(--radius-sm);
   color: inherit;
   background: transparent;
   text-align: left;

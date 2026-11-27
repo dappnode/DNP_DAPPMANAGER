@@ -18,10 +18,10 @@
   background: linear-gradient(135deg, #7b2ff2 0%, #f357a8 50%, #7b2ff2 100%);
   color: #fff;
   padding: 2.5rem;
-  border-radius: 1rem;
+  border-radius: var(--radius-lg);
   max-width: 600px;
   width: 100%;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-lg);
   animation: modalFadeIn 0.3s ease-out;
 }
 
@@ -71,7 +71,7 @@
     background: rgba(255, 255, 255, 0.3);
   }
 
-  &:focus {
+  &:focus-visible {
     outline: 2px solid rgba(255, 255, 255, 0.5);
     outline-offset: 2px;
   }
@@ -144,7 +144,7 @@
   width: 100%;
   font-size: 1.1rem;
   font-weight: 600;
-  border-radius: 0.5rem;
+  border-radius: var(--radius-md);
   padding: 0.875rem 1.5rem;
   border: none;
   cursor: pointer;

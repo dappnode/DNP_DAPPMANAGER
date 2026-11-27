@@ -1,89 +1,150 @@
-.banner-notifications-col {
+.staker-disclaimer-modal {
+  z-index: 3000 !important; /* Ensure modal appears above sidebar (z-index: 2000) */
+}
+.staker-disclaimer-modal .modal-dialog {
+  max-width: 800px;
+}
+.staker-disclaimer-modal .modal-header {
+  background-color: var(--background-secondary);
+  border-bottom: 2px solid var(--border-color);
+  padding: 1.5rem;
+}
+.staker-disclaimer-modal .modal-header .modal-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.staker-disclaimer-modal .modal-header .btn-close {
+  opacity: 0.7;
+}
+.staker-disclaimer-modal .modal-header .btn-close:hover {
+  opacity: 1;
+}
+.staker-disclaimer-modal .modal-body {
+  padding: 1.5rem;
+  max-height: 70vh;
+  overflow-y: auto;
+  background-color: var(--background-primary);
+}
+.staker-disclaimer-modal .modal-body .disclaimer-intro {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background-color: var(--background-secondary);
+  border-left: 3px solid #e0a800;
+  border-radius: var(--radius-md);
+}
+.staker-disclaimer-modal .modal-body .disclaimer-intro p {
+  margin-bottom: 0.75rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+.staker-disclaimer-modal .modal-body .disclaimer-intro p:last-child {
+  margin-bottom: 0;
+}
+.staker-disclaimer-modal .modal-body .disclaimer-intro p strong {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.staker-disclaimer-modal .modal-body .disclaimer-sections {
+  margin-bottom: 1.5rem;
+}
+.staker-disclaimer-modal .modal-body .disclaimer-acceptance {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background-color: var(--background-secondary);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+}
+.staker-disclaimer-modal .modal-body .disclaimer-acceptance .disclaimer-checkbox-label {
   display: flex;
-  flex-direction: column;
-  gap: 5px;
-  margin: 1.5rem 0;
+  align-items: flex-start;
+  cursor: pointer;
+  margin: 0;
+  user-select: none;
+}
+.staker-disclaimer-modal .modal-body .disclaimer-acceptance .disclaimer-checkbox-label input[type=checkbox] {
+  margin-right: 0.5rem;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.staker-disclaimer-modal .modal-body .disclaimer-acceptance .disclaimer-checkbox-label span {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+.staker-disclaimer-modal .modal-body .disclaimer-acceptance .disclaimer-checkbox-label:hover span {
+  color: var(--primary-color);
+}
+.staker-disclaimer-modal .modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+.staker-disclaimer-modal .modal-body::-webkit-scrollbar-track {
+  background: var(--background-secondary);
+  border-radius: var(--radius-sm);
+}
+.staker-disclaimer-modal .modal-body::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: var(--radius-sm);
+}
+.staker-disclaimer-modal .modal-body::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}
+.staker-disclaimer-modal .modal-footer {
+  background-color: var(--background-secondary);
+  border-top: 2px solid var(--border-color);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+.staker-disclaimer-modal .modal-footer button {
+  min-width: 120px;
+}
 
-  .banner-card {
-    padding: 10px 15px;
-    border-radius: 5px;
-    background-color: #e9ecef;
-    color: #212529;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+.modal-backdrop {
+  z-index: 2999 !important; /* Just below modal but above sidebar */
+}
 
-    &:hover {
-      opacity: 0.8;
-      cursor: pointer;
-    }
-
-    &.medium-priority {
-      background-color: #d1ecf1;
-      color: #0c5460;
-    }
-
-    &.high-priority {
-      background-color: #ffeda6;
-      color: #433c1d;
-    }
-
-    &.critical-priority {
-      background-color: #f8d7da;
-      color: #721c24;
-    }
-
-    h5 {
-      margin: 0px;
-    }
-
-    .banner-header {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
-
-      .banner-title {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 2px;
-        font-weight: normal;
-      }
-
-      .close-btn {
-        padding: 0px;
-        border: none;
-        background: none;
-
-        cursor: pointer;
-        color: #000;
-        font-size: 1.2rem;
-        font-weight: 700;
-
-        &:hover {
-          opacity: 0.5;
-        }
-      }
-    }
-
-    .banner-body {
-      font-size: 1rem;
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
-      gap: 15px;
-
-      @media (max-width: 60rem) {
-        flex-direction: column;
-      }
-
-      button {
-        > div {
-          white-space: nowrap; // Prevent CTA text from wrapping
-        }
-      }
-    }
-  }
+body.dark .staker-disclaimer-modal .modal-header,
+body.dark .staker-disclaimer-modal .modal-body,
+body.dark .staker-disclaimer-modal .modal-footer,
+html.dark .staker-disclaimer-modal .modal-header,
+html.dark .staker-disclaimer-modal .modal-body,
+html.dark .staker-disclaimer-modal .modal-footer {
+  background-color: var(--color-dark-card);
+}
+body.dark .staker-disclaimer-modal .modal-header,
+html.dark .staker-disclaimer-modal .modal-header {
+  border-bottom-color: var(--color-dark-border);
+}
+body.dark .staker-disclaimer-modal .modal-header .modal-title,
+html.dark .staker-disclaimer-modal .modal-header .modal-title {
+  color: var(--color-dark-maintext);
+}
+body.dark .staker-disclaimer-modal .modal-body .disclaimer-intro,
+html.dark .staker-disclaimer-modal .modal-body .disclaimer-intro {
+  background-color: var(--color-dark-background-main);
+  border-left-color: #e0a800;
+}
+body.dark .staker-disclaimer-modal .modal-body .disclaimer-intro p,
+body.dark .staker-disclaimer-modal .modal-body .disclaimer-intro strong,
+html.dark .staker-disclaimer-modal .modal-body .disclaimer-intro p,
+html.dark .staker-disclaimer-modal .modal-body .disclaimer-intro strong {
+  color: var(--color-dark-secondarytext);
+}
+body.dark .staker-disclaimer-modal .modal-body .disclaimer-acceptance,
+html.dark .staker-disclaimer-modal .modal-body .disclaimer-acceptance {
+  background-color: var(--color-dark-background-main);
+  border-color: var(--color-dark-border);
+}
+body.dark .staker-disclaimer-modal .modal-body .disclaimer-acceptance .disclaimer-checkbox-label span,
+html.dark .staker-disclaimer-modal .modal-body .disclaimer-acceptance .disclaimer-checkbox-label span {
+  color: var(--color-dark-maintext);
+}
+body.dark .staker-disclaimer-modal .modal-footer,
+html.dark .staker-disclaimer-modal .modal-footer {
+  border-top-color: var(--color-dark-border);
 }

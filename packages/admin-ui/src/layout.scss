@@ -46,7 +46,9 @@
   TEXT STYLES 
 */
 body {
-  font-family: overpass, sans-serif !important;
+  font-family: var(--font-sans) !important;
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* Reset margins and underlying sizes. 
@@ -121,10 +123,11 @@ body,
   align-items: center;
   width: 100%;
   gap: 0.5rem;
-  border-radius: 5px;
-  padding-left: 10px;
+  border-radius: var(--radius-sm);
+  padding-left: 15px;
   @media (max-width: 40rem) {
     grid-gap: 0;
+    padding-left: 10px;
   }
 
   /* SIDEBAR > TOP */

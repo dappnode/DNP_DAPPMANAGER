@@ -54,6 +54,15 @@ const useLocalStorage = <T extends string>(
   return [storedValue, setStoredValue];
 };
 
+/** With no saved choice, start in the theme the operating system asks for */
+const getSystemTheme = (): Theme =>
+  typeof window.matchMedia === "function" && window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+
+/** Browser chrome colour (PWA title bar, mobile address bar) per theme. Matches the main background */
+const themeColor: Record<Theme, string> = { light: "#f7f9f9", dark: "#181d24" };
+
 function MainApp({ username }: { username: string }) {
   // App is the parent container of any other component.
   // If this re-renders, the whole app will. So DON'T RERENDER APP!
@@ -63,7 +72,7 @@ function MainApp({ username }: { username: string }) {
   useUiTelemetryConsent();
 
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
-  const [theme, setTheme] = useLocalStorage<Theme>("theme", "light");
+  const [theme, setTheme] = useLocalStorage<Theme>("theme", getSystemTheme());
 
   useEffect(() => {
     const handleResize = () => setScreenWidth(window.innerWidth);
@@ -94,6 +103,9 @@ function MainApp({ username }: { username: string }) {
     body.classList.add(theme);
     // Bootstrap utilities and portals (modals, dropdowns) also need the active theme.
     html.dataset.bsTheme = theme;
+    // Native controls, scrollbars and the browser chrome follow the theme too.
+    html.style.colorScheme = theme;
+    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", themeColor[theme]);
   }, [theme]);
 
   return (

@@ -10,7 +10,7 @@
 
   .category {
     padding: 3px 5px;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     cursor: pointer;
     font-size: 1rem;
     color: var(--light-text-color);
@@ -41,7 +41,7 @@
 }
 
 .notification-card {
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   background-color: #e9ecef;
   padding: 10px;
   cursor: pointer;
@@ -117,7 +117,7 @@
         align-items: center;
         background-color: transparent !important;
         padding: 0px 5px;
-        border-radius: 10px;
+        border-radius: var(--radius-md);
         font-size: 0.7rem;
 
         @media (max-width: 60rem) {
@@ -242,7 +242,7 @@
   .page-item {
     cursor: pointer;
     padding: 5px 10px;
-    border-radius: 5px;
+    border-radius: var(--radius-sm);
     background-color: #e9ecef;
     border: none;
 
@@ -257,7 +257,7 @@
   .active {
     background-color: #ced4da !important;
     padding: 5px 10px;
-    border-radius: 5px;
+    border-radius: var(--radius-sm);
   }
 }
 

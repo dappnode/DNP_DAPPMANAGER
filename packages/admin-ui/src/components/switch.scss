@@ -60,10 +60,10 @@
       margin-left: calc(2.375rem * 0.8);
     }
   }
-  input:focus + label {
+  input:focus-visible + label {
     &::before {
-      outline: none;
-      box-shadow: 0 0 0 0.2rem rgba(0, 136, 221, 0.25);
+      outline: var(--focus-ring);
+      outline-offset: var(--focus-ring-offset);
     }
   }
   input:disabled + label {
