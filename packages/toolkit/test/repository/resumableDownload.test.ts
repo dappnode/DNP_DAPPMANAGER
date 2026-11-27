@@ -16,7 +16,7 @@ const CHUNK = 256 * 1024;
 
 type Behaviour =
   | { kind: "ranges" }
-  | { kind: "ignoreRanges" }
+  | { kind: "ignoreRanges"; rateLimitFirstRawRequests?: number }
   | { kind: "truncate"; afterBlocks: number }
   | { kind: "drop"; afterBlocks: number }
   | { kind: "corrupt"; blockIndex: number }
@@ -55,6 +55,7 @@ function corrupt(block: FixtureBlock): FixtureBlock {
 function mockGateways(file: FixtureFile, behaviours: Record<string, Behaviour>): Served[] {
   const served: Served[] = [];
   const byCid = new Map(file.blocks.map((b) => [b.cid.toString(), b]));
+  let rawRequests = 0;
   globalThis.fetch = async (input) => {
     const url = new URL(input.toString());
     const record: Served = { url: input.toString(), blocks: [] };
@@ -70,6 +71,11 @@ function mockGateways(file: FixtureFile, behaviours: Record<string, Behaviour>):
     if (behaviour.kind === "fail") return new Response("down", { status: 500, statusText: "Internal Server Error" });
 
     if (format === "raw") {
+      // A gateway that drops connections serves no single blocks either
+      if (behaviour.kind === "truncate") return new Response("not found", { status: 404 });
+      if (behaviour.kind === "ignoreRanges" && rawRequests++ < (behaviour.rateLimitFirstRawRequests ?? 0)) {
+        return new Response("slow down", { status: 429, statusText: "Too Many Requests" });
+      }
       const block = byCid.get(cid);
       if (!block) return new Response("not found", { status: 404 });
       record.blocks = [cid];
@@ -230,6 +236,31 @@ describe("Resumable verified image download", function () {
     for (const s of raw) expect(held.has(s.blocks[0])).to.equal(false);
     // Only one ranged request was made before switching to raw blocks
     expect(fromB.filter((s) => s.url.includes("entity-bytes="))).to.have.length(1);
+  });
+
+  it("slows down and waits instead of giving up when a gateway rate limits raw block requests", async () => {
+    const afterBlocks = file.blocks.findIndex((b) => b.cid.equals(file.leaves[14].cid));
+    const served = mockGateways(file, {
+      [A]: { kind: "truncate", afterBlocks },
+      [B]: { kind: "ignoreRanges", rateLimitFirstRawRequests: 20 }
+    });
+    const sleeps: number[] = [];
+    const repo = new DappnodeRepository(
+      [A, B],
+      new JsonRpcProvider(),
+      { baseUrl: "https://mirror.example", maxBytes: 1024 },
+      () => false,
+      undefined,
+      { sleep: async (ms) => void sleeps.push(ms) }
+    );
+    const path = join(dir, "image.txz");
+
+    await repo.writeFileToFs({ hash: file.root.toString(), path, fileSize: file.tsize });
+
+    expect(Buffer.compare(await readFile(path), Buffer.from(file.content))).to.equal(0);
+    // The rate-limited gateway was paused for seconds, not hammered again after a sub-second retry
+    expect(sleeps.some((ms) => ms >= 1000)).to.equal(true);
+    expect(servedBy(served, B).filter((s) => s.url.endsWith("?format=raw")).length).to.be.greaterThan(20);
   });
 
   it("reuses the block store left by a previous failed run", async () => {

@@ -97,7 +97,8 @@ export interface TransportRequest<T> {
 export class TransportPolicy {
   readonly headersTimeoutMs: number;
   private readonly maxConcurrentPerHost: number;
-  private readonly sleep: (ms: number, signal?: AbortSignal) => Promise<void>;
+  /** Waits for the given time. Injectable, so tests do not wait for real delays. */
+  readonly sleep: (ms: number, signal?: AbortSignal) => Promise<void>;
   private readonly random: () => number;
   private readonly health: EndpointHealth;
   private readonly semaphores = new Map<string, Semaphore>();

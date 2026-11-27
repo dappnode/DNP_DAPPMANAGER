@@ -34,6 +34,11 @@ const CAR_OVERHEAD_BYTES = 16 * 1024 * 1024;
 const MAX_FAILURES_WITHOUT_PROGRESS = 2;
 /** Assembly re-checks every block; retry a few times if stored blocks turn out to be missing or corrupt. */
 const MAX_ASSEMBLY_ATTEMPTS = 3;
+/** A rate-limited gateway (429) is paused for this long, doubling on every further 429 without progress. */
+const RATE_LIMIT_BASE_MS = 2 * 1000;
+const RATE_LIMIT_CAP_MS = 30 * 1000;
+/** Give up on a gateway after this many consecutive rate-limited rounds without a single new block. */
+const MAX_RATE_LIMIT_ROUNDS = 6;
 
 export interface ResumableDownloadArgs {
   client: IpfsGatewayClient;
@@ -89,6 +94,9 @@ class ResumableDownload {
   private readonly rangesUnsupported = new Set<string>();
   private readonly failuresWithoutProgress = new Map<string, number>();
   private readonly lastErrors = new Map<string, TransportError>();
+  private readonly rateLimitRounds = new Map<string, number>();
+  private readonly rateLimitedUntil = new Map<string, number>();
+  private readonly rawConcurrency = new Map<string, number>();
   private lastProgress = -1;
 
   constructor(
@@ -130,6 +138,17 @@ class ResumableDownload {
         const index = gateway === undefined ? -1 : candidates.indexOf(gateway);
         gateway = candidates[(index + 1) % candidates.length];
       }
+      // Leave rate-limited gateways alone while another one is available, else wait for the first to recover
+      const now = Date.now();
+      const ready = candidates.filter((url) => (this.rateLimitedUntil.get(url) ?? 0) <= now);
+      if (ready.length === 0) {
+        gateway = candidates.reduce((a, b) => (this.rateLimitedUntil.get(a)! <= this.rateLimitedUntil.get(b)! ? a : b));
+        const waitMs = this.rateLimitedUntil.get(gateway)! - now;
+        this.args.log("debug", `IPFS gateway ${gateway} is rate limiting, waiting ${waitMs} ms`);
+        await this.args.client.policy.sleep(waitMs);
+      } else if (!ready.includes(gateway)) {
+        gateway = ready[0];
+      }
 
       const blocksBefore = this.store.count;
       let error: TransportError | undefined;
@@ -150,7 +169,16 @@ class ResumableDownload {
       } else if (!progressed) {
         this.lastErrors.set(gateway, new TransportError("integrity", "response did not contain any missing block"));
       }
-      if (!progressed) {
+      if (progressed) this.rateLimitRounds.delete(gateway);
+      if (error?.kind === "http" && error.status === 429) {
+        // Rate limiting is not a broken gateway: slow down and pause it instead of giving up on it
+        const rounds = (this.rateLimitRounds.get(gateway) ?? 0) + 1;
+        this.rateLimitRounds.set(gateway, rounds);
+        this.rawConcurrency.set(gateway, Math.max(1, Math.floor(this.rawConcurrencyOf(gateway) / 2)));
+        const pauseMs = Math.min(error.retryAfterMs ?? RATE_LIMIT_BASE_MS * 2 ** (rounds - 1), RATE_LIMIT_CAP_MS);
+        this.rateLimitedUntil.set(gateway, Date.now() + pauseMs);
+        if (rounds >= MAX_RATE_LIMIT_ROUNDS) this.failuresWithoutProgress.set(gateway, MAX_FAILURES_WITHOUT_PROGRESS);
+      } else if (!progressed) {
         this.failuresWithoutProgress.set(gateway, (this.failuresWithoutProgress.get(gateway) ?? 0) + 1);
       }
       moveOn = error !== undefined || !progressed;
@@ -222,6 +250,10 @@ class ResumableDownload {
     await this.fetchRawBlocks(gateway, missing);
   }
 
+  private rawConcurrencyOf(gateway: string): number {
+    return this.rawConcurrency.get(gateway) ?? RAW_BLOCK_CONCURRENCY;
+  }
+
   private markRangesUnsupported(gateway: string, reason: string): void {
     this.rangesUnsupported.add(gateway);
     this.args.log(
@@ -274,7 +306,7 @@ class ResumableDownload {
     while (level.length > 0) {
       const next: CID[] = [];
       const seen = new Set<string>();
-      await runPool(level, RAW_BLOCK_CONCURRENCY, async (cid) => {
+      await runPool(level, this.rawConcurrencyOf(gateway), async (cid) => {
         const bytes = await this.args.client.fetchFrom(
           gateway,
           `/ipfs/${cid}?format=raw`,
