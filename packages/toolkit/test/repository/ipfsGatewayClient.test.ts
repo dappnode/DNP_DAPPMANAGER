@@ -12,8 +12,9 @@ describe("IpfsGatewayClient", () => {
     const requestedUrls: string[] = [];
     globalThis.fetch = async (input) => {
       requestedUrls.push(input.toString());
+      // 404 is not retried on the same gateway, so the next gateway is tried right away
       return requestedUrls.length === 1
-        ? new Response("unavailable", { status: 503 })
+        ? new Response("not found", { status: 404 })
         : new Response('{"ok":true}', { status: 200 });
     };
 
@@ -59,7 +60,9 @@ describe("IpfsGatewayClient", () => {
 
   it("reports every gateway error when all attempts fail", async () => {
     globalThis.fetch = async () => new Response("unavailable", { status: 502, statusText: "Bad Gateway" });
-    const client = new IpfsGatewayClient(["https://first.example", "https://second.example"]);
+    const client = new IpfsGatewayClient(["https://first.example", "https://second.example"], undefined, {
+      sleep: async () => undefined
+    });
 
     try {
       await client.fetch("/ipfs/cid", {}, async (response) => response.text());
@@ -76,7 +79,7 @@ describe("IpfsGatewayClient", () => {
     globalThis.fetch = async () => {
       requestCount += 1;
       return requestCount === 1
-        ? new Response("unavailable", { status: 503, statusText: "Service Unavailable" })
+        ? new Response("not found", { status: 404, statusText: "Not Found" })
         : new Response("ok", { status: 200 });
     };
 
@@ -89,7 +92,7 @@ describe("IpfsGatewayClient", () => {
       { level: "debug", message: "Trying IPFS gateway https://first.example/ipfs/cid?format=car" },
       {
         level: "warn",
-        message: "IPFS gateway failed https://first.example/ipfs/cid?format=car: 503 Service Unavailable"
+        message: "IPFS gateway failed https://first.example/ipfs/cid?format=car: 404 Not Found"
       },
       { level: "debug", message: "Trying IPFS gateway https://second.example/ipfs/cid?format=car" }
     ]);
