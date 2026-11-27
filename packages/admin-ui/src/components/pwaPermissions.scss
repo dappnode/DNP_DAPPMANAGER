@@ -40,7 +40,7 @@
     gap: 10px;
     position: relative;
     padding: 2rem;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     opacity: 0;
     animation: popIn 0.5s ease forwards;
 

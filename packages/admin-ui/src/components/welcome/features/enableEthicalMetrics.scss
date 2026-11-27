@@ -20,7 +20,7 @@
 
   span {
     padding: 3px;
-    border-radius: 5px;
+    border-radius: var(--radius-sm);
     background-color: lightgray;
   }
 }
@@ -29,7 +29,7 @@
   font-size: 13px;
   span {
     padding: 3px;
-    border-radius: 5px;
+    border-radius: var(--radius-sm);
     background-color: lightgray;
   }
 }

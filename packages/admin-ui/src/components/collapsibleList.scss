@@ -6,7 +6,7 @@
 
 .collapsible-list-item {
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background-color: var(--background-primary);
   overflow: hidden;
   transition: all 0.2s ease;
@@ -17,7 +17,7 @@
 
   &.open {
     border-color: var(--primary-color);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--shadow-sm);
   }
 }
 
@@ -32,8 +32,8 @@
   cursor: pointer;
   transition: background-color 0.2s ease;
 
-  &:focus {
-    outline: 2px solid var(--primary-color);
+  &:focus-visible {
+    outline: var(--focus-ring);
     outline-offset: -2px;
   }
 }
@@ -108,7 +108,7 @@ html.dark {
 
     &.open {
       border-color: var(--color-dark-secondarytext);
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+      box-shadow: var(--shadow-sm);
     }
   }
 

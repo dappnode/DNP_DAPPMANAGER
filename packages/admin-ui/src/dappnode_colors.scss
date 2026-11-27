@@ -1,7 +1,29 @@
 :root {
+  // Typography
+  --font-sans: "Inter Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --bs-body-font-family: var(--font-sans);
+  --bs-font-sans-serif: var(--font-sans);
+  --bs-font-monospace: var(--font-mono);
+  // Corner radii: controls and badges / cards and menus / dialogs and panels
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  // Elevation: resting surfaces / floating overlays
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.04), 0 2px 8px rgba(16, 24, 40, 0.06);
+  --shadow-lg: 0 4px 12px rgba(16, 24, 40, 0.08), 0 16px 48px rgba(16, 24, 40, 0.16);
+  // Current page in the sidebar
+  --nav-active-color: #005f86;
+  --nav-active-background: rgba(0, 177, 244, 0.14);
+  // Keyboard focus ring
+  --focus-ring-color: var(--dappnode-darker-main-color);
+  --focus-ring: 2px solid var(--focus-ring-color);
+  --focus-ring-offset: 2px;
   --dappnode-white-color: #fff;
   --dappnode-strong-main-color: #00b1f4;
   --dappnode-darker-main-color: #007dfc;
+  --dappnode-main-hover-color: #0ba5e3;
+  --dappnode-main-active-color: #0a9bd8;
   --dappnode-shadow-main-color: #06d4e7;
   --dappnode-light-main-color: #a0bdbb;
   --dappnode-gray-main-color: #748888;
@@ -11,7 +33,7 @@
   // Border colors
   --border-color: #e5e5e5;
   --color-light-border: #e5e5e5;
-  --color-dark-border: #616161;
+  --color-dark-border: #343c48;
   --border-style-light: var(--border-size) solid var(--color-light-border);
   --border-style-dark: var(--border-size) solid var(--color-dark-border);
 
@@ -20,15 +42,15 @@
   --color-light-background-main: #f7f9f9; // Used by main
 
   // DARK mode
-  --color-dark-background-sidebar: #212121; // Used by sidebar
-  --color-dark-background-topbar: #313131; // Used by topbar
-  --color-dark-background-main: #313131; // Used by main
+  --color-dark-background-sidebar: #12161c; // Used by sidebar
+  --color-dark-background-topbar: #181d24; // Used by topbar
+  --color-dark-background-main: #181d24; // Used by main
   --color-dark-maintext: #ffffff; // Used by main
   --color-dark-secondarytext: #dddddd; // Used by main
   --color-dark-tertiarytext: #cccccc; // Used by main
   --color-dark-quaternarytext: #c1c1c1; // Used by main
-  --color-dark-card: #414141; // Used by cards
-  --color-dark-card-hover: #4b4b4b; // Keeps secondary text readable on hover
+  --color-dark-card: #212730; // Used by cards
+  --color-dark-card-hover: #2a313c; // Keeps secondary text readable on hover
   --color-dark-danger-background: #8d2222; // Used by danger alerts
 
   // Buttons
@@ -71,23 +93,25 @@
   background-color: var(--dappnode-strong-main-color);
   border-color: var(--dappnode-strong-main-color);
 
+  /* Hover and press stay in the brand colour, one and two steps darker */
   &:hover {
-    color: var(--dappnode-white-color);
-    background-color: #0066cc;
-    border-color: #0066cc;
+    color: var(--primary-button-text-color);
+    background-color: var(--dappnode-main-hover-color);
+    border-color: var(--dappnode-main-hover-color);
   }
 
-  &:focus,
-  &.focus {
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.5);
-  }
-
+  /* Disabled is the same button, faded */
   &.disabled,
   &:disabled {
-    color: var(--dappnode-white-color);
-    background-color: var(--dappnode-gray-main-color);
-    border-color: var(--dappnode-gray-main-color);
+    color: var(--primary-button-text-color);
+    background-color: var(--dappnode-strong-main-color);
+    border-color: var(--dappnode-strong-main-color);
+    opacity: 0.45;
   }
+}
+
+.btn {
+  --bs-btn-font-weight: 500;
 }
 
 .btn-outline-secondary {
@@ -109,9 +133,9 @@
 .btn-dappnode:not(:disabled):not(.disabled):active,
 .btn-dappnode:not(:disabled):not(.disabled).active,
 .show > .btn-dappnode.dropdown-toggle {
-  color: var(--dappnode-white-color);
-  background-color: #0066cc;
-  border-color: #0066cc;
+  color: var(--primary-button-text-color);
+  background-color: var(--dappnode-main-active-color);
+  border-color: var(--dappnode-main-active-color);
 }
 
 .btn-outline-dappnode {
@@ -121,14 +145,8 @@
   border-color: var(--dappnode-strong-main-color) !important;
 
   &:hover {
-    color: var(--dappnode-white-color);
-    background-color: #0066cc;
-    border-color: #0066cc !important;
-  }
-
-  &:focus,
-  &.focus {
-    box-shadow: 0 0 0 0.2rem var(--dappnode-shadow-main-color);
+    color: var(--dappnode-links-color);
+    background-color: color-mix(in srgb, var(--dappnode-strong-main-color) 12%, transparent);
   }
 
   &.disabled,
@@ -146,10 +164,19 @@
   border-color: var(--dappnode-strong-main-color);
 }
 
-.btn-outline-dappnode:not(:disabled):not(.disabled):active:focus,
-.btn-outline-dappnode:not(:disabled):not(.disabled).active:focus,
-.show > .btn-outline-dappnode.dropdown-toggle:focus {
-  box-shadow: 0 0 0 0.2rem var(--dappnode-shadow-main-color);
+/* Keyboard focus: a crisp offset ring, never shown for mouse clicks */
+:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+.btn:focus-visible,
+.btn:first-child:active:focus-visible,
+.btn.active:focus-visible,
+.btn.show:focus-visible,
+.btn-check:focus-visible + .btn {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+  box-shadow: none;
 }
 
 /* Opacity shades */
@@ -206,10 +233,29 @@
   background-color: var(--success-color);
   color: var(--primary-button-text-color);
 }
+/* Alerts as quiet callouts: normal text on a faint tint, with the meaning
+   carried by a coloured bar on the leading edge instead of a filled block */
+.alert {
+  --alert-accent: var(--dappnode-gray-main-color);
+  --bs-alert-color: var(--bs-body-color);
+  --bs-alert-link-color: var(--bs-body-color);
+  --bs-alert-bg: color-mix(in srgb, var(--alert-accent) 7%, transparent);
+  --bs-alert-border-color: color-mix(in srgb, var(--alert-accent) 28%, transparent);
+  --bs-alert-border-radius: var(--radius-md);
+  border-left: 3px solid var(--alert-accent);
+}
 .alert-warning {
-  color: #433c1d;
-  background-color: #ffeda6;
-  border-color: #ffeda6;
+  --alert-accent: #e0a800;
+}
+.alert-danger {
+  --alert-accent: #d6404b;
+}
+.alert-success {
+  --alert-accent: var(--success-green-color);
+}
+.alert-info,
+.alert-primary {
+  --alert-accent: var(--dappnode-strong-main-color);
 }
 
 .alert a:not(.btn) {

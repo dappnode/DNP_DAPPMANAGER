@@ -81,10 +81,10 @@
   .credentials-config {
     white-space: pre;
     font-size: 75%;
-    font-family: "Inconsolata", monospace;
+    font-family: var(--font-mono);
     overflow: auto;
     padding: 1.25rem;
-    border-radius: 0.25rem;
+    border-radius: var(--radius-sm);
     background-color: #f7f9f9;
   }
 

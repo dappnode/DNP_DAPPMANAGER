@@ -29,14 +29,14 @@
   code {
     background: rgba(0, 0, 0, 0.06);
     padding: 0.15rem 0.35rem;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     font-size: 0.85em;
   }
 
   pre {
     background: rgba(0, 0, 0, 0.05);
     padding: 0.75rem;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     overflow-x: auto;
 
     code {

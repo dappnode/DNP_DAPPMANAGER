@@ -224,7 +224,7 @@ p.no-p-style:last-child {
 }
 
 .card {
-  border-radius: 10px;
+  border-radius: var(--radius-md);
 }
 .card-body {
   padding: 0.75rem;
@@ -257,7 +257,7 @@ p.no-p-style:last-child {
   text-align: center;
   font-size: 15px;
   padding: 5px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   z-index: 1;
   bottom: calc(100% + 5px);
   left: 50%;
@@ -316,6 +316,26 @@ p.no-p-style:last-child {
   .accordion-body {
     padding: 0px;
   }
+}
+
+/* Respect the operating system's "reduce motion" setting everywhere */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Numbers line up in columns and do not jitter while they update */
+.table,
+.list-grid,
+.progress,
+.badge {
+  font-variant-numeric: tabular-nums;
 }
 
 /* Remove bootsrap's default table background */

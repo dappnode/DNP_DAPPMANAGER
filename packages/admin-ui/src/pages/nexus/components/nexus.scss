@@ -52,7 +52,7 @@
   flex-direction: column;
   flex: 1;
   min-height: 0;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--border-color);
   background: var(--color-light-background-sidebar-topbar, #fff);
   overflow: hidden;
@@ -62,7 +62,7 @@
   width: 310px;
   flex: 0 0 310px;
   min-height: 0;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--border-color);
   background: var(--color-light-background-sidebar-topbar, #fff);
   display: flex;
@@ -128,7 +128,7 @@
 .nexus-chat-avatar {
   width: 40px;
   height: 40px;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   background: linear-gradient(135deg, var(--dappnode-strong-main-color), var(--dappnode-darker-main-color));
   color: white;
   display: flex;
@@ -186,7 +186,7 @@
 .nexus-icon-button {
   width: 36px;
   height: 36px;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
   background: transparent;
   color: inherit;
@@ -251,8 +251,8 @@
   padding: 0.5rem;
   background: var(--color-light-background-sidebar-topbar, #fff);
   border: 1px solid var(--border-color);
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
 }
 
 .nexus-history-header {
@@ -282,7 +282,7 @@
   width: 26px;
   height: 26px;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   background: transparent;
   color: inherit;
   display: inline-flex;
@@ -312,7 +312,7 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 0.75rem;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   color: inherit;
 
@@ -376,7 +376,7 @@
   justify-content: center;
   background: transparent;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   color: inherit;
   opacity: 0.5;
   font-size: 0.95rem;
@@ -434,7 +434,7 @@
 .nexus-empty-icon {
   width: 64px;
   height: 64px;
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   background: linear-gradient(135deg, var(--dappnode-strong-main-color), var(--dappnode-darker-main-color));
   color: white;
   display: flex;
@@ -458,7 +458,7 @@
   padding: 0.85rem 1rem;
   font-size: 0.9rem;
   border: 1px solid var(--border-color);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   background: white;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -510,7 +510,7 @@
 .nexus-avatar-assistant {
   width: 32px;
   height: 32px;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background: linear-gradient(135deg, var(--dappnode-strong-main-color), var(--dappnode-darker-main-color));
   color: white;
   display: flex;
@@ -524,7 +524,7 @@
 .nexus-bubble {
   max-width: 85%;
   padding: 0.85rem 1.1rem;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   white-space: pre-wrap;
   line-height: 1.55;
   font-size: 0.95rem;
@@ -576,7 +576,7 @@
 .nexus-confirmation-inner {
   border: 1px solid rgba(245, 158, 11, 0.45);
   background: #fffbeb;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   padding: 1rem;
 }
 
@@ -606,7 +606,7 @@
   background: rgba(255, 255, 255, 0.6);
   border: 1px solid rgba(245, 158, 11, 0.25);
   padding: 0.75rem;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   font-size: 0.8rem;
   margin: 0.75rem 0;
   white-space: pre-wrap;
@@ -631,7 +631,7 @@
   background: rgba(188, 47, 57, 0.08);
   color: var(--text-danger-color);
   padding: 0.6rem 0.85rem;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   font-size: 0.85rem;
   margin-bottom: 0.75rem;
 }
@@ -700,7 +700,7 @@
 .nexus-not-configured-icon {
   width: 44px;
   height: 44px;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   background: rgba(0, 0, 0, 0.04);
   display: flex;
   align-items: center;
@@ -746,11 +746,11 @@
   max-width: 480px;
   max-height: calc(100dvh - 2rem);
   overflow-y: auto;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--border-color);
   background: var(--color-light-background-sidebar-topbar, #fff);
   padding: 1.25rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-lg);
 }
 
 .nexus-key-editor-header {
@@ -774,7 +774,7 @@
   opacity: 0.5;
   cursor: pointer;
   padding: 0.25rem;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   transition:
     opacity 0.15s ease,
     background 0.15s ease;
@@ -841,7 +841,7 @@
   display: flex;
   align-items: center;
   border: 1px solid var(--border-color);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   background: rgba(0, 0, 0, 0.03);
   padding: 0.35rem 0.35rem 0.35rem 0.75rem;
   transition:
@@ -869,7 +869,7 @@
 .nexus-key-editor-toggle {
   width: 36px;
   height: 36px;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   border: none;
   background: transparent;
   display: flex;
@@ -897,7 +897,7 @@
   background: rgba(188, 47, 57, 0.08);
   color: var(--text-danger-color);
   padding: 0.6rem 0.85rem;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   font-size: 0.85rem;
   margin-top: 1rem;
 }
@@ -927,7 +927,7 @@
   }
 
   .nexus-chat-card {
-    border-radius: 12px;
+    border-radius: var(--radius-md);
   }
 }
 
@@ -1011,7 +1011,7 @@
   .nexus-empty-icon {
     width: 48px;
     height: 48px;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     font-size: 1.35rem;
     margin-bottom: 0.85rem;
   }
@@ -1024,7 +1024,7 @@
   .nexus-suggestion {
     padding: 0.75rem 0.85rem;
     font-size: 0.85rem;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
   }
 
   .nexus-thread {
@@ -1046,7 +1046,7 @@
   .nexus-bubble {
     max-width: 92%;
     padding: 0.7rem 0.8rem;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     font-size: 0.9rem;
     line-height: 1.5;
   }
@@ -1102,7 +1102,7 @@
   .nexus-not-configured-icon {
     width: 36px;
     height: 36px;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     font-size: 1rem;
   }
 
@@ -1122,7 +1122,7 @@
   .nexus-key-editor-card {
     max-width: none;
     max-height: calc(100dvh - 1.5rem);
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
     padding: 1rem;
   }
 
@@ -1339,7 +1339,7 @@
 .nexus-private-mode-status {
   margin: 0.5rem 0 0.75rem;
   padding: 0.5rem 0.75rem;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 0.82rem;
   line-height: 1.5;
 
@@ -1415,7 +1415,7 @@
   flex: none;
   padding: 0.25rem 0.65rem;
   border: 1px solid currentColor;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   background: transparent;
   color: inherit;
   font-size: 0.8rem;
@@ -1436,7 +1436,7 @@
   gap: 0.75rem;
   margin: 0.5rem 0.75rem 0;
   padding: 0.55rem 0.8rem;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background: rgba(248, 113, 113, 0.1);
   border: 1px solid rgba(248, 113, 113, 0.3);
   font-size: 0.85rem;

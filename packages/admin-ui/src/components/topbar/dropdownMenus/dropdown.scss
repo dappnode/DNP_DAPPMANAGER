@@ -25,9 +25,9 @@
     /* Does not need a z-index, it has the topbar z-index */
     background-color: white;
     border: var(--border-style);
-    border-radius: 0.5rem;
+    border-radius: var(--radius-md);
     padding: 0.5rem 0;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-lg);
     /* Positioning */
     position: absolute;
     top: 2.5rem;

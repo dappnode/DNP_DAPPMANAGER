@@ -8,6 +8,9 @@ import App from "./App";
 import { cleanObj } from "utils/objects";
 
 // Init css
+// Self-hosted fonts, bundled so they load offline and over VPN
+import "@fontsource-variable/inter";
+import "@fontsource-variable/jetbrains-mono";
 import "react-toastify/dist/ReactToastify.css";
 // Boostrap loaders
 import "bootstrap/dist/css/bootstrap.min.css";

@@ -23,10 +23,10 @@
 .welcome {
   padding: var(--default-spacing);
   padding-bottom: 0;
-  border-radius: 0.5rem;
+  border-radius: var(--radius-md);
   border: var(--border-style);
   background: #fefefe;
-  box-shadow: 0 20px 75px rgba(0, 0, 0, 0.13);
+  box-shadow: var(--shadow-lg);
   color: #666;
 
   /* Sizing */

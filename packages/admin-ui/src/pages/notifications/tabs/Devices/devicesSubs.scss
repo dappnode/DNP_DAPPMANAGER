@@ -37,7 +37,7 @@
         input {
           width: 30ch;
           margin-right: 5px;
-          border-radius: 5px;
+          border-radius: var(--radius-sm);
         }
         @media (max-width: 40rem) {
           width: 100%;

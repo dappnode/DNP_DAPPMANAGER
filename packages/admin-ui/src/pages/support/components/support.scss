@@ -1,7 +1,7 @@
 .discourse-topic-body {
   /* Box styling */
   border: solid 1px #d3d3d396;
-  border-radius: 5px;
+  border-radius: var(--radius-sm);
   padding: 16px 8px;
   margin: 0px 0px 0px;
   background-color: var(--bs-tertiary-bg);
@@ -17,7 +17,7 @@
 .discourse-topic-header {
   /* Box styling */
   border: solid 1px #d3d3d396;
-  border-radius: 5px;
+  border-radius: var(--radius-sm);
   padding: 8px;
   margin: 10px 0px 0px;
   background-color: #f5f5f51a;
