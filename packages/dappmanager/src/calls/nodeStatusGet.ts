@@ -1,250 +1,111 @@
+import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
-import { ClientResult, DashboardSupportedNetwork, NodeStatusByNetwork } from "@dappnode/types";
+import {
+  ClientError,
+  ClientErrorReason,
+  ClientResult,
+  DashboardSupportedNetwork,
+  Network,
+  NodeStatusByNetwork
+} from "@dappnode/types";
+import { evaluateConsensus, fetchConsensus } from "../nodeSyncStatus/consensus.js";
+import { ConsensusContext, evaluateExecution, fetchExecution } from "../nodeSyncStatus/execution.js";
+import { progressTracker } from "../nodeSyncStatus/progressTracker.js";
+import { isConnectionError } from "../nodeSyncStatus/utils.js";
+import { consensusClientsGetByNetworks } from "./consensusClientGet.js";
+import { executionClientsGetByNetworks } from "./executionClientGet.js";
 
 /** Timeout in milliseconds for each individual client request group (EC or CC) */
 const CLIENT_TIMEOUT_MS = 5_000;
 
-const ecBaseUrl = (network: DashboardSupportedNetwork) => `http://execution.${network}.dncore.dappnode:8545`;
-const ccBaseUrl = (network: DashboardSupportedNetwork) => `http://beacon-chain.${network}.dncore.dappnode:3500`;
-
-const getEcName = async (network: DashboardSupportedNetwork) => {
-  const versionResponse = await fetch(ecBaseUrl(network), {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      jsonrpc: "2.0",
-      method: "web3_clientVersion",
-      params: [],
-      id: 1
-    })
-  });
-
-  if (!versionResponse.ok) {
-    throw new Error(`HTTP error! Status: ${versionResponse.status}`);
-  }
-  const versionData = await versionResponse.json();
-  const clientName = versionData.result.split("/")[0];
-
-  return { name: clientName };
+/** Seconds per slot, which is also about the time per execution block */
+const SECONDS_PER_SLOT: Record<DashboardSupportedNetwork, number> = {
+  [Network.Mainnet]: 12,
+  [Network.Gnosis]: 5,
+  [Network.Lukso]: 12,
+  [Network.Hoodi]: 12,
+  [Network.Sepolia]: 12
 };
 
-const getEcSyncStatus = async (network: DashboardSupportedNetwork) => {
-  const syncResponse = await fetch(`${ecBaseUrl(network)}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      jsonrpc: "2.0",
-      method: "eth_syncing",
-      params: [],
-      id: 0
-    })
-  });
-  if (!syncResponse.ok) {
-    throw new Error(`HTTP error! Status: ${syncResponse.status}`);
-  }
+class TimeoutError extends Error {}
 
-  const syncData = await syncResponse.json();
-  const syncing = syncData.result;
+type Settled<T> = { ok: true; value: T } | { ok: false; error: unknown };
 
-  let isSynced = false;
-  let currentBlock = null;
-  let startingBlock = null;
-  let highestBlock = null;
-  let progress = null;
-
-  if (syncing === false) {
-    // Node is fully synced
-    isSynced = true;
-    // Get current block number
-    const blockResponse = await fetch(`${ecBaseUrl(network)}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        jsonrpc: "2.0",
-        method: "eth_blockNumber",
-        params: [],
-        id: 1
+/** Runs a client request group within CLIENT_TIMEOUT_MS, returning its error instead of throwing */
+async function settle<T>(promise: Promise<T>): Promise<Settled<T>> {
+  let timer: NodeJS.Timeout | undefined;
+  try {
+    const value = await Promise.race([
+      promise,
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new TimeoutError(`Timeout after ${CLIENT_TIMEOUT_MS}ms`)), CLIENT_TIMEOUT_MS);
       })
-    });
-    const blockData = await blockResponse.json();
-    currentBlock = parseInt(blockData.result, 16);
-    startingBlock = currentBlock;
-    highestBlock = currentBlock;
-    progress = 100;
-  } else {
-    // Node is syncing
-    isSynced = false;
-    startingBlock = parseInt(syncing.startingBlock, 16);
-    currentBlock = parseInt(syncing.currentBlock, 16);
-    highestBlock = parseInt(syncing.highestBlock, 16);
-
-    if (
-      Number.isFinite(currentBlock) &&
-      Number.isFinite(startingBlock) &&
-      Number.isFinite(highestBlock) &&
-      highestBlock !== startingBlock
-    ) {
-      progress = ((currentBlock - startingBlock) / (highestBlock - startingBlock)) * 100;
-      progress = Math.max(0, Math.min(100, Math.round(progress)));
-    } else {
-      progress = 0;
-    }
+    ]);
+    return { ok: true, value };
+  } catch (error) {
+    return { ok: false, error };
+  } finally {
+    clearTimeout(timer);
   }
-
-  return { isSynced, currentBlock, progress };
-};
-
-const getEcPeers = async (network: DashboardSupportedNetwork) => {
-  const peersResponse = await fetch(ecBaseUrl(network), {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      jsonrpc: "2.0",
-      method: "net_peerCount",
-      params: [],
-      id: 1
-    })
-  });
-  if (!peersResponse.ok) {
-    throw new Error(`HTTP error! Status: ${peersResponse.status}`);
-  }
-  const peersData = await peersResponse.json();
-  return peersData.result ? parseInt(peersData.result, 16) : 0;
-};
-const getCcName = async (network: DashboardSupportedNetwork) => {
-  const versionResponse = await fetch(`${ccBaseUrl(network)}/eth/v1/node/version`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json"
-    }
-  });
-  if (!versionResponse.ok) {
-    throw new Error(`HTTP error! Status: ${versionResponse.status}`);
-  }
-  const versionData = await versionResponse.json();
-
-  const clientName = versionData.data.version.split("/")[0];
-
-  return { name: clientName };
-};
-
-// get also peers for the consensus clients
-
-const getCcPeers = async (network: DashboardSupportedNetwork) => {
-  const peersResponse = await fetch(`${ccBaseUrl(network)}/eth/v1/node/peer_count`);
-  if (!peersResponse.ok) {
-    throw new Error(`HTTP error! Status: ${peersResponse.status}`);
-  }
-  const peersData = await peersResponse.json();
-  return peersData.data.connected;
-};
-
-const getCcSyncStatus = async (network: DashboardSupportedNetwork) => {
-  // Standard endpoint for consensus client sync status (REST API, not JSON-RPC)
-  const syncResponse = await fetch(`${ccBaseUrl(network)}/eth/v1/node/syncing`);
-  if (!syncResponse.ok) {
-    throw new Error(`HTTP error! Status: ${syncResponse.status}`);
-  }
-  const syncData = await syncResponse.json();
-  const syncing = syncData.data;
-
-  const isSynced = syncing.is_syncing === false;
-  const headSlot = parseInt(syncing.head_slot, 10);
-  const syncDistance = parseInt(syncing.sync_distance, 10);
-
-  let progress = null;
-
-  if (syncing.is_syncing === false) {
-    progress = 100;
-  } else {
-    const highestSlot = headSlot + syncDistance;
-
-    if (
-      Number.isFinite(headSlot) &&
-      Number.isFinite(syncDistance) &&
-      Number.isFinite(highestSlot) &&
-      highestSlot !== 0
-    ) {
-      progress = (headSlot / highestSlot) * 100;
-      progress = Math.max(0, Math.min(100, Math.round(progress)));
-    } else {
-      progress = 0;
-    }
-  }
-
-  return { isSynced, currentBlock: headSlot, progress };
-};
-const getEcData = async (network: DashboardSupportedNetwork): Promise<ClientResult> => {
-  const ecName = await getEcName(network);
-  const ecSync = await getEcSyncStatus(network);
-  const ecPeers = await getEcPeers(network);
-
-  return {
-    name: ecName.name,
-    isSynced: ecSync.isSynced,
-    currentBlock: ecSync.currentBlock,
-    progress: ecSync.progress,
-    peers: ecPeers
-  };
-};
-
-const getCcData = async (network: DashboardSupportedNetwork): Promise<ClientResult> => {
-  const ccVersion = await getCcName(network);
-  const ccSync = await getCcSyncStatus(network);
-  const ccPeers = await getCcPeers(network);
-
-  return {
-    name: ccVersion.name,
-    isSynced: ccSync.isSynced,
-    currentBlock: ccSync.currentBlock,
-    progress: ccSync.progress,
-    peers: ccPeers
-  };
-};
+}
 
 /**
- * Wraps a client data fetch with a timeout. If the request exceeds
- * CLIENT_TIMEOUT_MS, it returns a ClientError instead of blocking.
+ * Tells a client that is still starting (its container runs but its API does not answer yet, as during a
+ * checkpoint or snapshot download) from one that is stopped or too busy to answer.
  */
-async function fetchClientWithTimeout(
-  fetchFn: () => Promise<ClientResult>,
-  network: DashboardSupportedNetwork
-): Promise<ClientResult> {
-  try {
-    const result = await Promise.race([
-      fetchFn(),
-      new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error(`Timeout after ${CLIENT_TIMEOUT_MS}ms`)), CLIENT_TIMEOUT_MS)
-      )
-    ]);
-    return result;
-  } catch (e) {
-    const message = e instanceof Error ? e.message : String(e);
-    logs.error(`Error fetching data for ${network}: ${message}`);
-    return { error: `Failed to fetch RPC: ${message}` };
-  }
+async function getErrorReason(
+  dnpName: string | null | undefined,
+  error: unknown
+): Promise<ClientErrorReason | undefined> {
+  if (!dnpName) return undefined;
+  const dnp = await listPackageNoThrow({ dnpName }).catch(() => null);
+  if (!dnp || !dnp.containers.some((container) => container.running)) return "stopped";
+  if (error instanceof TimeoutError) return "unresponsive";
+  if (isConnectionError(error)) return "starting";
+  return undefined;
+}
+
+async function toClientError(
+  network: DashboardSupportedNetwork,
+  layer: "execution" | "consensus",
+  error: unknown
+): Promise<ClientError> {
+  const message = error instanceof Error ? error.message : String(error);
+  logs.error(`Error fetching ${layer} client status for ${network}: ${message}`);
+  const getClients = layer === "execution" ? executionClientsGetByNetworks : consensusClientsGetByNetworks;
+  const dnpName = (await getClients({ networks: [network] }))[network];
+  const reason = await getErrorReason(dnpName, error);
+  return { error: `Failed to fetch RPC: ${message}`, ...(reason ? { reason } : {}) };
+}
+
+async function getNodeStatus(network: DashboardSupportedNetwork): Promise<{ ec: ClientResult; cc: ClientResult }> {
+  const [ccRaw, ecRaw] = await Promise.all([
+    settle(fetchConsensus(network)),
+    settle(fetchExecution(network, Date.now()))
+  ]);
+  const nowMs = Date.now();
+
+  // The EC is judged against the CC's view of the chain, so the CC is evaluated first
+  const ccEvaluation = ccRaw.ok ? evaluateConsensus(ccRaw.value, nowMs, progressTracker, `${network}:cc`) : null;
+  const ccContext: ConsensusContext = ccEvaluation
+    ? { reachable: true, atHead: ccEvaluation.atHead, executionTarget: ccEvaluation.executionTarget }
+    : { reachable: false, atHead: false, executionTarget: null };
+
+  const [cc, ec] = await Promise.all([
+    ccEvaluation ? ccEvaluation.data : toClientError(network, "consensus", ccRaw.ok ? null : ccRaw.error),
+    ecRaw.ok
+      ? evaluateExecution(ecRaw.value, ccContext, SECONDS_PER_SLOT[network], nowMs, progressTracker, `${network}:ec`)
+      : toClientError(network, "execution", ecRaw.error)
+  ]);
+  return { ec, cc };
 }
 
 export async function nodeStatusGetByNetwork({ networks }: { networks: DashboardSupportedNetwork[] }) {
   const resultsByNetwork: NodeStatusByNetwork = {};
-
   await Promise.all(
     networks.map(async (network) => {
-      const [ec, cc] = await Promise.all([
-        fetchClientWithTimeout(() => getEcData(network), network),
-        fetchClientWithTimeout(() => getCcData(network), network)
-      ]);
-      resultsByNetwork[network] = { ec, cc };
+      resultsByNetwork[network] = await getNodeStatus(network);
     })
   );
-
   return resultsByNetwork;
 }

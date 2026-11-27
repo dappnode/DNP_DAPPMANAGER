@@ -65,6 +65,10 @@
             background-color: rgb(255, 204, 204);
             color: rgb(180, 0, 0);
           }
+          &.stalled {
+            background-color: rgb(255, 214, 190);
+            color: rgb(160, 50, 0);
+          }
           &.waiting {
             padding-right: 4px;
             padding-left: 4px;
@@ -139,6 +143,44 @@
           height: 10px;
           .progress-bar {
             background-color: orange;
+          }
+          &.indeterminate .progress-bar {
+            opacity: 0.5;
+          }
+        }
+
+        .node-readiness {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          margin-bottom: 0.5rem;
+          font-size: 13px;
+          &.ready {
+            color: #006b00;
+          }
+          &.not-ready {
+            color: var(--light-text-color);
+          }
+        }
+
+        .client-sync-phase,
+        .client-sync-background {
+          margin-top: 4px;
+          font-size: 12px;
+          color: var(--light-text-color);
+        }
+
+        .client-sync-issues {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-top: 4px;
+          font-size: 12px;
+          .client-sync-issue {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            color: darkorange;
           }
         }
 
@@ -216,9 +258,17 @@
             background-color: rgb(180, 0, 0);
             color: rgb(255, 204, 204);
           }
+          &.stalled {
+            background-color: rgb(160, 50, 0);
+            color: rgb(255, 214, 190);
+          }
           &.waiting {
             background-color: #696969;
           }
+        }
+
+        .node-readiness.ready {
+          color: rgb(150, 220, 150);
         }
 
         .network-card-icon {
@@ -250,4 +300,11 @@
       }
     }
   }
+}
+
+.sync-details-tooltip {
+  text-align: left;
+  font-family: monospace;
+  font-size: 11px;
+  word-break: break-all;
 }
