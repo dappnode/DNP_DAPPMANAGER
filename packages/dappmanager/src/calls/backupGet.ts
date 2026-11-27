@@ -5,7 +5,7 @@ import { logs } from "@dappnode/logger";
 import * as db from "@dappnode/db";
 import { params } from "@dappnode/params";
 // Modules
-import { listPackage } from "@dappnode/dockerapi";
+import { dockerGetBackupItem, listPackage, writeBackupArchive } from "@dappnode/dockerapi";
 // Utils
 import { shell } from "@dappnode/utils";
 import { validateBackupArray } from "../utils/index.js";
@@ -29,6 +29,7 @@ export async function backupGet({ dnpName, backup }: { dnpName: string; backup: 
 
   // Intermediate step, the file is in local file system
   const backupDir = path.join(tempTransferDir, `${dnp.dnpName}_backup`);
+  const backupDirComp = `${backupDir}.tar.xz`;
   await shell(`mkdir -p ${backupDir}`); // Never throws
 
   // Copy file from container to local file system
@@ -45,12 +46,15 @@ export async function backupGet({ dnpName, backup }: { dnpName: string; backup: 
           const container = dnp.containers.find((c) => !service || c.serviceName === service);
           if (!container) throw Error(`No container found for service ${service}`);
 
-          const toPath = path.join(backupDir, name);
+          const toPath = path.join(backupDir, `${name}.tar`);
 
-          await shell(`docker cp ${container.containerName}:${fromPath} ${toPath}`);
+          // The docker archive API keeps the owner and permissions of the files
+          await dockerGetBackupItem(container.containerName, fromPath, toPath);
           successfulBackups.push(name);
         } catch (e) {
-          if (e.message.includes("No such container:path")) lastError = Error(`path ${fromPath} does not exist`);
+          // Docker also answers 404 "No such container" if the container does not exist
+          const pathNotFound = e.statusCode === 404 && e.message.includes("Could not find the file");
+          lastError = pathNotFound ? Error(`path ${fromPath} does not exist`) : e;
           logs.error("Error getting backup", { dnpName, name, fromPath }, e);
         }
       }
@@ -64,15 +68,16 @@ export async function backupGet({ dnpName, backup }: { dnpName: string; backup: 
     }
 
     /**
-     * Use the -C option to cd in the directory before doing the tar
-     * Provide the list of directories / files to include to keep the file structure clean
+     * Gzip tar (despite the extension) with one top level entry per item, the
+     * same layout `tar -czf` produced from `docker cp` copies:
      *
-     * successfulBackups = ["config", "keys", "name"]
-     * dirList = "config keys name"
+     * successfulBackups = ["config", "keys"]
+     * config, keys/, keys/key1.json
      */
-    const backupDirComp = `${backupDir}.tar.xz`;
-    const dirListToComp = successfulBackups.join(" ");
-    await shell(`tar -czf ${backupDirComp} -C ${backupDir} ${dirListToComp}`);
+    await writeBackupArchive(
+      successfulBackups.map((name) => ({ name, tarPath: path.join(backupDir, `${name}.tar`) })),
+      backupDirComp
+    );
     await shell(`rm -rf ${backupDir}`);
 
     const fileId = crypto.randomBytes(32).toString("hex");
@@ -88,8 +93,8 @@ export async function backupGet({ dnpName, backup }: { dnpName: string; backup: 
 
     return fileId;
   } catch (e) {
-    // In case of error delete all intermediate files to keep the disk space clean
-    await shell(`rm -rf ${tempTransferDir}`);
+    // In case of error delete the intermediate files of this backup to keep the disk space clean
+    await shell(`rm -rf ${backupDir} ${backupDirComp}`);
     throw e;
   }
 }

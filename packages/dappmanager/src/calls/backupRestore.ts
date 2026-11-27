@@ -3,7 +3,7 @@ import fs from "fs";
 import * as db from "@dappnode/db";
 import { params } from "@dappnode/params";
 import { logs } from "@dappnode/logger";
-import { listPackage } from "@dappnode/dockerapi";
+import { dockerPutBackupItem, listPackage, readBackupArchive, tarListTopLevelNames } from "@dappnode/dockerapi";
 import { packageRestart } from "./packageRestart.js";
 import { shell } from "@dappnode/utils";
 import { validateBackupArray } from "../utils/index.js";
@@ -37,9 +37,7 @@ export async function backupRestore({
   // Intermediate step, the file is in local file system
   const backupDir = path.join(tempTransferDir, `${dnp.dnpName}_backup`);
   const backupDirCompressed = `${backupDir}.tar.xz`;
-  await shell(`rm -rf ${backupDir}`); // Just to be sure it's clean
   await shell(`rm -rf ${backupDirCompressed}`); // Just to be sure it's clean
-  await shell(`mkdir -p ${backupDir}`); // Never throws
 
   // Fetch the filePath and the file with fileId
   const filePath = db.fileTransferPath.get(fileId);
@@ -49,29 +47,19 @@ export async function backupRestore({
 
   try {
     /**
-     * Untar to directory
-     * `tar -xf vpn.dnp.dappnode.eth_backup.tar.xz -C test/`
-     * Then,
-     * user@dn:~/home$ ls test/
-     * modules  secrets  src
+     * The backup is a gzip tar with one top level entry per item
+     * `tar -tf vpn.dnp.dappnode.eth_backup.tar.xz`
+     * modules/  modules/...  secrets/  src
      */
-    await shell(`tar -xf ${backupDirCompressed} -C ${backupDir}`);
-    await shell(`rm -rf ${backupDirCompressed}`);
+    const backupNames = await tarListTopLevelNames(readBackupArchive(backupDirCompressed));
 
     const successfulBackups: string[] = [];
     let lastError: Error | null = null;
 
-    // Create the target folders while the package runs (docker exec needs a
-    // running container), then stop it so the files are not replaced under a
-    // running process: a database closing on restart could otherwise
-    // overwrite or delete the restored files (e.g. SQLite removing its -wal)
-    for (const { path: toPath, service } of backup) {
-      const container = dnp.containers.find((c) => !service || c.serviceName === service);
-      if (!container?.running) continue;
-      await shell(`docker exec ${container.containerName} mkdir -p ${path.parse(toPath).dir}`).catch((e) =>
-        logs.warn(`Could not create ${path.parse(toPath).dir} in ${container.containerName}: ${e.message}`)
-      );
-    }
+    // Stop the package so the files are not replaced under a running
+    // process: a database closing on restart could otherwise overwrite or
+    // delete the restored files (e.g. SQLite removing its -wal). The docker
+    // archive API restores into stopped containers and creates missing folders
     let restart: RestartPackage | null = null;
     if (canStopForBackup(dnp)) restart = await stopPackageForBackup(dnp);
 
@@ -81,15 +69,11 @@ export async function backupRestore({
         if (!container) throw Error(`No container found for service ${service}`);
         const containerName = container.containerName;
 
-        const fromPath = path.join(backupDir, name);
-        // lstatSync throws if path does not exist, so must call existsSync first
-        if (!fs.existsSync(fromPath)) throw Error(`path ${fromPath} does not exist`);
+        if (!backupNames.has(name)) throw Error(`${name} not found in the backup file`);
 
-        if (fs.lstatSync(fromPath).isDirectory()) {
-          await shell(`docker cp ${fromPath}/. ${containerName}:${toPath}`);
-        } else {
-          await shell(`docker cp ${fromPath} ${containerName}:${toPath}`);
-        }
+        // The docker archive API keeps the owner and permissions stored in the
+        // backup, and needs neither a shell in the container nor it running
+        await dockerPutBackupItem(containerName, backupDirCompressed, { name, itemPath: toPath });
         successfulBackups.push(name);
       } catch (e) {
         lastError = e;
@@ -108,11 +92,10 @@ export async function backupRestore({
     }
 
     // Clean intermediate file
-    await shell(`rm -rf ${backupDir}`);
     await shell(`rm -rf ${backupDirCompressed}`);
   } catch (e) {
-    // In case of error delete all intermediate files to keep the disk space clean
-    await shell(`rm -rf ${tempTransferDir}`);
+    // In case of error delete the intermediate file of this restore to keep the disk space clean
+    await shell(`rm -rf ${backupDirCompressed}`);
     throw e;
   }
 }
