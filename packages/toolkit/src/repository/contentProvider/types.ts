@@ -19,12 +19,13 @@ export type MirrorStreamResult =
 export interface FetchOptions {
   signal?: AbortSignal;
   onProgress?: (progress: number) => void;
-  maxBytes?: number; // per-call size limit; checked against Content-Length (early abort) and actual bytes after download
+  maxBytes?: number; // per-call size limit; checked against Content-Length (early abort) and while reading the body
 }
 
 export interface MirrorOptions {
   baseUrl: string;
-  timeoutMs: number;
+  /** Time to response headers. Defaults to the shared transport policy's headers timeout. */
+  timeoutMs?: number;
   maxBytes: number;
 }
 
@@ -35,7 +36,7 @@ export interface MirrorFileEntry {
 
 export interface MirrorProvider {
   /** List files in a package directory (no individual file CIDs) */
-  listFiles(cid: string): Promise<MirrorFileEntry[]>;
+  listFiles(cid: string, options?: Pick<FetchOptions, "signal">): Promise<MirrorFileEntry[]>;
   /** Fetch a file into memory (for small files like manifests) */
   fetchFile(cid: string, filename: string, options?: FetchOptions): Promise<MirrorFetchResult>;
   /** Stream a file directly to disk (for large files like Docker images — avoids OOM) */

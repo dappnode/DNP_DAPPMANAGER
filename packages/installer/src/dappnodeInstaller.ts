@@ -52,11 +52,12 @@ export class DappnodeInstaller extends DappnodeRepository {
       provider,
       {
         baseUrl: params.CONTENT_MIRROR_BASE_URL,
-        timeoutMs: params.CONTENT_MIRROR_TIMEOUT_MS,
         maxBytes: params.CONTENT_MIRROR_MAX_BYTES
       },
       () => db.mirrorProviderEnabled.get(),
-      (level, message) => logs[level](message)
+      (level, message) => logs[level](message),
+      // Time to response headers for both IPFS gateways and the mirror
+      { headersTimeoutMs: params.IPFS_TIMEOUT }
     );
   }
 
@@ -72,7 +73,7 @@ export class DappnodeInstaller extends DappnodeRepository {
    */
   public async getIpfsFileBytes(hash: string, maxLength: number): Promise<Uint8Array> {
     await this.updateProviders();
-    return super.writeFileToBytes(hash, maxLength, params.IPFS_TIMEOUT);
+    return super.writeFileToBytes(hash, maxLength);
   }
 
   /**
