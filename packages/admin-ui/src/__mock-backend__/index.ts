@@ -127,38 +127,84 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   nodeStatusGetByNetwork: async () => ({
     mainnet: {
       ec: {
-        name: "Nethermind",
-        dnp: "nethermind.dnp.dappnode.eth",
+        name: "Geth",
+        state: "synced",
         isSynced: true,
         currentBlock: 23648945,
         progress: 100,
-        peers: 50
+        peers: 50,
+        background: "Indexing transactions",
+        details: { latestBlock: 23648945, latestBlockAgeSeconds: 8, targetBlock: 23648945, ethSyncing: false }
       },
       cc: {
         name: "Nimbus",
-        dnp: "nimbus.dnp.dappnode.eth",
+        state: "synced",
         isSynced: true,
         currentBlock: 12875373,
         progress: 100,
-        peers: 40
+        peers: 40,
+        details: { headSlot: 12875373, wallSlot: 12875374, isSyncing: false, isOptimistic: false }
+      }
+    },
+    gnosis: {
+      ec: {
+        name: "Nethermind",
+        state: "syncing",
+        isSynced: false,
+        currentBlock: 0,
+        progress: 43,
+        peers: 25,
+        phase: "Downloading state",
+        phaseProgress: 43,
+        etaSeconds: 9000
+      },
+      cc: {
+        name: "Teku",
+        state: "waiting",
+        isSynced: false,
+        currentBlock: 18375221,
+        progress: 0,
+        peers: 60,
+        phase: "Waiting for the execution client to sync",
+        phaseProgress: null
       }
     },
     hoodi: {
       ec: {
         name: "besu",
-        dnp: "besu-hoodi.dnp.dappnode.eth",
-        isSynced: true,
+        state: "syncing",
+        isSynced: false,
         currentBlock: 1480848,
-        progress: 100,
-        peers: 30
+        progress: 0,
+        peers: 30,
+        phase: "Healing state",
+        phaseProgress: null
       },
       cc: {
         name: "Prysm",
-        dnp: "prysm-hoodi.dnp.dappnode.eth",
+        state: "syncing",
         isSynced: false,
         currentBlock: 1592925,
-        progress: 100,
-        peers: 20
+        progress: 62,
+        peers: 20,
+        phase: "Syncing the beacon chain",
+        phaseProgress: 62,
+        behind: { count: 3200, unit: "slots", seconds: 38400 },
+        etaSeconds: 1500
+      }
+    },
+    sepolia: {
+      ec: { error: "Failed to fetch RPC: fetch failed", reason: "starting" },
+      cc: {
+        name: "Lighthouse",
+        state: "stalled",
+        isSynced: false,
+        currentBlock: 9100000,
+        progress: 0,
+        peers: 0,
+        phase: "No peers",
+        phaseProgress: null,
+        issues: ["No peers"]
       }
     }
   }),

@@ -2,20 +2,19 @@ import React from "react";
 import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
 import { basePath as stakersBasePath, relativePath as stakersPath } from "pages/stakers";
-import { relativePath as packagesRelativePath } from "pages/packages";
 import { Network, NetworkStatus, NodeStatus } from "@dappnode/types";
-import { isClientError } from "hooks/useNetworkStats";
 import newTabProps from "utils/newTabProps";
 import { gweiToToken } from "utils/gweiToToken";
 import { capitalize } from "utils/strings";
 import Card from "components/Card";
 import Loading from "components/Loading";
 import Button from "components/Button";
-import { OverlayTrigger, ProgressBar, Tooltip } from "react-bootstrap";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { HealthIcon } from "./icons/HealthIcon";
 import { BoltIcon } from "./icons/BoltIcon";
 import { RewardsIcon } from "./icons/RewardsIcon";
-import { MdInfoOutline, MdWarningAmber } from "react-icons/md";
+import { MdCheckCircleOutline, MdInfoOutline, MdWarningAmber } from "react-icons/md";
+import { ClientSyncStatus, getReadiness } from "./ClientSyncStatus";
 
 const NetworkCard = ({
   title,
@@ -50,17 +49,9 @@ export const StatusCard = ({
   };
 }) => {
   const navigate = useNavigate();
-
   const ecResult = data?.ec ?? null;
   const ccResult = data?.cc ?? null;
-
-  const ecError = ecResult && isClientError(ecResult) ? ecResult : null;
-  const ccError = ccResult && isClientError(ccResult) ? ccResult : null;
-
-  const execution = ecResult && !isClientError(ecResult) ? ecResult : null;
-  const consensus = ccResult && !isClientError(ccResult) ? ccResult : null;
-
-  const consensusSynced = consensus?.isSynced ?? false;
+  const readiness = getReadiness(ecResult, ccResult);
 
   return (
     <NetworkCard title="NODE STATUS" icon={<HealthIcon />}>
@@ -68,29 +59,26 @@ export const StatusCard = ({
         <Loading small />
       ) : data ? (
         <div className="status-card-container">
-          <ClientSection
+          <div className={`node-readiness ${readiness.ready ? "ready" : "not-ready"}`}>
+            {readiness.ready ? <MdCheckCircleOutline /> : <MdInfoOutline />} {readiness.reason}
+          </div>
+
+          <ClientSyncStatus
             label="EXECUTION"
+            layer="execution"
             network={network}
             dnpName={clientsDnps?.ecDnp ?? null}
-            clientData={execution}
-            clientError={ecError}
-            isInstalled={ecResult !== null}
-            showWaiting={!consensusSynced && !!execution}
-            showProgress={consensusSynced && !!execution && !execution.isSynced}
-            progress={execution?.progress}
+            result={ecResult}
           />
 
           <hr />
 
-          <ClientSection
+          <ClientSyncStatus
             label="CONSENSUS"
+            layer="consensus"
             network={network}
             dnpName={clientsDnps?.ccDnp ?? null}
-            clientData={consensus}
-            clientError={ccError}
-            isInstalled={ccResult !== null}
-            showProgress={!!consensus && !consensus.isSynced}
-            progress={consensus?.progress}
+            result={ccResult}
           />
         </div>
       ) : (
@@ -106,153 +94,6 @@ export const StatusCard = ({
       </Button>
     </NetworkCard>
   );
-};
-
-/**
- * Renders a single client row (execution or consensus) with one of four states:
- * - Not installed
- * - Error (with tooltip)
- * - Syncing/synced (with optional progress bar)
- * - Waiting (execution waiting for consensus to sync)
- */
-const ClientSection = ({
-  label,
-  network,
-  dnpName,
-  clientData,
-  clientError,
-  isInstalled,
-  showWaiting = false,
-  showProgress = false,
-  progress
-}: {
-  label: string;
-  network: string;
-  dnpName: string | null;
-  clientData: { name: string; isSynced: boolean; currentBlock: number; peers: number; progress: number } | null;
-  clientError: { error: string } | null;
-  isInstalled: boolean;
-  showWaiting?: boolean;
-  showProgress?: boolean;
-  progress?: number;
-}) => {
-  const parseClientName = (name: string) => capitalize(name.split(".")[0].split("-")[0] ?? "-");
-
-  const clientLink = dnpName ? (
-    <Link to={`/${packagesRelativePath}/${dnpName}/info`}>
-      {clientData ? capitalize(clientData.name ?? "-") : parseClientName(dnpName)}
-    </Link>
-  ) : clientData ? (
-    capitalize(clientData.name ?? "-")
-  ) : (
-    "-"
-  );
-
-  if (!isInstalled) {
-    return (
-      <div>
-        <div className="status-client-row">
-          <div className="network-stat-col">
-            <div>{label}</div>
-            <span>-</span>
-          </div>
-          <div className="status-client-details">
-            <div />
-            <div className="network-stat-col">
-              <div className="badge-status waiting">Not installed</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (clientError) {
-    return (
-      <div>
-        <div className="status-client-row">
-          <div className="network-stat-col">
-            <div>{label}</div>
-            <span>{clientLink}</span>
-          </div>
-          <div className="status-client-details">
-            <div />
-            <div className="network-stat-col">
-              <OverlayTrigger
-                overlay={<Tooltip id={`${label.toLowerCase()}-error-tooltip-${network}`}>{clientError.error}</Tooltip>}
-                placement="top"
-              >
-                <div>
-                  <div>
-                    <MdInfoOutline className="tooltip-icon" />
-                  </div>
-                  <div className="badge-status offline">Error</div>
-                </div>
-              </OverlayTrigger>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (clientData) {
-    return (
-      <div>
-        <div className="status-client-row">
-          <div className="network-stat-col">
-            <div>{label}</div>
-            <span>{clientLink}</span>
-          </div>
-          <div className="status-client-details">
-            <div className="network-stat-col">
-              <div>PEERS</div>
-              <span>{clientData.peers}</span>
-            </div>
-            <div className="network-stat-col">
-              {showWaiting ? (
-                <OverlayTrigger
-                  overlay={
-                    <Tooltip id={`${label.toLowerCase()}-waiting-tooltip`}>
-                      {label.charAt(0) + label.slice(1).toLowerCase()} client status will be available once the
-                      consensus client finishes syncing.
-                    </Tooltip>
-                  }
-                  placement="top"
-                >
-                  <div>
-                    <div>
-                      <MdInfoOutline className="tooltip-icon" />
-                    </div>
-                    <div className="badge-status waiting">Waiting</div>
-                  </div>
-                </OverlayTrigger>
-              ) : (
-                <>
-                  <div>#{clientData.currentBlock}</div>
-                  <div className={`badge-status ${clientData.isSynced ? "synced" : "syncing"}`}>
-                    {clientData.isSynced ? "synced" : "syncing"}
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-        {showProgress && progress !== undefined && (
-          <OverlayTrigger
-            overlay={
-              <Tooltip id={`${clientData.name}-${network}-progress-tooltip`}>Syncing progress: {progress}%</Tooltip>
-            }
-            placement="top"
-          >
-            <ProgressBar animated now={progress} />
-          </OverlayTrigger>
-        )}
-      </div>
-    );
-  }
-
-  return null;
 };
 
 export const ValidatorsCard = ({
