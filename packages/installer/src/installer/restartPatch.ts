@@ -19,7 +19,9 @@ import { sendCoreInstalledResolvedNotification } from "./sendCoreInstallResolved
 const restartId = params.restartDnpName;
 const dappmanagerName = params.dappmanagerDnpName;
 const restartContainerName = params.restartContainerName;
-const restartScriptPath = path.join(params.DNCORE_DIR, "restart-dappnode.sh");
+// The paths used by the restart container are resolved to absolute ones: DNCORE_DIR is relative
+// when TEST is set, and the restart container must not depend on its working directory
+const restartScriptPath = path.resolve(params.DNCORE_DIR, "restart-dappnode.sh");
 const timeoutWaitForRestart = 60 * 1000;
 
 /**
@@ -45,8 +47,9 @@ export async function restartDappmanagerPatch({
   restartLaunchCommand?: string;
   packagesData?: InstallPackageData[];
 }): Promise<void> {
-  const composeRestartPath = getDockerComposePath(restartId, true);
-  if (!composeBackupPath) composeBackupPath = getBackupPath(composePath);
+  const composeRestartPath = path.resolve(getDockerComposePath(restartId, true));
+  composePath = path.resolve(composePath);
+  composeBackupPath = path.resolve(composeBackupPath || getBackupPath(composePath));
 
   // Must make sure that there is no restart container running previously
   // If it's still running it will wait for a few seconds before killing it. If it working
