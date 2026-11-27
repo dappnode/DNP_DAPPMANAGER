@@ -104,7 +104,7 @@ describe("Mirror to IPFS fallback", () => {
     });
 
     expect(await readFile(path, "utf8")).to.equal("docker image bytes");
-    expect(requests.some((url) => url.startsWith(MIRROR))).to.equal(false);
+    expect(requests.some((url) => new URL(url).origin === MIRROR)).to.equal(false);
   });
 
   it("falls back to IPFS for a small file when the mirror file download fails", async () => {

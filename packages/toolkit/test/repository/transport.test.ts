@@ -5,6 +5,10 @@ import { TransportError, TransportPolicy, parseRetryAfter } from "../../src/repo
 const FIRST = "https://first.example";
 const SECOND = "https://second.example";
 
+/** Whether a request targets the given gateway, comparing whole origins rather than URL prefixes. */
+const isFrom = (input: Parameters<typeof fetch>[0], origin: string): boolean =>
+  new URL(input.toString()).origin === origin;
+
 function client(options: { sleeps?: number[]; now?: () => number } = {}): IpfsGatewayClient {
   return new IpfsGatewayClient([FIRST, SECOND], undefined, {
     sleep: async (ms) => {
@@ -36,7 +40,7 @@ describe("Transport policy", () => {
     const requests: string[] = [];
     globalThis.fetch = async (input) => {
       requests.push(input.toString());
-      return input.toString().startsWith(FIRST) ? stalledResponse() : new Response('{"ok":true}');
+      return isFrom(input, FIRST) ? stalledResponse() : new Response('{"ok":true}');
     };
 
     const result = await client().fetch("/ipfs/cid", {}, (res) => res.json(), {
@@ -87,7 +91,7 @@ describe("Transport policy", () => {
     const requests: string[] = [];
     globalThis.fetch = async (input) => {
       requests.push(input.toString());
-      return input.toString().startsWith(FIRST)
+      return isFrom(input, FIRST)
         ? new Response("slow down", { status: 503, headers: { "Retry-After": "60" } })
         : new Response("ok");
     };
@@ -117,7 +121,7 @@ describe("Transport policy", () => {
     const requests: string[] = [];
     globalThis.fetch = async (input) => {
       requests.push(input.toString());
-      return input.toString().startsWith(FIRST) ? new Response("no", { status: 404 }) : new Response("ok");
+      return isFrom(input, FIRST) ? new Response("no", { status: 404 }) : new Response("ok");
     };
     const sleeps: number[] = [];
 
@@ -130,7 +134,7 @@ describe("Transport policy", () => {
     const requests: string[] = [];
     globalThis.fetch = async (input) => {
       requests.push(input.toString());
-      return new Response(input.toString().startsWith(FIRST) ? "corrupt" : '"ok"');
+      return new Response(isFrom(input, FIRST) ? "corrupt" : '"ok"');
     };
 
     expect(await client().fetch("/ipfs/cid", {}, (res) => res.json())).to.equal("ok");
@@ -143,7 +147,7 @@ describe("Transport policy", () => {
     const requests: string[] = [];
     globalThis.fetch = async (input) => {
       requests.push(input.toString());
-      if (input.toString().startsWith(FIRST) && !firstHealthy) throw new TypeError("fetch failed");
+      if (isFrom(input, FIRST) && !firstHealthy) throw new TypeError("fetch failed");
       return new Response("ok");
     };
     const gatewayClient = client({ now: () => now });
@@ -182,7 +186,7 @@ describe("Transport policy", () => {
 
   it("keeps gateway health when the gateway list is replaced", async () => {
     globalThis.fetch = async (input) => {
-      if (input.toString().startsWith(FIRST)) throw new TypeError("fetch failed");
+      if (isFrom(input, FIRST)) throw new TypeError("fetch failed");
       return new Response("ok");
     };
     const gatewayClient = client({ now: () => 0 });

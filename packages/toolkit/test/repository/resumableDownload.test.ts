@@ -120,7 +120,7 @@ function mockGateways(file: FixtureFile, behaviours: Record<string, Behaviour>):
 }
 
 function servedBy(served: Served[], origin: string): Served[] {
-  return served.filter((s) => s.url.startsWith(origin));
+  return served.filter((s) => new URL(s.url).origin === origin);
 }
 
 function leafCids(file: FixtureFile): Set<string> {
